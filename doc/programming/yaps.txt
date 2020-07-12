@@ -1,0 +1,134 @@
+Some Notes on the yaps Code
+-------------------------------------------------------------
+       written by Seymour Shlien	November 21 2004
+
+This file gives an algorithmic description of the
+yaps program which converts an abc file to a PostScript file.
+
+The source consists of almost 10000 lines of C in the following
+files. 
+
+parseabc.c is the front end which scans the abc file and invokes
+        the appropriate event handler for each element it encounters
+        (eg. bar lines, notes, chords etc.) It happens to be the
+        front end for other programs such as abc2midi, and
+        abc2abc. More details are given in abc2midi.txt.
+
+yapstree.c contains all the event handlers called by the parser.
+	It produces a complex data structure called tune which
+        references many other structures. When the parser completes
+        processing the tune, event_blankline or event_eof calls
+        printtune (in drawtree.c) which processes the tune structure
+        producing a PostScript file. Unlike abc2midi, most of the
+        layout including the detailed beaming is done in the first
+        pass during the parsing stage. The information in this
+        structure is then processed by drawtune.c in two more
+        passes. An overview of these structures is provided here.
+        More details on the tune structure is provided in this
+        file.
+
+drawtune.c contains the function printtune which turns the tune
+	structure into an actual PostScript file. This is done
+	in two passes. Before writing the PostScript file it
+	is necessary to determine the boundingbox of the output
+	image since this information is recorded in the header
+	of the output file. This is determined in the first pass
+	where functions monospace() or spacevoices() (in position.c)
+	are called. During this pass the pixel positions
+	of each object are recorded in the associated structures.
+	In the second pass, the actual PostScript file is written.
+	The function calls printlib() (in pslib.c) outputs
+	all the PostScript boiler plate macro definitions required
+	by yaps. The information in the tune structure is used
+        to output the music notation in a PostScript file. 
+
+
+position.c contains functions for determining the amount of space
+	that is required for the different music objects drawn
+	in the PostScript file.
+
+parser2.c contains additional parsing functions missing in parseabc.
+	They handle more recent features added to the abcmidi package.
+
+pslib.c Definition of new PostScript commands (eg. notes, clefs,
+	stems, tails, ...) which are copied to the PostScript
+	file.
+
+debug.c Functions which support the -d option in yaps. It prints
+	some of the contents of the internal tune structure.
+
+
+Data Structures
+---------------
+
+The data structures are defined in the include file structs.h.
+
+The top level structure, tune is instantiated by init_tune which
+is called by event_init or event_refno. It stores all the
+information in the abc field commands (X: ,M:, L:, C:, O: and etc.).
+It contains a pointer to the voice structure and a list of voice
+pointers where most of the body information is recorded.
+
+The voice structure is instantiated by the function newvoice
+which is called by setvoice(n) whenever the voice context
+switches in the abc file. Setvoice performs the voice switching
+(which occurs in voice interleaved files) and either creates
+a new voice or finds the matching voice structure already existing.
+The voice structure contains the feature structure which
+is somewhat similar in function to the one defined in store.c
+(for abc2midi).
+
+The feature structure encodes all the detailed information in
+the body, using the same typedef enum featuretype defined
+in abc.h. Unlike store.c there is no num and denom arrays. Instead
+the feature struct contains a void* pointer called item which
+can point to anything and where additional information can be
+stored. If the feature type is a NOTE then a "note" struct
+is created which records a lot of detailed information related
+to the placement and visual representation of the note. They
+include:
+tail_type	which specifies whether the note appears in
+		isolation or is part of a beamed group
+base_exp	whole, half, quarter,  ... notes
+dots		how many dots follow
+stemlength, stemup, fliphead, pitch, octave, accidentals, accents,...
+(see struct.h)
+Most of the information except actual positioning is determined
+by functions such as count_dots and beamitem in yapstree.c.
+You can view this information by running yaps.exe with the -d
+run time parameter.
+
+The handling of the note positioning is quite complex as
+outlined below. It is therefore not easy to implement the
+splitvoice feature into yaps. Here is a description.
+
+The positioning of notes is done by the function
+spacemultiline() which calls advance() unless one is printing
+the voices separately.  The positioning is done on all the voices
+at the same time to ensure that they are lined up properly.
+Spacemultiline accesses all the active voices using the functions
+firstitem() and nextitem() which are used for handling any lists
+of objects. Each voice maintains its own pointer to the current
+feature being scanned (v->place). Each voice also maintains its
+own pointer to the relative time of the note being scanned
+in the variable v->time. (v->time contains both a numerator
+and denominator.) The advance() function updates v->place,
+v->time and interprets the voice features determining the
+amount of space that is needed to plot the next object (itemspace)
+and the number of plotable objects (items). The position to
+plot the next object (x) is maintained by spacemultiline and
+passed to advance. Advance() updates v->place->x with the position
+to plot the object based on its width. Spacemultiline()
+maintains a mastertime variable for maintaining synchrony
+between all voices.
+
+At least two passes are made through the voice features.
+In the first pass provisional positions are computed for the
+notes. The amount of space left over in the music lines is
+computed and is used to determine the internote gaps.
+In the second pass, the notes are repositioned to use up
+the entire space in the staff line.
+
+Spacemultiline is called for each staff line whose end is
+signaled by a linefeed feature in the voice.
+

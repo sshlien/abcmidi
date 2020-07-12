@@ -1,0 +1,99 @@
+
+# tested with MS Visual C++ 2010 Express
+# build with:
+#     nmake /F makefiles\makefile.w32 all
+
+!include <win32.mak>
+
+# $(cvars) static link
+# $(cvarsdll) dynamically link
+# add -O2 to end of line for speed optimization
+# add -O1 for size optimization
+#comp	= $(cc) /wd4996 -D_CRT_SECURE_NO_WARNINGS  $(cflags) $(cvars)
+comp	= $(cc) /wd4996 -D_CRT_SECURE_NO_WARNINGS  $(cflags) $(cvarsdll)
+
+#all:	abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch
+
+all:	abc2midi.exe midi2abc.exe abc2abc.exe mftext.exe yaps.exe midicopy.exe abcmatch.exe
+
+
+abc2midi.exe:	parseabc.obj store.obj genmidi.obj midifile.obj queues.obj parser2.obj stresspat.obj 
+	$(link) $(conflags) -out:abc2midi.exe  parseabc.obj store.obj genmidi.obj queues.obj parser2.obj midifile.obj stresspat.obj
+
+abcmatch.exe:	abcmatch.obj matchsup.obj parseabc.obj
+	$(link)  $(conflags) -out:abcmatch.exe  abcmatch.obj matchsup.obj parseabc.obj
+
+midi2abc.exe:	midifile.obj midi2abc.obj
+	$(link)  $(conflags) -out:midi2abc.exe  midifile.obj midi2abc.obj
+
+abc2abc.exe:	parseabc.obj toabc.obj
+	$(link) $(conflags) -out:abc2abc.exe  parseabc.obj toabc.obj
+
+mftext.exe:	midifile.obj mftext.obj crack.obj
+	$(link)  $(conflags) -out:mftext.exe  midifile.obj mftext.obj crack.obj
+
+midicopy.exe:	midicopy.obj
+	$(link)  $(conflags) -out:midicopy.exe  midicopy.obj
+
+yaps.exe:	parseabc.obj yapstree.obj drawtune.obj debug.obj pslib.obj position.obj parser2.obj
+	$(link)  $(conflags) -out:yaps.exe  parseabc.obj yapstree.obj drawtune.obj debug.obj position.obj pslib.obj parser2.obj $(conlibs)
+
+
+abcmatch.obj:	abcmatch.c abc.h
+	$(comp) abcmatch.c
+
+crack.obj:	crack.c
+	$(comp) crack.c
+
+debug.obj:	debug.c structs.h abc.h
+	$(comp) debug.c
+
+drawtune.obj:	drawtune.c structs.h sizes.h abc.h drawtune.h
+	$(comp) drawtune.c
+
+genmidi.obj:	genmidi.c abc.h midifile.h genmidi.h
+	$(comp) genmidi.c
+
+matchsup.obj:	matchsup.c abc.h parseabc.h parser2.h
+	$(comp) matchsup.c
+
+mftext.obj:	mftext.c midifile.h
+	$(comp) mftext.c
+
+midi2abc.obj:	midi2abc.c midifile.h
+	$(comp) midi2abc.c
+
+midifile.obj:	midifile.c midifile.h
+	$(comp) midifile.c
+
+parseabc.obj:	parseabc.c abc.h parseabc.h
+	$(comp) parseabc.c
+
+parser2.obj:	parser2.c abc.h parseabc.h parser2.h
+	$(comp) parser2.c
+
+position.obj:	position.c abc.h structs.h sizes.h
+	$(comp) position.c
+
+pslib.obj:	pslib.c drawtune.h
+	$(comp) pslib.c
+
+queues.obj:	queues.c genmidi.h
+	$(comp) queues.c
+
+store.obj:	store.c abc.h parseabc.h midifile.h genmidi.h
+	$(comp) store.c
+
+stresspat.obj:	stresspat.c
+	$(comp) stresspat.c
+
+toabc.obj:	toabc.c abc.h parseabc.h
+	$(comp) toabc.c
+
+yapstree.obj:	yapstree.c abc.h parseabc.h structs.h drawtune.h
+	$(comp) yapstree.c
+
+
+clean:
+	del *.obj
+	del *.exe

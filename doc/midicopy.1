@@ -1,0 +1,157 @@
+.TH MIDICOPY 1
+.SH NAME
+midicopy \- Copy selected track, channel, time interval of a MIDI file to another MIDI file
+.SH SYNOPSIS
+\fBmidicopy\fP [\fB-ver\fP] [\fB-trks\fP \fIn1,n2,..\fP]\
+    [\fB-xtrks\fP \fIn1,n2,..\fP]\
+    [\fB-xchns\fP \fIn1,n2,..\fP]\
+    [\fB-chans\fP \fIn1,n2,...\fP]\
+    [\fB-from\fP \fIn (in midi ticks)\fP] [\fB-to\fP \fIn (in midi ticks)\fP]\
+    [\fB-fromsec %f\fP \fIn (in seconds)\fP] [\fB-tosec\fP \fIn (in seconds)\fP]\
+    [\fB-frombeat %f\fP \fIn (in beats)\fP] [\fB-tobeat\fP \fIn (in beats)\fP]\
+    [\fB-replace\fP \fItrk,loc,val\fP] [\fB-tempo %n\fP] [\fB-speed %f\fP]\
+    [\fB-drumfocus\fP \fIn \fIm\fP] [\fB-mutenodrum [%d]\fP]\
+    [\fB-setdrumloudness\fP \fIn \fIm\fP]\
+    [\fB-focusontrack\fP \fIn1,n2,... (from 1)\fP]\
+    [\fB-focusonchannel\fP \fIn1,n2,... (from 1)\fP]\
+    [\fB-attenuation\fP \fIn\fP]\
+    [\fB-nobends\fP]\
+    [\fB-indrums\fP \fIn1,n2,...\fP]\
+    [\fB-xdrums\fP \fIn1,n2,...\fP]\
+    [\fB-onlydrums\fP]\
+    [\fB-nodrums\fP]\
+ \fIinput.mid output.mid\fP
+.SH "DESCRIPTION"
+.PP
+.B midicopy
+is used to copy part of a MIDI file to another MIDI file. You can select
+a particular time interval, particular channels, and particular tracks
+or any combinations. If one or both of the run time parameters \-from or \-to
+are included, the program returns the playing time in seconds of the
+output file.  Midicopy was developed by Seymour Shlien from the
+midifilelib distribution available from
+.IR http://www.harmony-central.com/MIDI/midifilelib.tar.gz .
+.SH OPTIONS
+.TP
+.B -ver
+prints version number and then exits
+.TP
+.B -trks n1,n2, etc
+Selects the tracks to be copied where the track numbers start
+from 1.  If more than one track is specified, they should be separated by
+commas. You should always copy track 1 since by convention it contains
+information pertinent to all the other  tracks. By default all tracks
+are copied unless you specify particular tracks using this run time
+parameter.
+.TP
+.B -xtrks n1,n2, etc
+Lists the tracks to exclude from copying. All other tracks are copied.
+This option does not work in combination with \-trks.
+.TP
+.B -xchns n1,n2, etc
+Lists the channels to exclude from copying. All other channels are copied.
+This option does not work in combination with \-chns.
+.TP
+.B -chns n
+Like above, it specifies the MIDI channels to be copied. By default
+all channels are copied. Channel numbers also start from 1.
+.TP
+.B -from n
+The program will copy all MIDI commands starting from midi pulse
+number n. By default it will start from time zero or the beginning
+of the MIDI file.
+.TP
+.B -to n
+Stops copying all events after midi pulse number n. By default
+the file is copied to the end.
+.TP
+.B -frombeat n
+The program will copy all MIDI commands starting from quarter beat
+number n. By default it will start from time zero or the beginning
+of the MIDI file.
+.TP
+.B -tobeat n
+Stops copying all events after quarter beat number n. By default
+the file is copied to the end.
+.TP
+.B -fromsec n
+The program will copy all MIDI commands starting from time n 
+in seconds.
+.TP
+.B -tosec n
+Stops copying all events after time n in seconds. These two
+options (\-fromsec and \-tosec) do not work accurately if the
+MIDI file has more than one tempo command. Only the first
+one is used for converting seconds into MIDI pulse units.
+It is therefore preferable to use the \-from and \-to options.
+.TP
+.B -replace trk,loc,val
+This option should be used alone. Midicopy will copy the entire
+file verbatim except it will replace a byte by val, where the
+byte is located in the specified track (trk) and specified position
+(loc). Commonly this function is used for changing a particular
+MIDI program number (instrument) associated with a channel.
+You need to know the byte count in the track of that parameter
+in order to use this function,
+.TP
+.B -tempo quarter notes/minute
+All tempo indications in the midi file will be replaced with
+the above value.
+.TP
+.B -speed factor
+All tempo indications in the midi file will be multiplied with
+this factor. Values greater than 1.0 will speed up the music while
+lower values slow the music. The factor is a floating point value.
+.TP
+.B -drumfocus drum-code excluded_drum_velocities
+The selected drum line (specified by the drum-code pitch value) is
+highlighted by reducing the loudness of all other drum lines to
+the excluded_drum_velocities value. The drum-code value must
+be in the range of 35 to 81 inclusive.
+.TP
+.B -mutenodrum [level]
+All channels which are not 9 (drum channel) are attenuated to the
+given level. If level is not specified, it is assumed to be zero.
+.TP
+.B -setdrumloudness n m
+where n is between 35 to 81 inclusive and m is the loudness between
+0 and 127. The loudness of all instances of drum n are changed
+to m.
+.TP
+.B -focusontrack n1,n2,...
+The velocities of notes in all tracks except n are attenuated.
+.TP
+.B -focusonchannel n1,n2,...
+The velocities of notes in all channels except n are attenuated.
+.TP
+.B -attenuation n
+Specifies the amount the note velocities are reduced by either
+-focusontracks or -focusonchannels. Current default is 70. 
+.TP
+.B -nobends
+Suppresses all channel pitchbend commands.
+.TP
+.B -indrums  n1,n2,...
+Only allow percussions with codes n1,n2,...
+.TP
+.B -xdrums  n1,n2,...
+Exclude the percussions with codes n1,n2,...
+.TP
+.B -onlydrums
+Only copy the percussion channel.
+.TP
+.B -nodrums
+Copy all channels except the percussion channel.
+
+.SH EXAMPLE
+.B midicopy.exe -trks 1,5 -from 2669 -to 8634 uzicko.mid fragment.mid
+Midicopy will copy tracks 1 and 5 starting from midi pulse position
+2669 and ending at MIDI pulse position 8634.
+
+.SH "SEE ALSO"
+.PP
+.IR abcmtex "(1), " abc2abc "(1), " abc2midi "(1), " midi2abc "(1) ", yaps "(1)"
+.SH AUTHOR
+This manual page was written by Seymour Shlien.
+.SH VERSION
+This man page describes midicopy version 1.33 from December 22 2019.

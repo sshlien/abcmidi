@@ -1,0 +1,123 @@
+.TH ABC2ABC 1 "07 June 2011"
+.SH NAME
+abc2abc \- a simple abc checker/re-formatter/transposer
+.SH SYNOPSIS
+\fBabc2abc\fP \fIfile\fP [ \fB-s\fP ] [ \fB-n\fP ] [ \fB-b\fP ]
+[ \fB-r\fP ] [ \fB-e\fP ] [ \fB-t \fP\fIsemitones\fP ] [ \fB-nda\fP ]
+[ \fB-u\fP ] [ \fB-d\fP ] [ \fB-v\fP ] [ \fB-V\fP\fIvoice number\fP]
+[\fB-P\fP\fivoice number\fp] [\fB-nokeys\fP]
+[ \fB-nokeyf\fP] [ \fB-usekey\fP\fI(sharps/flats)\fP]
+[\fB-useclef\fP\fI(treble/clef)\fP] [ \fB-OCC\fP ]
+.SH "DESCRIPTION"
+.PP
+.B abc2abc
+is a simple abc checker/re-formatter/transposer.
+It will check whether the \fIfile\fP given on the command line
+obeys basic abc syntax.
+.PP
+If you want to check an abc tune,
+it is recommended that you use
+.B abc2midi
+with the \fB-c\fP option.
+This performs extra checks that
+.B abc2abc
+does not do.
+.PP
+The output of
+.B abc2abc
+goes to standard output.
+Use redirection to save it to a file.
+.SH OPTIONS
+.TP
+.B \-s
+Rework spacing in the file (which affects how notes are beamed together
+when the music is printed out). This option does not appear to be working
+correctly.
+.TP
+.BI \-n " X"
+Reformats the abc file with line breaks every \fIX\fP bars.
+.TP
+.B \-b
+Don't do bar checking.
+.TP
+.B \-r
+Don't do repeat checking.
+.TP
+.B \-e
+Don't report errors.
+.TP
+.BI \-t " n"
+Transpose tune by \fIn\fP semitones. This function will also
+work with K: none or one of \-nokeys or \-nokeyf.
+If a voice is assigned to channel 10 (drum channel) using a
+%%MIDI channel 10
+command, then this voice is never transposed.
+
+.TP
+.B \-nda
+Convert double accidentals in guitar chord to another chord though
+strictly not correct.
+.TP
+.B \-u
+Update notation; the older notation \fB+ +\fP for chords is replaced by 
+\fB[]\fP and \fBs s\fP for slurs is replaced by \fB()\fP.
+.TP
+.B \-OCC
+Accept the old notation for chord. Normally this is turned off,
+since it conflicts with abc draft standard version 2.0 for
+decorations (eg. +crescendo(+).
+.TP
+.B \-d
+Re-notate the tune with all note lengths doubled. The unit length specified by the L: field
+command is halved (e.g. L:1/8 to L:1/16).
+.TP
+.B \-v
+Re-notate the tune with all note lengths halved. The unit length specified by the L: field
+command is doubled (e.g. L:1/8 to L:1/4).
+.TP
+.B \-ver
+Prints version number and exits.
+.TP
+.BI \-V " X[,Y...]"
+For multivoiced abc files (i.e. contains V: field commands), only voices \fIX[,Y,...]\fP are copied.
+.TP
+.BI \-P " X,[,Y...]"
+For multivoiced abc files (i.e. contains V: field commands), all voices except \fIX[,Y...]\fP remain the same. Voices X,Y... are modified according the other runtime parameters. 
+.TP
+.BI \-X " n"
+For a file containing many tunes, the X: reference numbers are renumbered sequentially
+starting from number \fIn\fP.
+.TP
+.BI \-xref " n"
+Only the tune with X: n is processed.
+.TP
+.B \-nokeys
+No key signature will be assumed. Instead, sharps and naturals will
+be placed wherever they are needed.
+.TP
+.B \-nokeyf
+No key signature will be assumed. Instead, flats and naturals will
+be placed wherever they are needed.
+.TP
+.B \-usekey " sf
+This will force abc2abc to output the notes in the key signature
+keys[sf] where sf specifies the number of flats (\-negative) or 
+sharps (+positive) in the key signature. It is a number between
+\-5 and +5 inclusive.
+.TP
+.B \-useclef
+This works with only the -t (transpose) and provided the abc
+file does not already have a clef command in the K: field. It
+does not support voices.
+.PP
+* Normally abc2abc will convert the deprecated notation for
+decorations (eg. !ppp!) to the abc version 2.0 draft standard (eg. +ppp+).
+If you do not wish to change to this standard include the \-OCC flag.
+
+.SH "SEE ALSO"
+.IR abcmtex "(1), " abc2midi "(1), " midi2abc "(1), " mftext "(1)"
+.SH AUTHOR
+This manual page was written by Anselm Lingnau <lingnau@tm.informatik.uni-frankfurt.de> and is now supported by Seymour Shlien <fy733@ncf.ca>
+for the GNU/Linux system.
+.SH VERSION
+This man page describes abc2abc version 2.04 from January 22 2020.

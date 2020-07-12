@@ -1,0 +1,227 @@
+Notes on the midi2abc code
+--------------------------
+written by Seymour Shlien
+
+
+midi2abc.txt	- last updated 	December 5 1999
+
+
+Introduction
+
+Midi2abc is a program for converting a midi files into an abc file.
+
+A midi file merely consists of a list of commands to turn on
+and off a set of voices at specific times. The time units are
+expressed in pulses where the number of pulses per second can
+be deduced from the information in the midi file. Pitch is
+specified in semitone units ranging from 0 to 127 where middle C
+is assigned a value of 60.
+
+There are two types of midi in general use. In type 0, all the
+voices are interleaved in time in one track. Each voice goes
+to a specific channel which is mapped to a particular musical
+instrument or program. There is a limit of 16 voices since only
+4 bits are assigned to indicate the channel number.  In type 2,
+the voices are placed in separate tracks. This format allows
+handling more than 16 voices.
+
+In order to create an abc file, midi2abc must determine the
+length of a musical unit (for example an eighth note) in terms
+of midi pulses, determine the key signature, and, finally map the
+midi commands into musical notes.
+
+Though the midi file specifies the number of pulses per quarter note
+(PPQN) in the Mthd header chunk, this is not necessarily an
+accurate indication. It is primarily used together with the tempo
+indication to determine the number of pulses per second. Unless
+the midi file was created by a computer program, the actual length
+of a quarter note in midi pulses can depart from the nominal indication. 
+Midi2abc tries to determine the length using its own heuristic
+algorithm.
+
+The sources of the program are contained in two files: midi2abc.c and
+midifile.c. This document does not try to describe completely how
+this program works, but is more of a general road map to the software.
+
+
+Algorithmic Description
+
+The conversion is done in multiple passes. In the first pass, the
+midi file is read and an internal representation of the file is 
+created and stored in global dynamic memory. In each subsequent pass,
+other information is added to the internal representation and finally
+it is written to the output abc file.
+
+After parsing the input run parameters and performing various 
+initializations, the main program calls the procedure mfread
+which is found in the midifile.c module.  Mfread parses the different
+midi components of the file and calls the appropriate functions 
+midi2abc to process these components. These functions begin with
+the txt_ prefix, some of which are listed here. 
+
+txt_header	midi header chunk
+txt_trackstart	start of midi track
+txt_trackend	end of midi track
+txt_noteon	note on channel command
+txt_noteoff	note off channel command
+txt_program	midi program definition or change
+txt_metatext	midi textual information
+txt_keysig	midi key signature indication
+txt_tempo	midi tempo indication
+
+Many other functions such as txt_pressure and txt_parameter
+corresponding to other midi commands, do nothing here.
+
+These functions build up an internal representation of the midi file
+in a global structure referenced through the track[64] structure. 
+Up to 64 midi tracks can be stored in the internal representation.
+Each track structure (atrack structure) contains single and double 
+linked lists of notes or text strings which are described below.
+In addition there are other linked lists (referenced by playinghead
+and chordhead), used for keeping track of notes currently playing
+and musical chords.
+
+Each note is represented by an anote structure which stores various
+parameters of the note. The anote structure is allocated dynamically 
+as the midi file is read. The first four entries of the structure 
+are filled in while the structures are being created by mfread.
+These are entries are listed below.
+
+anote.pitch	pitch in midi units
+anote.chan	midi channel number
+anote.vel	midi velocity (corresponding to loudness)
+anote.time	time in midi pulses.
+
+The other entries in the anote structure are determined in later passes.
+The anote structures are linked together into a a listx structure which
+is included in the atrack structure. The head and tail of the list are
+contained in this structure to facilitate the construction of this list.
+In addition there is tlistx structure for storing all the textual 
+information (for example words in a Karaoke midi file) which may be found
+in the track.
+
+There is a doubly linked list structure of anotes (dlistx,
+*playinghead) which is used as a work space for matching the note off 
+command with the corresponding note on command. This is needed in order 
+to determine the length of time the note was turned on (called anote.tplay).
+
+The internal representation is mainly constructed by the important
+functions txt_noteon and txt_noteoff called by mfread. These functions 
+in turn call the functions addnote and notestop. The midi file contains
+separate commands for turning a note on or off so that in order to
+determine the length of time that a note has been on, it is necessary to
+match a note-off command with the corresponding note-on command.
+Every time a note is turned on, it is also added to the playhead (tail)
+structure. The procedure notestop finds the corresponding note-on
+command in the playhead structure, removes it, and records the
+duration of the note which was turned on.
+
+At the end of the first pass, the number of tracks is counted and each
+track is processed by the function postprocess which computes the entry
+anote.dtnext for each anote structure. This entry contains the time
+interval between the current and the next note in the linked list of
+notes.
+
+The abc time unit length is either 1/8 or 1/16 depending on the time
+signature. A time signature of 4/4 is assumed unless it is specified 
+by the run time parameters (-m or -xm). (If -xm is specified, then the
+program uses the time signature given by the midi meta command if it 
+exists in the file.)
+
+The next step involves the quantization of the midi time units
+expressed in pulse counts into abc time units. It is first necessary
+to estimate the length of an abc time unit in terms of midi time
+units. This either is estimated using a heuristic algorithm,
+guesslength, or is determined from the run time parameters (-Q or -b).
+
+The function guesslength makes an initial guess by dividing the
+total number of pulse counts in the track by the total number
+of notes. It then tries 100 different lengths in the neighbourhood
+of this initial guess and chooses the one which leads to the smallest 
+quantization error. The quantization error is determined by the function
+quantizer which keeps track of the total deviation of the time
+a note starts (in pulse counts) from the expected time the note 
+starts assuming the standard musical intervals. This deviation
+can either drift positively or negatively with time. The total
+error is determined by summing the absolute values of these
+deviations for each bar. 
+
+Once the unit length has been determined, all the notes in all
+tracks are quantized by the function quantizer. This function
+assigns values to the anote entries, anote.xnum, anote.playnum
+and anote.denom. 
+
+anote.xnum	interval between the current note and following note
+                also called the gap.
+anote.playnum	note duration.
+anote.denom	always has the value of 2.
+
+A musical part does not necessarily begin at the start of a bar line,
+but may have some leading notes. This is called anacrusis.
+There are two methods to estimate the anacrusis. The function findana
+searches for the first upbeat by examining the velocities (loudness) of
+the notes. The function guessana, chooses the anacrusis which minimizes
+the number of tied notes across a bar line which is determined by the
+function testtrack.
+
+At this point the key signature of the tune must be determined.
+The procedure findkey computes the frequency distribution of all the
+notes in the piece and stores it in the local array n[]. The key
+signature is determined by transposing the distribution by each
+of the 12 keys and counting the number of sharp or flat notes. The
+key signature is determined from the key which leads to the minimum
+number of black keys on the piano. The mode of the scale (major,
+minor, Dorian, etc.) is determined by looking at the final note of
+the piece.
+
+Once the key signature is determined, the assumed flats or sharps
+are determined by the procedure setupkey. The program is now ready
+for its final pass where the musical parts (or voices) are printed
+in the output abc file.
+
+The procedure printtrack processes the internal representation
+of each midi track producing a separate voice for each track.
+In order to handle chords which may be present in an individual
+track, printtrack maintains a structure referenced by chordhead
+by calling the support functions addchord(), advancechord(),
+removechord() and printchord(). These functions handle single
+notes as well as chords. Another function, dospecial(), handles
+the triplets and broken rhythms (eg. dotted notes followed by
+half sized note or vice versa) whenever they are detected. The
+printchord() function is supported by the functions printfraction()
+and printpitch(). 
+
+After the track is printed, the memory allocated to the structures
+for the internal representation of the tracks is freed.
+
+The option -splitvoice was introduced to handle polyphonic chords.
+Without this option polyphonic chords appear in the abc file
+like this.
+
+[DF-A-][FA-]Az|
+
+this will be represented by three voices
+
+V: split1A
+D2 z6| 
+V: split1B
+F4 z4| 
+V: split1C
+A6 z2|
+
+This option is implemented by the function printtrack_split_voice().
+The function label_split_voices() is called to assign all the notes
+in the track to their split voice. This assignment of each note is
+stored in note->splitnum. This is a complex function since it needs
+to try to match the onset and end of each note in the chord. If
+it is unable to do this for a particular note, then the note is
+assigned to a different split. At the end, nsplits were created.
+The notes in each split are printed in a separate voice by the
+function printtrack_split(). The function printtrack_split(splitnumber)
+was derived from printtrack(); however, it only processes the
+notes belonging to a particular splitnumber.
+
+It was necessary to determine and store the offset of the first
+note in each split using the function set_first_gaps() prior
+to calling printtrack_split().
+

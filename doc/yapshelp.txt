@@ -1,0 +1,211 @@
+
+YAPS - an abc to PostScript Converter
+
+YAPS is Yet Another abc to PostScript converter.
+
+The original converter was Michael Methfessel's abc2ps program. Another
+converter is abcm2ps, based on the abc2ps code. YAPS uses the library 
+of PostScript routines from abc2ps, but the parser and other C code does 
+not come from abc2ps.
+
+What is PostScript ?
+--------------------
+This program is intended for converting an abc tune to high quality
+printed output. If yaps created an image file in, say, GIF
+or PNG format it would have to decide how many pixels wide and how
+many pixels high the final image would be. When the image was printed
+on a printer capable of much higher resolution, you would be able to
+see that the image was built up of lower resolution pixels. PostScript 
+gets round this limitation by storing the image as a description of 
+all the objects that will appear on the page. These descriptions are 
+converted to pixels at the last moment, when the resolution of the 
+printer is known. This way, you can make full use of the resolution
+available.
+
+If you are lucky, you may have a PostScript printer, in which case
+you can send the output of yaps directly to the printer. If not,
+there are PostScript interpreter programs available, which will
+turn a PostScript image into other image formats. A popular freely
+available PostScript interpreter is called GhostScript. Another
+freely available program, GSView, provides a graphical interface
+to GhostScript and lets you view images on-screen.
+
+For a full description of the PostScript language, see "PostScript
+Language Reference (third edition)" by Adobe Systems Inc.
+
+----------------------------------------------------------------
+Executing yaps with no filename will give the yaps version and the
+following message:
+
+Usage:  yaps <abc file> [<options>]
+  possible options are -
+  -d            : debug - display data structure
+  -e <list>     : draw tunes with reference numbers in list
+     list is comma-separated and may contain ranges
+     but no spaces e.g. 1,3,7-20
+  -E            : generate Encapsulated PostScript
+  -l            : landscape mode
+  -M XXXxYYY    : set margin sizes in points
+     28.3 points = 1cm, 72 points = 1 inch
+  -N            : add page numbering
+  -k [NN]       : number every bar or every NN th bar
+  -o <filename> : specify output file
+  -P ss         : paper size; 0 is A4, 1 is US Letter
+     or XXXxYYY to set size in points
+  -s XX         : scaling factor (default is 0.7)
+  -V            : separate voices in multi-voice tune
+  -x            : print tune number in X: field
+Takes an abc music file and converts it to PostScript.
+If no output filename is given, then by default it is
+the input filename but with extension .ps .
+
+YAPS features
+-------------
+
+1. Uses the abc2midi parsing code, so hopefully compatibility with
+abc2midi will be good.
+
+2. Measures the width of lyric text for lyric typesetting.
+
+3. Uses dynamically extensible data structures in most places, so
+you should not be restricted by compiled-in limits.
+
+4. Multiple voices drawn with notes played at the same time aligned.
+
+5. Supports special characters using ISO latin 1 font. Special
+characters are created with a TeX-like code e.g. \'E or a 3 digit octal
+code e.g. \315 .
+
+6. Supports the following clefs : baritone, tenor, alto, mezzo, soprano,
+treble, bass. Recommended use is
+
+  I:clef=bass
+
+To make it easier to enter tunes in clefs othan than treble clef,
+yaps supports I:octave=-1 to indicate than a C in the tune represents
+the note one octave below the pitch defined in the abc standard. These 
+may be combined in one I: statement e.g.
+
+I:clef=bass octave=-2
+
+You can also use clefs that are one, two or three octaves higher or
+lower than normal using e.g. treble-8, treble+15, treble-22. The clef is
+drawn with a small 8, 15 or 22 above or below the clef symbol. The clef=
+and octave= commands may also go in the K: field e.g.
+
+K:G clef=bass-8 octave=-3
+
+Note that there is an incompatibility between the behaviour of yaps and
+the behaviour of abc2ps 1.3.3. abc2ps 1.3.3 does not support the 
+I:octave=N command, but selecting certain clefs causes it to automatically 
+transpose by several octaves. You can produce abc that works for both by
+following the clef change with an I:octave=N command to do the transpose
+that abc2ps does automatically.
+
+7. Produces boxed part labels.
+
+8. Supports the segno symbol with !segno! and coda with !coda! . Other
+musical instructions such as !fine! and !D.C.! come out as text.
+
+9. Supports the U: field for abbreviating symbols to single characters. 
+e.g.
+
+U:S = !segno!
+
+allows S to be used to produce the segno symbol. Currently this only
+allows new symbols to be defined and does not allow the existing
+pre-defined symbols M,L,R,H and T to be altered.
+
+10. Supports the following abc2ps extensions to abc :
+
+   %%newpage  - start a new page, 
+   %%vskip N  - adds vertical space of N points. If N is followed by
+                'cm' or 'in' the units are taken as centimetres or inches 
+                instead of points e.g. 4cm. 
+   %%text     - print text
+   %%centre (or %%center for Americans) - print centred text. 
+
+   If %%text or %%centre appear in the header, the text appears above the 
+   tune.
+
+   %%staffsep SIZE - set vertical blank space between 2 consecutive music
+                     staves.
+   %%titleleft N - select title placed to the left or centred. N = 1 places
+                   the title on the left while N = 0 centres it.
+   %%titlecaps - title is displayed in upper case (capital) letters.
+   %%textfont NAME SIZE - select font called NAME and point size SIZE for
+   text produced by %%text or %%centre. If only NAME is given, the font
+   stays the same size. Likewise, if '-' is given as the NAME, only the
+   font size changes.
+
+   %%titlefont NAME SIZE - select font for title.
+   %%subtitlefont NAME SIZE - select font for titles after the first title.
+   %%composerfont NAME SIZE - select font for words in C: and O: fields and
+                             part specifier (P: in header).
+   %%wordsfont NAME SIZE - select font for words in W: fields.
+   %%partsfont NAME SIZE - select font for boxed parts and !instruction! .
+   %%vocalfont NAME SIZE - select font for words in w: fields.
+   %%gchordfont NAME SIZE - select font for guitar chords in the music.
+   (It is advisable not to change the font name for the last two, since
+    the program calculates the width of strings using default fonts)
+
+   %%titlespace, %%subtitlespace, %%textspace, %%composerspace, %%wordsspace,
+   %%partsspace, %%vocalspace and %%gchordspace determine the amount of 
+   space left above the relevant type of text. Each of these should be 
+   followed by a size in points or value in centrimetres or inches.
+
+   e.g. %%composerfont 3
+        %%titlefont 2cm
+
+11. Supports placing of accompaniment chords either above or below the
+stave.
+   
+   %%chordsabove - places accompaniment chords above the stave (default).
+   %%chordsbelow - places accompaniment chords below the stave.
+
+12. Supports optional text enclosed in quotes before and after the
+tempo specification in the Q: field. This extension comes from abc2ps.
+
+13. Allows highlighting notes by switching output from black to
+red and vice-versa using the !red! and !black! instructions.
+
+Known bugs and Limitations
+--------------------------
+1. Overfull lines of music are not split over multiple lines.
+
+WARNING - the -s option is now used for scaling. Selecting separate
+printing of each voice (which previously used -s) is now done with -V.
+
+YAPS is still under development and missing a number of features. However,
+it should produce acceptable output most of the time. You may want to try 
+abc2ps or abcm2ps if you find that YAPS will not do what you want.
+
+Viewing PostScript Files from DOS
+---------------------------------
+Here is how I arranged things so that I can view PostScript from DOS :
+
+1. Install Ghostscript 5.10 (compiled to run under DOS). This is not
+totally straightforward; you have to install the fonts separately and 
+then set the environment variable GS_LIB to a path containing the 
+GhostScript initialization files and the fonts.
+2. Install Pictview, a free image viewer.
+3. Create a small batch file ps.bat containing the following line:
+
+c:\gs5.10\gs386 -r120 -sOutputFile=out.tif -sDEVICE=tiffg3 -sPAPERSIZE=a4 -dNOPAUSE -dBATCH %1
+
+When you run this, it creates a TIFF file out.tif containing all
+pages in compressed format.
+
+The following commands will show you the dots for an abc file:
+
+yaps demo.abc
+ps demo.ps
+pictview out.tif
+
+
+Copyright (c) James Allwright 1999
+(parts of the code Copyright Michael Methfessel).
+This code may be freely re-distributed under the terms of the
+GNU public license. You are encouraged to modify and redistribute it,
+provided this copyright notice is retained.
+

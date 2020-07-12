@@ -1,0 +1,426 @@
+Notes on the code
+-----------------
+
+These notes are for anyone who wants to re-compile, re-write or re-use
+bits of the code. Additional information is available by downloading
+the file abcextra.zip. This includes :
+
+* man pages for abc2midi and midi2abc.
+* A detailed description of the inner workings of abc2midi, written by
+  Seymour Shlien.
+
+Compilation
+-----------
+
+The file midifile.c and the header file midifile.h are slightly changed from 
+the midifilelib distribution. To see the program dependencies, examine the
+Makefile.
+
+The code is written in K&R style C and should be fairly easy to compile
+on any system with a C compiler and a make utility. Makefiles are
+provided for gcc/unix, DJGPP/DOS and PCC/DOS. There are also some notes
+on using the GUI front-end to Pacific C/DOS. You may get warning
+messages if your compiler prefers ANSI C style function prototypes.
+
+Choose the most suitable makefile; unix.mak, djgpp.mak or pcc.mak and
+rename it as 'makefile'. If you are not using any of the above compilers,
+you may have to edit the makefile so that it uses compilation flags
+suitable for your compiler.
+
+To compile the code, type
+
+make all
+
+If the complete compilation does not work, you can try compiling the 
+individual programs separately :
+
+make midi2abc (or make midi2abc.exe)
+make abc2midi (or make abc2midi.exe)
+make abc2abc (or make abc2abc.exe)
+make mftext (or make mftext.exe)
+make yaps (or make yaps.exe)
+
+Note that the make utility on some systems (e.g. GNU make) may require the 
+Makefile to be a unix text file and not a DOS text file. The difference 
+is that unix uses newline to mark the end of each line while DOS uses 
+carriage return and newline.
+
+Note, if you have difficulty compiling the package because you do not have
+snprintf see the note in doc/CHANGES dated January 08 2005 (and also
+December 17 2004).
+
+
+---------------------------------------------------------------------
+Calling abc2midi or midi2abc from a GUI.
+----------------------------------------
+
+The programs should now have an exit value of 0 for normal termination
+and 1 for an error state. However, abc2midi will still exit with 0 if
+it finds non-fatal errors in the code, so the user should always have
+the option of looking at the program's text output (I don't want to
+get blamed when useful diagnostic output turns into the ubiquitous
+'OK' click-button).
+
+----------------------------------------------------------------------
+Man pages
+---------
+Files: abc2midi.1 and midi2abc.1
+
+Christoph Dalitz has written some man pages for abc2midi and
+midi2abc. These should be installed in the sub-directory /man1
+of the directory given by the MANPATH environment variable.
+(The man command is usually only found on Unix variants).
+
+The source distribution has been re-organized to contain only the
+source and a few text files. If you want these man pages, you need 
+to download the file abcextra.zip.
+
+---------------------------------------------------------------------
+Code Layout and Indentation style
+---------------------------------
+If you want to add your own code and make it fit in with the existing
+coding style, you can use GNU indent. The following is a DOS batch file
+to invoke indent with the appropriate options.
+
+indent -bad -bap -br -ce -cli0 -npcs -di1 -nbc -i2 -ts0 -psl -lp -ipo %1
+rem
+rem options for GNU indent to achieve my personal style
+rem
+rem -bad  blank line after declaration block
+rem -bap  blank line after procedure body
+rem -br   brace on same line after if, struct and enum
+rem -ce   cuddle else
+rem -cli0 case at same identation as switch
+rem -npcs no space between procedure name and following open bracket
+rem -di1  one space between variable type and variable name
+rem -nbc  comma-separated variables on the same line
+rem -i2   indent 2 spaces
+rem -ts0  no tabs
+rem -npsl  function type on same line as function name
+rem -lp   continuations matched to left parenthesis
+rem -ip0  no indention of variables in K&R function headers
+rem -ncs  no space after cast
+
+---------------------------------------------------------------------
+
+Extensions to the abc Format
+----------------------------
+
+1. The parser recognizes 
+%%package <string>
+as some package-specific command and calls event_specific with the
+package name and the string that follows it.
+
+2. The abc standard defines notation for 4 octaves :
+
+C, - B,
+C  - B
+c  - b
+c' - b'
+
+The parser recognizes each additional comma as meaning "going down
+an extra octave", giving
+
+C,, - B,,
+C,,, - B,,,
+and so on.
+
+Likewise, each additional prime symbols s interpreted as "go up an extra 
+octave" :
+
+c'' - b''
+c''' - b'''
+and so on.
+
+----------------------------------------------------------------------
+
+abc2midi
+--------
+abc2midi consists of the following C source files:
+
+parseabc.c - parses the input text and calls a routine for
+             every parsed element encountered.
+parser2.c  - performs some additional parsing that may not be
+             required.
+store.c    - builds an internal representation of the abc tune.
+genmidi.c  - uses the internal representation to generate
+             the MIDI file, using calls to MIDI-specific routines
+             in midifile.c
+queues.c   - library of routines for handling 'queues', a data
+             structure used internally by genmidi.c
+midifile.c - Thompson and Czeisperger's public domain library of 
+             MIDI file manipulation routines.
+
+In the first phase of parsing, the abc file is read and when, say, a note
+is encountered, the routine event_note() is called. The code for event_note
+is in the file store.c. Encountering an X in the abc generally causes a
+routine called event_X() to be called. abc2midi builds up an internal 
+representation of the tune. At the end of the abc tune, a little bit of 
+processing is done on the internal representation before the routine 
+writetrack() is called to actually write out the MIDI file. If there are
+repeats in the music, something that appears only once in the abc may be
+invoked twice by writetrack().
+
+The internal representation uses the arrays feature[], pitch[], num[], 
+and denom[]. feature[] holds a description of an object while the other
+arrays hold data relating to the object. The list of possible features
+can be found in the file abc.h . The main features are NOTE, a note of
+specified duration, REST, a pause of specified duration and TNOTE, a
+note of specified duration with no interval between when it starts and
+when the next item starts. This provides a simple way of representing
+chords. Ties, broken rhythm signs and grace note brackets are all
+deal with before writetrack() is called.
+
+To add your own special features, you could define a new feature type.
+However, an easier option is to use the %%MIDI format. If the parser
+encounters "%%MIDI command", where command is not recognized by the
+routine event_specific(), the string following %%MIDI is stored away
+and passed to the routine dodeferred() by writetrack() when the MIDI
+file is being written.
+----------------------------------------------------------------------
+abc2abc
+-------
+abc2abc shares the parser with abc2midi, but instead of storing the
+abc code in an internal format, it is written almost straight out
+again. The components of abc2abc are:
+
+parseabc.c - parser
+toabc.c    - generates output abc.
+midifile.c - public domain MIDI library.
+
+----------------------------------------------------------------------
+YAPS
+----
+
+YAPS is written mainly using ANSI C style function headers and
+compiled and tested using DJGPP (DOS/Windows port of gcc).
+
+The code is composed of the following files:
+
+parseabc.c - reads through the abc text file. When it recognizes an abc
+"unit" it calls a routine such as event_note() or event_key().
+
+yapstree.c - creates a data structure to represent a tune. 
+Generally, I have tried to use as small a number of passes through the
+data structure as possible. This means that things like applying a
+broken rhythm symbol > is done as the notes are read in, rather than 
+using a second pass. This results in a lot of variables being needed in
+'struct voice' to keep track of what is going on as we read in the
+current symbols. Different sets of these variables are used on different
+passes through the data.
+
+drawtune.c - responsible for creating the PostScript file. When a whole
+tune has been read in, this calculates the size of each individual
+element, works out spacing within each line, decides how to place the beam
+for a group of beamed notes, then finally generates the PostScript for
+the tune.
+
+position.c - called by drawtune.c. This set of routines is responsible
+for spacing each line correctly. Where the input abc is multi-voice, 
+elements played at the same time but in different voices are aligned.
+
+pslib.c - a single routine to print out the entire library of PostScript
+functions used by yaps.
+
+debug.c - routines to print to screen the contents of a tune data
+structure. 
+
+abc.h - header file defining abc element types.
+
+structs.h - header file defining the data structures used by the program.
+The voice structure holds a lot of cuurent context information, used by
+the program as it does a pass through the voice.
+
+sizes.h - header file containing macros to define sizes in points for all
+the graphic elements.
+
+Dynamic Memory Management
+-------------------------
+abc2midi uses a system of re-sizable arrays in order to handle arbitrary
+size input. This scheme was a natural way to adapt the original fixed size
+arrays, and is not as flexible as it might be. Yaps instead uses linked
+lists. There is a tune data structure containing a linked list of voices
+and the notes and other elements are stored in a linked list in each tune.
+Some music elements contain their own linked lists; for example a note
+may have a linked list of lyric syllables. Adding a new data item to an
+element (e.g. a note) involves the following :
+
+1. find 'struct note' in structs.h and add the element.
+2. Initialize it in newnote().
+3. If it is a pointer to a new data structure, make sure the new data
+   structure is de-allocated in freevoice().
+   
+----------------------------------------------------------------------
+The abc parser
+--------------
+The parser (parseabc.c) has been written in such a way that it forms 
+an independent unit which must be linked with routines to handle
+parsed units. This is very similar to the way that the
+midifilelib utilities work. 
+
+The abc is parsed line by line. Each line may be
+
+* A comment
+* A package-specific command
+* A field (which may have a trailing comment)
+* A blank line
+* A TeX command
+
+Having detected one of these, the parser calls an appropriate
+routine. If it is none of these, then within the tune body it is
+
+* A line of music (which may have a trailing comment).
+
+Which is parsed and individual elements recognized. Outside the tune 
+body it is
+
+* A line of arbitrary text.
+
+and an appropriate routine is called.
+
+Routines called by the parser
+-----------------------------
+These may be a bit out of date - look in the file parseabc.c for the actual
+interfaces.
+
+event_init(argc, argv, filename) 
+int argc;
+char* argv[];
+char** filename;
+- first routine called by the parser. Expects filename to be the name of the
+  abc file to parse on return.
+
+event_text(s)
+char *s;
+- called whenever a line of text is encountered.
+
+event_tex(s)
+char *s;
+- called whenever a TeX command is encountered.
+
+event_linebreak()
+- called whenever a newline character is encountered.
+
+event_blankline()
+- called whenever a blank line is encountered.
+
+event_eof()
+- called when the end of file is reached.
+
+event_error(s)
+char *s;
+- called whenever an error condition is detected. Errors are
+  generally not fatal within the parser.
+
+event_warning(s)
+char *s;
+- called whenever a condition which is likely to be an error is
+  detected.
+
+event_comment(s)
+char *s;
+- called whenever a comment is encountered.
+
+The following are calls are invoked by fields in the abc :
+
+event_specific(package, s)
+char *package, *s;
+- recognizes %%package s
+
+event_length(n)
+int n;
+- recognizes L:
+
+event_refno(n)
+int n;
+- recognizes X:
+
+event_tempo(n, a, b, rel)
+int n, a, b;
+int relative;
+- recognizes Q:
+
+event_timesig(n, m)
+int n, m;
+- recognizes M:
+
+event_key(sharps, s, minor)
+int sharps;
+char *s;
+int minor;
+- recognizes K:
+
+event_part(s)
+char* s;
+- recognizes P:
+
+When any other field is encountered in the abc :
+
+event_field(k, f)
+char k;
+char *f;
+
+If a line of music is encountered, the elements of that line each
+trigger a call to one of the following events, provided that parsing
+of music lines has been enabled :
+
+event_graceon()
+
+event_graceoff()
+
+event_rep1()
+
+event_rep2()
+
+event_slur(t)
+int t;
+
+event_tie()
+
+event_rest(n,m)
+int n, m;
+
+event_bar(type)
+int type;
+
+event_space()
+
+event_lineend(ch, n)
+char ch;
+int n;
+
+event_broken(type, mult)
+int type, n;
+
+event_tuple(p, q, r)
+int p, q, r;
+- general tuple: q and r are zero if not present
+
+event_chord()
+- called whenever + is encountered.
+
+event_chordon()
+- called whenever [ is encountered.
+
+event_chordoff()
+- called whenever ] is encountered.
+
+event_gchord(s)
+char* s;
+
+event_reserved(p)
+char p;
+
+event_note(roll, staccato, updown, accidental, mult, note, octave, n, m)
+int roll, staccato, mult;
+char updown, accidental, note;
+int octave, n, m;
+
+In addition, there are 2 other routines :
+
+int getline() - returns the line currently being parsed
+
+parseron() - enable parsing of music lines.
+
+parseroff() - disable parsing of music lines.
+

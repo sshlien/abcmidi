@@ -1,0 +1,201 @@
+.TH YAPS 1 "13 August 2005"
+.SH NAME
+.B
+YAPS
+\- converts an abc file to a PostScript file
+.SH SYNOPSIS
+yaps \fiabc\ file\fP [\-d] [\-e\ <list>] [\-E] [\-l] [\-M \fiXXXxYYY\fP] \
+[\-N] [\-k nn] [\-o \fifile\ name\fP] [\-P \-\fiss\fP] [\-s \fiXX\fP] [\-V]\
+[\-ver] [\-x] [\-OCC]
+
+
+
+.SH OPTIONS
+.TP
+.B -d
+For debugging only. Displays the internal data structures used in the program.
+.TP
+.B -e \fi<list>\fP
+Draws tunes with reference numbers in a comma separated list. Spaces are
+not allowed but a range of reference numbers can be specified. For example,
+1,3,7-10.
+.TP
+.B -E
+Generates Encapsulated Postscript output.
+.TP
+.B -M \fiXXXxYYY\fb
+Set margin sizes in points where 28.3 points = 1cm and 72 points = 1 inch.
+.TP
+.B -N
+Adds page numbering.
+.TP
+.B -k [nn]
+Adds bar numbering. If number nn is included, then every nn'th bar
+is numbered. Otherwise all bars are numbered.
+.TP
+.B -o \fifilename\fP 
+Specifies the output postscript file name.
+.TP
+.B -P \fiss\fP
+Specifies the paper size where 0 is A4 and 1 is US Letter
+or XXXxYYY sets the paper size in point units.
+ units.
+.TP
+.B  -s \fiXX\fP
+Specifies the scaling factor (default is 0.7)
+.TP
+.B -V
+Voices are printed out separately for a multi-voice tune. Otherwise they
+ are interleaved.
+
+.TP
+.B -ver
+Prints version number and exits.
+.TP
+.B  -x
+Print tune number in X: field
+.TP
+.B -OCC
+Required if the tune uses the old convention for chords delineated
+with +..+ instead of [...].
+
+.SH FEATURES
+
+.PP
+* Uses the abc2midi parsing code, so hopefully compatibility with
+abc2midi will be good.
+.PP
+* Measures the width of lyric text for lyric typesetting.
+.PP
+* Uses dynamically extensible data structures in most places, so
+you should not be restricted by compiled-in limits.
+.PP
+* Multiple voices drawn with notes played at the same time aligned.
+.PP
+* Supports special characters using ISO latin 1 font. Special
+characters are created with a TeX-like code e.g. \'E or a 3 digit octal
+code e.g. \315 .
+.PP
+* Supports the following clefs : baritone, tenor, alto, mezzo, soprano,
+treble, bass. Recommended use is
+.PP
+* Invisible rests (x) are displayed like normal rests.
+.PP
+* Nonnumeric voice id's, eg. V: soprano are accepted.
+.PP
+  I:clef=bass
+.PP
+To make it easier to enter tunes in clefs othan than treble clef,
+yaps supports I:octave=-1 to indicate that a C in the tune represents
+the note one octave below the pitch defined in the abc standard. These
+may be combined in one I: statement e.g.
+.PP
+I:clef=bass octave=-2
+.PP
+You can also use clefs that are one, two or three octaves higher or
+lower than normal using e.g. treble-8, treble+15, treble-22. The clef is
+drawn with a small 8, 15 or 22 above or below the clef symbol. The clef=
+and octave= commands may also go in the K: field e.g.
+.PP
+K:G clef=bass-8 octave=-3
+.PP
+Note that there is an incompatibility between the behaviour of yaps and
+the behaviour of abc2ps 1.3.3. abc2ps 1.3.3 does not support the
+I:octave=N command, but selecting certain clefs causes it to automatically
+transpose by several octaves. You can produce abc that works for both by
+following the clef change with an I:octave=N command to do the transpose
+that abc2ps does automatically.
+.PP
+* Produces boxed part labels.
+.PP
+* Supports the segno symbol with !segno! and coda with !coda! . Other
+musical instructions such as !fine! and !D.C.! come out as text.
+* Supports the U: field for abbreviating symbols to single characters.  e.g.
+.PP
+U:S = !segno!
+.PP
+allows S to be used to produce the segno symbol. Currently this only
+allows new symbols to be defined and does not allow the existing
+pre-defined symbols M,L,R,H and T to be altered.
+.PP
+* Supports the !red! and !black! instructions for switching from
+black to red or vice-versa.
+.PP
+* Supports the following abc2ps extensions to abc :
+.PP
+   %%newpage  - start a new page,
+.br
+   %%vskip N  - adds vertical space of N points. If N is followed by
+                'cm' or 'in' the units are taken as centimetres or
+                inches instead of points e.g. 4cm.
+.br
+   %%text     - print text
+.br
+   %%centre (or %%center for Americans) - print centred text.
+.br
+   If %%text or %%centre appear in the header, the text appears above
+   the tune.
+.PP
+   %%staffsep SIZE - set the vertical blank space between 2 consecutive
+                     music staves.
+.PP
+   %%titleleft N - select title placed to the left or centred. N = 1
+                   places the title on the left while N = 0 centres it.
+.br
+   %%titlecaps - title is displayed in upper case (capital) letters.
+.br
+   %%textfont NAME SIZE - select font called NAME and point size SIZE
+   for text produced by %%text or %%centre. If only NAME is given, the
+   font stays the same size. Likewise, if '-' is given as the NAME,
+   only the font size changes.
+.br
+   %%titlefont NAME SIZE - select font for title.
+.br
+   %%subtitlefont NAME SIZE - select font for titles after the first
+   title.
+.br
+   %%composerfont NAME SIZE - select font for words in C: and O: fields
+                             and part specifier (P: in header).
+.br
+   %%wordsfont NAME SIZE - select font for words in W: fields.
+.br
+   %%partsfont NAME SIZE - select font for boxed parts and
+   !instruction! .
+.br
+   %%vocalfont NAME SIZE - select font for words in w: fields.
+.br
+   %%gchordfont NAME SIZE - select font for guitar chords in the music.
+   (It is advisable not to change the font name for the last two, since
+    the program calculates the width of strings using default fonts)
+.br
+   %%titlespace, %%subtitlespace, %%textspace, %%composerspace,
+   %%wordsspace, %%partsspace, %%vocalspace and %%gchordspace
+   determine the amount of space left above the relevant type 
+   of text. Each of these should be followed by a size in points
+   or value in centrimetres or inches.
+.br
+   e.g. %%composerfont 3
+        %%titlefont 2cm
+.PP
+* Supports placing of accompaniment chords either above or below the
+  stave.
+.PP
+   %%chordsabove - places accompaniment chords above the stave
+   (default).
+.br
+   %%chordsbelow - places accompaniment chords below the stave.
+.PP
+* Supports optional text enclosed in quotes before and after the
+  tempo specification in the Q: field. This extension comes from
+  abc2ps.
+
+.SH AUTHOR
+James Allwright <J.R.Allwright@westminster.ac.uk>
+.SH SUPPORTED
+Seymour Shlien <fy733@ncf.ca>
+.PP
+More complete documentation can be found in abcguide.txt which
+comes with the abcMIDI distribution package.
+.SH VERSION
+This man page describes version 1.39 August 13 2005.
+

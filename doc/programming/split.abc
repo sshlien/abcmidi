@@ -1,0 +1,131 @@
+X:1
+T: test split file 1
+M: 2/4
+L: 1/4
+K: G
+G & E & C|D|GA & EF|
+
+
+X:2
+T: test split file 2
+M: 1/4
+L: 1/4
+K: G
+%%MIDI program 20
+D|G & E|C|F|G & E|
+
+X:3
+T: test split file 3
+M: 2/4
+L: 1/8
+Q: 50
+K: D
+CD |EF AB & CD FG| G2 | BD D2 & GB B2|
+
+X:4
+T: test split file 4
+M: 1/4
+L: 1/4
+K: G
+V:1
+|:G |[1 D & B:|
+V:2
+|:g |[1 d & b:|
+V:1
+[2 F & A|
+V:2
+[2 f & a|
+
+X:5
+T: test split file 5
+M: 1/4
+L: 1/4
+K: G
+G & E |D|
+
+X:6
+T: test split file 6
+M: 1/4
+L: 1/4
+K: G
+D|G & E|
+
+X:7
+T: test split file 7
+M: 1/4
+L: 1/4
+K: G
+D|G & E & C|F|
+
+X:8
+T: test split file 8
+M: 1/4
+L: 1/4
+K: G
+G & E & C|D|
+
+X:9
+T: test split file 9
+M: 1/4
+L: 1/4
+K: G
+G & E & C|D|F & A|
+
+X:10
+T: test split file 10
+M: 1/4
+L: 1/4
+K: G
+V:1
+|:G |[1 D & B
+V:2
+|:g |[1 d & b
+V:1
+:|[2 F & A|
+V:2
+:|[2 f & a|
+
+X:11
+T: test split file 11
+M: 1/4
+L: 1/4
+K: G
+|:G & E :|D|F & A|
+
+X:12
+T: test split file 12
+M: 1/4
+L: 1/4
+K: G
+|:G & E |D:|F & A|
+
+X:13
+T: test split file 13
+M: 1/4
+L: 1/4
+K: G
+|:G & E |[1 D:|[2 F & A|
+
+X:14
+T: test split file 14
+M: 1/4
+L: 1/4
+K: G
+|:G |[1 D & B:|[2 F & A|
+
+X:15
+T: splits with octave=1
+M: 4/4
+L: 1/4
+K: G octave=1
+G A B C & E F G A|
+
+
+X:16
+T: test split file 13
+M: 1/4
+L: 1/4
+K: G
+|:G & E |1 D:|2 F & A|
+
+

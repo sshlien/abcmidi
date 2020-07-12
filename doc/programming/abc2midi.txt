@@ -1,0 +1,420 @@
+Some Notes on the abc2midi Code
+-------------------------------
+  written by Seymour Shlien
+
+
+Abc2midi.txt  - last updated 29 November 1999.
+
+
+This file provides an algorithmic description of the program
+abc2midi which converts an abc file into a midi file.
+
+The sources of abc2midi now comprising of 6700 lines of C code are
+contained in the following five files.
+
+parseabc.c is the front end which scans the abc file and invokes
+	the appropriate event handler for each element it encounters
+	(eg. bar lines, notes, chords etc.) It happens to be the
+	front end for other programs such as abc2ps, yaps and
+	abc2abc.
+store.c contains all the event handlers which are invoked from
+	parseabc. It converts the abc file into an internal 
+	representation described later in this file.
+genmidi.c converts this internal representation in an output midi
+	file.
+queues.c are some utilities needed by genmidi.
+midifile.c is a library of public domain routines to read and write
+	midifiles.
+
+In order to handle the multiple voices, parts, repeats and accompaniments
+which occur in abc files, the program performs multiple passes. The
+midi file stores the different voices, accompaniment and lyrics in
+individual tracks, so it is necessary to separates these parts prior
+to writing it to the midi file. If there are repeats in the music,
+something which appears only once in the abc file may be invoked twice
+when creating the output midi file.
+
+Parseabc.c
+----------
+
+The parser has been written so that it should be possible to write
+your own utility to handle the interpreted abc and link it with
+the parser code. This is very similar to the way that the midifilelib
+utilities work. The parser is designed so that it can write out
+almost exactly what it reads in. This means that in some cases
+the level of parsing is fairly primitive and it may be necessary to make
+use of routines in store.c which perform further processing on an item.
+
+In the first phase of parsing, the abc file is read and when, say, a note
+is encountered, the routine event_note() is called. The code for event_note
+is in the file store.c. Encountering an X in the abc generally causes a
+routine called event_X() to be called. An internal representation of the tune 
+is built up and when the end of an abc tune is reached, a little bit of 
+processing is done on the internal representation before the routine 
+mywritetrack() is called to actually write out the MIDI file.
+
+The main program to abc2midi is contained in this file. Since this
+main program is used to start other programs such as yaps, it is
+fairly simple. It calls event_init defined in store.c which obtains
+all the user parameters (eg. input filename) and then executes the
+top level procedure, parsefile.
+
+The procedure parsefile (filename), opens the specified file (or stdin)
+and processes it one character at a time. The characters fill a line
+buffer which is passed to the procedure parseline whenever a linebreak
+character (eg. linefeed) is encountered. By doing it in this fashion,
+abc2midi is able to eliminate the extra carriage return which occurs
+in DOS files.
+
+The procedure parseline first checks for blank lines and comments. A
+blank line signals the end of the tune and the event_blankline is called
+to initiate the next stage in processing. If it is neither a comment or
+blank line, the procedure must decide whether the line is a a field line
+(eg."X:2") or part of a music body (eg. "|:C>DGz|..."). This is decided
+using the following rule. If the first letter begins with one of the field
+letter commands and is immediately followed by a ":", then it is treated
+as a field line and parsefield is called. Otherwise if a K: field line
+was already encountered (variable inbody set to 1), then it is treated 
+as a line of music. If neither case is satisfied, then the line is
+intepreted as plain text.
+
+The procedure parsefield identifies the particular field line type
+and invokes the appropriate support function or event handler. If the
+field command occurs after the first K: line, then only certain field
+lines are legal. (For example it is illegal to place a T: (title) line
+after the K: (key signature) line.)
+
+The procedure parsemusic is the most complex procedure in the file and
+recognizes the musical notes, chords, guitar chord names, bar lines,
+repeats, slurs, ties, graces etc. Appropriate event handlers and 
+support functions are called to complete the tasks of parsing the
+information. The parsenote function, for example, must check for
+decorations, accidentals, octave shifts as well as identifying the
+note and its determining its duration.
+
+Unlike the other software modules, parseabc.c contains few global
+variables. The global variables linenum, inhead, inbody, parsing,
+slur, parserinchord indicate which lexical component of the abc 
+tune is being processed.
+
+
+
+
+store.c
+-------
+
+This is the most complex module consisting of almost 3000 lines
+of source code.  This module contains all of the event handlers which
+may be invoked in the file parseabc.c.  The main purpose of these
+handlers are to build up an internal representation of the abc file
+in the global memory arrays. This is a complete representation
+which allows the regeneration of the abc file (eg. abc2abc) or
+the creation of a midi file. The internal representation is used
+by the genmidi.c software to create the midi file.
+
+
+Global variables
+
+The internal representation is stored in global variables defined
+at the beginning of the file. A description of the most important
+variables is given here.
+
+The music is stored in the four arrays, feature, pitch, num, denom.
+These arrays contains a list of the lexical components in the order
+that they have been encountered or created.
+
+The array "feature" identifies the type of component which can be one
+of the following enum features.
+
+SINGLE_BAR, DOUBLE_BAR, BAR_REP, REP_BAR, REP1, REP2, BAR1,
+REP_BAR2, DOUBLE_REP, THICK_THIN, THIN_THICK, PART, TEMPO,
+TIME, KEY, REST, TUPLE, NOTE, NONOTE, OLDTIE, TEXT, SLUR_ON,
+SLUR_OFF, TIE, TITLE, CHANNEL, TRANSPOSE, RTRANSPOSE, GRACEON,
+GRACEOFF, SETGRACE, SETC, GCHORD, GCHORDON, GCHORDOFF, VOICE,
+CHORDON, CHORDOFF, SLUR_TIE, TNOTE, LT, GT, DYNAMIC, LINENUM,
+MUSICLINE, MUSICSTOP, WORDLINE, WORDSTOP 
+
+The array pitch[] mainly stores the pitch of a musical note, 
+represented in the same manner as in a midi file. Thus middle
+C has a value of 60. The array has other uses, for example
+in a LINENUM feature it stores the line number relative to
+the X: reference command where the lexical feature has been
+detected. The LINENUM feature is useful when reporting warnings
+or errors in the input file. Duration of the notes are represented
+as a fraction, where the standard unit is defined by the L:
+command. If feature[n] is a NOTE, then num[n] and denom[n]
+contain the numerator and denominator of this fraction.
+
+Here is an example of the contents of these arrays for the
+following small file in the same order that they are stored in
+these arrays.
+
+X: 1
+T: sample
+M: 2/4
+L: 1/8
+K: G
+|: C>D[EF]G |C4:|
+
+
+Feature		Pitch	Num 	Denom
+LINENUM		2	0	0
+TITLE		0	0	0
+LINENUM		3	0	0
+LINENUM		4	0	0
+LINENUM		5	0	0
+DOUBLE_BAR	0	0	0
+LINENUM		6	0	0
+MUSICLINE	0	0	0
+BAR_REP		0	0	0
+NOTE		60	2	3
+NOTE		62	1	3
+CHORDON		0	0	0
+NOTE		64	1	2
+NOTE		66	1	2
+CHORDOFF	0	1	2
+NOTE		67	1	2
+SINGLE_BAR	0	0	0
+NOTE		60	2	1
+REP_BAR		0	0	0
+MUSIC_STOP	0	0	0
+LINENUM		7	0	0
+
+
+In order to support multivoice abc files in the form
+V:1
+| ...| ...|....
+V:2
+| ...| ...|....
+%
+V:1
+| ...| ...|....
+V:2
+| ...| ...|....
+etc.
+
+abc2midi maintains a voicecontext structure for each voice.
+This allows each voice to define its own key signature, default
+note length using internal field commands. There is a head
+voicecontext which is used when no voice field commands are
+defined in the abc file. The v[] array maintains a set of
+all voices active in the abc file and voicecount keeps track
+of the number of voices.
+
+Similarly, abcmidi maintains a list of all the part stored 
+in the feature[], pitch[], num[] and denom[] arrays.
+
+All text items (eg. title and some other fields) are stored
+in char atext[][] arrays, so that they can be included in
+the midi output file. The textual information is repeated
+in each track of the output midi file. 
+
+Following the conventions in the midi file, the program uses
+the quarter note as the standard unit of time instead of the
+whole note. In contrast, the standard length in the abc file
+is based on the whole note. For example in L:1/8, the fraction
+refers to a whole note. In order to convert time units to
+quarter notes, the numerator of the time specifications
+for note lengths is multiplied by 4 when it is added to
+the feature list.
+
+Table of contents of procedures in store.c
+
+getarg(option, argc, argv) - gets run time arguments.
+newvoice(n) - creates a new voice context.
+getvoicecontext() - finds or makes a voice context.
+clearvoicecontexts() - frees up the memory of the voice context
+
+event_init() - called by main program
+event_text(s) - called when a line of text is encountered.
+event_reserved(p) - handles reserved character codes H-Z.
+event_tex(s) - called whenever a TeX command is encountered.
+event_linebreak() - called whenever a newline character is encountered.
+event_startmusicline() - called for each new music line.
+event_endmusicline() - called at the end of each music line.
+event_eof() - end of abc file encountered.
+event_fatal_error(s) - reports fatal error. 
+event_error(s) - reports an error.
+event_warning(s) - reports a potential problem.
+event_comment(s) - called whenever a comment is encountered.
+event_specific(package, s) - recognizes %%package s.
+event_startinline() - beginning of an in-music field command.
+event_closeinline() - finishes an in-music field command.
+event_field(k,f) - for R:, T: and any other unprocessed field commands.
+event_words(p) - processes a w: field command.
+
+char_out(list,out,ch) - for building up a parts list in a P: command.
+read_spec() - converts P:A(AB)3 to P:AABABAB etc.
+event_part(s) - handles a  P: field.
+
+char_break() - reports error for improper voice change.
+event_voice(n,s) - processes a V: field.
+event_length(n) - recognizes L: field
+event_blankline - starts finishfile() procedure.
+event_refno(n) - recognizes X:
+event_tempo(n, a, b, rel) - recognizes Q:
+event_timesig(n, m) - recognizes M:
+event_key(sharps, s, minor, modmap, modmul) - recognizes K:
+event_graceon() - start of grace notes, "{" encountered.
+event_graceoff() - end of grace notes, "}" encountered.
+event_rep1() - handles first repeat indicated by [1.
+event_rep2() - handles second repeat indicated by [2.
+event_slur(t) -called when s encountered in abc.
+event_sluron(t) called when "(" is encountered in abc.
+event_sluroff(t) called when ")" is encountered in abc.
+slurtotie() - converts slur into tied notes.
+event_tie() - handles tie indication "-".
+event_rest(n,m) - processes rest indication Z or z.
+event_bar(type) - processes various types of bar lines.
+event_space() - space character encountered. Ignored here.
+event_linend(ch,n) - handles line continuation at end of line (eg. \).
+event_broken(type, mult) - handles >, <, >> etc. in abc.
+event_tuple(n,q,r) - handles triplets and general tuplets.
+event_chord() - called whenever + is encountered.
+marknotestart() - remembers last few notes in voice context.
+marknoteend() - this is used to process broken rhythms (eg. >).
+marknote() - called for single note (as opposed to chord).
+event_chordon() - called whenever [ is encountered.
+event_chordoff() - called whenever ] is encountered.
+splitstring(s,sep,handler) - splits string with separator sep.
+event_instuction(s) - handles !...! event.
+getchordnumber(s) - searches known chords for chord s.
+addchordname(s, len, notes) - adds chord name to known chord list.
+event_gchord(s) - handles guitar chords.
+event_handle_gchord(s) - handler for guitar chords.
+event_handle_instruction(s) - handles dynamic indications (eg. !ppp!).
+event_finger(p) - handles 1,2,...5 in guitar chord field (does nothing).
+hornp(num,denom) - modifies rhythm to hornpipe.
+event_note(roll, staccato, updown, accidental, mult, note, octave, n, m)
+doroll(note,octave,n,m,pitch) - applies roll to note.
+dotrill(note,octave,n,m,pitch) - applies trill to note.
+pitchof(note,accidental,mult,octave) -finds MIDI pitch value
+setmap(sf,map,mult) - converts key signature to accidental map.
+altermap(v,modmap,modmul) - modifies accidental map.
+copymap(v) - sets up working accidental map at beginning of bar.
+
+addfeature(f,p,n,d) - places feature in internal tables.
+autoextend(maxnotes) - increase memory limits for feature arrays.
+textextend(maxstrings, stringarray) - resize array pointers to strings.
+myputc(c) - workaround for problems with PCC compiler.
+tiefix() - connect up tied notes.
+dotie(j,xinchord) -  called in preprocessing stage to handle ties.
+addfrac(xnum,xdenom,a,b) - add a/b to the number of units in bar.
+applybroken(place, type, n) - adjust length of broken notes.
+brokenadjust() -adjust length of broken notes.
+applygrace() - assign lengths to grace notes.
+dograce() - assign lengths to grace notes.
+lenmul(n, a, b) - multiply num(n),denom(n) by a/b.
+zerobar() - start a new count of beats in the bar.
+delendrep() - remove bogus repeat.
+placeendrep(j) - patch up missing repeat.
+placestartrep(j) - patch up missing repeat.
+fixreps() - find and correct missing repeats in music.
+startfile() - initialization performed after an event_refno.
+tempounits(t_num, t_denom) - interprets Q: field.
+setbeat() - sets default gchord command for time signature.
+headerprocess() - called after the first K: field in tune.
+finishfile() - starts next stage of processing when end of tune
+is encountered.
+
+All the functions in this file respond to event calls from parseabc.
+Once the internal representation of the abc file is completed, the
+procedure finishfile is called to perform some clean up and create
+the midi file.  An internal representation of the midi file is
+first created and then it is written onto the designated output file.
+As finishfile provides the link to the next module, genmidi.c, here
+is a brief description of what it does.
+
+proc finishfile performs several passes through the internal 
+representation to clean up the graces (dograce), the tied notes
+(tiefix) and any unbalanced repeats. It then calls writetrack(i)
+for each midi track to create the internal midi representation
+and finally the midi representation is recorded in the output
+file.
+
+
+
+genmidi.c
+---------
+The procedure finishfile described above, creates each midi track
+by calling the function writetrack which is defined here. To create
+a track from the internal representation, the program must find all
+the parts and put them in order with all the repeats. In addition, if
+it contains karaoke text, this too must be placed in a separate track.
+Any chordal accompaniment is generated from the guitar chord indications
+and placed in another track. For multivoice and multipart music, a voice
+may be missing in a particular part.  If the voice is missing, the
+procedure fillvoice ensures that all voices remain properly aligned when
+the voice reappears in another part.
+
+Here is a simple road map to the important procedures included in this
+file.
+
+dodeferred is here used to handle any dynamic indications (eg. !ppp!)
+which may be contained in the file. The %%MIDI messages are stored
+in a atext string which is pointed to by the contents of the pitch[]
+array.
+
+checkbar is called each time a bar line is encountered and reports
+a warning if the wrong number of beats occur.
+
+Transitions between parts are handled by the procedure partbreak.
+
+There are a number of procedures for handling karoake text --  
+karaokestarttrack(), findwline(startline), getword(place,w),
+write_syllable(place) and checksyllables().
+
+For the first track, the meter, tempo and key signature are recorded
+using the functions set_meter(n,m), write_meter(n,m), write_keysig(sf,mi).
+
+Chordal accompaniment is produced by the procedure dogchords(i).
+
+
+
+queues.c
+--------
+
+For each midi note, it is necessary to send a note-on and a note-off
+instruction. When polyphonic music is played on the same track, keeping
+track of the time to issue a note-off instruction may get complicated.
+The procedures in this file are used to maintain a linked list for the
+notes to be turned off. The notes are put into the list in the order
+that they are encountered but the order in which to issue note-off
+commands is maintained by the links. As many as 50 notes playing
+simultaneously can be handled by the list.
+
+
+
+
+
+Addendum
+--------
+
+The following section contains clarifications on various components
+of abc2midi.
+
+29 June 2003
+
+Treatment of octave shifts. 
+
+The key signature field command K: has provision for shifting
+a note using either transpose= or octave= subcommands. Both
+of these functions operate quite differently and deserve some
+description especially for multivoiced tunes.
+
+The octave shift, is performed in event_note in store.c, using
+the cached value v.octaveshift which is stored in the global
+voicecontext structure, v. There is a structure for each voice
+in the abc file.  Whenever a new V: command is encountered,
+event_voice (store.c) is invoked, which swaps the appropriate
+voices structure into the global v array using the function 
+getvoicecontext(n). If getvoicecontext cannot find a cached
+structure for that voice, then a new voice structure is created
+and added to the linked list of voice structures. The v.octaveshift
+variable is updated by event_octave which is called by event_key
+(store.c) which is called by parsekey in parseabc.c
+(Comment: it is not too clear how an octave switch is
+handled in the middle of a repeat section. i.e. does the old
+value get restored when repeating.)
+
+(Description of transpose shift is in CHANGES July 1 2003.)

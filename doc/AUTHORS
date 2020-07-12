@@ -1,0 +1,26 @@
+
+This file contains additional documentation for the abcMIDI package :
+
+Unix Man Pages
+--------------
+* abc2midi.1 man pages for abc2midi written by Christoph Dalitz.
+* midi2abc.1 man page for midi2abc written by Christoph Dalitz.
+* abc2abc.1 man page for abc2abc written by Anselm Lingnau.
+* mftext.1 man page for mftext written by Anselm Lingnau.
+
+These man pages are now supported by Seymour Shlien
+
+If you wish to preview these man pages use groff with the -man
+option. The output is normally in postscript format, but you
+can override this using the -a option. For example,
+groff -man -a abc2midi.1
+
+
+To install the man pages, copy them to appropriate directory (typically
+this will be /usr/man/man1). You may also need to run mandb after
+copying them across.
+
+Code Documentation
+------------------
+* abc2midi.txt : notes on the abc2midi code written by Seymour Shlien.
+* midi2abc.txt : notes on the midi2abc code written by Seymour Shlien.

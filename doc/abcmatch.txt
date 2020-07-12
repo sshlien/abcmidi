@@ -1,0 +1,318 @@
+abcmatch		version 1.35	January 15 2006.
+
+seymour shlien <fy733@ncf.ca>
+
+Introduction:
+------------
+
+The purpose of this program is to search for specific sequences of
+notes in an  abc file composed of many tunes. For example, if you
+know a few bars of a tune, you can use this program to find the 
+tune having this sequence and perhaps identify the tune.
+
+At a minimum, abcmatch requires two files. A template file called
+match.abc which contains the bars that you are searching for and
+a large file consisting of a hundred or more abc tunes. 
+The program automatically loads up the match.abc file and
+then scans every tune in the large file.
+
+The match.abc file is a regularly formatted abc file containing
+the basic fields, X:, M:, L:, and K: and the body.
+Normally, this file is created by runabc.tcl.
+An example match.abc file is shown below.
+
+
+X:1
+M:6/8
+L:1/8
+K:E
+cff f2e|
+
+As well as the sample bars, abcmatch needs to know the meter
+(given by M:) and the key signature (given by K:). The default note
+length L: should also be given if it is not 1/8. It is important
+that all bars be terminated with a bar line indicated by |
+(otherwise that bar may not be seen by the program).
+
+Abcmatch uses the key signature to know the relative position
+of the notes in the scale.  It also uses the key signature to
+determine all the assumed sharps and flats. Thus the program
+can find matching bars in a tune transposed to another key 
+signature (assuming the key difference is not too large).
+When the program finds matches, they are returned in a list that
+looks like this.
+ 
+abcmatch.exe scotjig.abc
+29 30 4 
+30 31 4 
+
+
+Each line indicates a particular match made by the program.
+The first number, (eg. 29) indicates the relative position of
+the tune in the abc file. Thus in this example, it indicates
+that a match was found for the 29 th tune in compilation file
+scotjib.abc. The next number is the X: reference number of
+that tune, and the last number is the bar number of the matching
+tune. Bar numbers are counted sequentially from the start of
+the tune, ignoring all V: and P: indications. Thus the bar
+numbers may not match the ones you get when you print the
+tune using one of the variants of abc2ps or yaps.
+
+Though the  program can be run stand alone, it is really meant to
+be run with a graphics user interface such as runabc.tcl (version
+1.59 or higher). Most of its output is rather cryptic.
+
+In performing the match, the program ignores all guitar chords,
+karaoke, note decorations (eg. stacatto markings), grace notes
+and hornpipe rhythm indications in either the match.abc template
+file or in the target file. Furthermore if chords in the form
+of [G2c2] are embedded in the abc file, only the higher note
+c2 is matched. Any warnings and error messages that are normally
+returned by the parser are suppressed unless the run time
+parameter -c is included.
+
+
+Installation:
+------------
+
+Unless you are running the program on Microsoft's windows
+operating system, it will be necessary for you to build the
+program from sources. For windows environment, I shall provide
+the executable. Here is how the makefile looks.
+
+CFLAGS=-c 
+abcmatch:  parseabc.o matchsup.o abcmatch.o
+	gcc  parseabc.o matchsup.o abcmatch.o -o abcmatch.exe
+
+parseabc.o : parseabc.c abc.h
+	gcc $(CFLAGS) abcparse.c
+
+matchsup.o : matchsup.c abc.h
+	gcc $(CFLAGS) abcstore.c
+
+abcmatch.o : abcmatch.c abc.h
+	gcc $(CFLAGS) abcmatch.c
+
+The program has been built using the gcc (GNU compiler) as well
+as Microsoft Visual C++ (with many warning messages).
+
+
+Operation:
+---------
+
+Here is now an explanation of the program and its run time 
+parameters.  If you run abcmatch without any parameters you
+will see:
+
+abcmatch version 1.55
+Usage : abcmatch <abc file> [-options]
+        [reference number] selects a tune
+        -c returns error and warning messages
+        -v selects verbose option
+        -r resolution for matching
+        -con  pitch contour match
+        -fixed <n> fixed number of notes
+        -qnt quantized pitch contour
+        -lev use levenshtein distance
+        -a report any matching bars (default all bars)
+        -ign ignore simple bars
+        -br %d only report number of matched bars when
+            above given threshold
+        -tp <abc file> [reference number]
+        -ver returns version number
+        -pitch_hist pitch histogram
+        -wpitch_hist interval weighted pitch histogram
+        -length_hist pitch histogram
+        -interval_hist pitch interval histogram
+        -pitch_table separate pitch pdfs for each tune
+        -interval_table separate interval pdfs for each tune
+
+
+When running this program, you must provide the name of the abc file name
+containing the numerous tunes. The other parameters are optional and
+are explained below.
+
+The -c and -v options are mainly used for debugging when the
+program does not do what was expected. The -ver option does
+nothing but return the version number of the program. (This
+is used to perform a sanity check when you are running it 
+from runabc).
+
+All the remaining parameters (-r -con -a -br) control the matching
+process.
+
+The option -norhythm, causes the matching algorithm to ignore
+the length of notes in a bar, thus E3/2F/D GA2 would match
+EFD G2A. The option ignores -r parameter since it is now
+irrelevant.
+
+The option -pitch_table is used to produce a interval weighted
+pitch histogram for each tune in the file. If this is saved
+in an external file, that file could be used as a database
+for finding tunes with similar pitch probability density functions
+(pdf).
+
+The -r parameter controls how the matching criterion handles
+small rhythm variations in the melody.  The -r option must be
+followed by a number which specifies the temporal resolution
+for the match. When the number is zero, this indicates that
+a perfect match should be performed, meaning that the lengths
+of each note in the bar must match exactly in order to be
+reported. For larger values a looser match will be performed
+as described below. Note lengths are converted into temporal
+units where a quarter note normally is assigned a value of
+24. Therefore an eight note has a value of 12, a sixteenth has
+a value of 6, a half note has a value of 48 and etc. If you
+specify a temporal resolution of 12, then the pitch values
+of the notes only need to match at time units which are multiples
+of an eighth note. 
+
+This means that the program would match the two bars
+C2 D2| and C C D D|.
+Similarly C2 D2| would also match C/D/C/D/D2|. By using
+a suitable value of the resolution, you can perform the
+matching only at the beginning of a measure or at the
+beginning of each beat.
+
+The -fixed <n> option causes the program to disregard
+bar lines when does the matching. It allows matching
+of notes between tunes having different time signatures.
+n is a number which specifies the exact number of
+notes to match. For example if n is 4, the program
+could match
+|C E G E| .. with |C E|G E|
+Note the matcher still starts at a beginning
+of a given bar for both the tune and template.
+
+Normally, when the program is presented with a sequence
+of several bars, the program will try it match it with
+a matching sequence. If abcmatch is run with the -a option,
+then the bars are matched individually in any sequence.
+In other words any matching bar found is reported.
+
+The -con option specifies contour matching. In this case,
+the program uses the key signature only to indicate accidentals.
+The pitch contour is computed from the pitch difference
+or interval between adjacent notes.
+
+Thus C2 DE| and c2 de| and G2 AB| all have the same pitch
+contour.
+
+The -qnt option will use the contour matching algorithm
+but also quantize the intervals using the following table
+
+unison and semitone    0
+minor 2nd to major 2nd 1
+minor 3rd to major 3rd 2
+any larger interval    3
+
+negative numbers are descending intervals.
+
+The -tp followed by a file name and reference number
+allows you to substitute any tune for the template match.abc.
+When using this feature, the entire tune is used as a
+template. Abcmatch does not match the template with itself,
+and only bars which match bars in other tunes are reported.
+
+The -br followed by a threshold, runs the program in a brief
+mode designed to identify groups of tunes sharing common bars.
+(-br stands for brief mode; I cannot think of a better name
+right now.) In this mode, the program counts the numbers of bars
+in the test tune which are also present in match.abc. If the
+number of common bars is larger or equal to the threshold 
+then the program reports the tune and the number of common bars. 
+The program scans all the tunes in the abc file and returns
+a list of all the tunes which have more than a specific number
+of bars in common with the template, match.abc. In actual
+use, the program is run repeatedly by a script. For each
+tune in a abc file, it creates a template file called match.abc
+and then executes abcmatch. The outputs are displayed on the
+screen in a form easy to interpret. Currently, the user
+has no control of the matching criterion. The rhythm must
+match exactly and the notes are transposed to suit the key
+signature. In other words the -r parameter is zero independent
+of what is specified in the parameter list.  
+
+The -pitch_hist or -length_hist runs the program in another mode.
+It produces a histogram of the distribution of the notes in the
+abc file. Thus if you type
+abcmatch.exe scotjig.abc -pitch_hist
+
+pitch_histogram
+64 2
+66 9
+67 11
+69 30
+71 18
+73 12
+74 14
+76 14
+78 14
+79 4
+81 4
+
+The pitch is indicated in midi units. Thus middle C is 60 and the
+pitches go up in semitone units. Following the pitch is a count
+of the number of times that note occurred. If you type
+
+abcmatch.exe scotjig.abc -length_hist
+
+length histogram
+12 100
+24 20
+36 6
+48 2
+72 4
+
+
+The program quantizes a quarter note into 24 units. Thus eighth notes
+have a value of 12, dotted half notes 72, etc. The program does
+not require the match.abc file to be present if you are computing
+the histograms since it does not perform any matching.
+
+
+abcmatch.exe scotjig.abc -interval_hist
+
+computes the histogram of the pitch interval in midi units
+between adjacent notes. The histogram is restricted between
+intervals -12 and 12 units.
+
+eg.
+interval_histogram
+-5 2
+-4 3
+-3 10
+-2 17
+-1 3
+0 8
+1 3
+2 23
+3 11
+4 1
+5 4
+
+For a collection of tunes in a file, you can use -pitch_table
+or -interval_table to create a database for future analysis.
+
+
+Limits of the program
+---------------------
+
+The program has some limits. For example, the abc file must
+have bar lines. Tied notes cannot be longer than 8 quarter notes.
+Specifying a too small resolution (eg. -r 1) may causes some 
+buffers to be exceeded.  When there are differences of key
+signatures more than 5 semitones, the program may transpose 
+the notes in the wrong direction.
+
+Abc tunes with more than one key signature or time signature
+may not be processed correctly.
+
+Comment:
+________
+
+
+This program is  designed to be a research tool to find
+similarities between abc tunes. I have discovered a few
+problems with tied notes and double or  triple bar lines.
+
