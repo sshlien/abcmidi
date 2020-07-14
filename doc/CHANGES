@@ -13745,4 +13745,12 @@ can take various values.
 You can find a test file detune.abc in the samples folder.
 
 
+July 14 2020
+yaps: cleaned up numerous gcc warnings such as
+drawtune.c:3245:16: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       lineno = (int)(ft->item);
+
+changed 
+       lineno = (long)(ft->item);
+etc.
 

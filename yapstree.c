@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.77 June 04 2020 yaps"
+#define VERSION "1.78 July 14 2020 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
