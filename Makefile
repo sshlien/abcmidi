@@ -6,13 +6,13 @@
 #
 # Written by R.F. Smith <rsmith@xs4all.nl>
 # Created: 2020-07-27T14:00:05+0200
-# Last modified: 2020-07-27T14:32:50+0200
+# Last modified: 2020-07-27T14:45:45+0200
 
 INSTALL = install
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL} -s -m 555
 
-CFLAGS = -O2
+CFLAGS = -O2 -DANSILIBS
 
 PREFIX = /usr/local
 BINDIR = ${PREFIX}/bin
