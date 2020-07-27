@@ -13754,3 +13754,34 @@ changed
        lineno = (long)(ft->item);
 etc.
 
+
+
+July 17 2020
+
+store.c: in order to improve the accuracy of the MIDI temperamentequal
+and MIDI temperamentlinear representation, the calculations were
+performed in floating point rather than integer arithmetic. The constant
+SEMISIZE = 4096 was eliminated, and the global variables octave_size,
+fifth_size, sharp_size, and microstep_size were turned into floating
+point variables. A new function compute_fifth_size () was introduced,
+which computes the perfect fifth interval quantized into the ndiv
+comma units. The result is returned in units of cents where one
+standard octave is 1200 cents. If you run abc2midi with -v 1 
+(verbose level 1), the size of the fifth interval and other variables
+is printed.
+
+This is a significant change affecting the code in the functions
+event_midi() and pitchof_b().
+
+
+July 24 2020
+
+store.c Hudson Lacerda corrected the algorithm in compute_fifth_size()
+and fixed a bug that I had introduced.
+
+
+
+
+
+
+

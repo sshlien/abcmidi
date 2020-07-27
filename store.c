@@ -183,9 +183,9 @@ int main()
 
 
 
- */
+*/
 
-#define VERSION "4.38 July 05 2020 abc2midi" 
+#define VERSION "4.39 July 19 2020 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -272,15 +272,14 @@ extern int microtone;
 extern int temperament;  /* [SS] 2020-06-25 */
 /* [HL] 2020-07-03 */
 float temperament_dt[12]={0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0};
-#define SEMISIZE 4096
 #define TEMPERDT -1
 #define TEMPEREQ 1
 #define TEMPERLN 2
 #define TEMPERNORMAL 0
-int octave_size = 12*SEMISIZE;
-int fifth_size = 7*SEMISIZE; /* default to 12-edo */
-int sharp_size = SEMISIZE; /* [HL] 2015-05-15] */
-int microstep_size = SEMISIZE; /* [HL] 2020-06-20 */
+float octave_size = 12.0; /* [SS] 2020-07-17 */
+float fifth_size = 7.0; /* default to 12-edo */
+float sharp_size = 1.0; /* [SS] 2020-07-17 */
+float microstep_size = 1.0; /* [SS] 2020-07-17 */
 int started_parsing=0;
 int v1index= -1;
 int ignore_fermata = 0; /* [SS] 2010-01-06 */
@@ -1889,6 +1888,28 @@ while (j > 0) {
     }
 }
 
+/* [SS] 2020-07-17 ; [HL] 2020-07-24 */
+float compute_fifth_size (octave_size, ndiv)
+float octave_size; /* in cents */
+int ndiv;
+/* rather than compute the fifth_size in cents directly
+ * we subtract the octave from the third harmonic.
+ * We do it this way  instead of the proportion 3/2 because the
+ * octave also can be tempered. When the octave is tempered, the factor 2
+ * in 3/2 might cause problems: mix of pure and tempered octaves!).
+ */
+{
+double x, h3;
+int n;
+float w;
+/* h3 (1901.955) is the 3rd harmonic (fifth+octave) represented in cents */
+h3 = 1200.0 * log2 (3.0);
+x = h3 - octave_size;           /* fifth reduced by the tempered octave */
+n = (int) (0.5 + x * ndiv / octave_size);     /* fifth in integer steps */
+w = n * octave_size / ndiv;                   /* fifth quantized according to temperament */
+return w; /* in cents */
+}
+
 
 /* [SS] 2015-08-11 */
 void event_midi(s)
@@ -2149,26 +2170,26 @@ char *s;
       double octave_cents=0.0;
       double fifth_cents=0.0;
       temperament = TEMPERLN;
-      middle_c = 60*SEMISIZE;
+      middle_c = 60;
 
       if (sscanf(p," %lf %lf ",&octave_cents,&fifth_cents) == 2) {
-        octave_size = (int)(octave_cents*SEMISIZE/100+0.5);
-        fifth_size = (int)(fifth_cents*SEMISIZE/100+0.5);
+        octave_size = octave_cents;
+        fifth_size = fifth_cents;
 	sharp_size = 7*fifth_size - 4*octave_size; /* [HL] 2015-05-15] */
         microstep_size = sharp_size;   /* [HL] 2020-06-20 */ 	
 	if(verbose) { /* [HL] 2015-05-15] */
 	    printf("temperamentlinear:\n"
 		   "\targs: %lf %lf\n",octave_cents, fifth_cents);
-	    printf("\toctave_size = %d (%.2lf cents)\n"
-		   "\tfifth_size = %d (%.2lf cents)\n"
-		   "\twhole-tone size = %d (%.2lf cents)\n"
-		   "\taccidental_size = %d (%.2lf cents)\n"
+	    printf("\toctave_size = %.3f (%.3lf cents)\n"
+		   "\tfifth_size = %.3f (%.3lf cents)\n"
+		   "\twhole-tone size = %.3f (%.3lf cents)\n"
+		   "\taccidental_size = %.3f (%.3lf cents)\n"
 		   ,
 		   octave_size,
-		   100.0*octave_size/SEMISIZE,
-		   fifth_size,100.0*fifth_size/SEMISIZE,
-		   2*fifth_size - octave_size, 100.0*(2.0*fifth_size-octave_size)/SEMISIZE,
-		   sharp_size,100.0*sharp_size/SEMISIZE
+		   octave_size,
+		   fifth_size,fifth_size,
+		   2*fifth_size - octave_size, 2.0*fifth_size-octave_size,
+		   sharp_size,sharp_size
 		   );
 	}
 
@@ -2182,72 +2203,70 @@ char *s;
   /* [HL] 2015-05-15 */
   else if (strcmp(command, "temperamentequal") == 0) {
       double octave_cents;
-      int acc_size = -1;  /* [SDG] 2020-06-03 */
+      float acc_size = -1.0;  /* [SDG] 2020-06-03 */
       int narg, ndiv, fifth_index, sharp_steps;
       narg = sscanf(p," %d %lf %d %d ",&ndiv, &octave_cents, &fifth_index, &sharp_steps);
       switch (narg) {
       case 1:
-	  octave_size = (int)( 1200.0 *SEMISIZE/100.0 + 0.5);
-	  fifth_size = (int)( 1901.95500086539 *SEMISIZE/100.0 + 0.5) - octave_size;
-          /* [SS] 2015-10-08 extra parentheses after (int) */
-	  fifth_size = (int) (((int) (1.0* ndiv *fifth_size/octave_size + 0.5)) * (1.0*octave_size/ndiv));
+	  octave_size = 1200.0; /* [SS] 2020-07-17 */
+          fifth_size = compute_fifth_size (octave_size, ndiv);
 	  acc_size = 7*fifth_size - 4*octave_size;
 	  break;
       case 2:
-	  octave_size = (int)(octave_cents * SEMISIZE/100.0 + 0.5);
-	  fifth_size = (int) (1901.95500086539 *SEMISIZE/100.0 + 0.5) - octave_size;
-          /* [SS] 2015-10-08 extra parentheses after (int) */
-	  fifth_size = (int) (((int)( 1.0 * fifth_size/octave_size*ndiv + 0.5 )) * (1.0*octave_size/ndiv));
+	  octave_size = octave_cents;
+          fifth_size = compute_fifth_size (octave_size, ndiv);
 	  acc_size = 7*fifth_size - 4*octave_size;
 	  break;
       case 3:
-	  octave_size = (int)(octave_cents * SEMISIZE/100.0 + 0.5);
-	  if (fifth_index > 0) /* user-defined fifth size */
-	      fifth_size = (int) ( 1.0 * fifth_index * octave_size/ndiv + 0.5);
+	  octave_size = octave_cents;
+	  if (fifth_index > 0.0) /* user-defined fifth size */
+	      fifth_size =  1.0 * fifth_index * octave_size/ndiv ;
 	  else {               /* automatically computed fifth size */
-	      fifth_size = ((int) (1901.95500086539 *SEMISIZE/100.0 + 0.5)) - octave_size;
-	      fifth_size = (int) (((int) ( 1.0 * fifth_size/octave_size*ndiv + 0.5 )) * (1.0*octave_size/ndiv));
-	  }
+              fifth_size = compute_fifth_size (octave_size, ndiv);
+	      }
 	  acc_size = 7*fifth_size - 4*octave_size;
 	  break;
       case 4:
-	  octave_size = (int)(octave_cents * SEMISIZE/100.0 + 0.5);
-	  if (fifth_index > 0) /* user-defined fifth size */
-	      fifth_size = (int) ( 1.0 * fifth_index * octave_size/ndiv + 0.5);
+	  octave_size = octave_cents;
+	  if (fifth_index > 0.0) /* user-defined fifth size */
+	      fifth_size =  1.0 * fifth_index * octave_size/ndiv ;
 	  else {               /* automatically computed fifth size */
-	      fifth_size = (int) (1901.95500086539 *SEMISIZE/100.0 + 0.5) - octave_size;
-          /* [SS] 2015-10-08 extra parentheses after (int) */
-	      fifth_size = (int) (((int) ( 1.0 * fifth_size/octave_size*ndiv + 0.5 )) * (1.0*octave_size/ndiv));
+              fifth_size = compute_fifth_size (octave_size, ndiv);
 	  }
 	  /* user-defined accidental size */
-	  acc_size = (int) (1.0 * sharp_steps * octave_size/ndiv + 0.5);
+	  acc_size = sharp_steps * octave_size/ndiv ;
 	  break;
       default:
 	  event_error("Bad format for temperamentequal command");
       }
-      microstep_size = (int) 1.0 * octave_size/ndiv + 0.5; /* [HL] 2020-06-20 */
+      microstep_size =  octave_size/ndiv; /* [SS] 2020-07-17 */
  
       sharp_size = acc_size;
 
       if(verbose) {
-	  printf("temperamentequal:\n"
-		 "\targs (%d): %d %lf %d %d\n",narg, ndiv, octave_cents, fifth_index, sharp_steps);
+	  printf("temperamentequal:\n\targs (%d):",narg);
+	  if(narg>=1) printf(" %d",ndiv);
+	  if(narg>=2) printf(" %.3lf",octave_cents);
+	  if(narg>=3) printf(" %d",fifth_index);
+	  if(narg>=4) printf(" %d",sharp_steps);
+	  printf("\n");
+
 	  printf("\tndiv = %d\n"
-		 "\toctave_size = %d (%.2lf cents)\n"
-		 "\tfifth_size = %d (%.2lf cents) (%d steps)\n"
-		 "\twhole-tone size = %d (%.2lf cents) (%d steps)\n"
-		 "\taccidental_size = %d (%.2lf cents) (%d steps)\n"
+		 "\toctave_size = %.3lf cents\n"
+		 "\tfifth_size = %.3lf (%d steps)\n"
+		 "\twhole-tone size = %.3lf (%d steps)\n"
+		 "\taccidental_size = %.3lf (%d steps)\n"
 		 ,
-		 ndiv,octave_size,
-		 100.0*octave_size/SEMISIZE,
-		 fifth_size,100.0*fifth_size/SEMISIZE,
-		 (int)(1.0*fifth_size/octave_size*ndiv+0.5),
-		 2*fifth_size - octave_size, 100.0*(2.0*fifth_size-octave_size)/SEMISIZE,
-		 (int)(1.0*(2*fifth_size-octave_size)/octave_size*ndiv+0.5),
-		 acc_size,100.0*acc_size/SEMISIZE,
-		 (int)(1.0*acc_size/octave_size*ndiv+0.5)
+		 ndiv,
+		 octave_size,
+		 fifth_size,
+		 (int) ((fifth_size/octave_size*ndiv) + 0.5),
+		 2.0*fifth_size-octave_size,
+		 (int) (((2*fifth_size-octave_size)*ndiv/octave_size) + 0.5),
+		 acc_size,
+		 (int) ((acc_size*ndiv/octave_size) + 0.5)
 		 );
-	         printf("\tmicrostep_size = %d (%.2lf cents)\n",microstep_size, 100.0*microstep_size/SEMISIZE); /* [HL] 2020-06-20*/
+	         printf("\tmicrostep_size = %.3lf cents (1 step)\n",microstep_size); /* [HL] 2020-06-20*/
 
       }
       
@@ -2261,7 +2280,7 @@ char *s;
       
 
       temperament = TEMPEREQ;
-      middle_c = 60*SEMISIZE;
+      middle_c = 60;
       done = 1;
     }
 
@@ -3677,23 +3696,24 @@ int *pitchbend;
   int p;
   char acc;
   int mul, noteno;
-  int pitch4096,pitch,bend;
+  float pitchvalue;
+  int pitch,bend;
   int a,b;
   int j;
 
   static int scale[7] = {0, 2, 4, 5, 7, 9, 11};
-  const int accidental_size = sharp_size;  /* [HL] 2015-05-15 - for temperamentlinear and temperamentequal */
-  const int tscale[7] = {
+  const float accidental_size = sharp_size/100.0;  /* [HL] 2015-05-15 - for temperamentlinear and temperamentequal */
+  const float tscale[7] = {
     0,
-    2*fifth_size-octave_size,
-    4*fifth_size-2*octave_size,
-    -1*fifth_size+octave_size,
+    (2*fifth_size-octave_size),
+    (4*fifth_size-2*octave_size),
+    (-1*fifth_size+octave_size),
     fifth_size,
-    3*fifth_size-octave_size,
-    5*fifth_size-2*octave_size
-  };
-  static const char *anoctave = "cdefgab";
+    (3*fifth_size-octave_size),
+    (5*fifth_size-2*octave_size) };
+  /* in units cents  [SS] 2020-07-17 */
 
+  static const char *anoctave = "cdefgab";
   acc = accidental;
   mul = mult;
   noteno = (int)note - 'a';
@@ -3730,29 +3750,29 @@ int *pitchbend;
   /* [HL] 2020-07-03 */
   if ((temperament==TEMPERLN) || (temperament==TEMPEREQ))  {
  
-    p = tscale[p];
-    if (acc == '^') p = p + mul*accidental_size;
-    if (acc == '_') p = p - mul*accidental_size;
+    pitchvalue = tscale[p]/100.0; /* cents to semitones */
+    if (acc == '^') pitchvalue = pitchvalue + mul*accidental_size;
+    if (acc == '_') pitchvalue = pitchvalue - mul*accidental_size;
 
-    pitch4096 =  p + octave*octave_size + middle_c;
+    pitchvalue =  pitchvalue + octave*octave_size/100.0 + middle_c;
     
     /* [HL] 2020-06-27 Adjust for A=440.0 with zero pitchbend */
-    pitch4096 += (9*SEMISIZE) - (3*fifth_size-octave_size);
+    pitchvalue += 9.0 - (3.0*fifth_size-octave_size)/100.0;
 
     /* [HL] 2015-05-15 */
     if (microtone) {
 	if (setmicrotone.denom == 100) /* microtone in cents */ 
-	    pitch4096 += (int) (1.0 * setmicrotone.num / setmicrotone.denom * SEMISIZE);
+	    pitchvalue+=  setmicrotone.num / setmicrotone.denom; 
         else if (setmicrotone.denom == 0) { /* [HL] 2020-06-20 / 2020-06-27 */
             /* microstep_size is accidental_size for temperamentlinear,
              * or
              * microstep_size is the octave fraction for temperamentequal
              * */
-           pitch4096 += (int) (1.0 * setmicrotone.num * microstep_size);
+           pitchvalue +=  setmicrotone.num * microstep_size/100.0;
        }
 
 	else /* microtone relative to sharp step in the current temperament */
-	    pitch4096 += (int) (1.0 * setmicrotone.num / setmicrotone.denom * accidental_size);
+	    pitchvalue +=  ((1.0 * setmicrotone.num) / setmicrotone.denom) * accidental_size;
 
 	/* needed? */
 	microtone = 0;
@@ -3760,8 +3780,8 @@ int *pitchbend;
 	active_pitchbend = 8192;
     }
  
-    pitch =  (SEMISIZE*128+pitch4096+SEMISIZE/2)/SEMISIZE-128;
-    bend =  8192+4096*(pitch4096 - pitch*SEMISIZE)/SEMISIZE;
+    pitch =  (int) (pitchvalue + 0.5);
+    bend = (int) (0.5 + 8192.0 + 4096.0 * (pitchvalue - (float) pitch));
     bend = bend<0?0:(bend>16383?16383:bend);
    } else { /* TEMPERNORMAL / TEMPERDT */
     p = scale[p];
@@ -3770,7 +3790,7 @@ int *pitchbend;
     pitch = p + 12*octave + middle_c;
     bend = 8192; /* corresponds to zero bend */
     if (temperament == TEMPERDT) {  /* [HL] 2020-07-03 */
-	bend += (int) (SEMISIZE * temperament_dt[p] / 100.0);
+      bend += (int) (0.5 + 40.96 * temperament_dt[p]);
 	bend = bend<0?0:(bend>16383?16383:bend);
     }
    }
