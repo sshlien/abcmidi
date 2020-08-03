@@ -13779,6 +13779,11 @@ July 24 2020
 store.c Hudson Lacerda corrected the algorithm in compute_fifth_size()
 and fixed a bug that I had introduced.
 
+July 28 2020
+
+store.c Minor correction in store.c when the microtone denominator is
+equal to 100 (in pitchof_b()).
+
 
 
 

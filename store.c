@@ -185,7 +185,7 @@ int main()
 
 */
 
-#define VERSION "4.39 July 19 2020 abc2midi" 
+#define VERSION "4.40 July 28 2020 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -3762,7 +3762,7 @@ int *pitchbend;
     /* [HL] 2015-05-15 */
     if (microtone) {
 	if (setmicrotone.denom == 100) /* microtone in cents */ 
-	    pitchvalue+=  setmicrotone.num / setmicrotone.denom; 
+	  pitchvalue+=  setmicrotone.num / 100.0; /* [HL] 2020-07-28 */
         else if (setmicrotone.denom == 0) { /* [HL] 2020-06-20 / 2020-06-27 */
             /* microstep_size is accidental_size for temperamentlinear,
              * or
@@ -3772,7 +3772,7 @@ int *pitchbend;
        }
 
 	else /* microtone relative to sharp step in the current temperament */
-	    pitchvalue +=  ((1.0 * setmicrotone.num) / setmicrotone.denom) * accidental_size;
+	  pitchvalue +=  (((float)setmicrotone.num) / ((float)setmicrotone.denom)) * accidental_size; /* [HL] 2020-07-28 */
 
 	/* needed? */
 	microtone = 0;
