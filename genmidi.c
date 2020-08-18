@@ -1875,6 +1875,39 @@ if (remainder == 0) {
  reduce(val_num,val_den);
 }
 
+/* [SS] 2020-08-09 */
+static void expand_array (shortarray, size, longarray, factor)
+/* if shortarray = {21,-40} and factor = 4
+ * longarray will be {5,6,5,5,-10,-10,-10,-10}
+ * It is used for smoothing a bendstring.
+ */
+int shortarray[], longarray[];
+int size;
+int factor;
+{
+float increment, accumulator;
+float last_accumulator;
+int i,j,k;
+if (size*factor > 256) {printf("not enough room in bendstring\n");
+	                return;
+                       }
+j = 0;
+for (i = 0; i< size; i++) {
+  increment = (float) shortarray[i]/factor;
+  accumulator = 0.0;
+  last_accumulator = 0.0;
+  for (k = 0; k < factor; k++) {
+    accumulator += increment;
+    if (increment > 0)
+      longarray[j] = (int) (accumulator + 0.5) - (int) (last_accumulator + 0.5);
+    else 
+      longarray[j] = (int) (accumulator - 0.5) - (int) (last_accumulator - 0.5);
+    last_accumulator = accumulator;
+    j++;
+    }
+  }
+}
+
 
 static void dodeferred(s,noteson)
 /* handle package-specific command which has been held over to be */
@@ -1888,6 +1921,7 @@ int noteson;
   int done;
   int val;
   int i;
+  int bendinput[64]; /* [SS] 2020-08-09 */
 
   p = s;
   skipspace(&p);
@@ -2044,6 +2078,21 @@ int noteson;
      else bendtype = 2;
      }
 
+  /* [SS] 2014-09-10 */
+  else if (strcmp(command, "bendstringex") == 0) {
+     i = 0;
+     while (i<64) { /* [SS] 2020-08-09 2015-09-10 2015-10-03 */
+          bendinput[i] = readsnump(&p);
+          skipspace(&p);
+          i = i + 1;
+          if (*p == 0) break;
+        };
+     expand_array (bendinput, i, benddata, 4);
+     bendnvals = i*4;
+     done = 1;
+     if (bendnvals == 1) bendtype = 3;
+     else bendtype = 2;
+     }
 
 
   else if (strcmp(command, "drone") == 0) {
