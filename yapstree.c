@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.78 July 14 2020 yaps"
+#define VERSION "1.79 October 01 2020 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -2969,7 +2969,7 @@ void event_microtone(int dir, int a, int b)
 {
 }
 
-void event_temperament(char **line) {
+void event_temperament(char *line) {
 }
 
 

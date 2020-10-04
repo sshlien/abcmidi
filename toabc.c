@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.08 June 04 2020 abc2abc"
+#define VERSION "2.09 October 01 2020 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -2395,7 +2395,7 @@ void event_microtone(int dir, int a, int b)
 {
 }
 
-void event_temperament(char **line) {
+void event_temperament(char *line) {
 }
 
 void event_normal_tone()

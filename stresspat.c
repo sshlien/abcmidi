@@ -538,6 +538,7 @@ read_custom_stress_file (char *filename)
       if (index > 47)
       {
         printf ("used up all available space for stress models\n");
+	fclose(inhandle); /* [JA] 2020-09-30 */
         return;
       }
       nmodels++;
@@ -563,4 +564,5 @@ read_custom_stress_file (char *filename)
     }
     if (fgets (str, 3, inhandle) == NULL) break; /* [SDG] 2020-06-03 */
   }
+  fclose(inhandle); /* [JA] 2020-09-30 */
 }

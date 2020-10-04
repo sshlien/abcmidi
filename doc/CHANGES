@@ -13802,3 +13802,51 @@ queues.c file. Presently, I am using a factor of 4 (not configurable).
 Bendstringex limited to 64 or less increments.
 
 
+September 30 2020
+
+James Allwright has reported several problems with the abcMIDI code
+and proposed some fixes and improvements.
+
+There is a bug in parsekey resulting in an extraneous warning for
+the following file.
+
+X: 1 
+T: parsekey() test
+M:4/4  
+L:1/8 
+Q:1/4=127
+K: D phr ^f
+| =C^C =D^D =E =F ^F =G |
+
+abc2midi parsekey.abc
+4.41 August 09 2020 abc2midi
+Warning in line-char 6-0 : Ignoring string '^f' in K: field
+writing MIDI file parsekey1.mid
+
+Despite the warning the output file is still correct.
+
+abc2abc and other applications depending on parseabc.c also produce
+similar warnings.
+
+Analysis: the problem originates in the function parsekey() in
+parseabc.c. The fix consists two small changes shown here.
+
+/* shortcuts such as ^/4G instead of ^1/4G not allowed here */
+/* parsed =0; [SS] 2020-09-30 */
+
+
+  /* if (parsed ==1) { [SS] 2020-09-30 */
+  if (success > 0) { /* [SS] 2020-09-30 */
+
+
+
+drawtune.c in read_boolean increased dimension of char p[]
+to allow for null termination. -- suggested by James Allwright.
+
+stresspat.c in custom_stress_file() added fclose(inhandle)
+to close the open input file. -- suggested by James Allwright.
+
+matchsup.c, yapstree.c, and toabc.c: event_temperament declared as
+event_temperament(*line) instead of event_temperament(**line).
+
+parsekey() was split into two functions, parsekey() and process_microtones().

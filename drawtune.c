@@ -1980,7 +1980,7 @@ char *s;
 /* set logical parameter from %%command */
 /* part of the handling for event_specific */
 {
-  char p[10];
+  char p[12]; /* [JA] 2020-09-30 */
   int result;
 
   p[0] = '\0';

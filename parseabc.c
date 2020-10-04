@@ -1133,6 +1133,51 @@ parseother (s, word, gotother, other, maxsize)	/* [SS] 2011-04-18 */
   return 0;
 }
 
+
+static void process_microtones (int *parsed,  char word[],
+  char modmap[], int modmul[], struct fraction modmicrotone[])
+{
+  int a, b;                     /* for microtones [SS] 2014-01-06 */
+  char c;
+  int j;
+  int success;
+
+  /* shortcuts such as ^/4G instead of ^1/4G not allowed here */
+
+	  success = sscanf (&word[1], "%d/%d%c", &a, &b, &c);
+	  if (success == 3) /* [SS] 2016-04-10 */
+	    {
+	      *parsed = 1;
+	      j = (int) c - 'A';
+              if (j > 7) j = (int) c - 'a';
+              if (j > 7 || j < 0) {printf("invalid j = %d\n",j); exit(-1);}
+	      if (word[0] == '_') a = -a;
+	      /* printf("%s fraction microtone  %d/%d for %c\n",word,a,b,c); */
+	   } else {
+	    success = sscanf (&word[1], "%d%c", &a, &c); /* [SS] 2020-06-25 */
+            if (success == 2)
+	    {
+            b = 0;
+            /* printf("%s integer microtone %d%c\n",word,a,c); */
+	    if (temperament != 1) { /* [SS] 2020-06-25 2020-07-05 */
+		    event_warning("do not use integer microtone without calling %%MIDI temperamentequal");
+	            }
+	    *parsed = 1;
+	    }
+          }
+	  /* if (parsed ==1)  [SS] 2020-09-30 */
+	  if (success > 0) {
+            j = (int) c - 'A';
+            if (j > 7) j = (int) c - 'a';
+            if (j > 7 || j < 0) {printf("invalid j = %d\n",j); exit(-1);}
+            if (word[0] == '_') a = -a;
+	    modmap[j] = word[0];
+	    modmicrotone[j].num = a;
+	    modmicrotone[j].denom = b;
+	    /* printf("%c microtone = %d/%d\n",modmap[j],modmicrotone[j].num,modmicrotone[j].denom); */
+	  }
+	} /* finished ^ = _ */
+
 int
 parsekey (str)
 /* parse contents of K: field */
@@ -1379,42 +1424,14 @@ parsekey (str)
 	      modmul[j] = 2;
 	      parsed = 1;
 	    };
+   }
 	  /* microtone? */
 	  /* shortcuts such as ^/4G instead of ^1/4G not allowed here */
-	  parsed =0;
-	  success = sscanf (&word[1], "%d/%d%c", &a, &b, &c);
-	  if (success == 3) /* [SS] 2016-04-10 */
-	    {
-	      parsed = 1;
-	      j = (int) c - 'A';
-              if (j > 7) j = (int) c - 'a';
-              if (j > 7 || j < 0) {printf("invalid j = %d\n",j); exit(-1);}
-	      if (word[0] == '_') a = -a;
-	      /* printf("%s fraction microtone  %d/%d for %c\n",word,a,b,c); */
-	   } else {
-	    success = sscanf (&word[1], "%d%c", &a, &c); /* [SS] 2020-06-25 */
-            if (success == 2)
-	    {
-            b = 0;
-            /* printf("%s integer microtone %d%c\n",word,a,c); */
-	    if (temperament != 1) { /* [SS] 2020-06-25 2020-07-05 */
-		    event_warning("do not use integer microtone without calling %%MIDI temperamentequal");
-	            }
-	    parsed = 1;
-	    }
-          }
-	  if (parsed ==1) {
-            j = (int) c - 'A';
-            if (j > 7) j = (int) c - 'a';
-            if (j > 7 || j < 0) {printf("invalid j = %d\n",j); exit(-1);}
-            if (word[0] == '_') a = -a;
-	    modmap[j] = word[0];
-	    modmicrotone[j].num = a;
-	    modmicrotone[j].denom = b;
-	    /* printf("%c microtone = %d/%d\n",modmap[j],modmicrotone[j].num,modmicrotone[j].denom); */
-	  }
-	} /* finished ^ = _ */
-    }
+	  /* parsed =0; [SS] 2020-09-30 */
+   process_microtones (&parsed,  word,
+        modmap, modmul, modmicrotone);
+   }
+
   if ((parsed == 0) && (strlen (word) > 0))
     {
       sprintf (msg, "Ignoring string '%s' in K: field", word);
