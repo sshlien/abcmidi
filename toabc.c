@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.09 October 01 2020 abc2abc"
+#define VERSION "2.10 October 06 2020 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -1213,6 +1213,7 @@ struct voice_params *vp;
 {
   char output[300];  /* [SS] 2017-10-09 2017-10-11 2018-12-27*/
   if (xinbody) {
+    close_newabc(); /* [SS] 2020-10-06 */
     next_voice = setvoice(n);
   };
   if (!must_emit_voice(n)) { /* [PHDM] 2013-03-08 */

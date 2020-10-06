@@ -13850,3 +13850,58 @@ matchsup.c, yapstree.c, and toabc.c: event_temperament declared as
 event_temperament(*line) instead of event_temperament(**line).
 
 parsekey() was split into two functions, parsekey() and process_microtones().
+
+
+October 06 2020
+
+abc2abc bug: abc2abc hangs when it is applied to a multivoiced file
+with the -n option. The following file hangs abc2abc
+
+X: 1
+T: hangs abc2abc
+M: 4/4
+L: 1/4
+K: C
+V:1
+C4|E4|D4|E4|
+F4|G4|A4|B4|
+V:2
+D4|F4|G4|A4|B4|c4|
+C4|B,4|
+
+eg
+
+abc2abc hanger.abc -n 3
+X:1
+T:hangs abc2abc
+M:4/4
+L:1/4
+K:C
+V:1
+C4|E4|D4|
+E4|F4|G4|A4|
+
+(Hangs when it encounters the V:2.)
+
+Analysis:
+The program hangs in a infinite loop 
+331	  while (v->bars_complete > v->bars_remaining) {
+in the function complete_bars in toabc.c
+v->bars_complete is 2, v->bars_remaining is -1 and bars_done is always 0.
+
+If you insert a comment before V:2, the program runs normally.
+
+Fix: insert the line
+ close_newabc(); /* [SS] 2020-10-06 */
+in the function event_voice().
+
+Explanation:
+v->bars_complete, v->bars_remaining are elements of a voice structure
+which has room for up to 30 voices. When V:2 is encountered, the
+program automatically calls event_voice and switches to a new voice;
+however, the program has not finished with voice 1 and the voice
+structure gets corrupted during the switch. Event_voice was modified
+so that any remaining data in voice 1 is released before the switch.
+
+
+
