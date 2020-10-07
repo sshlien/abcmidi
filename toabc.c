@@ -835,6 +835,12 @@ void event_linebreak()
   };
 }
 
+/* a score linebreak character has been encountered */
+void event_score_linebreak(char ch)
+{
+  emit_char(ch);
+}
+
 void event_startmusicline()
 /* encountered the start of a line of notes */
 {

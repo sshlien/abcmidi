@@ -591,6 +591,11 @@ void event_linebreak()
   addfeature(LINENUM, lineno, 0, 0);
 }
 
+/* a score linebreak character has been encountered */
+void event_score_linebreak(char ch)
+{
+}
+
 void event_startmusicline()
 /* starting to parse line of abc music */
 {

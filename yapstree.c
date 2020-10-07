@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.79 October 01 2020 yaps"
+#define VERSION "1.80 October 07 2020 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -1411,6 +1411,21 @@ static void divide_ties()
     s = cv->slur_place[i];
     s->crossline = 1;
   };
+}
+
+/* A score_linebreak has been encountered [JA] 2020-10-07*/
+void event_score_linebreak (char ch)
+{
+
+  if (xinbody) {
+    /* end current score line - code from endmusicline */
+    cv->lineend = addfeature (MUSICSTOP, (void *)NULL);
+    addfeature (PRINTLINE, newvertspacing ());
+    cv->line = newline;
+    divide_ties ();
+    /* start new score line - startmusicline */
+    event_startmusicline ();
+  }
 }
 
 void event_endmusicline(endchar)

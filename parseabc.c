@@ -2608,6 +2608,10 @@ parsemusic (field)
 		  decorators_passback[i] = 0;	/* [SS] 2012-03-30 */
 		}
 	      break;
+      case '$':
+        p = p + 1;
+        event_score_linebreak ('$');  /* [JA] 2020-10-07 */
+        break;
 /*  hidden rest  */
 	    case 'x':
 	      {
@@ -2841,8 +2845,6 @@ parsemusic (field)
 		  {
 		    event_reserved (*p);
 		  }
-		else if (fileprogram == ABC2MIDI && *p == '$') ; /* ignore [SS] 2019-12-9 */
-	       	/* $ sometimes used as a score linebreak character */
 		else
 		  {
 		    sprintf (msg, "Unrecognized character: %c", *p);

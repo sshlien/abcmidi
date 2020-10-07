@@ -1787,6 +1787,11 @@ void event_linebreak()
   addfeature(LINENUM, lineno, 0, 0);
 }
 
+/* a score linebreak character has been encountered */
+void event_score_linebreak(char ch)
+{
+}
+
 void event_startmusicline()
 /* starting to parse line of abc music */
 {
@@ -1903,7 +1908,7 @@ double x, h3;
 int n;
 float w;
 /* h3 (1901.955) is the 3rd harmonic (fifth+octave) represented in cents */
-h3 = 1200.0 * log2 (3.0);
+h3 = 1200.0 * log (3.0)/log(2.0);  /* 1200 * log2(3.0) */
 x = h3 - octave_size;           /* fifth reduced by the tempered octave */
 n = (int) (0.5 + x * ndiv / octave_size);     /* fifth in integer steps */
 w = n * octave_size / ndiv;                   /* fifth quantized according to temperament */

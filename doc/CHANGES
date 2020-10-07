@@ -13904,4 +13904,8 @@ structure gets corrupted during the switch. Event_voice was modified
 so that any remaining data in voice 1 is released before the switch.
 
 
+October 7 2020
+James Allwright has introduced event_score_linebreak in parseabc.c,
+yapstree.c, etc. which replaces the change made on December 09 2019.
+Except for yapstree.c, event_score_linebreak does nothing.
 
