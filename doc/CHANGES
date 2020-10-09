@@ -13909,3 +13909,12 @@ James Allwright has introduced event_score_linebreak in parseabc.c,
 yapstree.c, etc. which replaces the change made on December 09 2019.
 Except for yapstree.c, event_score_linebreak does nothing.
 
+
+October 10 2020
+midicopy new feature: -zerochannels will set all channel numbers in
+the midi file to zero. Some midi files (http://scarlatti.antikytherapubs.com/ )
+adjust the tuning by assigning each pitch class to a separate channel
+and applying an appropriate pitchbend to each of these channels.
+This may pose a problem for some software which attempts to render the
+midi file in music notation.
+

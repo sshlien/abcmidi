@@ -52,7 +52,7 @@
 
 
 
-#define VERSION "1.36 June 04 2020 midicopy"
+#define VERSION "1.37 October 10 2020 midicopy"
 #include "midicopy.h"
 #define NULLFUNC 0
 #define NULL 0
@@ -112,6 +112,7 @@ int chosen_drum = 0;		/* [SS] 2013-10-01 */
 int drumvelocity = 0;		/* [SS] 2013-10-01 */
 int attenuation = 70;           /* [SS] 2017-11-27 */
 int nobends = 0;                /* [SS] 2017-12-15 */
+int zerochannels = 0;           /* [SS] 2020-10-09 */
 
 long Mf_numbyteswritten = 0L;
 long readvarinum ();
@@ -1025,6 +1026,7 @@ void
 chanmessage (int status, int c1, int c2)
 {
   int chan = status & 0xf;
+  if (zerochannels) chan = 0; /* [SS] 2020-10-09 */
   haschannel[chan] = 1;
 
   if (!cut_beginning ())
@@ -1853,6 +1855,7 @@ main (int argc, char *argv[])
       printf ("-xdrums n1,n2,... (drums to exclude)\n"); /* [SS] 2019-12-22 */
       printf ("-onlydrums (only channel 10)\n"); /* [SS] 2019-12-22 */
       printf ("-nodrums (exlcude channel 10)\n"); /* [SS] 2019-12-22 */
+      printf ("-zerochannels  set all channel numbers to zero\n"); /* [SS] 2020-10-09 */
       exit (1);
     }
 
@@ -2136,6 +2139,9 @@ main (int argc, char *argv[])
 
   arg = getarg("-nodrums",argc,argv); /* [SS] 2019-12-22 */
   if (arg >=0) ctocopy[9] = 0;     
+
+  arg = getarg("-zerochannels",argc,argv); /* [SS] 2020-10-09 */
+  if (arg >=0) zerochannels = 1;
 
   F_in = fopen (argv[argc - 2], "rb");
   if (F_in == NULL)

@@ -5,7 +5,7 @@ abc2midi version 4.42 October 01 2020
 abc2abc  version 2.10 October 01 2020
 yaps     version 1.80 October 07 2020
 abcmatch version 1.74 October 01 2020
-midicopy version 1.36 June 04 2019
+midicopy version 1.37 October 10 2020
 
 24th January 2002
 
@@ -440,6 +440,12 @@ midicopy copies selected tracks, channels, time interval of the input midi file.
 -focusontrack n1,n2,... 
 -focusonchannel n1,n2,...
 -attenuation n
+-nobends
+-indrums n1,n2,... (drums to include)
+-xdrums n1,n2,... (drums to exclude)
+-onlydrums (only channel 10)
+-nodrums (exlcude channel 10)
+-zerochannels  set all channel numbers to zero
 
 
 midicopy.exe -ver
