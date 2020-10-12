@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.80 October 07 2020 yaps"
+#define VERSION "1.81 October 12 2020 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -64,7 +64,6 @@ char outputroot[256];
 char matchstring[256];
 int fileopen;
 
-int repcheck;
 int xinhead;
 int xinbody;
 int suppress;
@@ -792,7 +791,6 @@ static struct voice* newvoice(int n)
   v->inslur = 0;
   v->ingrace = 0;
   v->inchord = 0;
-  v->expect_repeat = 0;
   v->tuplenotes = 0;
   v->thistuple = NULL;
   v->tuple_count = 0;
@@ -2195,45 +2193,6 @@ char* playonrep_list;
   checkbar(type); /* increment bar number if bar complete */
 /* [SS] 2015-11-15 * changed (void*) to (int *) */
   addfeature(type, (int *)cv->barno); /* save bar number */
-  switch(type) {
-  case SINGLE_BAR:
-    break;
-  case DOUBLE_BAR:
-    break;
-  case THIN_THICK:
-    break;
-  case THICK_THIN:
-    break;
-  case BAR_REP:
-    if ((cv->expect_repeat) && (repcheck)) {
-      event_error("Expecting repeat, found |:");
-    };
-    cv->expect_repeat = 1;
-    break;
-  case REP_BAR:
-    if ((!cv->expect_repeat) && (repcheck)) {
-      event_error("No repeat expected, found :|");
-    };
-    cv->expect_repeat = 0;
-    break;
-  case BAR1:
-    if ((!cv->expect_repeat) && (repcheck)) {
-      event_error("found |1 in non-repeat section");
-    };
-    break;
-  case REP_BAR2:
-    if ((!cv->expect_repeat) && (repcheck)) {
-      event_error("No repeat expected, found :|2");
-    };
-    cv->expect_repeat = 0;
-    break;
-  case DOUBLE_REP:
-    if ((!cv->expect_repeat) && (repcheck)) {
-      event_error("No repeat expected, found ::");
-    };
-    cv->expect_repeat = 1;
-    break;
-  };
   if ((playonrep_list != NULL) && (strlen(playonrep_list) > 0)) {
     event_playonrep(playonrep_list);
   };

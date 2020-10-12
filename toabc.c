@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.10 October 06 2020 abc2abc"
+#define VERSION "2.11 October 12 2020 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -66,7 +66,7 @@ struct fract chordfactor; /* factor of the first note in a chord [PHDM] 2013-03-
 struct fract breakpoint; /* used to break bar into beamed sets of notes */
 int barno; /* number of bar within tune */
 int newspacing; /* was -s option selected ? */
-int barcheck, repcheck; /* indicate -b and -r options selected */
+int barcheck; /* indicate -b and -r options selected */
 int echeck; /* was error-checking turned off ? (-e option) */
 int newbreaks; /* was -n option selected ? */
 int nodouble_accidentals;
@@ -105,8 +105,6 @@ char* clef = ""; /* [SS] 2020-01-22 */
 
 extern int nokey; /* signals no key signature assumed */
 extern int nokeysig; /* signals -nokeys or -nokeysf option */
-extern int voicecodes ;  /* from parseabc.c */
-extern char voicecode[16][30]; /*for interpreting V: string */
  
 struct voicetype { /* information needed for each voice */
   int number; /* voice number from V: field */
@@ -115,7 +113,6 @@ struct voicetype { /* information needed for each voice */
   struct abctext* currentline;
   int bars_remaining;
   int bars_complete;
-  int expect_repeat; /* [SS] 2018-12-01 */
   int drumchan;
 } voice[MAX_VOICES];
 int voicecount, this_voice, next_voice;
@@ -1206,7 +1203,6 @@ int num;
     voice[voice_index].bars_complete = 0;
     voice[voice_index].bars_remaining = bars_per_line;
     voice[voice_index].drumchan = 0;
-    voice[voice_index].expect_repeat = -1; /* [SS] 2018-12-01 */
   };
   voice[voice_index].currentline = NULL;
   return(voice_index);
@@ -1236,38 +1232,26 @@ struct voice_params *vp;
       }; 
     }; 
   }; 
-  if (strlen(s) == 0) {
-    if(voicecodes >= n) emit_string_sprintf("V:%s",voicecode[n-1]);
-    else emit_int_sprintf("V:%d", n);
-    if (vp->gotclef) {sprintf(output," clef=%s", vp->clefname);
-	    emit_string(output);}
-    if (vp->gotoctave) {sprintf(output," octave=%d", vp->octave);
-	    emit_string(output);}
-    if (vp->gottranspose) {sprintf(output," transpose=%d", vp->transpose);
-	    emit_string(output);}
-     if (vp->gotname) {sprintf(output," name=%s", vp->namestring);
-            emit_string(output);}
-     if (vp->gotsname) {sprintf(output," sname=%s", vp->snamestring);
-            emit_string(output);}
-     if( vp->gotmiddle ) { sprintf(output, " middle=%s", vp->middlestring);
-            emit_string(output);}
-     if( vp->gotother ) { sprintf(output, " %s", vp->other);
-            emit_string(output);}  /* [SS] 2011-04-18 */
+  if (strlen(voicecode[n-1].label) > 0) {
+    emit_string_sprintf("V:%s",voicecode[n-1].label);
   } else {
-    if(voicecodes >= n) emit_string_sprintf("V:%s",voicecode[n-1]);
-    emit_int_sprintf("V:%d ", n);
-    if (vp->gotclef) {sprintf(output," clef=%s", vp->clefname);
-	    emit_string(output);}
-    if (vp->gotoctave) {sprintf(output," octave=%d", vp->octave);
-	    emit_string(output);}
-    if (vp->gottranspose) {sprintf(output," transpose=%d", vp->transpose);
-	    emit_string(output);}
-     if (vp->gotname) {sprintf(output," name=%s", vp->namestring);
-            emit_string(output);}
-     if( vp->gotmiddle ) { sprintf(output, " middle=%s", vp->middlestring);
-            emit_string(output);}
-     if( vp->gotother ) { sprintf(output, " %s", vp->other);
-            emit_string(output);} /* [SS] 2011-04-18 */
+    emit_int_sprintf("V:%d", n);
+  }
+  if (vp->gotclef) {sprintf(output," clef=%s", vp->clefname);
+ 	    emit_string(output);}
+  if (vp->gotoctave) {sprintf(output," octave=%d", vp->octave);
+ 	    emit_string(output);}
+  if (vp->gottranspose) {sprintf(output," transpose=%d", vp->transpose);
+ 	    emit_string(output);}
+  if (vp->gotname) {sprintf(output," name=%s", vp->namestring);
+         emit_string(output);}
+  if (vp->gotsname) {sprintf(output," sname=%s", vp->snamestring);
+         emit_string(output);}
+  if( vp->gotmiddle ) { sprintf(output, " middle=%s", vp->middlestring);
+         emit_string(output);}
+  if( vp->gotother ) { sprintf(output, " %s", vp->other);
+         emit_string(output);}  /* [SS] 2011-04-18 */
+  if (strlen(s) != 0) {
     emit_string(s);
   };
   inmusic = 0;
@@ -1426,8 +1410,6 @@ static void start_tune()
   count.denom = 1;
   barno = 0;
   tuplenotes = 0;
-  /* expect_repeat is now a voice struct variable [SS] 2018-12-01 */
-  /* expect_repeat = -1; repeat from start may occur [J-FM] 2012-06-04 */
   inlinefield = 0;
   if (barlen.num == 0) {
     /* generate missing time signature */
@@ -1741,39 +1723,18 @@ char* replist;
     break;
   case BAR_REP:
     emit_string("|:");
-    if (voice[this_voice].expect_repeat > 0 && repcheck)
-    {
- /* no error if first repeat [J-FM] 2012-06-04 */
-      event_error("Expecting repeat, found |:");
-    };
-    voice[this_voice].expect_repeat = 1;
     break;
   case REP_BAR:
     emit_string_sprintf(":|%s", replist);
-    if ((!voice[this_voice].expect_repeat) && (repcheck)) {
-      event_warning("No repeat expected, found :|");
-    };
-    voice[this_voice].expect_repeat = 0;
     break;
   case BAR1:
     emit_string("|1");
-    if ((!voice[this_voice].expect_repeat) && (repcheck)) {
-      event_warning("found |1 in non-repeat section");
-    };
     break;
   case REP_BAR2:
     emit_string(":|2");
-    if ((!voice[this_voice].expect_repeat) && (repcheck)) {
-      event_warning("No repeat expected, found :|2");
-    };
-    voice[this_voice].expect_repeat = 0;
     break;
   case DOUBLE_REP:
     emit_string("::");
-    if ((voice[this_voice].expect_repeat) && (repcheck)) {
-      event_error("No repeat expected, found ::");
-    };
-    voice[this_voice].expect_repeat = 1;
     break;
   };
   if ((count.num*barlen.denom != barlen.num*count.denom) &&

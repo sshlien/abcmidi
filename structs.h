@@ -151,7 +151,6 @@ struct voice {
   struct fract barcount;
   int barno;
   int barchecking;
-  int expect_repeat;
   int brokentype, brokenmult, brokenpending;
   int tiespending;
   struct feature* tie_place[MAX_TIES];

@@ -185,7 +185,7 @@ int main()
 
 */
 
-#define VERSION "4.42 Ocober 01 2020 abc2midi" 
+#define VERSION "4.43 Ocober 12 2020 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -892,6 +892,10 @@ char **filename;
   } else {
     check = 0;
   };
+  /* disable repeat checking because abc2midi does its own workaround
+   * attempting to fix various repeat errors.
+   */
+  repcheck = 0;
   /* look for filename-from-tune-titles option */
   namelimit = 252;
   titlenames = 0;

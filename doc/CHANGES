@@ -13918,3 +13918,23 @@ and applying an appropriate pitchbend to each of these channels.
 This may pose a problem for some software which attempts to render the
 midi file in music notation.
 
+
+October 12 2020
+James Allwright has made significant improvements to parseabc.c, toabc.c,
+and yapstree.c related to  repeat checking. In parseabc.c, new functions
+were introduced: init_voice_contexts, reset_parser_status,
+interpret_voice_label, check_bar_repeats, and check_and_call_bar().
+The functions isnumberp(), init_voicecode(), and interpret_voicestring()
+have been retired. Reset_parser_status() is called each time a new
+X: reference field command is encountered. Check_bar_repeats() replaces
+a lot of the code that appears in event_bar() defined in toabc.c and
+yapstree.c. parsemusic() calls event_bar indirectly through the
+function check_and_call_bar(). Minor changes were made to toabc.c, store.c
+and yapstree.c to accommodate the changes to parseabc. In particular,
+a new flag repcheck is introduced and connected to parseabc.c as
+an extern (in parseabc.h). In addition a new struct (voice_context)
+has been introduced in parseabc.h.
+
+
+
+

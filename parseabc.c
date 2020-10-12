@@ -90,10 +90,12 @@ int chorddecorators[DECSIZE];
 char decorations[] = ".MLRH~Tuv'OPS"; /* 2020-05-01 */
 char *abbreviation[SIZE_ABBREVIATIONS];
 
-int voicecodes = 0;
-/* [SS] 2015-03-16 allow 24 voices */
-/*char voicecode[16][30];       for interpreting V: string */
-char voicecode[24][30];		/*for interpreting V: string */
+int num_voices = 0;  /* [JA] 2020-10-12 */
+int repcheck = 1; /* enables/ disables repeat checking */
+/* abc2midi disables repeat checking because it does its own thing */
+voice_context_t voicecode[MAX_VOICES];
+int voicenum; /* current voice number */
+int has_voice_fields = 0;
 
 int decorators_passback[DECSIZE];
 /* this global array is linked as an external to store.c and 
@@ -328,30 +330,6 @@ skiptospace (p)
   while (((int) **p != ' ') && ((int) **p != TAB) && (int) **p != '\0')
     *p = *p + 1;
 }
-
-
-int
-isnumberp (p)
-     char **p;
-/* returns 1 if positive number, returns 0 if not a positive number */
-/* ie -4 or 1A both return 0. This function is needed to get the    */
-/* voice number.                                                    */
-{
-  char **c;
-  c = p;
-  while (( **c != ' ') && ( **c != TAB) &&  **c != '\0')
-    {
-      if (( **c >= 0) &&  (**c <= 9)) /*[SDG] 2020-06-03 */
-	*c = *c + 1;
-      else
-	return 0;
-    }
-  return 1;
-/* could use isdigit(**c) */
-/* is zero a positive number? is V:0 ok? [SS] */
-}
-
-
 
 int
 readnumf (num)
@@ -788,72 +766,137 @@ lcase (s)
     };
 }
 
-
-void
-init_voicecode ()
+/* [JA] 2020-10-12 */
+void init_voice_contexts (void)
 {
   int i;
-  for (i = 0; i < 24; i++) /* [SS} 2015-03-15 */
-    voicecode[i][0] = 0;
-  voicecodes = 0;
+  for (i = 0; i < MAX_VOICES; i++) {      /* [SS} 2015-03-15 */
+    voicecode[i].label[0] = '\0';
+    voicecode[i].expect_repeat = 0;
+    voicecode[i].repeat_count = 0;
+  }
 }
+
+/* [JA] 2020-10-12 */
+/* called at the start of each tune */
+static void reset_parser_status (void)
+{
+  voicenum = 0;
+  has_voice_fields = 0;
+  num_voices = 1;
+  parserinchord = 0;
+  ingrace = 0;
+  slur = 0;
+  init_voice_contexts ();
+}
+
 
 void
 print_voicecodes ()
 {
   int i;
-  if (voicecodes == 0)
+  if (num_voices == 0)
     return;
   printf ("voice mapping:\n");
-  for (i = 0; i < voicecodes; i++)
+  for (i = 0; i < num_voices; i++)
     {
       if (i % 4 == 3)
 	printf ("\n");
-      printf ("%s  %d   ", voicecode[i], i + 1);
+      printf ("%s  %d   ", voicecode[i].label, i + 1);
     }
   printf ("\n");
 }
 
-int
-interpret_voicestring (char *s)
-{
-/* if V: is followed  by a string instead of a number
- * we check to see if we have encountered this string
- * before. We assign the number associated with this
- * string and add it to voicecode if it was not encountered
- * before. If more than 16 distinct strings were encountered
- * we report an error -1.
+/* [JA] 2020-10-12 */
+int interpret_voice_label (char *s, int num)
+/* We expect a numeric value indicating the voice number.
+ * The assumption is that these will ocuur in the order in which voices
+ * appear, so that we have V:1, V:2, ... V:N if there are N voices.
+ * The abc standard 2.2 allows strings instead of these numbers to
+ * represent voices.
+ * This function should be called with either
+ * an empty string and a valid num or
+ * a valid string and num set to 0.
+ *
+ * If num is non-zero, we check that it is valid and return it.
+ * If the number is one above the number of voices currently in use,
+ * we allocate a new voice.
+ *
+ * If num is zero and the string is not empty, we check if string
+ * has been assigned to one of the existing voices. If not, we
+ * allocate a new voice and assign the string to it.
+ *
+ * If we exceed MAX_VOICES voices, we report an error.
+ *
+ * we return a voice number in the range 1 - num_voices
 */
+{
   int i;
   char code[32];
-  char msg[80];			/* [PHDM] 2012-11-22 */
+  char msg[80];                 /* [PHDM] 2012-11-22 */
   char *c;
   c = readword (code, s);
 
-/* [PHDM] 2012-11-22 */
-  if (*c != '\0' && *c != ' ' && *c != ']')
+  if (num > 0)
+  {
+    if (num > num_voices + 1)
     {
-      sprintf (msg, "invalid character `%c' in Voice ID", *c);
-      event_error (msg);
+      char error_message[80];
+
+      snprintf(error_message, 80, "V:%d out of sequence, treating as V:%d",
+               num, num_voices);
+      event_warning(error_message);
+      num = num_voices + 1;
     }
+    /* declaring a new voice */
+    if (num == num_voices + 1)
+    {
+      if (num_voices >= MAX_VOICES)
+      {
+        event_warning("Number of available voices exceeded");
+        return 1;
+      }
+      num_voices = num_voices + 1;
+      voicecode[num_voices - 1].label[0] = '\0';
+    }
+    return num;
+  }
+/* [PHDM] 2012-11-22 */
+  if (*c != '\0' && *c != ' ' && *c != ']') {
+    sprintf (msg, "invalid character `%c' in Voice ID", *c);
+    event_error (msg);
+  }
 /* [PHDM] 2012-11-22 */
 
   if (code[0] == '\0')
-    return 0;
-  if (voicecodes == 0)
-    {
-      strcpy (voicecode[voicecodes], code);
-      voicecodes++;
-      return voicecodes;
+  {
+    event_warning("Empty V: field, treating as V:1");
+    return 1;
+  }
+  /* Has supplied label been used for one of the existing voices ? */
+  if (has_voice_fields)
+  {
+    for (i = 0; i < num_voices; i++) {
+      if (strcmp (code, voicecode[i].label) == 0) {
+        return i + 1;
+      }
     }
-  for (i = 0; i < voicecodes; i++)
-    if (stringcmp (code, voicecode[i]) == 0)
-      return (i + 1);
-  if ((voicecodes + 1) > 23) /* [SS] 2015-03-16 */
-    return -1;
-  strcpy (voicecode[voicecodes], code);
-  voicecodes++;
-  return voicecodes;
+  }
+  /* if we have got here, we have a new voice */
+  if ((num_voices + 1) > MAX_VOICES) {/* [SS] 2015-03-16 */
+    event_warning("Number of available voices exceeded");
+    return 1;
+  }
+  /* First V: field is a special case. We are already on voice 1,
+   * so we don't increment the number of voices, but we will set
+   * status->has_voice_fields on returning from this function.
+   */
+  if (has_voice_fields)
+  {
+    num_voices++;
+  }
+  strncpy (voicecode[num_voices - 1].label, code, 31);
+  return num_voices;
 }
 
 /* The following three functions parseclefs, parsetranspose,
@@ -1479,22 +1522,14 @@ parsevoice (s)
   vparams.other[0] = '\0';	/* [SS] 2011-04-18 */
 
   skipspace (&s);
-  if (isnumberp (&s) == 1)
-    {
-      num = readnump (&s);
-    }
-  else
-    {
-      num = interpret_voicestring (s);
-      if (num == 0)
-	event_error ("No voice number or string in V: field");
-      if (num == -1)
-	{
-	  event_error ("More than 16 voices encountered in V: fields");
-	  num = 0;
-	}
-      skiptospace (&s);
-    };
+  num = 0;
+  if (isdigit(*s)) {  /* [JA] 2020-10-12 */
+    num = readnump (&s);
+  }
+  num = interpret_voice_label (s, num);
+  has_voice_fields = 1;
+  skiptospace (&s);
+  voicenum = num;
   skipspace (&s);
   while (*s != '\0')
     {
@@ -2115,9 +2150,14 @@ parsefield (key, field)
 	{
 	  event_error ("second X: field in header");
 	};
+      if (inbody)
+      {
+       /* [JA] 2020-10-14 */
+        event_error ("Missing blank line before new tune");
+      }
       event_refno (x);
       ignore_line =0; /* [SS] 2017-04-12 */
-      init_voicecode ();	/* [SS] 2011-01-01 */
+      reset_parser_status(); /* [JA] 2020-10-12 */
       inhead = 1;
       inbody = 0;
       parserinchord = 0;
@@ -2376,6 +2416,99 @@ print_inputline ()
   printf ("\n");
 }
 
+/* [JA] 2020-10-12 */
+/* Look for problems in the use of repeats */
+static void check_bar_repeats (int bar_type, char *replist)
+{
+  voice_context_t *cv = &voicecode[voicenum];
+
+  switch (bar_type) {
+    case SINGLE_BAR:
+      break;
+    case DOUBLE_BAR:
+      break;
+    case THIN_THICK:
+      break;
+    case THICK_THIN:
+      break;
+    case BAR_REP:
+      if (cv->expect_repeat) {
+        event_warning ("Expecting repeat, found |:");
+      };
+      cv->expect_repeat = 1;
+      cv->repeat_count = cv->repeat_count + 1;
+      break;
+    case REP_BAR:
+      if (!cv->expect_repeat) {
+        char error_message[80];
+
+        if (cv->repeat_count == 0)
+        {
+          snprintf(error_message, 80, "Missing repeat at start ? Unexpected :|%s found", replist);
+          event_warning (error_message);
+        }
+        else
+        {
+          snprintf(error_message, 80, "Unexpected :|%s found", replist);
+          event_warning (error_message);
+        }
+      };
+      cv->expect_repeat = 0;
+      cv->repeat_count = cv->repeat_count + 1;
+      break;
+    case BAR1:
+      if (!cv->expect_repeat) {
+        if (cv->repeat_count == 0)
+        {
+          event_warning ("Missing repeat at start ? found |1");
+        }
+        else
+        {
+          event_warning ("found |1 in non-repeat section");
+        }
+      };
+      break;
+    case REP_BAR2:
+      if (!cv->expect_repeat) {
+        if (cv->repeat_count == 0)
+        {
+          event_warning ("Missing repeat at start ? found :|2");
+        }
+        else
+        {
+          event_warning ("No repeat expected, found :|2");
+        }
+      };
+      cv->expect_repeat = 0;
+      cv->repeat_count = cv->repeat_count + 1;
+      break;
+    case DOUBLE_REP:
+      if (!cv->expect_repeat) {
+        if (cv->repeat_count == 0)
+        {
+          event_warning ("Missing repeat at start ? found ::");
+        }
+        else
+        {
+          event_warning ("No repeat expected, found ::");
+        }
+      };
+      cv->expect_repeat = 1;
+      cv->repeat_count = cv->repeat_count + 1;
+      break;
+  };
+}
+
+/* [JA] 2020-10-12 */
+static void check_and_call_bar(int bar_type, char *replist)
+{
+  if (repcheck)
+  {
+    check_bar_repeats (bar_type, replist);
+  }
+  event_bar (bar_type, replist);
+}
+
 void
 parsemusic (field)
      char *field;
@@ -2459,20 +2592,20 @@ parsemusic (field)
 	      switch (*p)
 		{
 		case ':':
-		  event_bar (BAR_REP, "");
+		  check_and_call_bar (BAR_REP, "");
 		  p = p + 1;
 		  break;
 		case '|':
-		  event_bar (DOUBLE_BAR, "");
+		  check_and_call_bar (DOUBLE_BAR, "");
 		  p = p + 1;
 		  break;
 		case ']':
-		  event_bar (THIN_THICK, "");
+		  check_and_call_bar (THIN_THICK, "");
 		  p = p + 1;
 		  break;
 		default:
 		  p = getrep (p, playonrep_list);
-		  event_bar (SINGLE_BAR, playonrep_list);
+		  check_and_call_bar (SINGLE_BAR, playonrep_list);
 		};
 	      break;
 	    case ':':
@@ -2480,20 +2613,20 @@ parsemusic (field)
 	      switch (*p)
 		{
 		case ':':
-		  event_bar (DOUBLE_REP, "");
+		  check_and_call_bar (DOUBLE_REP, "");
 		  p = p + 1;
 		  break;
 		case '|':
 		  p = p + 1;
 		  p = getrep (p, playonrep_list);
-		  event_bar (REP_BAR, playonrep_list);
+		  check_and_call_bar (REP_BAR, playonrep_list);
 		  if (*p == ']')
 		    p = p + 1;	/* [SS] 2013-10-31 */
 		  break;
                 /*  [JM] 2018-02-22 dotted bar line ... this is legal */
 		default:
                 /* [SS] 2018-02-08 introducing DOTTED_BAR */
-		  event_bar (DOTTED_BAR,"");
+		  check_and_call_bar (DOTTED_BAR,"");
 		};
 	      break;
 	    case ' ':
@@ -2558,9 +2691,9 @@ parsemusic (field)
 		{
 		case '|':
 		  p = p + 1;
-		  event_bar (THICK_THIN, "");
+		  check_and_call_bar (THICK_THIN, "");
 		  if (*p == ':') {  /* [SS] 2015-04-13 [SDG] 2020-06-04 */
-		      event_bar (BAR_REP, "");
+		      check_and_call_bar (BAR_REP, "");
 		      p = p + 1;
 		      }
 		  break;
@@ -2596,7 +2729,7 @@ parsemusic (field)
 	      /*if (!inchordflag && *p == '|') {  [SS] 2018-12-21 not THICK_THIN  bar line*/
 	      if (!parserinchord && *p == '|') { /* [SS] 2019-06-06 not THICK_THIN  bar line*/
                 p = p + 1; /* skip over | */
-	        event_bar (THIN_THICK, "");}
+	        check_and_call_bar (THIN_THICK, "");}
               else {
 	        readlen (&chord_n, &chord_m, &p); /* [SS] 2019-06-06 */
 	        event_chordoff (chord_n, chord_m);

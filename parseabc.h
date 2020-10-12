@@ -32,12 +32,22 @@ struct voice_params {
         char other[V_STRLEN+1]; /* [SS] 2011-04-18 */
 	};
 
+typedef struct voice_context {
+  char label[31];
+  int expect_repeat;
+  int repeat_count;
+} voice_context_t;
+
+#define MAX_VOICES 30
+
 /* holds a fraction */
 struct fraction {
   int num;
   int denom;
 };
 
+extern int repcheck; /* allows backend to enable/disable repeat checking */
+extern voice_context_t voicecode[MAX_VOICES];
 
 #ifndef KANDR
 extern int readnump(char **p);

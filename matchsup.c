@@ -824,6 +824,7 @@ void event_octave(num, local)
 /* used internally by other routines when octave=N is encountered */
 /* in I: or K: fields */
 int num;
+int local;
 {
   if (dotune) {
     if (pastheader || local) {
