@@ -1,127 +1,92 @@
-# Generic unix/gcc Makefile for abcMIDI package 
-# 
+# file: Makefile
+# vim:fileencoding=utf-8:fdm=marker:ft=make
+# Makefile for abcMIDI package
+# Works with both GNU make and BSD make, provided that CC is defined.
+# If not, use e.g. “make CC=gcc”.
 #
-# compilation #ifdefs - you need to compile with these defined to get
-#                       the code to compile with PCC.
-#
-# NOFTELL in midifile.c and genmidi.c selects a version of the file-writing
-#         code which doesn't use file seeking.
-#
-# PCCFIX in mftext.c midifile.c midi2abc.c
-#        comments out various things that aren't available in PCC
-#
-# ANSILIBS includes some ANSI header files (which gcc can live without,
-#          but other compilers may want).
-#
-# USE_INDEX causes index() to be used instead of strchr(). This is needed
-#           by some pre-ANSI C compilers.
-#
-# ASCTIME causes asctime() to be used instead of strftime() in pslib.c.
-#         If ANSILIBS is not set, neither routine is used.
-#
-# KANDR selects functions prototypes without argument prototypes.
-#       currently yaps will only compile in ANSI mode.
-#
-#
-# On running make, you may get the mysterious message :
-#
-# ', needed by `parseabc.o'. Stop `abc.h
-#
-# This means you are using GNU make and this file is in DOS text format. To
-# cure the problem, change this file from using PC-style end-of-line (carriage 
-# return and line feed) to unix style end-of-line (line feed).
+# Written by R.F. Smith <rsmith@xs4all.nl>
+# Created: 2020-07-27T14:00:05+0200
+# Last modified: 2020-07-27T14:45:45+0200
 
-VERSION = @VERSION@
-
-CC = gcc
-INSTALL = /usr/bin/install -c
+INSTALL = install
 INSTALL_DATA = ${INSTALL} -m 644
-INSTALL_PROGRAM = ${INSTALL}
+INSTALL_PROGRAM = ${INSTALL} -s -m 555
 
-CFLAGS = -DANSILIBS  -O2  
-CPPFLAGS = -DHAVE_CONFIG_H  -I. 
-LDFLAGS =  -lm
+CFLAGS = -O2 -DANSILIBS
 
-prefix = /usr/local
-exec_prefix = ${prefix}
+PREFIX = /usr/local
+BINDIR = ${PREFIX}/bin
+LIBDIR = ${PREFIX}/lib
+DATADIR = ${PREFIX}/share
+DOCDIR = ${PREFIX}/share/doc/abcmidi
+MANDIR = ${PREFIX}/man/man1
 
-srcdir = .
-VPATH = .
-bindir = ${exec_prefix}/bin
-libdir = ${exec_prefix}/lib
-datadir = ${prefix}/share
-docdir = ${prefix}/share/doc/abcmidi
-mandir = ${prefix}/share/man/man1
+BIN= abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch
+MAN= abc2midi.1.gz midi2abc.1.gz abc2abc.1.gz mftext.1.gz yaps.1.gz midicopy.1.gz abcmatch.1.gz
 
-binaries=abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch
+all : ${BIN} ${MAN}
 
-all : abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch
+OBJ_ABC2MIDI= parseabc.o store.o genmidi.o midifile.o queues.o parser2.o stresspat.o
+abc2midi : ${OBJ_ABC2MIDI}
+	${CC} -o abc2midi ${OBJ_ABC2MIDI} -lm
+${OBJ_ABC2MIDI}: abc.h parseabc.h Makefile
 
-OBJECTS_ABC2MIDI=parseabc.o store.o genmidi.o midifile.o queues.o parser2.o stresspat.o
-abc2midi : $(OBJECTS_ABC2MIDI)
-	$(CC) $(CFLAGS) -o abc2midi $(OBJECTS_ABC2MIDI) $(LDFLAGS) -lm
-$(OBJECTS_ABC2MIDI): abc.h parseabc.h config.h Makefile
+OBJ_ABC2ABC= parseabc.o toabc.o
+abc2abc : ${OBJ_ABC2ABC}
+	${CC} -o abc2abc ${OBJ_ABC2ABC}
+${OBJ_ABC2ABC}: abc.h parseabc.h Makefile
 
-OBJECTS_ABC2ABC=parseabc.o toabc.o
-abc2abc : $(OBJECTS_ABC2ABC)
-	$(CC) $(CFLAGS) -o abc2abc $(OBJECTS_ABC2ABC) $(LDFLAGS)
-$(OBJECTS_ABC2ABC): abc.h parseabc.h config.h Makefile
+OBJ_MIDI2ABC= midifile.o midi2abc.o
+midi2abc : ${OBJ_MIDI2ABC}
+	${CC} -o midi2abc ${OBJ_MIDI2ABC} -lm
+${OBJ_MIDI2ABC}: abc.h midifile.h Makefile
 
-OBJECTS_MIDI2ABC=midifile.o midi2abc.o 
-midi2abc : $(OBJECTS_MIDI2ABC)
-	$(CC) $(CFLAGS) -o midi2abc $(OBJECTS_MIDI2ABC) $(LDFLAGS)
-$(OBJECTS_MIDI2ABC): abc.h midifile.h config.h Makefile
+OBJ_MFTEXT= midifile.o mftext.o crack.o
+mftext : ${OBJ_MFTEXT}
+	${CC} -o mftext ${OBJ_MFTEXT}
+${OBJ_MFTEXT}: abc.h midifile.h Makefile
 
-OBJECTS_MFTEXT=midifile.o mftext.o crack.o
-mftext : $(OBJECTS_MFTEXT)
-	$(CC) $(CFLAGS) -o mftext $(OBJECTS_MFTEXT) $(LDFLAGS)
-$(OBJECTS_MFTEXT): abc.h midifile.h config.h Makefile
+OBJ_YAPS= parseabc.o yapstree.o drawtune.o debug.o pslib.o position.o parser2.o
+yaps : ${OBJ_YAPS}
+	${CC} -o yaps ${OBJ_YAPS}
+${OBJ_YAPS}: abc.h midifile.h Makefile
 
-OBJECTS_YAPS=parseabc.o yapstree.o drawtune.o debug.o pslib.o position.o parser2.o
-yaps : $(OBJECTS_YAPS)
-	$(CC) $(CFLAGS) -o yaps $(OBJECTS_YAPS) $(LDFLAGS)
-$(OBJECTS_YAPS): abc.h midifile.h config.h Makefile
+OBJ_MIDICOPY= midicopy.o
+midicopy : ${OBJ_MIDICOPY}
+	${CC} -o midicopy ${OBJ_MIDICOPY}
+${OBJ_MIDICOPY}: abc.h midifile.h midicopy.h Makefile
 
-OBJECTS_MIDICOPY=midicopy.o
-midicopy : $(OBJECTS_MIDICOPY)
-	$(CC) $(CFLAGS) -o midicopy $(OBJECTS_MIDICOPY) $(LDFLAGS)
-$(OBJECTS_MIDICOPY): abc.h midifile.h midicopy.h config.h Makefile
+OBJ_ABCMATCH= abcmatch.o matchsup.o parseabc.o
+abcmatch : ${OBJ_ABCMATCH}
+	${CC} ${CFLAGS} -o abcmatch ${OBJ_ABCMATCH}
+${OBJ_ABCMATCH}: abc.h midifile.h Makefile
 
-OBJECTS_ABCMATCH=abcmatch.o matchsup.o parseabc.o
-abcmatch : $(OBJECTS_ABCMATCH)
-	$(CC) $(CFLAGS) -o abcmatch $(OBJECTS_ABCMATCH) $(LDFLAGS)
-$(OBJECTS_ABCMATCH): abc.h midifile.h config.h Makefile
+parseabc.o: parseabc.c abc.h parseabc.h
 
-parseabc.o : parseabc.c abc.h parseabc.h
+parser2.o: parser2.c abc.h parseabc.h parser2.h
 
-parser2.o : parser2.c abc.h parseabc.h parser2.h
+toabc.o: toabc.c abc.h parseabc.h
 
-toabc.o : toabc.c abc.h parseabc.h
+genmidi.o: genmidi.c abc.h midifile.h genmidi.h
 
-# could use -DNOFTELL here
-genmidi.o : genmidi.c abc.h midifile.h genmidi.h
+stresspat.o: stresspat.c
 
-stresspat.o :	stresspat.c
+store.o: store.c abc.h parseabc.h midifile.h genmidi.h
 
-store.o : store.c abc.h parseabc.h midifile.h genmidi.h
+queues.o: queues.c genmidi.h
 
-queues.o : queues.c genmidi.h
+midifile.o: midifile.c midifile.h
 
-# could use -DNOFTELL here
-midifile.o : midifile.c midifile.h
+midi2abc.o: midi2abc.c midifile.h
 
-midi2abc.o : midi2abc.c midifile.h
-
-midicopy.o : midicopy.c midicopy.h
+midicopy.o: midicopy.c midicopy.h
 
 abcmatch.o: abcmatch.c abc.h
 
-crack.o : crack.c
+crack.o: crack.c
 
-mftext.o : mftext.c midifile.h
+mftext.o: mftext.c midifile.h
 
-# objects needed by yaps
-#
 yapstree.o: yapstree.c abc.h parseabc.h structs.h drawtune.h
 
 drawtune.o: drawtune.c structs.h sizes.h abc.h drawtune.h
@@ -132,43 +97,59 @@ position.o: position.c abc.h structs.h sizes.h
 
 debug.o: debug.c structs.h abc.h
 
-#objects for abcmatch
-#
-matchsup.o : matchsup.c abc.h parseabc.h parser2.h
+matchsup.o: matchsup.c abc.h parseabc.h parser2.h
+
+abc2midi.1.gz: doc/abc2midi.1
+	gzip -c doc/abc2midi.1 >abc2midi.1.gz
+
+midi2abc.1.gz: doc/midi2abc.1
+	gzip -c doc/midi2abc.1 >midi2abc.1.gz
+
+abc2abc.1.gz: doc/abc2abc.1
+	gzip -c doc/abc2abc.1 >abc2abc.1.gz
+
+mftext.1.gz: doc/mftext.1
+	gzip -c doc/mftext.1 >mftext.1.gz
+
+yaps.1.gz: doc/yaps.1
+	gzip -c doc/yaps.1 >yaps.1.gz
+
+midicopy.1.gz: doc/midicopy.1
+	gzip -c doc/midicopy.1 >midicopy.1.gz
+
+abcmatch.1.gz: doc/abcmatch.1
+	gzip -c doc/abcmatch.1 >abcmatch.1.gz
+
 
 clean :
-	rm *.o ${binaries}
+	rm -f *.o ${BIN} ${MAN}
 
-install: abc2midi midi2abc abc2abc mftext midicopy yaps abcmatch
-	$(INSTALL) -d $(DESTDIR)$(bindir)
-	$(INSTALL) -m 755 ${binaries} $(DESTDIR)$(bindir)
+install: ${BIN} ${MAN}
+	${INSTALL} -d ${BINDIR}
+	${INSTALL_PROGRAM} ${BIN} ${BINDIR}
 
 	# install documentation
-	$(INSTALL) -d $(DESTDIR)${docdir}
-	$(INSTALL)  -m 644 doc/*.txt $(DESTDIR)$(docdir)
-	$(INSTALL)  -m 644 doc/AUTHORS $(DESTDIR)$(docdir)
-	$(INSTALL)  -m 644 doc/CHANGES $(DESTDIR)$(docdir)
-	$(INSTALL)  -m 644 VERSION $(DESTDIR)$(docdir)
+	${INSTALL} -d ${DOCDIR}
+	${INSTALL_DATA} VERSION doc/CHANGES doc/AUTHORS doc/*.txt ${DOCDIR}
 
 	# install manpages
-	$(INSTALL)  -d $(DESTDIR)${mandir}
-	$(INSTALL)  -m 644 doc/*.1 $(DESTDIR)$(mandir)
-
+	${INSTALL} -d ${MANDIR}
+	${INSTALL_DATA} *.1.gz ${MANDIR}
 
 uninstall:
 	echo "uninstalling...";
-	#rm -f $(DESTDIR)$(bindir)/$(binaries)
-	rm -f $(DESTDIR)$(bindir)/abc2midi
-	rm -f $(DESTDIR)$(bindir)/abc2abc
-	rm -f $(DESTDIR)$(bindir)/yaps
-	rm -f $(DESTDIR)$(bindir)/midi2abc
-	rm -f $(DESTDIR)$(bindir)/mftext
-	rm -f $(DESTDIR)$(bindir)/abcmatch
-	rm -f $(DESTDIR)$(bindir)/midicopy
-	rm -f $(DESTDIR)$(docdir)/*.txt
-	rm -f $(DESTDIR)$(docdir)/AUTHORS
-	rm -f $(DESTDIR)$(docdir)/CHANGES
-	rm -f $(DESTDIR)$(docdir)/VERSION
-	rm -f $(DESTDIR)$(mandir)/*.1
-	rmdir $(DESTDIR)$(docdir)
-
+	rm -f ${BINDIR}/abc2midi
+	rm -f ${BINDIR}/abc2abc
+	rm -f ${BINDIR}/yaps
+	rm -f ${BINDIR}/midi2abc
+	rm -f ${BINDIR}/mftext
+	rm -f ${BINDIR}/abcmatch
+	rm -f ${BINDIR}/midicopy
+	rm -f ${DOCDIR}
+	rm -f ${MANDIR}/abc2midi.1*
+	rm -f ${MANDIR}/abc2abc.1*
+	rm -f ${MANDIR}/yaps.1*
+	rm -f ${MANDIR}/midi2abc.1*
+	rm -f ${MANDIR}/mftext.1*
+	rm -f ${MANDIR}/abcmatch.1*
+	rm -f ${MANDIR}/midicopy.1*
