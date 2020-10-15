@@ -1854,7 +1854,7 @@ main (int argc, char *argv[])
       printf ("-indrums n1,n2,... (drums to include)\n"); /* [SS] 2019-12-22 */
       printf ("-xdrums n1,n2,... (drums to exclude)\n"); /* [SS] 2019-12-22 */
       printf ("-onlydrums (only channel 10)\n"); /* [SS] 2019-12-22 */
-      printf ("-nodrums (exlcude channel 10)\n"); /* [SS] 2019-12-22 */
+      printf ("-nodrums (exclude channel 10)\n"); /* [SS] 2019-12-22 */
       printf ("-zerochannels  set all channel numbers to zero\n"); /* [SS] 2020-10-09 */
       exit (1);
     }
