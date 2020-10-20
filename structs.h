@@ -7,6 +7,8 @@
 /* The voice data structure also holds various state variables */
 /* to allow processing of voice data as it is read in */
 
+#include "music_utils.h"
+
 enum tail_type {nostem, single, startbeam, midbeam, endbeam};
 
 /* holds a fraction */
@@ -112,13 +114,7 @@ struct slurtie {
   int crossline;
 };  
 
-enum cleftype {noclef, treble, soprano, mezzo, alto, tenor, baritone, bass};
 enum linestate {header, midline, newline};
-
-struct aclef {
-  enum cleftype type;
-  int octave;
-};
 
 /* holds calculated vertical spacing for one stave line */
 /* associated with PRINTLINE */
@@ -181,7 +177,7 @@ struct voice {
   struct feature* chordplace;
   enum linestate line;
   /* following fields are initially inherited from tune */
-  struct aclef* clef;
+  cleftype_t* clef;
   struct key* keysig;
   struct fract meter;
   struct atempo* tempo;
@@ -215,7 +211,7 @@ struct tune {
   struct llist voices;
   struct voice* cv;
   struct fract unitlen;
-  struct aclef clef;
+  cleftype_t clef;
   struct llist words;
 };
 

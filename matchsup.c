@@ -763,6 +763,9 @@ struct voice_params *vp;
     if (pastheader)  checkbreak();
     v = getvoicecontext(n);
     addfeature(VOICE, v->indexno, 0, 0);
+    if (vp->gotclef) {
+      event_octave(vp->new_clef.octave_offset, 1);
+    }
     if (vp->gotoctave) {
       event_octave(vp->octave,1);
     };
@@ -1349,11 +1352,13 @@ int num, denom;
 }
 
 
-void event_note(decorators, accidental, mult, note, xoctave, n, m)
+void event_note(decorators, clef, accidental, mult, note, xoctave, n, m)
 /* handles a note in the abc */
 int decorators[DECSIZE];
+cleftype_t *clef;
+char accidental;
 int mult;
-char accidental, note;
+char note;
 int xoctave, n, m;
 {
   int pitch;
@@ -1858,19 +1863,21 @@ static void headerprocess()
   voicesused = 0;
 }
 
-void event_key(sharps, s, modeindex, modmap, modmul, modmicrotone, gotkey, gotclef, clefname,
+void event_key(sharps, s, modeindex, modmap, modmul, modmicrotone,
+          gotkey, gotclef, clefname, clef,
           octave, transpose, gotoctave, gottranspose, explict)
 /* handles a K: field */
 int sharps; /* sharps is number of sharps in key signature */
-int modeindex; /* 0 major, 1,2,3 minor, 4 locrian, etc.  */
 char *s; /* original string following K: */
+int modeindex; /* 0 major, 1,2,3 minor, 4 locrian, etc.  */
 char modmap[7]; /* array of accidentals to be applied */
 int  modmul[7]; /* array giving multiplicity of each accent (1 or 2) */
 struct fraction modmicrotone[7]; /* [SS] 2014-01-06 */
 int gotkey, gotclef;
+char* clefname;
+cleftype_t *clef;  /* [JA] 2020-10-19 */
 int octave, transpose, gotoctave, gottranspose;
 int explict;
-char* clefname;
 {
   int minor;
   strncpy(keysignature,s,16);
@@ -1897,6 +1904,9 @@ char* clefname;
       v = newvoice(1);
       head = v;
     };
+    if (gotclef) {
+      event_octave(clef->octave_offset, 0);
+    }
     if (gotoctave) {
       event_octave(octave,0);
     };

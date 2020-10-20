@@ -13936,5 +13936,36 @@ an extern (in parseabc.h). In addition a new struct (voice_context)
 has been introduced in parseabc.h.
 
 
+October 19 2020
+James Allwright has implement the abc draft standard 2.2 clef parameters.
+This specifies the clef by letter and line number on which it sits.
+See http://abcnotation.com/wiki/abc:standard:v2.2#clefs . An
+example is given below.
+
+X:1
+T: clef test
+M: 4/4
+L: 1/4
+K: D clef=G2
+"Treble" DEFG|AGFE|ABcd|
+K: D clef=G1
+"French violin" DEFG|AGFE|ABcd|
+K: D clef=F5
+"Sub-bass" DEFG|AGFE|ABcd|
+K: D clef=F3
+"Baritone" DEFG|AGFE|ABcd|
+
+The implementation involved major changes to parseabc.c and the creation of
+new files music_utils.c and music_utils.h. The function isclef() in parseabc.c
+has been revised and now calls get_standard_clef() or
+get_extended_clef_details() that are defined in music_utils.c.
+The clef is represent by a new structure cleftype_t.  parseclef() and
+event_key() defined in parseabc.c have a new parameter, a structure newclef.
+
+Minor changes were made to store.c, toabc.c, matchsup.c. and debug.c.
+Significant changes were made to yapstree.c and drawtune.c.
+
+The makefiles folder has been moved to legacy_code.
+
 
 

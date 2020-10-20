@@ -9,6 +9,8 @@
 #define KANDR
 #endif
 
+#include "music_utils.h"
+
 /* the arg list to event_voice keeps growing; if we put the args into a structure
 and pass that around, routines that don't need the new ones need not be altered.
 NB. event_voice is *called* from parseabc.c, the actual procedure is linked
@@ -16,26 +18,28 @@ in from the program-specific file */
 /* added middle= stuff */
 #define V_STRLEN 256 /* [SS] 2017-10-11 increase from 64 */
 struct voice_params {
-	int gotclef;
-	int gotoctave;
-        int gottranspose;
-	int gotname;
-	int gotsname;
-	int gotmiddle;
-        int gotother;  /* [SS] 2011-04-18 */
-        int octave;
-	int transpose;
-	char clefname[V_STRLEN+1];
-	char namestring[V_STRLEN+1];
-	char snamestring[V_STRLEN+1];
-	char middlestring[V_STRLEN+1];
+  int gotclef;
+  int gotoctave;
+  int gottranspose;
+  int gotname;
+  int gotsname;
+  int gotmiddle;
+  int gotother;  /* [SS] 2011-04-18 */
+  int octave;
+  int transpose;
+  char clefname[V_STRLEN+1];
+  cleftype_t new_clef;
+  char namestring[V_STRLEN+1];
+  char snamestring[V_STRLEN+1];
+  char middlestring[V_STRLEN+1];
         char other[V_STRLEN+1]; /* [SS] 2011-04-18 */
-	};
+  };
 
 typedef struct voice_context {
   char label[31];
   int expect_repeat;
   int repeat_count;
+  cleftype_t clef;
 } voice_context_t;
 
 #define MAX_VOICES 30
@@ -119,7 +123,7 @@ extern void event_info_key(char *key, char *value);
 extern void event_info(char *s);
 extern void event_key(int sharps, char *s, int modeindex, 
                char modmap[7], int modmul[7], struct fraction modmicro[7],
-               int gotkey, int gotclef, char *clefname,
+               int gotkey, int gotclef, char *clefname, cleftype_t *new_clef,
                int octave, int transpose, int gotoctave, int gottranspose,
                int explict);
 extern void event_microtone(int dir, int a, int b);
@@ -145,7 +149,8 @@ extern void event_chordon(int chorddecorators[DECSIZE]);
 extern void event_chordoff(int, int);
 extern void event_instruction(char *s);
 extern void event_gchord(char *s);
-extern void event_note(int decorators[DECSIZE], char accidental, int mult, 
+extern void event_note(int decorators[DECSIZE], cleftype_t *clef,
+                       char accidental, int mult, 
                        char note, int xoctave, int n, int m);
 extern void event_abbreviation(char symbol, char *string, char container);
 extern void event_acciaccatura();

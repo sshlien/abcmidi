@@ -14,7 +14,7 @@ void showfeature(struct feature *ft)
   struct rest* arest;
   struct tuple* atuple;
   struct note* anote;
-  struct aclef* theclef;
+  cleftype_t* theclef; /* [JA] 2020-10-19 */
     switch (ft->type) {
     case SINGLE_BAR:  printf("SINGLE_BAR\n");
       break;
@@ -181,8 +181,7 @@ struct voice* v;
   struct fract* afract;
   struct rest* arest;
   struct tuple* atuple;
-  struct aclef* theclef;
-*/
+  cleftype_t* theclef; /* [JA] 2020-10-19 */
   int sharps;
   struct chord* thischord;
   int chordcount;

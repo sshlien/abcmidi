@@ -58,7 +58,7 @@ extern void spacevoices(struct tune* t);
 extern void showtune(struct tune *t);
 
 struct key* newkey(char* name, int sharps, char accidental[], int mult[]);
-struct aclef* newclef(enum cleftype t, int octave);
+cleftype_t* newclef(cleftype_t* clef);
 char* addstring(char *s);
 extern int lineno;
 extern int separate_voices;
@@ -595,40 +595,78 @@ static void staveline()
   fprintf(f, "%.1f staff\n", scaledwidth);
 }
 
-static void printclef(struct aclef* t, double x, double yup, double ydown)
+static void printclef (cleftype_t * t, double x, double yup,
+                       double ydown)
 /* draw a clef of the specified type */
 {
-  switch (t->type) {
-  case treble:
-    fprintf(f, "%.1f tclef\n", x);
-    break;
-  case bass:
-    fprintf(f, "%.1f bclef\n", x);
-    break;
-  case alto:
-    fprintf(f, "%.1f cclef\n", x);
-    break;
-  case baritone:
-    fprintf(f, "0 %d T %.1f cclef 0 %d T\n", 4*TONE_HT, x, -4*TONE_HT);
-    break;
-  case tenor:
-    fprintf(f, "0 %d T %.1f cclef 0 %d T\n", 2*TONE_HT, x, -2*TONE_HT);
-    break;
-  case mezzo:
-    fprintf(f, "0 %d T %.1f cclef 0 %d T\n", -2*TONE_HT, x, 2*TONE_HT);
-    break;
-  case soprano:
-    fprintf(f, "0 %d T %.1f cclef 0 %d T\n", -4*TONE_HT, x, 4*TONE_HT);
-    break;
-  default:
-    break;
-  };
-  if (t->octave > 0) {
-    fprintf(f, "%.1f %.1f (%d) bnum\n", x, yup - CLEFNUM_HT + 3, t->octave);
-  };
-  if (t->octave < 0) {
-    fprintf(f, "%.1f %.1f (%d) bnum\n", x, -ydown, - t->octave);
-  };
+  double y;
+  int num_to_show;
+  double clef_y;
+  double clef_ytop;
+  double clef_ybot;
+
+  y = (TONE_HT * 2) * (t->staveline - 1);
+  switch (t->basic_clef) {
+    case basic_clef_treble:
+    case basic_clef_auto:
+    case basic_clef_perc:
+    case basic_clef_none:
+      clef_y = y - (TONE_HT * 2);
+      fprintf(f, "gsave 0 %.1f T\n", clef_y);
+      fprintf(f, "%.1f tclef grestore\n", x);
+      clef_ytop = clef_y + (TONE_HT * 11);
+      clef_ybot = clef_y - (TONE_HT * 4);
+      break;
+    case basic_clef_bass:
+      clef_y = y - (TONE_HT * 6);
+      fprintf(f, "gsave 0 %.1f T\n", clef_y);
+      fprintf(f, "%.1f bclef grestore\n", x);
+      clef_ytop = clef_y + (TONE_HT * 8);
+      clef_ybot = clef_y - (TONE_HT * 0);
+      break;
+    case basic_clef_alto:
+      clef_y = y - (TONE_HT * 4);
+      fprintf(f, "gsave 0 %.1f T\n", clef_y);
+      fprintf(f, "%.1f cclef grestore\n", x);
+      clef_ytop = clef_y + (TONE_HT * 8);
+      clef_ybot = clef_y - (TONE_HT * 0);
+      break;
+    default:
+      break;
+  }
+  /* make sure we don't draw within staves */
+  if (clef_ybot > 0.0) {
+    clef_ybot = 0.0;
+  }
+  if (clef_ytop < (TONE_HT * 8)) {
+    clef_ytop = TONE_HT * 8;
+  }
+  //do_T (out, 0, -y);
+
+  /* draw -15, -8, +8, +15 above or below clef */
+  switch (t->octave_offset) {
+    case -2:
+      num_to_show = -15;
+      break;
+    case -1:
+      num_to_show = -8;
+      break;
+    case 1:
+      num_to_show = 8;
+      break;
+    case 2:
+      num_to_show = 15;
+      break;
+    default:
+      num_to_show = 0;
+      break;
+  }
+  if (t->octave_offset > 0) {
+    fprintf(f, "%.1f %.1f (+%d) bnum\n", x, clef_ytop + 2, num_to_show);
+  }
+  if (t->octave_offset < 0) {
+    fprintf(f, "%.1f %.1f (%d) bnum\n", x, clef_ybot - CLEFNUM_HT - 2, num_to_show);
+  }
 }
 
 void set_keysig(struct key* k, struct key* newval)
@@ -676,7 +714,7 @@ static double size_timesig(struct fract* meter)
 }
 
 static void draw_keysig(char oldmap[], char newmap[], int newmult[], 
-            double x, struct aclef* clef)
+            double x, cleftype_t* clef)
 /* draw key specified key signature at position x on line           */
 /* arrays oldmap[], newmap[], newmult[] are indexed with a=0 to g=7 */
 /* sharp_pos[] and flat_pos[] give order of notes                   */
@@ -689,32 +727,23 @@ static void draw_keysig(char oldmap[], char newmap[], int newmult[],
   int i;
   int offset, pos;
   int note;
-  
-  switch (clef->type) {
-  case treble:
-    offset = 0;
-    break;
-  case soprano:
-    offset = 2;
-    break;
-  case mezzo:
-    offset = 4;
-    break;
-  case alto:
-    offset = 6;
-    break;
-  case tenor:
-    offset = 8;
-    break;
-  case baritone:
-    offset = 10;
-    break;
-  case bass:
-    offset = 12;
-    break;
-  case noclef:
-    break;
-  };
+ 
+  switch (clef->basic_clef) {
+    case basic_clef_treble:
+    case basic_clef_auto:
+    case basic_clef_perc:
+    case basic_clef_none:
+      offset = 0 + (clef->staveline - 2) * 2;
+      break;
+    case basic_clef_alto:
+      offset = 6 + (clef->staveline - 3) * 2;
+      break;
+    case basic_clef_bass:
+      offset = 12 + (clef->staveline - 6) * 2;
+      break;
+    case basic_clef_undefined:
+      break;
+  }
   xpos = x;
   /* draw naturals to cancel out old accidentals */
   for (i=0; i<7; i++) {
@@ -1237,13 +1266,69 @@ static void drawbeam(struct feature* beamset[], int beamctr, int dograce)
   if (redcolor) fprintf(f,"0 setgray\n");
 }
 
+static void sizeclef(cleftype_t *theclef, struct feature *ft)
+{
+  double y;
+  double clef_y;
+  double clef_ytop;
+  double clef_ybot;
+
+  /* take account of staveline when calculating clef size */
+  y = (TONE_HT * 2) * (theclef->staveline - 1);
+  switch (theclef->basic_clef) {
+    case basic_clef_treble:
+    case basic_clef_auto:
+    case basic_clef_perc:
+    case basic_clef_none:
+    default:
+      clef_y = y - (TONE_HT * 2);
+      clef_ytop = clef_y + (TONE_HT * 11);
+      clef_ybot = clef_y - (TONE_HT * 6);
+      ft->xright = TREBLE_RIGHT;
+      ft->xleft = TREBLE_LEFT;
+      break;
+    case basic_clef_bass:
+      clef_y = y - (TONE_HT * 6);
+      clef_ytop = clef_y + (TONE_HT * 8);
+      clef_ybot = clef_y - (TONE_HT * 0);
+      ft->xright = BASS_RIGHT;
+      ft->xleft = BASS_LEFT;
+      break;
+    case basic_clef_alto:
+      clef_y = y - (TONE_HT * 4);
+      clef_ytop = clef_y + (TONE_HT * 8);
+      clef_ybot = clef_y - (TONE_HT * 0);
+      ft->xright = CCLEF_RIGHT;
+      ft->xleft = CCLEF_LEFT;
+      break;
+  }
+  /* extend limits to top and bottom of stave if necessary */
+  if (clef_ybot > 0.0)
+  {
+    ft->ydown = 0.0;
+  }
+  if (clef_ytop < (TONE_HT * 8))
+  {
+    clef_ytop = TONE_HT * 8;
+  }
+  /* allow extra space for +8, -8 etc */
+  if (theclef->octave_offset > 0) {
+    clef_ytop = clef_ytop + 2 + CLEFNUM_HT + 2;
+  }
+  if (theclef->octave_offset < 0) {
+    clef_ybot = clef_ybot - CLEFNUM_HT - 2;
+  }
+  ft->yup = clef_ytop;
+  ft->ydown = clef_ybot;
+}
+
 static void sizevoice(struct voice* v, struct tune* t)
 /* compute width and height values for all elements in voice */
 {
   struct feature* ft;
   struct note* anote;
   struct key* akey;
-  struct aclef* theclef;
+  cleftype_t* theclef;
   char* astring;
   struct fract* afract;
   struct rest* arest;
@@ -1262,8 +1347,7 @@ static void sizevoice(struct voice* v, struct tune* t)
   chordhead = NULL;
   thischord = NULL;
   chordplace = NULL;
-  v->clef->type = t->clef.type;
-  v->clef->octave = t->clef.octave;
+  copy_clef (v->clef, &t->clef);
   if (v->keysig == NULL) {
     event_error("Voice has no key signature");
   };
@@ -1493,55 +1577,9 @@ static void sizevoice(struct voice* v, struct tune* t)
       theclef = ft->item;
       if (theclef == NULL) {
         theclef = v->clef;
-      };
-      ft->yup = (double)8*TONE_HT;
-      ft->ydown = 0.0;
-      switch (theclef->type) {
-      case treble:
-        ft->yup = (double)TREBLE_UP;
-        ft->ydown = (double)TREBLE_DOWN;
-        ft->xright = TREBLE_RIGHT;
-        ft->xleft = TREBLE_LEFT;
-        break;
-      case baritone:
-        ft->yup = (double)12*TONE_HT;
-        ft->xright = CCLEF_RIGHT;
-        ft->xleft = CCLEF_LEFT;
-        break;
-      case tenor:
-        ft->yup = (double)10*TONE_HT;
-        ft->xright = CCLEF_RIGHT;
-        ft->xleft = CCLEF_LEFT;
-        break;
-      case alto:
-        ft->xright = CCLEF_RIGHT;
-        ft->xleft = CCLEF_LEFT;
-        break;
-      case mezzo:
-        ft->ydown = (double)2*TONE_HT;
-        ft->xright = CCLEF_RIGHT;
-        ft->xleft = CCLEF_LEFT;
-        break;
-      case soprano:
-        ft->ydown = (double)4*TONE_HT;
-        ft->xright = CCLEF_RIGHT;
-        ft->xleft = CCLEF_LEFT;
-        break;
-      case bass:
-        ft->xright = BASS_RIGHT;
-        ft->xleft = BASS_LEFT;
-        break;
-      case noclef:
-	break;
-      };
-      if (theclef->octave > 0) {
-        ft->yup = ft->yup + CLEFNUM_HT;
-      };
-      if (theclef->octave < 0) {
-        ft->ydown = ft->ydown + CLEFNUM_HT;
-      };
-      v->clef->type = theclef->type;
-      v->clef->octave = theclef->octave;
+      }
+      sizeclef(theclef, ft);
+      copy_clef (v->clef, theclef);
       break;
     case PRINTLINE:
       break;
@@ -2712,10 +2750,9 @@ static void resetvoice(struct tune* t, struct voice * v)
 {
   v->place = v->first;
   if (v->clef == NULL) {
-    v->clef = newclef(t->clef.type, t->clef.octave);
+    v->clef = newclef(&t->clef);
   } else {
-    v->clef->type = t->clef.type;
-    v->clef->octave = t->clef.octave;
+    copy_clef (v->clef, &t->clef);
   };
   if (v->keysig == NULL) {
     v->keysig = newkey(t->keysig->name, t->keysig->sharps, 
@@ -2943,7 +2980,7 @@ static int printvoiceline(struct voice* v)
   struct chord* thischord;
   int chordcount;
   double xchord;
-  struct aclef* theclef;
+  cleftype_t* theclef;
   int printedline;
   double xend;
   int inend;
@@ -3265,8 +3302,7 @@ static int printvoiceline(struct voice* v)
     case CLEF:
       theclef = ft->item;
       if (theclef != NULL) {
-        v->clef->type = theclef->type;
-        v->clef->octave = theclef->octave;
+        copy_clef (v->clef, theclef);
       };
       if (v->line == midline) {
         printclef(v->clef, ft->x, ft->yup, ft->ydown);
@@ -3566,8 +3602,7 @@ void printtune(struct tune* t)
   /* musicsetup(); */
   thisvoice = firstitem(&t->voices);
   while (thisvoice != NULL) {
-    thisvoice->clef->type = t->clef.type;
-    thisvoice->clef->octave = t->clef.octave;
+    copy_clef (thisvoice->clef, &t->clef);
     setfract(&thisvoice->meter, t->meter.num, t->meter.denom);
     thisvoice->place = thisvoice->first;
     thisvoice = nextitem(&t->voices);

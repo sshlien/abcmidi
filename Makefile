@@ -46,7 +46,7 @@ prefix = /usr/local
 exec_prefix = ${prefix}
 
 srcdir = .
-VPATH = .
+
 bindir = ${exec_prefix}/bin
 libdir = ${exec_prefix}/lib
 datadir = ${prefix}/share
@@ -57,12 +57,12 @@ binaries=abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch
 
 all : abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch
 
-OBJECTS_ABC2MIDI=parseabc.o store.o genmidi.o midifile.o queues.o parser2.o stresspat.o
+OBJECTS_ABC2MIDI=parseabc.o store.o genmidi.o midifile.o queues.o parser2.o stresspat.o music_utils.o
 abc2midi : $(OBJECTS_ABC2MIDI)
 	$(CC) $(CFLAGS) -o abc2midi $(OBJECTS_ABC2MIDI) $(LDFLAGS) -lm
 $(OBJECTS_ABC2MIDI): abc.h parseabc.h config.h Makefile
 
-OBJECTS_ABC2ABC=parseabc.o toabc.o
+OBJECTS_ABC2ABC=parseabc.o toabc.o music_utils.o
 abc2abc : $(OBJECTS_ABC2ABC)
 	$(CC) $(CFLAGS) -o abc2abc $(OBJECTS_ABC2ABC) $(LDFLAGS)
 $(OBJECTS_ABC2ABC): abc.h parseabc.h config.h Makefile
@@ -77,7 +77,7 @@ mftext : $(OBJECTS_MFTEXT)
 	$(CC) $(CFLAGS) -o mftext $(OBJECTS_MFTEXT) $(LDFLAGS)
 $(OBJECTS_MFTEXT): abc.h midifile.h config.h Makefile
 
-OBJECTS_YAPS=parseabc.o yapstree.o drawtune.o debug.o pslib.o position.o parser2.o
+OBJECTS_YAPS=parseabc.o yapstree.o drawtune.o debug.o pslib.o position.o parser2.o music_utils.o
 yaps : $(OBJECTS_YAPS)
 	$(CC) $(CFLAGS) -o yaps $(OBJECTS_YAPS) $(LDFLAGS)
 $(OBJECTS_YAPS): abc.h midifile.h config.h Makefile
@@ -87,10 +87,12 @@ midicopy : $(OBJECTS_MIDICOPY)
 	$(CC) $(CFLAGS) -o midicopy $(OBJECTS_MIDICOPY) $(LDFLAGS)
 $(OBJECTS_MIDICOPY): abc.h midifile.h midicopy.h config.h Makefile
 
-OBJECTS_ABCMATCH=abcmatch.o matchsup.o parseabc.o
+OBJECTS_ABCMATCH=abcmatch.o matchsup.o parseabc.o music_utils.o
 abcmatch : $(OBJECTS_ABCMATCH)
 	$(CC) $(CFLAGS) -o abcmatch $(OBJECTS_ABCMATCH) $(LDFLAGS)
 $(OBJECTS_ABCMATCH): abc.h midifile.h config.h Makefile
+
+music_utils.o : music_utils.c music_utils.h
 
 parseabc.o : parseabc.c abc.h parseabc.h
 

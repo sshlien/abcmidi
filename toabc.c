@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.11 October 12 2020 abc2abc"
+#define VERSION "2.12 October 19 2020 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -29,6 +29,7 @@
 #endif
 
 #include "abc.h"
+#include "music_utils.h"
 #include "parseabc.h"
 #include <stdio.h>
 
@@ -136,7 +137,6 @@ struct abctext* head;
 struct abctext* tail;
 
 
-extern char *mode[];
 extern int modekeyshift[];
 int basemap[7], workmap[7]; /* for -nokey and pitchof() */
 int  workmul[7];
@@ -1489,7 +1489,8 @@ return 0;
 /* end of [SS] 2011-02-15 */
 
 
-void event_key(sharps, s, modeindex, modmap, modmul, modmicrotone,  gotkey, gotclef, clefname,
+void event_key(sharps, s, modeindex, modmap, modmul, modmicrotone,
+          gotkey, gotclef, clefname, new_clef,
           octave, xtranspose, gotoctave, gottranspose, explict)
 int sharps;
 char *s;
@@ -1499,6 +1500,7 @@ int modmul[7];
 struct fraction modmicrotone[7]; /* [SS[ 2014-01-06 */
 int gotkey, gotclef;
 char* clefname;
+cleftype_t *new_clef;  /* [JA] 2020-10-19 */
 int octave, xtranspose, gotoctave, gottranspose;
 int explict;
 {
@@ -2240,8 +2242,9 @@ int *octave, *mult;
 
 
 
-void event_note1(decorators, xaccidental, xmult, xnote, xoctave, n, m)
+void event_note1(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m)
 int decorators[DECSIZE];
+cleftype_t *clef;  /* [JA] 2020-10-19 */
 int xmult;
 char xaccidental, xnote;
 int xoctave, n, m;
@@ -2393,9 +2396,10 @@ int accidental_to_code (char xaccidental)
 }
 
 
-void event_note2(decorators, xaccidental, xmult, xnote, xoctave, n, m)
+void event_note2(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m)
 /* this function is called if flag nokey is set */
 int decorators[DECSIZE];
+cleftype_t *clef;  /* [JA] 2020-10-19 */
 int xmult;
 char xaccidental, xnote;
 int xoctave, n, m;
@@ -2454,16 +2458,17 @@ int xoctave, n, m;
 }
 
 
-void event_note(decorators, xaccidental, xmult, xnote, xoctave, n, m)
+void event_note(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m)
 int decorators[DECSIZE];
+cleftype_t *clef;  /* [JA] 2020-10-19 */
 int xmult;
 char xaccidental, xnote;
 int xoctave, n, m;
 {
 if (nokey)
-  event_note2(decorators, xaccidental, xmult, xnote, xoctave, n, m);
+  event_note2(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m);
 else
-  event_note1(decorators, xaccidental, xmult, xnote, xoctave, n, m);
+  event_note1(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m);
 }
 
 

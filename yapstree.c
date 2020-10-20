@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.81 October 12 2020 yaps"
+#define VERSION "1.82 October 19 2020 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -52,6 +52,9 @@ extern void font_command();
 extern void setup_fonts();
 extern void printtune(struct tune *t);
 extern void set_keysig(struct key *k, struct key *newval);
+
+/* forward definition */
+void event_clef(char* clefstr, cleftype_t * new_clef);
 
 programname fileprogram = YAPS;
 extern int oldchordconvention; /* for handling +..+ chords */
@@ -202,15 +205,14 @@ static struct chord* newchord()
   return(f);
 }
 
-struct aclef* newclef(enum cleftype t, int octave)
+cleftype_t *newclef (cleftype_t * source_clef)
 /* create and initialize clef data structure */
 {
-  struct aclef* f;
+  cleftype_t *f; /* [JA] 2020-10-19 */
 
-  f = (struct aclef*)checkmalloc(sizeof(struct aclef));
-  f->type = t;
-  f->octave = octave;
-  return(f);
+  f = (cleftype_t *) checkmalloc (sizeof (cleftype_t));
+  copy_clef (f, source_clef);
+  return (f);
 }
 
 struct key* newkey(char* name, int sharps, char accidental[], int mult[])
@@ -556,60 +558,37 @@ struct llist* newlist()
   return(l);
 }
 
-static int notenum(int octave, char ch, enum cleftype clef, int clefoctave)
+static int notenum(int octave, char ch, cleftype_t * clef)
 /* converts note to number for stave position */
 /* note E is zero (bottom line of stave) */
 {
   int n;
 
-  n = 5 + (7 + ch -'c')%7 + 7*(octave-1);
-  switch (clef) {
-  case treble:
-    break;
-  case soprano:
-    n = n + 2;
-    break;
-  case mezzo:
-    n = n + 4;
-    break;
-  case alto:
-    n = n + 6;
-    break;
-  case tenor:
-    n = n + 8;
-    break;
-  case baritone:
-    n = n + 10;
-    break;
-  case bass:
-    n = n + 12;
-    break;
-  case noclef:
-    break;
-  };
-  switch (clefoctave) {
-  case -22:
-    n = n + 21;
-    break;
-  case -15:
-    n = n + 14;
-    break;
-  case -8:
-    n = n + 7;
-    break;
-  case 8:
-    n = n - 7;
-    break;
-  case 15:
-    n = n - 14;
-    break;
-  case 22:
-    n = n - 21;
-    break;
-  default:
-    break;
-  };
-  return(n);
+  n = 1 + (7 + ch - 'c') % 7 + 7 * (octave - 1);
+  /* apply shift associated with type of clef */
+  switch (clef->basic_clef) {
+    default:
+    case basic_clef_treble:
+    case basic_clef_auto:
+    case basic_clef_perc:
+    case basic_clef_none:
+    case basic_clef_undefined:
+      /* no shift */
+      break;
+    case basic_clef_bass:
+      n = n + 8;
+      break;
+    case basic_clef_alto:
+      n = n + 4;
+      break;
+  }
+  /* apply any shift from the placing of the clef */
+  n = n + (2 * clef->staveline);
+  /* We ignore octave shift from the clef. This is understood as an
+   * instruction to the player to play in a different octave, but
+   * the written notes do not change position.
+   */
+  return (n);
 }
 
 int count_dots(int *base, int *base_exp, int n, int m)
@@ -684,9 +663,10 @@ static char* decstring(int decorators[])
   };
 }
 
-static struct note* newnote(decorators, xaccidental, xmult, xnote, xoctave, 
+static struct note* newnote(decorators, clef, xaccidental, xmult, xnote, xoctave, 
                             a, b)
 int decorators[DECSIZE];
+cleftype_t *clef; /* [JA] 2020-10-19 */
 int xmult;
 char xaccidental, xnote;
 int xoctave;
@@ -711,7 +691,7 @@ int a, b;
   n->mult = xmult; 
   n->octave = xoctave;
   n->pitch = xnote;
-  n->y = notenum(xoctave, xnote, cv->clef->type, cv->clef->octave);
+  n->y = notenum(xoctave, xnote, clef);
   if (n->y < 4) {
     n->stemup = 1;
   } else {
@@ -801,7 +781,7 @@ static struct voice* newvoice(int n)
   v->barno = 0;
   v->barchecking = thetune.barchecking;
   setfract(&v->barlen, thetune.meter.num, thetune.meter.denom);
-  v->clef = newclef(thetune.clef.type, thetune.clef.octave);
+  v->clef = newclef(&thetune.clef);
   if (thetune.keysig == NULL) {
     printf("Trying to set up voice with no key signature\n");
     exit(0);
@@ -879,8 +859,8 @@ static void init_tune(struct tune* t, int x)
   setfract(&t->unitlen, 0, 1);
   t->cv = NULL;
   t->keysig = NULL;
-  t->clef.type = treble;
-  t->clef.octave = 0;
+  init_new_clef (&t->clef);
+  get_standard_clef ("treble", &t->clef); /* default to treble clef */
   t->tempo = NULL;
   init_llist(&t->words);
 };
@@ -1380,7 +1360,7 @@ void event_startmusicline()
     cv->more_lyrics = 0;
   };
   if ((cv->line == header) || (cv->line == newline)) {
-    addfeature(CLEF, newclef(cv->clef->type, cv->clef->octave));
+    addfeature(CLEF, newclef(cv->clef));
     addfeature(KEY, newkey(cv->keysig->name, cv->keysig->sharps,
                            cv->keysig->map, cv->keysig->mult));
     if ((cv->line == header)||(cv->changetime)) {
@@ -1794,6 +1774,12 @@ struct voice_params *vp;
 {
   if (xinbody) {
     setvoice(n);
+    if (vp->gotclef) {
+      event_clef (vp->clefname, &vp->new_clef);
+    }
+    if (vp->gotoctave) {
+      event_octave (vp->octave, 0);
+    }
   } else {
     if (!suppress) {
       event_error("V: field outside tune body");
@@ -1905,82 +1891,18 @@ int n, m, checkbars;
   };
 }
 
-enum cleftype findclef(clefstr, oct)
-char* clefstr;
-int* oct;
-/* converts a clef name string to an enumerated type */
-/* also looks for +8 +15 +22 -8 -15 -22 octave shift */
-{
-  enum cleftype type;
-  char* p;
-  int interval;
-
-  type = noclef;
-  p = clefstr;
-  if (strncmp(clefstr, "treble", 6)==0) {
-    type = treble;
-    p = p + 6;
-  };
-  if (strncmp(clefstr, "bass", 4)==0) {
-    type = bass;
-    p = p + 4;
-  };
-  if (strncmp(clefstr, "baritone", 8)==0) {
-    type = baritone;
-    p = p + 8;
-  };
-  if (strncmp(clefstr, "tenor", 5)==0) {
-    type = tenor;
-    p = p + 5;
-  };
-  if (strncmp(clefstr, "alto", 4)==0) {
-    type = alto;
-    p = p + 4;
-  };
-  if (strncmp(clefstr, "mezzo", 5)==0) {
-    type = mezzo;
-    p = p + 5;
-  };
-  if (strncmp(clefstr, "mezzo-soprano", 13)==0) {
-    type = mezzo;
-    p = p + 13;
-  };
-  if (strncmp(clefstr, "soprano", 7)==0) {
-    type = soprano;
-    p = p + 7;
-  };
-  interval = 0;
-  if ((type != noclef) && ((*p == '+') || (*p == '-'))) {
-    sscanf(p+1, "%d", &interval);
-    if ((interval == 8) || (interval == 15) || (interval == 22)) {
-      if (*p == '-') {
-        interval = -interval;
-      };
-    } else {
-      interval = 0;
-    };
-  };
-  *oct = interval;
-  return(type);
-}
-
-void event_clef(char* clefstr)
+void event_clef(char* clefstr, cleftype_t * new_clef)
 /* a clef has been encountered in the abc */
 {
-  enum cleftype clef;
-  int num;
-
-  clef = findclef(clefstr, &num);
+  if (new_clef->basic_clef == basic_clef_undefined) {
+    return;
+  }
   if (xinbody) {
-    cv->clef->type = clef;
-    cv->clef->octave = num;
-    addfeature(CLEF, newclef(clef, num));
+    copy_clef (cv->clef, new_clef);
+    addfeature (CLEF, newclef (new_clef));
   };
   if ((xinhead) && (!xinbody)) {
-    if (clef != noclef) {
-       thetune.clef.type = clef;
-       thetune.clef.octave = num;
-    };
+    copy_clef (&thetune.clef, new_clef);
   };
 }
 
@@ -2117,7 +2039,8 @@ void event_octave(int num, int local)
   };
 }
 
-void event_key(sharps, s, minor, modmap, modmul, modmicrotone, gotkey, gotclef, clefstr,
+void event_key(sharps, s, minor, modmap, modmul, modmicrotone, gotkey,
+          gotclef, clefstr, new_clef,
           octave, transpose, gotoctave, gottranspose, explict)
 int sharps;
 char *s;
@@ -2126,21 +2049,26 @@ char modmap[7];
 int modmul[7];
 struct fraction modmicrotone[7]; /* [SS] 2014-01-06 */
 int gotkey, gotclef;
-char* clefstr;
+char* clefstr;  /* [JA] 2020-10-19 */
+cleftype_t * new_clef;
 int octave, transpose, gotoctave, gottranspose;
 int explict;
 /* A key field (K: ) has been encountered */
 {
   if (xinhead || xinbody) {
     if (gotclef==1) {
-      event_clef(clefstr);
+      event_clef(clefstr, new_clef);
     };
     if (gotkey==1) {
       event_true_key(sharps, s, minor, modmap, modmul);
     };
   };
+  if (gotclef)
+  {
+    event_octave(new_clef->octave_offset, 0);
+  }
   if (gotoctave) {
-    event_octave(octave,0);
+    event_octave(octave, 0);
   };
 }
 
@@ -2878,8 +2806,9 @@ char c; /* [SS] 2017-04-19 to distinguish X from Z in abc2abc */
   xevent_rest(1, 1, n);
 }
 
-void event_note(decorators, xaccidental, xmult, xnote, xoctave, n, m)
+void event_note(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m)
 int decorators[DECSIZE];
+cleftype_t *clef; /* [JA] 2020-10-19 */
 int xmult;
 char xaccidental, xnote;
 int xoctave, n, m;
@@ -2890,7 +2819,7 @@ int xoctave, n, m;
   struct chord* thechord;
   int pitchval;
 
-  nt = newnote(decorators, xaccidental, xmult, xnote, xoctave+cv->octaveshift, 
+  nt = newnote(decorators, clef, xaccidental, xmult, xnote, xoctave, 
                n * cv->unitlen.num, m * cv->unitlen.denom);
   nt->tuplenotes = cv->tuplenotes;
   noteplace = addfeature(NOTE, nt);
@@ -2905,7 +2834,7 @@ int xoctave, n, m;
     advance_ties();
   } else {
     thechord = cv->thischord;
-    pitchval = notenum(xoctave, xnote, cv->clef->type, cv->clef->octave);
+    pitchval = notenum(xoctave, xnote, clef);
     if (cv->chordcount == 0) {
       thechord->ytop = pitchval;
       thechord->ybot = pitchval;
@@ -2961,7 +2890,17 @@ char* value;
   int num;
 
   if (strcmp(key, "clef")==0) {
-    event_clef(value);
+    cleftype_t new_clef; /* [JA] 2020-10-19 */
+    int valid_clef;
+
+    init_new_clef (&new_clef);
+    valid_clef = get_standard_clef (value, &new_clef);
+    if (!valid_clef) {
+      valid_clef = get_extended_clef_details (value, &new_clef);
+    }
+    if (valid_clef) {
+      event_clef (value, &new_clef);
+    }
   };
   if (strcmp(key, "octave")==0) {
     num = readsnumf(value);

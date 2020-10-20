@@ -32,6 +32,7 @@
 #define TAB 9
 #include "abc.h"
 #include "parseabc.h"
+#include "music_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 /* [JM] 2018-02-22 to handle strncasecmp() */
@@ -123,13 +124,7 @@ int oldchordconvention = 0;
 char * abcversion = "2.0"; /* [SS] 2014-08-11 */
 char lastfieldcmd = ' '; /* [SS] 2014-08-15 */
 
-char *mode[10] = { "maj", "min", "m",
-  "aeo", "loc", "ion", "dor", "phr", "lyd", "mix"
-};
-
-int modeshift[10] = { 0, -3, -3,
-  -3, -5, 0, -2, -4, 1, -1
-};
+/* tables mode and modeshift moved to music_utils.c */
 
 int modeminor[10] = { 0, 1, 1,
   1, 0, 0, 0, 0, 0, 0
@@ -580,142 +575,34 @@ ismicrotone (p, dir)
   return 0;
 }
 
-
-
-
-int
-isclef (s, gotoctave, octave, strict)
-     char *s;
-     int *gotoctave, *octave;
-     int strict;
 /* part of K: parsing - looks for a clef in K: field                 */
 /* format is K:string where string is treble, bass, baritone, tenor, */
 /* alto, mezzo, soprano or K:clef=arbitrary                          */
+/* revised by James Allwright  [JA] 2020-10-18 */
+int isclef (char *s, cleftype_t * new_clef,
+            int *gotoctave, int *octave, int expect_clef)
 {
   int gotclef;
-  s = s;
+
   gotclef = 0;
-  if (strncmp (s, "bass", 4) == 0)
-    {
-      gotclef = 1;
-      *octave = 0; /* [SS] 2020-05-06 */
-    };
-  if (strncmp (s, "treble", 6) == 0)
-    {
-      gotclef = 1;
-      /* [SS] 2020-05-06 */
-      /*if (fileprogram == ABC2MIDI && *gotoctave != 1 && *octave != 1)*/
-      if (fileprogram == ABC2MIDI)
-        {
-        /* [SS] 2015-07-02  2019-01-20*/
-	/* event_warning ("clef= is overriding octave= setting"); */
-        *gotoctave = 1;		/* [SS] 2011-12-19 */
-        *octave = 0; /* [SS] 2020-05-06 */
-        }
-    };
-  if (strncmp (s, "treble+8", 8) == 0)
-    {
-      gotclef = 1;
-      /* [SS] 2020-05-06 */
-      /*if (fileprogram == ABC2MIDI && *gotoctave != 1 && *octave != 1)*/
-      if (fileprogram == ABC2MIDI)
-        {
-	/* event_warning ("clef= is overriding octave= setting"); */
-        /* [SS] 2015-07-02 2019-01-20 */
-        *gotoctave = 1;
-        *octave = 1;
-        }
-    };
-  if (strncmp (s, "treble-8", 8) == 0)
-    {
-      gotclef = 1;
-      /* [SS] 2020-05-06 */
-      /*if (fileprogram == ABC2MIDI && *gotoctave == 1 && *octave != -1)*/
-      if (fileprogram == ABC2MIDI)
-        {
-	/* event_warning ("clef= is overriding octave= setting"); */
-        *gotoctave = 1;
-        *octave = -1;
-        }
-    };
-  if (strncmp (s, "baritone", 8) == 0)
-    {
-      gotclef = 1;
-      *octave = 0; /* [SS] 2020-05-06 */
-    };
-  if (strncmp (s, "tenor", 5) == 0)
-    {
-      gotclef = 1;
-      *octave=0;  /* [SS] 2020-05-06 */
-    };
-  if (strncmp (s, "tenor-8", 7) == 0)
-    {
-      gotclef = 1;
-      /* [SS] 2020-05-06 */
-      /*if (fileprogram == ABC2MIDI && *gotoctave == 1 && *octave != -1) {*/
-      if (fileprogram == ABC2MIDI) {
-	/*event_warning ("clef= is overriding octave= setting");*/
-        *gotoctave = 1;
-        *octave = -1;
-        }
-    };
-  if (strncmp (s, "alto", 4) == 0)
-    {
-      gotclef = 1;
-      *octave=0;  /* [SS] 2020-05-06 */
-    };
-  if (strncmp (s, "mezzo", 5) == 0)
-    {
-      gotclef = 1;
-      *octave=0;  /* [SS] 2020-05-06 */
-    };
-  if (strncmp (s, "soprano", 7) == 0)
-    {
-      gotclef = 1;
-      *octave=0;  /* [SS] 2020-05-06 */
-    };
-/*
- * only clef=F or clef=f is allowed, or else
- * we get a conflict with the key signature
- * indication K:F
-*/
-
-  if (strncmp (s, "f", 1) == 0 && strict == 0)
-    {
-      gotclef = 1;
-      *octave=0;  /* [SS] 2020-05-06 */
+  new_clef->octave_offset = 0;
+  gotclef = get_standard_clef (s, new_clef);
+  if (!gotclef && expect_clef) {
+    /* do we have a clef in letter format ? e.g. C1, F3, G3 */
+    gotclef = get_extended_clef_details (s, new_clef);
+    if (new_clef->basic_clef == basic_clef_none) {
+      event_warning ("Found clef=none, but a clef is required. Ignoring");
+      gotclef = 0;
     }
-  if (strncmp (s, "F", 1) == 0 && strict == 0)
-    {
-      gotclef = 1;
-      *octave=0;  /* [SS] 2020-05-06 */
-    }
-  if (strncmp (s, "g", 1) == 0 && strict == 0)
-    {
-      gotclef = 1;
-      *octave=0;  /* [SS] 2020-05-06 */
-    }
-  if (strncmp (s, "G", 1) == 0 && strict == 0)
-    {
-      gotclef = 1;
-      *octave=0;  /* [SS] 2020-05-06 */
-    }
-  if (strncmp (s, "perc", 1) == 0 && strict == 0)
-    {
-      gotclef = 1;
-      *octave=0;  /* [SS] 2020-05-06 */
-    }				/* [SS] 2011-04-17 */
-
-  if (!strict && !gotclef)
-    {
-      gotclef = 1;
-      event_warning ("cannot recognize clef indication");
-    }
-
+  }
+  if (expect_clef && !gotclef) {
+    char error_message[80];
+    
+    snprintf (error_message, 80, "clef %s not recognized", s);
+    event_warning (error_message);
+  } 
   return (gotclef);
 }
-
-
 
 char *
 readword (word, s)
@@ -910,12 +797,14 @@ int interpret_voice_label (char *s, int num)
  * s is advanced to point to the next token.
  */
 
+
 int
-parseclef (s, word, gotclef, clefstr, gotoctave, octave)
+parseclef (s, word, gotclef, clefstr, newclef, gotoctave, octave)
      char **s;
      char *word;
      int *gotclef;
-     char *clefstr;
+     char *clefstr;  /* [JA] 2020-10-19 */
+     cleftype_t * newclef;
      int *gotoctave, *octave;
 /* extracts string clef= something */
 {
@@ -935,14 +824,14 @@ parseclef (s, word, gotclef, clefstr, gotoctave, octave)
 	  *s = *s + 1;
 	  skipspace (s);
 	  *s = readword (clefstr, *s);
-	  if (isclef (clefstr, gotoctave, octave, 0))
+	  if (isclef (clefstr, newclef, gotoctave, octave, 1))
 	    {
 	      *gotclef = 1;
 	    };
 	};
       successful = 1;
     }
-  else if (isclef (word, gotoctave, octave, 1))
+  else if (isclef (word, newclef, gotoctave, octave, 0))
     {
       *gotclef = 1;
       strcpy (clefstr, word);
@@ -1192,8 +1081,13 @@ static void process_microtones (int *parsed,  char word[],
 	    {
 	      *parsed = 1;
 	      j = (int) c - 'A';
-              if (j > 7) j = (int) c - 'a';
-              if (j > 7 || j < 0) {printf("invalid j = %d\n",j); exit(-1);}
+        if (j > 7) {
+          j = (int) c - 'a';
+        }
+        if (j > 7 || j < 0) {
+          event_error ("Not a valid microtone");
+          return;
+        }
 	      if (word[0] == '_') a = -a;
 	      /* printf("%s fraction microtone  %d/%d for %c\n",word,a,b,c); */
 	   } else {
@@ -1209,12 +1103,17 @@ static void process_microtones (int *parsed,  char word[],
 	    }
           }
 	  /* if (parsed ==1)  [SS] 2020-09-30 */
-	  if (success > 0) {
-            j = (int) c - 'A';
-            if (j > 7) j = (int) c - 'a';
-            if (j > 7 || j < 0) {printf("invalid j = %d\n",j); exit(-1);}
-            if (word[0] == '_') a = -a;
-	    modmap[j] = word[0];
+    if (success > 0) {
+      j = (int) c - 'A';
+      if (j > 7) {
+        j = (int) c - 'a';
+      }
+      if (j > 7 || j < 0) {
+        event_error ("Not a valid microtone");
+        return;
+      }
+      if (word[0] == '_') a = -a;
+      modmap[j] = word[0];
 	    modmicrotone[j].num = a;
 	    modmicrotone[j].denom = b;
 	    /* printf("%c microtone = %d/%d\n",modmap[j],modmicrotone[j].num,modmicrotone[j].denom); */
@@ -1260,6 +1159,7 @@ parsekey (str)
   int foundmode;
   int transpose, octave;
   char clefstr[30];
+  cleftype_t newclef;
   char modestr[30];
   char msg[80];
   char *moveon;
@@ -1286,6 +1186,7 @@ parsekey (str)
   gotclef = 0;
   cgotoctave = 0;
   coctave = 0;
+  init_new_clef (&newclef);
   modeindex = 0;
   explict = 0;
   modnotes = 0;
@@ -1300,7 +1201,11 @@ parsekey (str)
   word[0] = 0; /* in case of empty string [SDG] 2020-06-04 */
   while (*s != '\0')
     {
-      parsed = parseclef (&s, word, &gotclef, clefstr, &cgotoctave, &coctave);
+      parsed = parseclef (&s, word, &gotclef, clefstr, &newclef, &cgotoctave, &coctave);
+      if (gotclef) {
+        /* make clef an attribute of current voice */
+        copy_clef (&voicecode[voicenum - 1].clef, &newclef);
+      }
       /* parseclef also scans the s string using readword(), placing */
       /* the next token  into the char array word[].                   */
       if (!parsed)
@@ -1492,7 +1397,7 @@ parsekey (str)
       explict = 1;		/* [SS] 2010-07-29 */
     }
   event_key (sf, str, modeindex, modmap, modmul, modmicrotone, gotkey,
-	     gotclef, clefstr, octave, transpose, gotoctave, gottranspose,
+	     gotclef, clefstr, &newclef, octave, transpose, gotoctave, gottranspose,
 	     explict);
   return (gotkey);
 }
@@ -1531,11 +1436,14 @@ parsevoice (s)
   skiptospace (&s);
   voicenum = num;
   skipspace (&s);
-  while (*s != '\0')
-    {
-      parsed =
-	parseclef (&s, word, &vparams.gotclef, vparams.clefname, &cgotoctave,
-		   &coctave);
+  while (*s != '\0') {
+    parsed =
+      parseclef (&s, word, &vparams.gotclef, vparams.clefname,
+                 &vparams.new_clef, &cgotoctave, &coctave);
+      if (vparams.gotclef) {
+        /* make clef an attribute of current voice */
+        copy_clef (&voicecode[num - 1].clef, &vparams.new_clef);
+      }
       if (!parsed)
 	parsed =
 	  parsetranspose (&s, word, &vparams.gottranspose,
@@ -1767,7 +1675,7 @@ parsenote (s)
   else
     {
       readlen (&n, &m, s);
-      event_note (decorators, accidental, mult, note, octave, n, m);
+      event_note (decorators, &voicecode[voicenum - 1].clef, accidental, mult, note, octave, n, m);
       if (!microtone)
 	event_normal_tone ();	/* [SS] 2014-01-09 */
     };
@@ -1920,7 +1828,7 @@ FILE * parse_abc_include (s)
   char includefilename[80];
   FILE *includehandle;
   int success;
-  success = sscanf (s, "%%%%abc-include %80s", includefilename); /* [SS] 2014-08-11 */
+  success = sscanf (s, "%%%%abc-include %79s", includefilename); /* [SS] 2014-08-11 */
   if (success == 1) {
     /* printf("opening include file %s\n",includefilename); */
     includehandle = fopen(includefilename,"r");
