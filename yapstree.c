@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.82 October 19 2020 yaps"
+#define VERSION "1.83 October 27 2020 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -325,7 +325,7 @@ static void closebeam(struct voice* v)
   };
   if (v->beamroot == v->beamend) {
     ft = v->beamroot;
-    n = ft->item;
+    n = ft->item.voidptr;
     n->beaming = single;
     v->beamroot = NULL;
     return;
@@ -341,7 +341,7 @@ static void closebeam(struct voice* v)
     switch (ft->type) {
     case NOTE:
       if (ingrace == 0) {
-        n = ft->item;
+        n = ft->item.voidptr;
         n->stemup = stemup;
       };
       break;
@@ -357,7 +357,7 @@ static void closebeam(struct voice* v)
     ft = ft->next;
   };
   if (ft == v->beamend) {
-    n = ft->item;
+    n = ft->item.voidptr;
     n->stemup = stemup;
     n->beaming = endbeam;
   } else {
@@ -377,7 +377,7 @@ static void closegracebeam(struct voice* v)
   if (ft == NULL) {
     event_error("Missing grace notes");
   } else {
-    n = ft->item;
+    n = ft->item.voidptr;
     if (v->gracebeamroot == v->gracebeamend) {
       n->beaming = single;
     } else {
@@ -395,13 +395,13 @@ static void insertnote(struct feature* chordplace, struct feature* newfeature)
   struct feature* previous;
   int foundplace;
 
-  newnote = newfeature->item;
+  newnote = newfeature->item.voidptr;
   previous = chordplace;
   f = chordplace->next;
   foundplace = 0;
   n = NULL;
   while ((f != NULL)&&(f->type==NOTE)&&(foundplace == 0)) {
-    n = f->item;
+    n = f->item.voidptr;
     if (newnote->y > n->y) {
       foundplace = 1;
     } else {
@@ -506,6 +506,50 @@ static void beamitem(featuretype mytype, void* newitem, struct feature* x)
   };
 }
 
+/* initialize a feature struct with empty values */
+static void init_feature (struct feature *x, featuretype mytype)
+{
+  x->next = NULL;
+  x->type = mytype; 
+  x->item.voidptr = NULL;
+  x->xleft = 0;
+  x->xright = 0;
+  x->yup = 0;
+  x->ydown = 0;
+}
+
+static struct feature *addnumberfeature (featuretype mytype, int number)
+/* handles numeric feature types
+ * may mark the end of a beamed section, so still need to call
+ * beamitem() on these
+ */
+{
+  struct feature *x;
+
+  if (cv == NULL) {
+    printf ("ERROR: no current voice in addfeature(status,type=%d\n", mytype);
+    //printf("status->inhead = %d status->inbody = %d\n", status->inhead, status->inbody);
+    exit (0);
+  }
+  x = (struct feature *)checkmalloc (sizeof (struct feature));
+  init_feature (x, mytype);
+  x->item.number = number;
+  if (cv->first == NULL) {
+    cv->first = x;
+    cv->last = x;
+    beamitem (mytype, NULL, x);
+  } else {
+    if ((cv->last == NULL) || (cv->last->next != NULL)) {
+      printf ("expecting NULL at list end!\n");
+      exit (0);
+    }
+    cv->last->next = x;
+    cv->last = x;
+    beamitem (mytype, NULL, x);
+  }
+  return (x);
+}
+
 static struct feature* addfeature(featuretype mytype, void* newitem)
 /* append a new data element to the linked list for the current voice */
 /* The element can be a note or lots of other things */
@@ -521,13 +565,8 @@ static struct feature* addfeature(featuretype mytype, void* newitem)
     exit(0);
   };
   x = (struct feature*)checkmalloc(sizeof(struct feature));
-  x->next = NULL;
-  x->type = mytype;
-  x->item = newitem;
-  x->xleft = 0;
-  x->xright = 0;
-  x->yup = 0;
-  x->ydown = 0;
+  init_feature (x, mytype);
+  x->item.voidptr = newitem;
   if (cv->first == NULL) {
     cv->first = x;
     cv->last = x;
@@ -697,7 +736,7 @@ int a, b;
   } else {
     n->stemup = 0;
   };
-  n->stemlength = 0.0;
+  n->beaming = single;          /* initial default value */
   n->syllables = NULL;
   if (cv->ingrace) {
     n->gchords = NULL;
@@ -708,6 +747,7 @@ int a, b;
     n->instructions = cv->instructions_pending;
     cv->instructions_pending = NULL;
   };
+  n->stemlength = 0.0;
   return(n);
 }
 
@@ -895,6 +935,7 @@ static void freefeature(void* item, featuretype type)
 
   switch(type) {
   case NOTE:
+  case CHORDNOTE:
     n = item;
     if (n->accents != NULL) {
       free(n->accents);
@@ -958,7 +999,7 @@ static void freevoice(struct voice* v)
 
   ft = v->first;
   while (ft != NULL) {
-    freefeature(ft->item, ft->type);
+    freefeature(ft->item.voidptr, ft->type);
     oldft = ft;
     ft = ft->next;
     free(oldft);
@@ -969,6 +1010,7 @@ static void freevoice(struct voice* v)
   };
   if (v->tempo != NULL) {
     freetempo(v->tempo);
+    free (v->tempo);
     v->tempo = NULL;
   };
   if (v->clef != NULL) {
@@ -1002,6 +1044,7 @@ static void freetune(struct tune* t)
   };
   if (t->tempo != NULL) {
     freetempo(t->tempo);
+    free(t->tempo);
     t->tempo = NULL;
   };
   v = firstitem(&t->voices);
@@ -1316,8 +1359,7 @@ event_error("extended overlay not implemented in yaps");
 
 void event_split_voice()
 {
-/* [SS] 2015-11-15 * changed (void*) to (int *) */
-addfeature(SPLITVOICE, (int *)  lineno);
+addnumberfeature(SPLITVOICE, lineno);
 event_error("voice split not implemented in yaps");
 }
 
@@ -1332,7 +1374,7 @@ void event_linebreak()
 {
 /* [SS] 2015-11-15 * changed (void*) to (int *) */
   if (xinbody) {
-    addfeature(LINENUM, (int *)lineno);
+    addnumberfeature(LINENUM, lineno);
   };
 }
 
@@ -1346,7 +1388,7 @@ static void tidy_ties()
 
   for (i=0; i<cv->tiespending; i++) {
     ft = cv->tie_place[i]; /* pointer to TIE feature */
-    s = ft->item;
+    s = ft->item.voidptr;
     addfeature(CLOSE_TIE, s);
   };
 }
@@ -1354,7 +1396,7 @@ static void tidy_ties()
 void event_startmusicline()
 /* We are at the start of a line of abc notes */
 {
-  cv->linestart = addfeature(MUSICLINE, (void*)NULL);
+  cv->linestart = addnumberfeature(MUSICLINE, 0);
   if (cv->more_lyrics != 0) {
     event_error("Missing continuation w: field");
     cv->more_lyrics = 0;
@@ -1382,7 +1424,7 @@ static void divide_ties()
 
   for (i=0; i<cv->tiespending; i++) {
     ft = cv->tie_place[i]; /* pointer to TIE feature */
-    s = ft->item;
+    s = ft->item.voidptr;
     s->crossline = 1;
   };
   for (i=0; i<cv->slurcount; i++) {
@@ -1397,7 +1439,7 @@ void event_score_linebreak (char ch)
 
   if (xinbody) {
     /* end current score line - code from endmusicline */
-    cv->lineend = addfeature (MUSICSTOP, (void *)NULL);
+    cv->lineend = addnumberfeature (MUSICSTOP, 0);
     addfeature (PRINTLINE, newvertspacing ());
     cv->line = newline;
     divide_ties ();
@@ -1410,7 +1452,7 @@ void event_endmusicline(endchar)
 char endchar;
 /* We are at the end of a line of abc notes */
 {
-  cv->lineend = addfeature(MUSICSTOP, (void*)NULL);
+  cv->lineend = addnumberfeature(MUSICSTOP, 0);
   if ((endchar == ' ') || (endchar == '!')) {
     addfeature(PRINTLINE, newvertspacing());
     cv->line = newline;
@@ -1508,7 +1550,7 @@ char *str; /* string following first word */
           vskip(vspace);
         };
       } else {
-        addfeature(VSKIP, (int*)((int)vspace));
+        addnumberfeature(VSKIP, (int)vspace);
       };
     };
   };
@@ -1612,7 +1654,7 @@ struct feature* apply_syll(char* s, struct feature* wordplace, int* errors)
     return(ft);
   };
   if (ft->type == NOTE) {
-    n = ft->item;
+    n = ft->item.voidptr;
     if (n->syllables == NULL) {
       n->syllables = newlist();
     };
@@ -2120,7 +2162,7 @@ char* playonrep_list;
   };
   checkbar(type); /* increment bar number if bar complete */
 /* [SS] 2015-11-15 * changed (void*) to (int *) */
-  addfeature(type, (int *)cv->barno); /* save bar number */
+  addnumberfeature(type, cv->barno); /* save bar number */
   if ((playonrep_list != NULL) && (strlen(playonrep_list) > 0)) {
     event_playonrep(playonrep_list);
   };
@@ -2398,12 +2440,12 @@ static void resolve_ties(struct feature* f)
   struct note* n;
   int i, j;
 
-  n = f->item;
+  n = f->item.voidptr;
   for (i=0; i<cv->tiespending; i++) {
     ft = cv->tie_place[i]; /* pointer to TIE feature */
-    s = ft->item;
+    s = ft->item.voidptr;
     ft = s->begin; /* pointer to NOTE feature */
-    m = ft->item;
+    m = ft->item.voidptr;
     if (m->y == n->y) { /* pitch match found */
       s->end = f;
       j = cv->tiespending;
@@ -2479,7 +2521,7 @@ int a, b;
   struct fract* afract;
 
   if (n->type == NOTE) {
-    anote =  n->item;
+    anote =  n->item.voidptr;
     afract = &anote->len;
     afract->num = afract->num * a;
     afract->denom = afract->denom * b;
@@ -2489,7 +2531,7 @@ int a, b;
                              anote->len.num, anote->len.denom);
   };
   if (n->type == REST) {
-    arest =  n->item;
+    arest =  n->item.voidptr;
     afract = &arest->len;
     afract->num = afract->num * a;
     afract->denom = afract->denom * b;
@@ -2509,11 +2551,11 @@ struct fract* getlenfract(struct feature *f)
 
   len = NULL;
   if (f->type == NOTE) {
-    anote = f->item;
+    anote = f->item.voidptr;
     len = &(anote->len);
   };
   if (f->type == REST) {
-    arest = f->item;
+    arest = f->item.voidptr;
     len = &(arest->len);
   };
   return(len);
@@ -2561,8 +2603,8 @@ static void brokenadjust()
     fr1 = getlenfract(cv->laststart);
     fr2 = getlenfract(cv->thisstart);
 /*
-    fr1 = cv->laststart->item;
-    fr2 = cv->thisstart->item;
+    fr1 = cv->laststart->item.voidptr;
+    fr2 = cv->thisstart->item.voidptr;
 */
     if ((fr1->num * fr2->denom) != (fr2->num * fr1->denom)) {
       failed = 1;
@@ -2675,11 +2717,11 @@ struct feature* f;
 struct note* anote;
 if (chord_n ==1 && chord_m ==1) return;
 f = chordplace->next;
-anote = f->item;
+anote = f->item.voidptr;
 /* remove old note length from barcount */
 addfractions(&cv->barcount, -anote->len.num, anote->len.denom);
 while ((f != NULL)&&((f->type==NOTE)||(f->type=CHORDNOTE))) {
-   anote = f->item;
+   anote = f->item.voidptr;
    /* remove old note length from barcount */
    setfract(&anote->len, chord_n*cv->unitlen.num, chord_m*cv->unitlen.denom);
    reducef(&anote->len);
@@ -2711,8 +2753,8 @@ void event_chordoff(int chord_n, int chord_m)
   };
   ft = cv->chordplace;
   if ((ft != NULL) && (ft->next != NULL) && (ft->next->type == NOTE)) {
-    thechord = ft->item;
-    firstnote = ft->next->item;
+    thechord = ft->item.voidptr;
+    firstnote = ft->next->item.voidptr;
     /* beaming for 1st note in chord */
     beamitem(NOTE, firstnote, ft->next);
     markchord(ft);

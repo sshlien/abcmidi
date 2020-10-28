@@ -13968,4 +13968,12 @@ Significant changes were made to yapstree.c and drawtune.c.
 The makefiles folder has been moved to legacy_code.
 
 
+October 27 2020
+
+James Allwright cleaned up the yaps source code, (uninitialized variables)
+and memory leaks detected by valgrind. In particular, one of the elements
+in the struct feature (item) was changed to a union of a void pointer
+and a number. This change propagated to the other files position.c,
+debug.c, yaprstree.c and drawtune.c. There are too many changes in
+yapstree.c and drawtune.c to list.
 

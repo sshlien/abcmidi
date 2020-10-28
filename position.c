@@ -148,11 +148,11 @@ static void advance(struct voice* v, int phase, int* items, double* itemspace, d
         *itemspace = *itemspace +  p->xleft + p->xright;
         *items = *items + 1;
         if (p->type == REST) {
-          arest = p->item;
+          arest = p->item.voidptr;
           addfract(&v->time, arest->len.num, arest->len.denom);
         };
         if ((p->type == NOTE) && (!v->ingrace)) {
-          anote = p->item;
+          anote = p->item.voidptr;
 	  notelen = anote->len;
 
  	 if (anote->tuplenotes >0) {

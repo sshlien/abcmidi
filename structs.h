@@ -104,7 +104,11 @@ struct feature {
   featuretype type;
   float xleft, xright, ydown, yup;
   float x;
-  void* item;
+  /* [JA] 2020-10-27 */
+  union {
+    void *voidptr;
+    int number;
+  }item;
 };
 
 /* structure used by both slurs and ties */

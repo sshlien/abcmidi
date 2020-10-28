@@ -29,7 +29,7 @@ void showfeature(struct feature *ft)
     case REP2:  printf("REP2\n");
       break;
     case PLAY_ON_REP:
-      printf("PLAY_ON_REP %s\n", (char*)ft->item);
+      printf("PLAY_ON_REP %s\n", (char*)ft->item.voidptr);
       break;
     case BAR1:  printf("BAR1\n");
       break;
@@ -42,25 +42,25 @@ void showfeature(struct feature *ft)
     case THIN_THICK:  printf("THIN_THICK\n");
       break;
     case PART:  printf("PART\n");
-      astring = ft->item;
+      astring = ft->item.voidptr;
       break;
     case TEMPO:  printf("TEMPO\n");
       break;
     case TIME:
-      afract = ft->item;
+      afract = ft->item.voidptr;
       printf("TIME %d / %d\n", afract->num, afract->denom);
       break;
     case KEY:  printf("KEY\n");
-      akey = ft->item;
+      akey = ft->item.voidptr;
       break;
     case REST:  printf("REST\n");
-      arest = ft->item;
+      arest = ft->item.voidptr;
       break;
     case TUPLE:  printf("TUPLE\n");
-      atuple = ft->item;
+      atuple = ft->item.voidptr;
       break;
     case NOTE:
-      anote = ft->item;
+      anote = ft->item.voidptr;
       printf("NOTE %c%c %d / %d\n", anote->accidental, anote->pitch,
                anote->len.num, anote->len.denom);
       if (anote->gchords != NULL) {
@@ -82,7 +82,7 @@ void showfeature(struct feature *ft)
               ft->x, ft->xleft, ft->xright);
       break;
     case CHORDNOTE: 
-      anote = ft->item;
+      anote = ft->item.voidptr;
       printf("CHORDNOTE %c%c %d / %d\n", anote->accidental, anote->pitch,
                anote->len.num, anote->len.denom);
       printf("stemup=%d beaming=%d base =%d base_exp=%d x=%.1f left=%.1f right=%.1f\n", 
@@ -143,7 +143,7 @@ void showfeature(struct feature *ft)
     case DYNAMIC:  printf("DYNAMIC\n");
       break;
     case LINENUM:  
-      printf("LINENUM %p\n", (void *)(ft->item)); /* [SDG] 2020-06-03 */
+      printf("LINENUM %d\n", ft->item.number);
       break;
     case MUSICLINE:  printf("MUSICLINE\n");
       break;
@@ -160,7 +160,7 @@ void showfeature(struct feature *ft)
     case NOBEAM: printf("NOBEAM\n");
       break;
     case CLEF: printf("CLEF\n");
-      theclef = ft->item;
+      theclef = ft->item.voidptr;
       break;
     case SPLITVOICE: printf("SPLITVOICE\n");
     default:
