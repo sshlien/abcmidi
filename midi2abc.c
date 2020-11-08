@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.46 June 22 2020 midi2abc"
+#define VERSION "3.47 November 01 2020 midi2abc"
 
 /* Microsoft Visual C++ Version 6.0 or higher */
 #ifdef _MSC_VER
@@ -375,6 +375,7 @@ char* s;
   if (numbytes > 1024) numbytes = 1024; /* [SS] 2019-08-11 */
   p = (char*) checkmalloc(numbytes); /* [SS] 2019-04-13  2019-08-11*/
   strncpy(p, s,numbytes); /* [SS] 2017-08-30 [SDG] 2020-06-03 */
+  p[numbytes-1] = '\0'; /* [JA] 2020-11-01 */
   return(p);
 }
 

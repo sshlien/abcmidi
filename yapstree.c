@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.83 October 27 2020 yaps"
+#define VERSION "1.85 November 07 2020 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -62,8 +62,8 @@ extern int oldchordconvention; /* for handling +..+ chords */
 struct voice* cv;
 struct tune thetune;
 
-char outputname[256];
-char outputroot[256];
+char outputname[MAX_OUTPUTNAME + 1]; /* [JA] 2020-11-01 */
+char outputroot[MAX_OUTPUTROOT + 1];
 char matchstring[256];
 int fileopen;
 
@@ -1213,14 +1213,29 @@ char** filename;
   };
   fileopen = 0;
   filearg = getarg("-o", argc, argv);
+  /* beware of security risk from buffer overflows here [JA] 2020-11-01*/
   if (filearg != -1) { 
-    /*strcpy(outputname, argv[filearg]); security risk buffer overflow */
-    /* strncpy(outputname, argv[filearg],sizeof(outputname)-1);  [SDG] 2020-06-03 */
-    snprintf(outputname, sizeof(outputname)-1,"%s",argv[filearg]); /* [SDG] 2020-06-03 */
+    if (strlen(argv[filearg]) > MAX_OUTPUTROOT)  /* [JA] 2020-11-01 */
+    {
+      printf("Specified output filename exceeds limit.\n");
+      exit(1);
+    }
+#ifdef NO_SNPRINTF
+    sprintf(outputname, "%s",argv[filearg]); /* [SS] 2020-11-01 */
+#else
+    snprintf(outputname, MAX_OUTPUTROOT,"%s",argv[filearg]);
+#endif
   } else {
-    /* strcpy(outputname, argv[1]); security risk: buffer overflow */
-    /* strncpy(outputname, argv[1],sizeof(outputname)-4);  [SDG] 2020-06-03 */
-    snprintf(outputname,sizeof(outputname)-4,"%s", argv[1]); /* [SDG] 2020-06-03 */
+    if (strlen(argv[1]) > MAX_OUTPUTROOT)
+    {
+      printf("Implied output filename exceeds limit.\n");
+      exit(1);
+    }
+#ifdef NO_SNPRINTF
+    sprintf(outputname,"%s", argv[1]);  /* [SS] 2020-11-01 */
+#else
+    snprintf(outputname,MAX_OUTPUTROOT,"%s", argv[1]);
+#endif
     place = strchr(outputname, '.');
     if (place == NULL) {
       strcat(outputname, ".ps");

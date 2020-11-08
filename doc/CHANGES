@@ -13977,3 +13977,24 @@ and a number. This change propagated to the other files position.c,
 debug.c, yaprstree.c and drawtune.c. There are too many changes in
 yapstree.c and drawtune.c to list.
 
+
+November 01 2020
+
+Yaps: James Allwright fixed a bug introduced recently that caused yaps
+to shift the notes down two ledger lines when the clef is not declared
+(parseabc.c). More security checks were introduced to prevent yaps
+and midi2abc to produce lines greater than 256 characters (drawtune.c,
+drawtune.h, yapstree.c  and midi2abc.c).
+
+November 07 2020
+Yaps: a missing voidptr prevented the compilation of drawtune.c on MacOS.
+Lines 3006-3011 was replaced with
+  if (v->place->type == LEFT_TEXT) {
+      printtext(left, v->place->item.voidptr, &textfont);
+    };
+    if (v->place->type == CENTRE_TEXT) {
+      printtext(centre, v->place->item.voidptr, &textfont);
+    };
+
+
+

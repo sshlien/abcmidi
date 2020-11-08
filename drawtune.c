@@ -26,6 +26,7 @@
 
 #ifdef _MSC_VER
 #define ANSILIBS 1
+#define snprintf _snprintf
 #endif
 
 #include <stdio.h>
@@ -45,8 +46,6 @@ extern struct tune thetune;
 extern int debugging;
 extern int pagenumbering;
 extern int barnums, nnbars;
-extern char outputname[256];
-extern char outputroot[256];
 extern int make_open();
 extern void printlib();
 extern int count_dots(int *base, int *base_exp, int n, int m);
@@ -3005,12 +3004,14 @@ static int printvoiceline(struct voice* v)
     if (v->place->type == NEWPAGE) {
       newpage();
     };
+    /* [JA] 2020-11-07 */
     if (v->place->type == LEFT_TEXT) {
-      printtext(left, v->place->item, &textfont);
+      printtext(left, v->place->item.voidptr, &textfont);
     };
     if (v->place->type == CENTRE_TEXT) {
-      printtext(centre, v->place->item, &textfont);
+      printtext(centre, v->place->item.voidptr, &textfont);
     };
+
     if (v->place->type == VSKIP) {
       vskip((double)v->place->item.number);
     };
@@ -3544,7 +3545,12 @@ void printtune(struct tune* t)
       boundingbox.urx = xmargin + pagewidth;
       boundingbox.ury = ymargin + pagelen;
     };
-    sprintf(outputname, "%s%d.eps", outputroot, t->no);
+#ifdef NO_SNPRINTF
+    /* [SS] 2020-11-01 */
+    sprintf(outputname,  "%s%d.eps", outputroot, t->no); /* [JA] 2020-11-01 */
+#else
+    snprintf(outputname, MAX_OUTPUTNAME, "%s%d.eps", outputroot, t->no); /* [JA] 2020-11-01 */
+#endif
     open_output_file(outputname, &boundingbox);
   } else {
     make_open();

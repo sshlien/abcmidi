@@ -166,7 +166,11 @@ char * concatenatestring(s1,s2)
 { 
    int len = strlen(s1) + strlen(s2) + 1;
    char *p = (char *) checkmalloc(len);
+#ifdef NO_SNPRINTF
+   sprintf(p, "%s%s",s1,s2); /* [SS] 2020-11-01 */
+#else
    snprintf(p,len, "%s%s",s1,s2);
+#endif
   return p;
 }
 
@@ -598,7 +602,11 @@ int isclef (char *s, cleftype_t * new_clef,
   if (expect_clef && !gotclef) {
     char error_message[80];
     
+#ifdef NO_SNPRINTF
+    sprintf (error_message, "clef %s not recognized", s);
+#else
     snprintf (error_message, 80, "clef %s not recognized", s);
+#endif
     event_warning (error_message);
   } 
   return (gotclef);
@@ -657,10 +665,15 @@ lcase (s)
 void init_voice_contexts (void)
 {
   int i;
+  cleftype_t default_clef;  /* [JA] 2020-11-01 */
+
+  /* we use treble clef when no clef is explicitly specified */
+  get_standard_clef ("treble", &default_clef); /* default to treble clef */
   for (i = 0; i < MAX_VOICES; i++) {      /* [SS} 2015-03-15 */
     voicecode[i].label[0] = '\0';
     voicecode[i].expect_repeat = 0;
     voicecode[i].repeat_count = 0;
+    copy_clef(&voicecode[i].clef, &default_clef); /* [JA] 2020-11-01 */
   }
 }
 
@@ -730,8 +743,13 @@ int interpret_voice_label (char *s, int num)
     {
       char error_message[80];
 
+#ifdef NO_SNPRINT 
+      sprintf(error_message, "V:%d out of sequence, treating as V:%d",
+               num, num_voices); /* [SS] 2020-10-01 */
+#else
       snprintf(error_message, 80, "V:%d out of sequence, treating as V:%d",
                num, num_voices);
+#endif
       event_warning(error_message);
       num = num_voices + 1;
     }
@@ -2123,7 +2141,11 @@ parsefield (key, field)
 	int num, denom;
 
 	/* strncpy (timesigstring, place, 16);   [SS] 2011-08-19 */
+#ifdef NO_SNPRINT 
+	sprintf(timesigstring,"%s",place); /* [SEG] 2020-06-07 */
+#else
 	snprintf(timesigstring,sizeof(timesigstring),"%s",place); /* [SEG] 2020-06-07 */
+#endif
 	if (strncmp (place, "none", 4) == 0)
         /* converts 'M: none'  to 'M: 4/4' otherwise a warning 
 	 * is returned if not a fraction [SS] */
@@ -2352,12 +2374,21 @@ static void check_bar_repeats (int bar_type, char *replist)
 
         if (cv->repeat_count == 0)
         {
+#ifdef NO_SNPRINT 
+          sprintf(error_message, "Missing repeat at start ? Unexpected :|%s found", replist);
+#else
           snprintf(error_message, 80, "Missing repeat at start ? Unexpected :|%s found", replist);
+#endif
           event_warning (error_message);
         }
         else
         {
+#ifdef NO_SNPRINT 
+          sprintf(error_message,  "Unexpected :|%s found", replist);
+#else
           snprintf(error_message, 80, "Unexpected :|%s found", replist);
+#endif
+
           event_warning (error_message);
         }
       };

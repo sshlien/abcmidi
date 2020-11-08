@@ -8,6 +8,13 @@ extern int eps_out;
 struct bbox {
   int llx, lly, urx, ury;
 };
+
+/* may add .ps or <N>.eps to outputroot to get outputname [JA] 2020-11-01 */
+#define MAX_OUTPUTROOT 250
+#define MAX_OUTPUTNAME (MAX_OUTPUTROOT + 20)
+extern char outputroot[MAX_OUTPUTROOT + 1];
+extern char outputname[MAX_OUTPUTNAME + 1];
+
 #ifdef ANSILIBS
 extern void setmargins(char* s);
 extern void setpagesize(char* s);
