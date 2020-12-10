@@ -8,6 +8,22 @@ ABC2ABC,
 YAPS,
 ABCMATCH} programname;
 
+typedef enum {
+  TIMESIG_NORMAL,
+  TIMESIG_FREE_METER,
+  TIMESIG_COMMON,
+  TIMESIG_CUT,
+  TIMESIG_COMPLEX
+} timesig_type_t;
+
+typedef struct timesig_details {
+  timesig_type_t type;
+  int num;
+  int denom;
+  int complex_values[8];
+  int num_values;
+} timesig_details_t;
+
 /* define types of abc object */
 typedef enum {
 /* types of bar sign */

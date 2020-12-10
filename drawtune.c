@@ -39,6 +39,7 @@
 #include "abc.h"
 #include "structs.h"
 #include "sizes.h"
+#include "parseabc.h"
 #include "drawtune.h"
 
 /* external functions  and variables */
@@ -695,21 +696,44 @@ static double size_keysig(char oldmap[], char newmap[])
   return((double)n * 5.0);
 }
 
-static double size_timesig(struct fract* meter)
+static void get_complex_numerator(char buffer[], timesig_details_t *timesig)
+{
+  int i;
+
+  buffer[0] = '\0';
+  for (i = 0; i < timesig->num_values; i++)
+  {
+    char num_buff[20];
+
+    if (i > 0)
+    {
+      strcat(buffer, "+");
+    }
+    snprintf(num_buff, 20, "%d", timesig->complex_values[i]);
+    num_buff[2] = '\0'; /* truncate to 2 digits */
+    strcat(buffer, num_buff);
+  }
+}
+
+static double size_timesig (timesig_details_t *timesig)
 /* compute width of the time signature */
 {
   double len1, len2;
-  char temp[20];
+  char temp[40];
 
-  sprintf(temp, "%d", meter->num);
-  len1 = stringwidth(temp, 16.0, 2);
-  sprintf(temp, "%d", meter->denom);
-  len2 = stringwidth(temp, 16.0, 2);
-  if (len1 > len2) {
-    return(len1);
+  if (timesig->type == TIMESIG_COMPLEX) {
+    get_complex_numerator(temp, timesig);
   } else {
-    return(len2);
-  };
+    sprintf (temp, "%d", timesig->num);
+  }
+  len1 = stringwidth (temp, 16.0, 2);
+  sprintf (temp, "%d", timesig->denom);
+  len2 = stringwidth (temp, 16.0, 2);
+  if (len1 > len2) {
+    return (len1);
+  } else {
+    return (len2);
+  }
 }
 
 static void draw_keysig(char oldmap[], char newmap[], int newmult[], 
@@ -782,10 +806,48 @@ static void draw_keysig(char oldmap[], char newmap[], int newmult[],
   fprintf(f, "\n");
 }
 
-static void draw_meter(struct fract* meter, double x)
+void draw_csig (double x)
+{
+  fprintf (f, " %.1f csig\n", x);
+}
+
+void draw_ctsig (double x)
+{
+  fprintf (f, " %.1f ctsig\n", x);
+}
+
+void draw_tsig (double x, char *top, char *bot)
+{
+  fprintf (f, " %.1f (%s) (%s) tsig\n", x, top, bot);
+}
+
+static void draw_meter (timesig_details_t *meter, double x)
 /* draw meter (time signature) at specified x value */
 {
-  fprintf(f, "%.1f (%d) (%d) tsig\n", x, meter->num, meter->denom);
+  char num[40];
+  char denom[10];
+
+  switch (meter->type) {
+  case TIMESIG_NORMAL:
+    snprintf (num, 10, "%d", meter->num);
+    snprintf (denom, 10, "%d", meter->denom);
+    draw_tsig (x, num, denom);
+    break;
+  case TIMESIG_COMMON:
+    draw_csig (x);
+    break;
+  case TIMESIG_CUT:
+    draw_ctsig (x);
+    break;
+  case TIMESIG_COMPLEX:
+    get_complex_numerator(num, meter);
+    snprintf (denom, 10, "%d", meter->denom);
+    draw_tsig (x, num, denom);
+    break;
+  default:
+  case TIMESIG_FREE_METER:
+    break;
+  }
 }
 
 static double maxstrwidth(struct llist* strings, double ptsize, int fontno)
@@ -1324,17 +1386,18 @@ static void sizeclef(cleftype_t *theclef, struct feature *ft)
 static void sizevoice(struct voice* v, struct tune* t)
 /* compute width and height values for all elements in voice */
 {
-  struct feature* ft;
-  struct note* anote;
-  struct key* akey;
-  cleftype_t* theclef;
-  char* astring;
-  struct fract* afract;
-  struct rest* arest;
-  struct note* lastnote;
-  struct chord* thischord;
-  struct feature* chordplace;
-  struct tuple* thistuple;
+  struct feature *ft;
+  struct note *anote;
+  struct key *akey;
+  cleftype_t *theclef;
+  timesig_details_t *timesig;
+  char *astring;
+  struct fract *afract;
+  struct rest *arest;
+  struct note *lastnote;
+  struct chord *thischord;
+  struct feature *chordplace;
+  struct tuple *thistuple;
   enum tail_type chordbeaming;
   int intuple, tuplecount;
   struct feature* tuplefeature;
@@ -1402,13 +1465,18 @@ static void sizevoice(struct voice* v, struct tune* t)
       astring = ft->item.voidptr;
     case TEMPO: 
       break;
-    case TIME: 
-      afract = ft->item.voidptr;
-      if (afract == NULL) {
-        afract = &v->meter;
-      };
-      ft->xleft = 0;
-      ft->xright = (float) size_timesig(afract);
+    case TIME:
+      {
+        double width;
+
+        timesig = ft->item.voidptr;
+        if (timesig == NULL) {
+          timesig = &v->timesig;
+        }
+        width = size_timesig (timesig);
+        ft->xleft = (float)(width / 2.0);
+        ft->xright = (float)(width / 2.0);
+      }
       break;
     case KEY: 
       ft->xleft = 0;
@@ -2762,8 +2830,7 @@ static void resetvoice(struct tune* t, struct voice * v)
     set_keysig(v->keysig, t->keysig);
     /* v->keysig->sharps = t->keysig->sharps; */
   };
-  v->meter.num = t->meter.num;
-  v->meter.denom = t->meter.denom;
+  copy_timesig(&v->timesig, &t->timesig);
 }
 
 static void resettune(struct tune* t)
@@ -2975,6 +3042,7 @@ static int printvoiceline(struct voice* v)
   struct feature* ft;
   struct note* anote;
   struct key* akey;
+  timesig_details_t *atimesig;
   char* astring;
   struct fract* afract;
   struct rest* arest;
@@ -3118,17 +3186,17 @@ static int printvoiceline(struct voice* v)
       draw_tempo(ft->x, spacing->yinstruct, ft->item.voidptr);
       break;
     case TIME: 
-      afract = ft->item.voidptr;
-      if (afract==NULL) {
+      atimesig = ft->item.voidptr;
+      if (atimesig == NULL) {
         if (v->line == midline) {
-          draw_meter(&v->meter, ft->x);
-        };
+          draw_meter (&v->timesig, ft->x);
+        }
       } else {
-        setfract(&v->meter, afract->num, afract->denom);
+        copy_timesig(&v->timesig, atimesig);
         if (v->line == midline) {
-          draw_meter(afract, ft->x);
-        };
-      };
+          draw_meter (atimesig, ft->x);
+        }
+      }
       break;
     case KEY: 
       akey = ft->item.voidptr;
@@ -3614,7 +3682,7 @@ void printtune(struct tune* t)
   thisvoice = firstitem(&t->voices);
   while (thisvoice != NULL) {
     copy_clef (thisvoice->clef, &t->clef);
-    setfract(&thisvoice->meter, t->meter.num, t->meter.denom);
+    copy_timesig(&thisvoice->timesig, &t->timesig);
     thisvoice->place = thisvoice->first;
     thisvoice = nextitem(&t->voices);
   };

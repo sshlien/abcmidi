@@ -93,6 +93,7 @@ void read_spec()
 void event_part()
 void event_voice()
 void event_length()
+void event_default_length()
 void tempounits()
 int get_tempo_from_name()
 void event_tempo()
@@ -185,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.44 Ocober 19 2020 abc2midi" 
+#define VERSION "4.45 December 20 2020 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -2998,6 +2999,12 @@ int n;
   };
 }
 
+void event_default_length (n)
+/* handles a missing L: field in the abc */
+     int n;
+{
+}
+
 static void tempounits(t_num, t_denom)
 /* interprets Q: once default length is known */
 int *t_num, *t_denom;
@@ -3084,31 +3091,38 @@ char *post;
   };
 }
 
-void event_timesig(n, m, dochecking)
+void event_timesig (timesig)
 /* handles an M: field  M:n/m */
-int n, m, dochecking;
+  timesig_details_t *timesig;
 {
+  int dochecking;
+
+  if (timesig->type == TIMESIG_FREE_METER) {
+    dochecking = 0;
+  } else {
+    dochecking = 1;
+  }
   if (dotune) {
     if (pastheader) {
-      addfeature(TIME, dochecking, n, m);
-      mtime_num = n; /* [SS] 2012-11-03 */
-      mtime_denom = m; /* [SS] 2012-11-03 */
+      addfeature (TIME, dochecking, timesig->num, timesig->denom);
+      mtime_num = timesig->num;            /* [SS] 2012-11-03 */
+      mtime_denom = timesig->denom;          /* [SS] 2012-11-03 */
       if (v != NULL) {
-        v->active_meter_num =  n; /* [SS] 2012-11-08 */
-        v->active_meter_denom =  m; /* [SS] 2012-11-08 */
-        }
+        v->active_meter_num = timesig->num; /* [SS] 2012-11-08 */
+        v->active_meter_denom = timesig->denom; /* [SS] 2012-11-08 */
+      }
     } else {
-      time_num = n;
-      time_denom = m;
-      mtime_num = n; /* [SS] 2012-11-03 */
-      mtime_denom = m; /* [SS] 2012-11-03 */
+      time_num = timesig->num;
+      time_denom = timesig->denom;
+      mtime_num = timesig->num;            /* [SS] 2012-11-03 */
+      mtime_denom = timesig->denom;          /* [SS] 2012-11-03 */
 
       /* [SS] 2015-03-11                                */
       /*if (v != NULL) {                                */
       /*  v->active_meter_num =  n;  [SS] 2012-11-08    */
       /*  v->active_meter_denom =  m;  [SS] 2012-11-08  */
       /*  }                                             */
-      meter_voice_update(n,m); /* [SS] 2015-03-11 */
+      meter_voice_update (timesig->num, timesig->denom); /* [SS] 2015-03-11 */
       timesigset = 1;
       barchecking = dochecking;
     };
@@ -4277,7 +4291,7 @@ int xoctave, n, m;
   int num, denom;
   int octave;
   int pitch;
-  int pitch_noacc;
+  int pitch_noacc = 0;
   int dummy;
 
   decotype[notes] = 0; /* [SS] 2012-07-02 no decoration */

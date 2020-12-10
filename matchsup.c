@@ -790,6 +790,12 @@ int n;
   };
 }
 
+void event_default_length (n)
+/* handles a missing L: field in the abc */
+     int n;
+{
+}
+
 static void tempounits(t_num, t_denom)
 /* interprets Q: once default length is known */
 int *t_num, *t_denom;
@@ -806,19 +812,25 @@ char *post;
 {
 }
 
-
-void event_timesig(n, m, dochecking)
+void event_timesig (timesig)
 /* handles an M: field  M:n/m */
-int n, m, dochecking;
+  timesig_details_t *timesig;
 {
+  int dobarchecks;
+
+  if (timesig->type == TIMESIG_FREE_METER) {
+    dobarchecks = 0;
+  } else {
+    dobarchecks = 1;
+  }
   if (dotune) {
     if (pastheader) {
-      addfeature(TIME, dochecking, n, m);
-   } else { 
-      time_num = n;
-      time_denom = m;
+      addfeature (TIME, dobarchecks, timesig->num, timesig->denom);
+    } else {
+      time_num = timesig->num;
+      time_denom = timesig->denom;
       timesigset = 1;
-      barchecking = dochecking;
+      barchecking = dobarchecks;
     };
   };
 }

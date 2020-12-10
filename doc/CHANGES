@@ -13997,4 +13997,27 @@ Lines 3006-3011 was replaced with
     };
 
 
+December 10 2020
+
+James Allwright has upgraded the parser so it can now interpret
+complex time signatures as shown in this example.
+
+X:1
+T: Example 1 using complex time signature
+M:(3+2+2)/8
+L:1/8
+K:G
+abc de fg|GGG aa bb|gfe GG FF|
+
+In addition the handling of the L: field was improved.
+This impacts abc2midi, yaps, abc2abc, and abcmatch.
+The implementation of these changes involved creating a new
+typedef structure (timesig_details) in abc.h, and numerous new
+functions or upgrades in parseabc.c (check_power_of_two,
+read_complex_has_timesig, read_L_unitlen, copy_timesig, 
+interpret_voice_label, ... Lots of changes to parseabc.h.
+Minor changes to store.c, toabc.c yapstree.c to link to the
+new functions in parseabc.c
+
+
 

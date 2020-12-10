@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.85 November 07 2020 yaps"
+#define VERSION "1.86 December 10 2020 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -127,6 +127,16 @@ static struct fract* newfract(int a, int b)
   f->num = a;
   f->denom = b;
   return(f);
+}
+
+static timesig_details_t *newtimesig(void)
+/* create an initialized time signature */
+{
+  timesig_details_t *new_timesig;
+
+  new_timesig = (timesig_details_t *)checkmalloc (sizeof (timesig_details_t));
+  init_timesig(new_timesig);
+  return new_timesig;
 }
 
 static struct slurtie* newslurtie()
@@ -437,7 +447,7 @@ static void beamitem(featuretype mytype, void* newitem, struct feature* x)
 
   /* deal with beaming here */
   if (cv->ingrace) {
-    if (mytype == NOTE) {
+    if ((mytype == NOTE) && (newitem != NULL)) {
       n = newitem;
       n->stemup = 1;
       if (cv->gracebeamroot == NULL) {
@@ -820,7 +830,7 @@ static struct voice* newvoice(int n)
   v->slurcount = 0;
   v->barno = 0;
   v->barchecking = thetune.barchecking;
-  setfract(&v->barlen, thetune.meter.num, thetune.meter.denom);
+  setfract (&v->barlen, thetune.timesig.num, thetune.timesig.denom);
   v->clef = newclef(&thetune.clef);
   if (thetune.keysig == NULL) {
     printf("Trying to set up voice with no key signature\n");
@@ -831,7 +841,7 @@ static struct voice* newvoice(int n)
   };
   v->tempo = NULL;
   setfract(&v->barcount, 0, 1);
-  setfract(&v->meter, thetune.meter.num, thetune.meter.denom);
+  copy_timesig(&v->timesig, &thetune.timesig);
   v->lastnote = NULL;
   v->laststart = NULL;
   v->lastend = NULL;
@@ -895,7 +905,7 @@ static void init_tune(struct tune* t, int x)
   t->parts = NULL;
   init_llist(&t->notes);
   init_llist(&t->voices);
-  setfract(&t->meter, 0, 1);
+  init_timesig(&t->timesig);
   setfract(&t->unitlen, 0, 1);
   t->cv = NULL;
   t->keysig = NULL;
@@ -1411,6 +1421,9 @@ static void tidy_ties()
 void event_startmusicline()
 /* We are at the start of a line of abc notes */
 {
+  voice_context_t *parser_voice;
+
+  parser_voice = &voicecode[voicenum - 1];
   cv->linestart = addnumberfeature(MUSICLINE, 0);
   if (cv->more_lyrics != 0) {
     event_error("Missing continuation w: field");
@@ -1421,7 +1434,11 @@ void event_startmusicline()
     addfeature(KEY, newkey(cv->keysig->name, cv->keysig->sharps,
                            cv->keysig->map, cv->keysig->mult));
     if ((cv->line == header)||(cv->changetime)) {
-      addfeature(TIME, newfract(cv->meter.num, cv->meter.denom));
+      timesig_details_t *timesig;
+
+      timesig = newtimesig();
+      copy_timesig(timesig, &parser_voice->timesig);
+      addfeature (TIME, timesig);
       cv->changetime = 0;
     };
     cv->line = midline;
@@ -1861,6 +1878,13 @@ int n;
   };
 }
 
+void event_default_length (n)
+     int n;
+/* Handles a missing L: field */
+{
+  event_length(n);
+}
+
 void event_refno(n)
 int n;
 /* A reference field (X: ) has been encountered. This indicates the start */
@@ -1920,29 +1944,34 @@ char *post; /* text after tempo */
   };
 }
 
-void event_timesig(n, m, checkbars)
-int n, m, checkbars;
+void event_timesig (timesig)
+  timesig_details_t *timesig;
 /* A time signature (M: ) has been encountered in the abc */
 {
+  int checkbars;
+
+  if (timesig->type == TIMESIG_FREE_METER) {
+    checkbars = 0;
+  } else {
+    checkbars = 1;
+  }
   if (xinhead) {
-    setfract(&thetune.meter, n, m);
+    copy_timesig(&thetune.timesig, timesig);
     thetune.barchecking = checkbars;
   } else {
     if (xinbody) {
-      if (checkbars == 1) {
-        addfeature(TIME, newfract(n,m));
-        setfract(&cv->meter, n, m);
-        setfract(&cv->barlen, n, m);
-        if (cv->line != midline) {
-          cv->changetime = 1;
-        };
-        cv->barchecking = 1;
-      } else {
-        cv->barchecking = 0;
-      };
+      timesig_details_t *time_timesig;
+
+      time_timesig = newtimesig();
+      copy_timesig(time_timesig, timesig);
+      addfeature (TIME, time_timesig);
+      setfract (&cv->barlen, timesig->num, timesig->denom);
+      if (cv->line != midline) {
+        cv->changetime = 1;
+      }
     } else {
       if (!suppress) {
-        event_warning("M: field outside tune ignored");
+        event_warning ("M: field outside tune ignored");
       };
     };
   };
@@ -2029,22 +2058,8 @@ static void start_body()
 /* default values for anything not explicitly declared */
 {
   parseron();
-  if (thetune.meter.num == 0) {
-    event_warning("no M: field, assuming 4/4");
-    /* generate missing time signature */
-    event_timesig(4, 4, 1);
-    event_linebreak();
-  };
-  if (thetune.unitlen.num == 0) {
-    event_warning("no L: field, using default rule");
-    if ((double) thetune.meter.num / (double) thetune.meter.denom < 0.75) {
-      /*setfract(&thetune.unitlen, 1, 16); [SS] 2004-09-06 */
-      event_length(16);
-    } else {
-     /* setfract(&thetune.unitlen, 1, 8); */
-      event_length(8);
-    };
-  };
+  /* missing M: is handled by setting default M:none */
+  /* missing L: is handled by event_default_length */
   if (thetune.tempo != NULL) {
     resolve_tempo(thetune.tempo, &thetune.unitlen);
   };

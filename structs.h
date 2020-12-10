@@ -183,7 +183,7 @@ struct voice {
   /* following fields are initially inherited from tune */
   cleftype_t* clef;
   struct key* keysig;
-  struct fract meter;
+  timesig_details_t timesig;
   struct atempo* tempo;
   /* place used while printing to keep track of progress through voice */
   struct feature* lineplace;
@@ -208,7 +208,7 @@ struct tune {
   char* origin;
   char* parts;
   struct llist notes;
-  struct fract meter;
+  timesig_details_t timesig;
   int barchecking;
   struct key* keysig;
   struct atempo* tempo;

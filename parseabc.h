@@ -39,7 +39,9 @@ typedef struct voice_context {
   char label[31];
   int expect_repeat;
   int repeat_count;
+  timesig_details_t timesig;
   cleftype_t clef;
+  int unitlen; /* unitlen value currently active in voice */
 } voice_context_t;
 
 #define MAX_VOICES 30
@@ -49,9 +51,6 @@ struct fraction {
   int num;
   int denom;
 };
-
-extern int repcheck; /* allows backend to enable/disable repeat checking */
-extern voice_context_t voicecode[MAX_VOICES];
 
 #ifndef KANDR
 extern int readnump(char **p);
@@ -69,6 +68,8 @@ extern int ismicrotone(char **p, int dir);
 extern void event_normal_tone(void);
 extern void print_inputline(void);
 extern void print_inputline_nolinefeed(void);
+extern void init_timesig(timesig_details_t *timesig);
+extern void copy_timesig(timesig_details_t *destination, timesig_details_t *source);
 #else
 extern int readnump();
 extern int readsnump();
@@ -84,11 +85,19 @@ extern char *lookup_abbreviation();
 extern int ismicrotone();
 extern void event_normal_tone();
 extern void print_inputline_nolinefeed();
+extern void init_timesig();
+extern void copy_timesig();
 #endif
 extern void parseron();
 extern void parseroff();
 
+/* variables exported by the parser */
 extern int lineno;
+extern int repcheck; /* allows backend to enable/disable repeat checking */
+extern voice_context_t voicecode[MAX_VOICES];
+extern timesig_details_t master_timesig;
+extern int voicenum;
+extern int parserinchord;
 
 /* event_X() routines - these are called from parseabc.c       */
 /* the program that uses the parser must supply these routines */
@@ -114,10 +123,11 @@ extern void event_part(char *s);
 
 extern void event_voice(int n, char *s, struct voice_params *params);
 extern void event_length(int n);
+extern void event_default_length(int n);
 extern void event_blankline(void);
 extern void event_refno(int n);
 extern void event_tempo(int n, int a, int b, int rel, char *pre, char *post);
-extern void event_timesig(int n, int m, int dochecking);
+extern void event_timesig(timesig_details_t *timesig);
 extern void event_octave(int num, int local);
 extern void event_info_key(char *key, char *value);
 extern void event_info(char *s);
@@ -183,6 +193,7 @@ extern void event_words();
 extern void event_part();
 extern void event_voice();
 extern void event_length();
+extern void event_default_length();
 extern void event_blankline();
 extern void event_refno();
 extern void event_tempo();

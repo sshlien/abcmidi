@@ -385,7 +385,7 @@ copy_metatext (int type, int length, char *m)
 }
 
 void
-copy_timesig (c1, c2, c3, c4)
+midicopy_timesig (c1, c2, c3, c4)
 int c1, c2, c3, c4;
 {
   char data[4];
@@ -996,7 +996,7 @@ metaevent (int type)
       mf_write_meta_event (0x54, m, 5);
       break;
     case 0x58:
-      copy_timesig (m[0], m[1], m[2], m[3]);
+      midicopy_timesig (m[0], m[1], m[2], m[3]);
       break;
     case 0x59:
       copy_keysig (m[0], m[1]);

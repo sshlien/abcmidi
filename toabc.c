@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.12 October 19 2020 abc2abc"
+#define VERSION "2.13 December 10 2020 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -58,6 +58,22 @@ struct fract {
   int denom;
 };
 
+typedef struct complex_barpoint {
+  struct fract break_here[8];
+} complex_barpoint_t;
+
+struct voicetype
+{                               /* information needed for each voice */
+  int number;                   /* voice number from V: field */
+  int barcount;
+  int foundbar;
+  struct abctext *currentline;
+  int bars_remaining;
+  int bars_complete;
+  int drumchan;
+  complex_barpoint_t bar_break; /* where to put spaces for complex time */
+} voice[MAX_VOICES];
+
 struct fract barlen; /* length of a bar as given by the time signature */
 struct fract unitlen; /* unit length as given by the L: field */
 struct fract count; /* length of bar so far */
@@ -65,6 +81,7 @@ struct fract prevcount; /* length of bar before last increment */
 struct fract tuplefactor; /* factor associated with a tuple (N */
 struct fract chordfactor; /* factor of the first note in a chord [PHDM] 2013-03-10 */
 struct fract breakpoint; /* used to break bar into beamed sets of notes */
+complex_barpoint_t master_bar_break;
 int barno; /* number of bar within tune */
 int newspacing; /* was -s option selected ? */
 int barcheck; /* indicate -b and -r options selected */
@@ -73,7 +90,6 @@ int newbreaks; /* was -n option selected ? */
 int nodouble_accidentals;
 int totalnotes, notecount; 
 int bars_per_line; /* number supplied after -n option */
-int barcount;
 int tuplenotes, barend;
 int xinhead, xinbody; /* are we in head or body of abc tune ? */
 int inmusic; /* are we in a line of notes (in the tune body) ? */
@@ -107,15 +123,6 @@ char* clef = ""; /* [SS] 2020-01-22 */
 extern int nokey; /* signals no key signature assumed */
 extern int nokeysig; /* signals -nokeys or -nokeysf option */
  
-struct voicetype { /* information needed for each voice */
-  int number; /* voice number from V: field */
-  int barcount;
-  int foundbar;
-  struct abctext* currentline;
-  int bars_remaining;
-  int bars_complete;
-  int drumchan;
-} voice[MAX_VOICES];
 int voicecount, this_voice, next_voice;
 enum abctype {field, bar, barline};
 /* linestat is used by -n for deciding when to generate a newline */
@@ -442,6 +449,10 @@ int *a, *b;
 {
   int t, n, m;
 
+  if (*b == 0) {
+    printf("Error in reduce: %d / %d\n", *a, *b);
+    return;
+  }
   /* find HCF using Euclid's algorithm */
   if (*a > *b) {
     n = *a;
@@ -455,6 +466,10 @@ int *a, *b;
     n = m;
     m = t;
   };
+  if (n == 0) {
+    printf("Error reducing %d / %d (n = 0) !!\n", *a, *b);
+    return;
+  }
   *a = *a/n;
   *b = *b/n;
 }
@@ -1176,6 +1191,29 @@ char* s;
   inmusic = 0;
 }
 
+/* initialize an abc2abc backend voice when we start using it */
+static void init_voice(int voice_index, int num)
+{
+  int i;
+  struct voicetype *v;
+  complex_barpoint_t *parent_breaks;
+  complex_barpoint_t *voice_breaks;
+
+  v = &voice[voice_index];
+  v->number = num;
+  v->drumchan = 0;
+  v->barcount = zero_barcount (&v->foundbar);
+  v->bars_complete = 0;
+  v->bars_remaining = bars_per_line;
+  parent_breaks = &master_bar_break;
+  voice_breaks = &v->bar_break;
+  for (i = 0; i < 8; i++)
+  {
+    voice_breaks->break_here[i].num = parent_breaks->break_here[i].num;
+    voice_breaks->break_here[i].denom = parent_breaks->break_here[i].denom;
+  }
+}
+
 int setvoice(num)
 int num;
 /* we need to keep track of current voice for new linebreak handling (-n) */
@@ -1198,11 +1236,7 @@ int num;
     } else {
       event_error("Number of voices exceeds static limit MAX_VOICES");
     };
-    voice[voice_index].number = num;
-    voice[voice_index].barcount = zero_barcount(&voice[voice_index].foundbar);
-    voice[voice_index].bars_complete = 0;
-    voice[voice_index].bars_remaining = bars_per_line;
-    voice[voice_index].drumchan = 0;
+    init_voice(voice_index, num);
   };
   voice[voice_index].currentline = NULL;
   return(voice_index);
@@ -1273,6 +1307,13 @@ int n;
   inmusic = 0;
 }
 
+void event_default_length(n)
+     int n;
+{
+  unitlen.num = 1;
+  unitlen.denom = n;
+}
+
 void event_refno(n)
 int n;
 {
@@ -1298,7 +1339,6 @@ int n;
   barlen.num = 0;
   barlen.denom = 1;
   inmusic = 0;
-  barcount = 0;
 }
 
 void event_tempo(n, a, b, relative, pre, post)
@@ -1337,39 +1377,109 @@ char *post;
   inmusic = 0;
 }
 
-void event_timesig(n, m, checkbars)
-int n, m, checkbars;
-
-/* [code contributed by Larry Myerscough 2015-11-5]
- * checkbars definition extended:
- *  0=> no,
- *  1=>yes, use numerical notation
- *  2=>yes, use 'common' notation for 2/2 or 4/4 according to numerator 
- *  */
+/* a complex time signature is something like M:(3+4)/8
+ * this means the time signature is actually 7/8 or 7 eighth notes in a bar,
+ * but you should group the eighth notes as a set of 3, then a set of four.
+ * This function works out where to put spaces between notes for a
+ * complex time signature.
+ */
+static void set_complex_barpoint(timesig_details_t *timesig,
+   complex_barpoint_t *complex_barpoint)
 {
-  if (checkbars == 1) {
-    emit_int_sprintf("M:%d/", n);
-    emit_int(m);
-  } else if (checkbars == 2) {
-      emit_int_sprintf("M:C", n);
-      if (n != 4) emit_string("|");
-  } else {
-    emit_string("M:none");
-    barcheck = 0;
-  };
-  barlen.num = n;
-  barlen.denom = m;
-  breakpoint.num = n;
-  breakpoint.denom = m;
-  if ((n == 9) || (n == 6)) {
-    breakpoint.num = 3;
-    breakpoint.denom = barlen.denom;
-  };
-  if (n%2 == 0) {
-    breakpoint.num = barlen.num/2;
-    breakpoint.denom = barlen.denom;
-  };
-  barend = n/breakpoint.num;
+  int i; 
+  struct fract count;
+
+  count.num = 0;
+  count.denom = 1;
+  for (i = 0; i < timesig->num_values; i++) {
+    int part_num; 
+    int part_denom;
+
+    /* get component of complex timesig as a fraction */
+    part_num = timesig->complex_values[i];
+    part_denom = timesig->denom;
+    /* add component of complex timesig to count */
+    count.num = (count.num * part_denom) + (part_num * count.denom);
+    count.denom = (count.denom * part_denom);
+    reduce(&count.num, &count.denom);
+    /* set next suggested break to be at current count value */
+    complex_barpoint->break_here[i].num = count.num;
+    complex_barpoint->break_here[i].denom = count.denom;
+  }
+}
+
+/* M: field in the source. Support M:none, M:C and M:C| as well as
+ * normal M:n/m
+ */
+void event_timesig (timesig)
+  timesig_details_t *timesig;
+{
+  emit_string ( "M:");
+  switch (timesig->type) {
+    default:
+    case TIMESIG_NORMAL:
+      emit_int ( timesig->num);
+      emit_string ( "/");
+      emit_int ( timesig->denom);
+      break;
+    case TIMESIG_FREE_METER:
+      emit_string ( "none");
+      barcheck = 0;
+      break;
+    case TIMESIG_COMMON:
+      emit_string ( "C");
+      break;
+    case TIMESIG_CUT:
+      emit_string ( "C|");
+      break;
+   case TIMESIG_COMPLEX:
+      {
+        int i;
+
+        emit_char( '(');
+        for (i = 0; i < timesig->num_values; i++)
+        {
+          if (i > 0) {
+            emit_char( '+');
+          }
+          emit_int ( timesig->complex_values[i]);
+        }
+        emit_char( ')');
+        emit_string ( "/");
+        emit_int ( timesig->denom);
+        if (xinhead) {
+          set_complex_barpoint(
+            &master_timesig, &master_bar_break);
+        } else if (xinbody) {
+          struct voicetype *toabc_voice;
+          voice_context_t *current_voice;
+
+          current_voice = &voicecode[this_voice];
+          toabc_voice = &voice[this_voice];
+          set_complex_barpoint(
+            &current_voice->timesig, &toabc_voice->bar_break);
+        }
+      }
+      break;
+  }
+  barlen.num = timesig->num;
+  barlen.denom = timesig->denom;
+  if ((timesig->type == TIMESIG_NORMAL) ||
+      (timesig->type == TIMESIG_COMMON) ||
+      (timesig->type == TIMESIG_CUT)) {
+
+    breakpoint.num = timesig->num;
+    breakpoint.denom = timesig->denom;
+    if ((timesig->num == 9) || (timesig->num == 6)) {
+      breakpoint.num = 3;
+      breakpoint.denom = barlen.denom;
+    };
+    if (timesig->num % 2 == 0) {
+      breakpoint.num = barlen.num / 2;
+      breakpoint.denom = barlen.denom;
+    };
+    barend = timesig->num / breakpoint.num;
+  }
   inmusic = 0;
 }
 
@@ -1414,18 +1524,10 @@ static void start_tune()
   if (barlen.num == 0) {
     /* generate missing time signature */
     event_linebreak();
-    event_timesig(4, 4, 1);
+    event_timesig (&master_timesig);
     inmusic = 0;
   };
-  if (unitlen.num == 0) {
-    if ((float) barlen.num / (float) barlen.denom < 0.75) {
-      unitlen.num = 1;
-      unitlen.denom = 16;
-    } else {
-      unitlen.num = 1;
-      unitlen.denom = 8;
-    };
-  };
+  /* missing unitlen handled by event_default_length */
   voicecount = 0;
   this_voice = setvoice(1);
   next_voice = this_voice;
@@ -1824,10 +1926,13 @@ int type, n;
 void event_tuple(n, q, r)
 int n, q, r;
 {
-  emit_int_sprintf("(%d", n);
   if (tuplenotes != 0) {
     event_error("tuple within tuple not allowed");
   };
+  if (newspacing) {
+    emit_char(' ');
+  }
+  emit_int_sprintf("(%d", n);
   if (q != 0) {
     emit_int_sprintf(":%d", q);
     tuplefactor.num = q;
@@ -1839,6 +1944,11 @@ int n, q, r;
       tuplenotes = n;
     };
   } else {
+    if (r != 0) {
+      /* cope with the case when q is zero, but r is not zero. */
+      emit_string ("::");
+      emit_int (r);
+    }
     tuplenotes = n;
     tuplefactor.denom = n;
     if ((n == 2) || (n == 4) || (n == 8)) tuplefactor.num = 3;
@@ -2239,8 +2349,50 @@ int *octave, *mult;
   }
 }
 
+/* decide whether or not to put a space after note.
+ * part of the logic for newspacing option */
+static void consider_break_after_note(int previous_tuplenotes)
+{
+  struct fract barpoint;
+  voice_context_t *current_voice;
 
+  current_voice = &voicecode[voicenum - 1];
+  if (previous_tuplenotes == 1) {
+    /* if the note just output was the last one in a tuple, generate space */
+    emit_string (" ");
+    return;
+  }
+  if (tuplenotes > 0) {
+    /* never break beaming within a tuple */
+    return;
+  }
+  if (!parserinchord) {
+    if (current_voice->timesig.type == TIMESIG_COMPLEX) {
+      struct voicetype *v;
+      int i;
 
+      v = &voice[voicenum - 1];
+      /* try all the pre-calculated breakpoints */
+      for (i = 0; i < current_voice->timesig.num_values - 1; i++) {
+        if ((v->bar_break.break_here[i].num ==
+               count.num) &&
+            (v->bar_break.break_here[i].denom ==
+               count.denom))
+        {
+          emit_string (" ");
+        }
+      }
+    } else {
+      barpoint.num = count.num * breakpoint.denom;
+      barpoint.denom = breakpoint.num * count.denom;
+      reduce (&barpoint.num, &barpoint.denom);
+      if ((barpoint.denom == 1) && (barpoint.num != 0) &&
+          (barpoint.num != barend)) {
+        emit_string (" ");
+      }
+    }
+  }
+}
 
 void event_note1(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m)
 int decorators[DECSIZE];
@@ -2255,6 +2407,7 @@ int xoctave, n, m;
   int mult;
   char accidental, note;
   int octave;
+  int prev_tuplenotes;
 
   mult = 0;  /* [SS] 2006-10-27 */
   if (transpose == 0 || drumchan) {
@@ -2347,17 +2500,12 @@ int xoctave, n, m;
       chordfactor.denom = m;
     }
   };
+  prev_tuplenotes = tuplenotes;
   if ((!ingrace) && (!inchord)) {
     addunits(n, m);
   };
   if (newspacing) {
-    barpoint.num = count.num * breakpoint.denom;
-    barpoint.denom = breakpoint.num * count.denom;
-    reduce(&barpoint.num, &barpoint.denom);
-    if ((barpoint.denom == 1) && (barpoint.num != 0) && 
-        (barpoint.num != barend)) {
-      emit_string(" ");
-    };
+    consider_break_after_note(prev_tuplenotes);
   };
 }
 
