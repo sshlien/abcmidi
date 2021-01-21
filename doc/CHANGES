@@ -14020,4 +14020,55 @@ Minor changes to store.c, toabc.c yapstree.c to link to the
 new functions in parseabc.c
 
 
+January 21 2021
+
+Abc2midi bug: the following tune exposes several problems.
+
+X:1
+T: voice repeats
+M: 4/4
+L: 1/4
+K:C
+[V:1] C2E2 |
+[V:2] C,4 |
+[V:1] D2F2 & f4|
+[V:2] D,4 |
+[V:1] E2G2   ::
+[V:2] E,4 ::
+[V:1]d2B2  |
+[V:2]B,4 |
+[V:1] c2A2|
+[V:2] A,4 |
+[V:1] B2G2 :|]
+[V:2] G,4 :|]
+
+Running abc2midi produces the following messages.
+voice mapping:
+  1     2   
+writing MIDI file repeats1.mid
+Error in line-char 8-10 : Expected end repeat not found at |:
+Error in line-char 8-10 : Expected end repeat not found at |:
+Warning in line-char 18-10 : Track 2 is 48.054165 quarter notes long not 40.054165
+Error in line-char 10-13 : Found unexpected ::
+Warning in line-char 18-11 : Track 3 is 36.054165 quarter notes long not 40.054165
+
+The first two error messages do not make sense since it points to
+line [V:1] D2F2 & f4| which does not contain a left repeat |: .
+Furthermore the double repeat E2G2 :: is ignored and that section is
+not repeated causing a loss of synchronization between the two voices
+and unequal tracks.
+
+Analysis:
+If we remove the split voice &f4, abc2midi runs without errors.
+If instead we put opening repeats |: in the first measure,
+[V:1] |: C2E2 |
+[V:2] |: C,4 |
+abc2midi again runs without errors.
+
+The problem is caused by a bug in the function add_missing_repeats (store.c)
+which is called by scan_for_missing_repeats. After, the first call to
+insertfeature, the locations in the array add_leftrepeat_at[] no longer
+point directly to the VOICE features but before. (The insertion shifts
+everything to the right.) It is necessary to adjust this position by
+looking ahead.
 

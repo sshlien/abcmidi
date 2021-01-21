@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.45 December 20 2020 abc2midi" 
+#define VERSION "4.46 January 21 2021 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -5957,7 +5957,7 @@ for (i=0;i<notes;i++) {
   j = feature[i];
   if (j == MUSICLINE) {
      insertfeature(DOUBLE_BAR,0,0,0,i+1);
-     voicestart[0] = i+1;
+     voicestart[0] = i+1; 
      break;
      }
   }
@@ -5970,14 +5970,15 @@ for (i=0;i<notes;i++) {
                  }
   if (j == VOICE) {
         voicenum = pitch[i];
-        if(!voicestart[voicenum]) voicestart[voicenum] = i;
+        if(!voicestart[voicenum]) {
+          voicestart[voicenum] = i;
+          /*printf("voicestart[%d] = %d\n",voicenum,voicestart[voicenum]);*/
+          }
         }
   if (j == BAR_REP) bar_rep_found[voicenum] = 1;
   if ((j == REP_BAR || j == DOUBLE_REP) && (!bar_rep_found[voicenum])) {
     /* printf("missing BAR_REP for voice inserted for voice %d part %c\n",voicenum,part); [SS] 2011-04-19 */
-     /*** add_leftrepeat_at[num2add] = voicestart[voicenum]+3; [SS] 2009-12-20*/
-     /***add_leftrepeat_at[num2add] = voicestart[voicenum]+2; /* [SS] 2009-12-20*/
-     add_leftrepeat_at[num2add] = voicestart[voicenum]+1; /* [SS] 2014-10-31*/
+     add_leftrepeat_at[num2add] = voicestart[voicenum]; /* [SS] 2014-10-31 2021-12-21*/
      num2add++;
      bar_rep_found[voicenum] = 1;
      }
@@ -5989,10 +5990,17 @@ if (verbose >3) printf("scan_for_missing_repeats finished\n");
 
 
 void add_missing_repeats () {
-int i,j;
+int i,j,k;
+int leftrepeat;
 for (i = num2add-1; i >= 0; i--) {
- insertfeature(BAR_REP,0,0,0,add_leftrepeat_at[i]); 
- /*for (j=0;j<parts;j++) {*/
+leftrepeat = add_leftrepeat_at[i];
+k=0;
+/* [SS] 2021-12-21 */
+while (feature[leftrepeat] != VOICE && k < 20) {
+  leftrepeat++; 
+  k++;
+  }
+ insertfeature(BAR_REP,0,0,0,leftrepeat+1); 
  /* for (j=0;j<=parts;j++) {   [SS] 2011-06-06 */
  for (j=0;j<26;j++) {  /* [SS] 2011-08-03 */
    if (part_start[j] > add_leftrepeat_at[i])
