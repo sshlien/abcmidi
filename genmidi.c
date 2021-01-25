@@ -518,7 +518,7 @@ int pass;
 {
   char msg[80];
   
-  if (barno >= 0 || barno < 1024) barloc[barno] = tracklen;
+  if (barno >= 0 && barno < 1024 && pass == 1) barloc[barno] = tracklen;
   if (barchecking) {
     /* only generate these errors once */
     if (noteson && (partrepno == 0)) {

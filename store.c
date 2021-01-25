@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.46 January 21 2021 abc2midi" 
+#define VERSION "4.47 January 24 2021 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -4707,6 +4707,22 @@ if (nofnop == 0) {
    done = 1;
   };
 
+ if (strcmp(s,"accent") == 0) { /* [SS] 2021-01-24 */
+   done = 1;
+   };
+
+ if (strcmp(s,"mordent") == 0) { /* [SS] 2021-01-24 */
+   done = 1;
+   };
+
+ if (strcmp(s,"sfz") == 0) { /* [SS] 2021-01-24 */
+   done = 1;
+   };
+
+ if (strcmp(s,"wedge") == 0) { /* [SS] 2021-01-24 */
+   done = 1;
+   };
+
   if (done == 0 && quiet == -1) {    /* [SS] 2013-11-02 */
     sprintf(buff, "instruction !%s! ignored", s);
     event_warning(buff);
@@ -5084,6 +5100,10 @@ if (gfact_method)  applygrace_orig(place);
 else applygrace_new(place);
 }
 
+static void cleargracenotes(int start,int end) {
+removefeatures(start,end);
+} /* [SS]  2021-01-24 */
+
 
 static void applygrace_orig(place)
 int place;
@@ -5129,6 +5149,10 @@ int place;
   nextinchord = 0;
   hostnotestart = -1;
   while ((hostnotestart == -1) && (j < notes)) {
+    if (feature[j] == SINGLE_BAR || feature[j] == DOUBLE_BAR) {
+                              cleargracenotes(start,end); /* [SS] 2021.01.24 */
+                              return;
+                             }      
     if ((feature[j] == NOTE) || (feature[j] == REST)) {
       hostnotestart = j;
     };
@@ -5192,7 +5216,6 @@ int place;
   };
 }
 
-
 static void applygrace_new(place)
 int place;
 /* assign lengths to grace notes before generating MIDI */
@@ -5238,6 +5261,10 @@ int place;
   nextinchord = 0;
   hostnotestart = -1;
   while ((hostnotestart == -1) && (j < notes)) {
+    if (feature[j] == SINGLE_BAR || feature[j] == DOUBLE_BAR) {
+                              cleargracenotes(start,end);
+                              return;
+                             } /* [SS] 2021-01-24 */    
     if ((feature[j] == NOTE) || (feature[j] == REST)) {
       hostnotestart = j;
     };

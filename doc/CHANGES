@@ -14072,3 +14072,18 @@ point directly to the VOICE features but before. (The insertion shifts
 everything to the right.) It is necessary to adjust this position by
 looking ahead.
 
+
+January 24 2021
+
+Abc2midi: in some abc files the grace note sequence occurs after the
+host note just before a barline. The grace sequence does not steal time
+from a note eventually causing a synchronization problem between
+the voices. Fix: the grace sequence is removed from the internal
+representation using a new function cleargracenotes() in store.c if
+a bar line is encountered during the search for the host note.
+
+Hooks to new instructions !accent! !mordent!, !sfz!, !wedge! were
+added to the function event_handle_instruction() in store.c.
+
+
+
