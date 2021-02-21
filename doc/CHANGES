@@ -14086,4 +14086,25 @@ Hooks to new instructions !accent! !mordent!, !sfz!, !wedge! were
 added to the function event_handle_instruction() in store.c.
 
 
+February 21 2021
+
+Abc2midi bug: unfortunately the fix applied to add_missing_repeats
+applied on January 21 2021 caused a new problem for single voice files.
+For example:
+
+X: 1
+T: repeat bug
+R: jig
+M: 6/8
+L: 1/8
+K: G
+D |"G" ~G3 GAB |"D"ABA ABd | "G"edd gdB | "D"AGF "G"G2 ::
+ A | "G"BAB dBd| "Em"ege "G"dBd | gfg "D"aga | "G"bgf g2 :|
+
+Those files do not contain a VOICE feature, so that the fix results
+in the leftrepeat being misplaced. The problem was repaired by
+testing the varieable voicesused before searching for the VOICE feature.
+
+
+
 

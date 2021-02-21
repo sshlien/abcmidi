@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.47 January 24 2021 abc2midi" 
+#define VERSION "4.49 February 21 2021 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -4707,6 +4707,13 @@ if (nofnop == 0) {
    done = 1;
   };
 
+/* The following instructions were added to avoid numerous
+   warnings if they appear in the abc file (in particular the
+   files derived from Craig Sapp's kern files using hum2abc).
+   Though most of these instructions are part of the abc
+   2.2 standard, I have yet to implement them.
+*/
+
  if (strcmp(s,"accent") == 0) { /* [SS] 2021-01-24 */
    done = 1;
    };
@@ -4720,6 +4727,10 @@ if (nofnop == 0) {
    };
 
  if (strcmp(s,"wedge") == 0) { /* [SS] 2021-01-24 */
+   done = 1;
+   };
+
+ if (strcmp(s,"turn") == 0) { /* [SS] 2021-01-25 */
    done = 1;
    };
 
@@ -6023,10 +6034,12 @@ for (i = num2add-1; i >= 0; i--) {
 leftrepeat = add_leftrepeat_at[i];
 k=0;
 /* [SS] 2021-12-21 */
+if (voicesused) { /* 2021-02-21 */
 while (feature[leftrepeat] != VOICE && k < 20) {
   leftrepeat++; 
   k++;
   }
+}
  insertfeature(BAR_REP,0,0,0,leftrepeat+1); 
  /* for (j=0;j<=parts;j++) {   [SS] 2011-06-06 */
  for (j=0;j<26;j++) {  /* [SS] 2011-08-03 */
