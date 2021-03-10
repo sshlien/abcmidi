@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.49 February 21 2021 abc2midi" 
+#define VERSION "4.50 March 10 2021 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -2303,11 +2303,11 @@ char *s;
 
 
   else if (strcmp(command,"drumon") == 0 && dotune) {  /* [SS] 2010-05-26 */
+      if (v == NULL) event_fatal_error("%%MIDI drumon must occur after the first K: header");
       addfeature(DRUMON, 0, 0, 0);
       v->hasdrums = 1;
       drumvoice = v->indexno; /* [SS] 2010-02-09 */
       done = 1;
-      if (v == NULL) event_error("%%MIDI drumon must occur after the first K: header");
     }
     if (strcmp(command,"drumoff") == 0) {
        addfeature(DRUMOFF, 0, 0, 0);

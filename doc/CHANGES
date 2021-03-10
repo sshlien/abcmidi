@@ -14107,4 +14107,24 @@ testing the varieable voicesused before searching for the VOICE feature.
 
 
 
+March 10 2021
+
+Abc2midi segmentation error: the following tune causes abc2midi to
+crash.
+
+X:6
+T:TEMP
+L:1/4
+M:2/2
+Q:1/4=112
+%%MIDI drum d2dd 39 39 39
+%%MIDI drumon
+K:G
+G4
+
+Fix: in event_midi check that the v structure is not NULL before
+setting v->hasdrums to 1. If it is NULL send an error message that
+%%MIDI drumon must occur after the first K: header.
+
+
 
