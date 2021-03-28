@@ -14127,4 +14127,12 @@ setting v->hasdrums to 1. If it is NULL send an error message that
 %%MIDI drumon must occur after the first K: header.
 
 
+March 27 2021
+abcmatch.c bug fix reported by umbraticus.
+277:
+        if (nbars >0 ...
+should be
+        if (*nbars >0 ...
+
+
 

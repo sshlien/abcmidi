@@ -49,7 +49,7 @@ Matching:
 
 
 
-#define VERSION "1.76 October 19 2020 abcmatch"
+#define VERSION "1.78 March 27 2021 abcmatch"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -274,7 +274,7 @@ make_note_representation (int *nnotes, int *nbars, int maxnotes, int maxbars,
    these bar line indications. Note bar numbering starts
    from 0. [SS] 2013-11-17
 */
-          if (nbars >0 && *nnotes > 0) {
+          if (*nbars >0 && *nnotes > 0) { /* 2021-03-27 */
 	    midipitch[*nnotes] = BAR;
 	    notelength[*nnotes] = BAR;
 	    (*nnotes)++;
