@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.50 March 10 2021 abc2midi" 
+#define VERSION "4.51 March 30 2021 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -5245,7 +5245,9 @@ int place;
   int nextinchord;
   int hostnotestart, hostnoteend;
   int  adjusted_num, adjusted_den;
+  int notesinchord;
 
+  notesinchord = -1;
   j = place;
   start = -1;
   while ((j < notes) && (start == -1)) {
@@ -5307,11 +5309,26 @@ int place;
     grace_denom = 1;
     p = start;
     while (p <= end) {
-      if ((feature[p] == NOTE) || (feature[p] == REST)) {
-        grace_num = grace_num * denom[p] + grace_denom * num[p];
-        grace_denom = grace_denom * denom[p];
-        reduce(&grace_num, &grace_denom);
-      };
+      switch(feature[p]) { /* [SS] 2021-03-30 */
+      case NOTE:
+      case REST:
+        if (notesinchord <= 0) {
+           /* if chordal grace note, only count the first note */
+           grace_num = grace_num * denom[p] + grace_denom * num[p];
+           grace_denom = grace_denom * denom[p];
+           reduce(&grace_num, &grace_denom);
+           if (notesinchord == 0) notesinchord++;
+           }
+        break; 
+      case CHORDON:
+        notesinchord = 0;
+        break;
+      case CHORDOFF:
+        notesinchord = -1;
+        break;
+     default:
+        break;
+     }
       p = p + 1;
     };
 
