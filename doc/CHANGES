@@ -14152,3 +14152,13 @@ in the chord [bc] are treated as if they were one note. Otherwise
 the measure would be too short (B is shrunk to make room for b and c)
 and there could be a loss of synchronization between the voices.
 
+April 26 2021
+
+abc2midi: bar line alignment. The feature introduced in Mar 18 2019,
+had a few issues. If the bar ends with a rest, the number of beats
+is incorrect because there is no MIDI message to indicate a rest other
+than a gap between a NOTEOFF and the following NOTEON and barlines
+do not exist in midi files. Using a cumulative beat count does not
+detect the possibility that the bar lines can realign because of
+two errors cancelling out. As an experiment, I save only the bar size.
+

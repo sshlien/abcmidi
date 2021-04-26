@@ -518,7 +518,7 @@ int pass;
 {
   char msg[80];
   
-  if (barno >= 0 && barno < 1024 && pass == 1) barloc[barno] = tracklen;
+  if (barno >= 0 && barno < 1024 && pass == 1) barloc[barno] = bar_num; /*[SS] 2021-04-26 */
   if (barchecking) {
     /* only generate these errors once */
     if (noteson && (partrepno == 0)) {
@@ -3527,7 +3527,7 @@ void dump_barloc (FILE *diaghandle, int trkno)
 int i;
 fprintf(diaghandle,"track = %d voice = %d type = %d number of bars = %d\n",trkno,trackdescriptor[trkno].voicenum,trackdescriptor[trkno].tracktype,barno);
 for (i=0;i<barno;i++) {
-  fprintf(diaghandle,"%6.2f\t",(double) barloc[i]/480.0);
+  fprintf(diaghandle,"%6.2f\t",(double) barloc[i]); /* [SS] 2021-04-26 */
   if (i%8 == 7) fprintf(diaghandle,"\n");
   }
 fprintf(diaghandle,"\n");
