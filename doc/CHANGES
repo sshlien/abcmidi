@@ -14162,3 +14162,13 @@ do not exist in midi files. Using a cumulative beat count does not
 detect the possibility that the bar lines can realign because of
 two errors cancelling out. As an experiment, I save only the bar size.
 
+
+May 09 2020
+
+abc2midi, abc2abc, yaps -- compatibility with abcm2ps.
+The %%beginps and %%endps enclose text which should not
+be processed by abc2midi or abc2abc.   The flag ignore_line is set
+to 1 when parseline() encounters "%%beginps" and is reset to 0
+when %%endps" is encountered. If ignore_line is 1, the rest of
+the code in parseline() is ignored when abc2midi is running.
+

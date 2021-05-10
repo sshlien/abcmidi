@@ -3149,6 +3149,14 @@ parseline (line)
   if (strcmp(line,"%%endtext") == 0) {
 	  ignore_line = 0;
           }
+  /* [SS] 2021-05-09 */
+  if (strcmp(line,"%%beginps") == 0) {
+	  ignore_line = 1;
+          }
+  if (strcmp(line,"%%endps") == 0) {
+	  ignore_line = 0;
+          }
+
   if ((strncmp(line,"%%temperament",12) == 0) && fileprogram == ABC2MIDI) {
 	  event_temperament(line);
           }
