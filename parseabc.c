@@ -420,7 +420,7 @@ int check_power_of_two(int denom)
     if (t % 2 != 0) {
       snprintf(error_message, 80, "%d b is not a power of 2", denom);
       event_error (error_message);
-      return 0;
+      return -1;
     } else {
       t = t / 2;
     }

@@ -14172,3 +14172,35 @@ to 1 when parseline() encounters "%%beginps" and is reset to 0
 when %%endps" is encountered. If ignore_line is 1, the rest of
 the code in parseline() is ignored when abc2midi is running.
 
+
+May 10 2020
+
+abc2midi: the following file causes a core dump.
+
+X:1
+T:Autumn Ale
+C:Chance Thomas, Stephen DiGregorio, Geoff Scott and/or Brad Spear
+R:Jig
+S:The Lord of the Rings Online Soundtrack
+O:Turbine's Middle Earth
+Z:Northman
+N:This is not intended for percussion instruments.
+Q:333
+M:6/8
+L:1/8
+K:D
+AGA BA/3B/3A/3G | FE/3F/3E/3D EFG |
+
+abc2midi notpowerof2.abc
+4.53 May 09 2021 abc2midi
+Error in line-char 13-5 : 3 b is not a power of 2
+Error in line-char 13-8 : 3 b is not a power of 2
+Floating point exception (core dumped)
+
+Analysis: the crash occurs in the function reduce (0)
+which cannot handle a division by zero. The function
+check_power_of_two(3) in parseabc.c returns 0 when the
+argument is not a power of 2. Fix: changed the return
+to -1. The program does not crash but the midi file
+is not created correctly.
+
