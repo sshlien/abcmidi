@@ -543,36 +543,36 @@ void readsig (char **sig, timesig_details_t *timesig)
   }
 }
 
-void
-readlen (a, b, p)
-     int *a, *b;
-     char **p;
+
+void readlen (int *a, int *b, char **p)
 /* read length part of a note and advance character pointer */
 {
   int t;
 
   *a = readnump (p);
-  if (*a == 0)
-    {
-      *a = 1;
-    };
+  if (*a == 0) {
+    *a = 1;
+  }
   *b = 1;
-  if (**p == '/')
-    {
-      *p = *p + 1;
-      *b = readnump (p);
-      if (*b == 0)
-	{
-	  *b = 2;
-	  while (**p == '/')
-	    {
-	      *b = *b * 2;
-	      *p = *p + 1;
-	    };
-	};
-    };
+  if (**p == '/') {
+    *p = *p + 1;
+    *b = readnump (p);
+    if (*b == 0) {
+      *b = 2;
+      /* [JA] 2021-05-19 prevent infinite loop */
+      /* limit the number of '/'s we support */
+      while ((**p == '/') && (*b < 1024)) {
+        *b = *b * 2;
+        *p = *p + 1;
+      }
+      if (*b >= 1024) {
+        event_warning ("Exceeded maximum note denominator");
+      }
+    }
+  }
   *b = check_power_of_two(*b);
 }
+
 
 /* [JA] 2020-12-10 */
 static void read_L_unitlen(int *num, int *denom, char **place)
