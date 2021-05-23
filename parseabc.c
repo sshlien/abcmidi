@@ -1261,7 +1261,17 @@ static void process_microtones (int *parsed,  char word[],
 	    modmicrotone[j].denom = b;
 	    /* printf("%c microtone = %d/%d\n",modmap[j],modmicrotone[j].num,modmicrotone[j].denom); */
 	  }
-	} /* finished ^ = _ */
+} /* finished ^ = _ */
+
+static void set_voice_from_master(int voice_num)
+{
+  voice_context_t *current_voice;
+
+  current_voice = &voicecode[voice_num - 1];
+  copy_timesig(&current_voice->timesig, &master_timesig);
+  copy_clef(&current_voice->clef, &master_clef);
+  current_voice->unitlen = master_unitlen;
+}
 
 int
 parsekey (str)
@@ -1345,7 +1355,7 @@ parsekey (str)
   while (*s != '\0')
     {
       parsed = parseclef (&s, word, &gotclef, clefstr, &newclef, &cgotoctave, &coctave);
-      if (gotclef) {
+      if (parsed) {  /* [JA] 2021-05-21 changed (gotclef) to (parsed) */
         /* make clef an attribute of current voice */
         if (inhead) {
           copy_clef (&master_clef, &newclef);
@@ -1548,16 +1558,6 @@ parsekey (str)
 	     gotclef, clefstr, &newclef, octave, transpose, gotoctave, gottranspose,
 	     explict);
   return (gotkey);
-}
-
-static void set_voice_from_master(int voice_num)
-{
-  voice_context_t *current_voice;
-
-  current_voice = &voicecode[voice_num - 1];
-  copy_timesig(&current_voice->timesig, &master_timesig);
-  copy_clef(&current_voice->clef, &master_clef);
-  current_voice->unitlen = master_unitlen;
 }
 
 void
@@ -2306,10 +2306,12 @@ parsefield (key, field)
          * if L: fields was missing in the header.
          */
         resolve_unitlen();
+      }
+      foundkey = parsekey (place); /* [JA] 2021.05.21 parsekey called before set_voice_from_master(1) */
+      if (inhead) {
         /* set voice parameters using values from header */
         set_voice_from_master(1);
       }
-      foundkey = parsekey (place);
       if (inhead || inbody) {
 	  if (foundkey)
 	    {

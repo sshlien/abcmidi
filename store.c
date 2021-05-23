@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.55 May 19 2021 abc2midi" 
+#define VERSION "4.56 May 21 2021 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -4300,7 +4300,11 @@ int xoctave, n, m;
     event_fatal_error("Internal error - no voice allocated");
   };
   if (gracenotes && ignore_gracenotes) return; /* [SS] 2010-01-08 */
-  octave = xoctave + v->octaveshift;
+  if (v->octaveshift == 0) {  /* [JA] 2021-05-21 */
+    octave = xoctave + clef->octave_offset;
+  } else {
+    octave = xoctave + v->octaveshift;
+  }
   num = n;
   denom = m;
   if (v->inchord) v->chordcount = v->chordcount + 1;

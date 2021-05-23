@@ -14206,7 +14206,7 @@ is not created correctly.
 
 
 
-May 10 2020
+May 19 2020
 
 abc2midi: the following file causes abc2midi to hang.
 
@@ -14217,4 +14217,26 @@ K:C
 2c/2fac'/c'/c'/c'/c'///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 James Allwright intoduced a fix in readlen() in parseabc.c
+
+
+May 22 2021
+
+abc2midi: treble-8 not applied in K: or V: commands after October 19 2020
+update. For example,
+
+X:1
+T: transposition
+L:1/2
+M:C
+K:none clef=treble-8 
+V:1
+cz
+V:2
+zc
+
+The note c should be played with midi pitch 60 instead of 72.
+James Allwright made minor fixes to parseabc.c and store.c, in order
+to get these options working again.
+
+
 
