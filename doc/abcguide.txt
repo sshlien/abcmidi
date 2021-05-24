@@ -1,10 +1,11 @@
-Guide to writing abc for abc2midi
----------------------------------
+Guide to writing abc for abc2midi - minor revision [JA] 2021-05-24
+--------------------------------------------------------------
+
 Updated June 1 2017. %%MIDI program ranges from 0 to 127 not 1 to 128.
 
-The defining document for abc is the abc version 1.6 specification which can 
-be found at http://www.gre.ac.uk/~c.walshaw/abc2mtex/abc.txt . This document
-is a description of abc as interpreted by abc2midi.
+The abc notation language is described by the version 1.6 specification
+document and later modifications to this document referred to as
+version 2.1 and version 2.2. These can be found at abcnotation.com .
 
 An abc tune consists of a header followed by a body. Each line in the
 header is a different field starting with a letter immediately followed 
@@ -160,15 +161,43 @@ K:G clef=soprano octave=-1 transpose=-1
 The clef is recognized by typesetting programs such as yaps and abc2mps
 and in some situations it will cause abc2midi to transpose the notes
 up or down by an octave.  Recognized clefs are treble,
-bass, baritone, tenor, alto, mezzo and soprano. There are also variants
-of these clefs; treble-8, tenor-8,  treble+8  covering ranges which are an
-octave below and an octave above the normal treble clef. Other
-variants are not recognized at this time. No transposition is
-assumed for the bass clef since many abc files enter the notes
-with all the commas.
+bass, baritone, tenor, alto, mezzo and soprano.
 
-The octave specifier is a convenience to make entering music easier.
-It allows the user to avoid repeatedly entering commas  or apostrophes
+Clefs with +8, -8:
+
+Sometimes, you will find written music where there is a treble clef (or
+some other clef) with a small 8. The meaning is that every note is to
+be played an octave higher than shown. Suppose you notate the abc note A
+using a treble clef. This appears as a note between the second and third
+lines from the bottom of the stave. Then with a treble+8 clef (which looks
+exactly the same except that it has a small 8), a note at the same position
+on the stave lines is now played as abc note a (which is normally put on
+a line one line up from the top line of the stave). Similarly, the
+treble-8 clef indicates that every note is to be played an octave lower
+than shown, so note A would be played as A, .
+
+The abc standard versions 2.1 and 2.2 support this idea, but the way
+the abc notation is interpreted changes when you have clef=treble+8.
+With clef=treble+8, every stave position is interpreted as being an
+octave higher than if you had clef=treble e.g. the note that sounds as
+a does in normal abc is written as A in abc with clef=treble+8.
+The overall effect of this is that when you change a passage from
+clef=treble to clef=treble+8, without editing any of the notes, every
+note appears at exactly the same place on the stave lines as it did
+before, but it is played an octave higher.
+
+The benefit of this change in interpretation is that you can notate
+very high or very low passages in abc without having to use lots of
+' or , characters.
+
+The octave specifier is a convenience to make entering music easier,
+developed before the +8/-8 clef modifier and still supported. However,
+to be compatible with other abc programs, it is recommended that you
+use the clef modifier. The syntax
+
+I:octave=<offset in octaves>
+
+allows the user to avoid repeatedly entering commas  or apostrophes
 when entering a sequence of low or high notes. Both yaps and abc2midi
 will transpose the notes by the specified number of octaves during 
 the parsing stage.
@@ -180,9 +209,10 @@ e.g. the passage  B,,, C,, D,, E,, F,, could be written more compactly as
   I:octave=0
 
 
-Some instruments such as the Bb clarinet automatically transpose the
-written music. For example in the case of the clarinet, the music is
-written in the key of C but the instrument plays it in the key of Bb.
+Some instruments such as the Bb clarinet are by classical convention 
+considered to transpose the written music. For example in the case of
+the clarinet, the music is written in the key of C but the instrument
+plays it in the key of Bb.
 For multivoiced tunes, the %%MIDI transpose indication is not that useful
 since it transposes all the voices by the specified amount. The 
 transpose=n subcommand in the K: field tells abc2midi to transpose
