@@ -37,6 +37,7 @@
 #include <stdlib.h>
 /* [JM] 2018-02-22 to handle strncasecmp() */
 #include <string.h>
+#include <limits.h>
 
 /* #define SIZE_ABBREVIATIONS ('Z' - 'H' + 1) [SS] 2016-09-20 */
 #define SIZE_ABBREVIATIONS 58
@@ -348,11 +349,15 @@ readnumf (num)
       event_error ("Missing Number");
     };
   t = 0;
-  while (((int) *p >= '0') && ((int) *p <= '9'))
+/* [JA] 2021-05-25 */
+  while (((int) *p >= '0') && ((int) *p <= '9') && (t < (INT_MAX-9)/10))
     {
       t = t * 10 + (int) *p - '0';
       p = p + 1;
     };
+  if (t >= (INT_MAX-9)/10) {  /* [JA] 2021-05-25 */
+    event_error ("Number too big");
+  }
   return (t);
 }
 
@@ -384,11 +389,16 @@ readnump (p)
   int t;
 
   t = 0;
-  while (((int) **p >= '0') && ((int) **p <= '9'))
-    {
-      t = t * 10 + (int) **p - '0';
-      *p = *p + 1;
-    };
+  /* [JA] 2021-05-25 */
+  while (((int) **p >= '0') && ((int) **p <= '9') && (t < (INT_MAX-9)/10))
+  {
+    t = t * 10 + (int) **p - '0';
+    *p = *p + 1;
+  }
+  /* advance over any spurious extra digits [JA] 2021-05-25 */
+  while (isdigit(**p)) {
+    *p = *p + 1;
+  }
   return (t);
 }
 

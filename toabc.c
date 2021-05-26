@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.14 May 09 2021 abc2abc"
+#define VERSION "2.15 May 25 2021 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -84,6 +84,7 @@ struct fract breakpoint; /* used to break bar into beamed sets of notes */
 complex_barpoint_t master_bar_break;
 int barno; /* number of bar within tune */
 int newspacing; /* was -s option selected ? */
+int have_spacing_scheme; /* do we support spacing for time signature ? [JA] */
 int barcheck; /* indicate -b and -r options selected */
 int echeck; /* was error-checking turned off ? (-e option) */
 int newbreaks; /* was -n option selected ? */
@@ -575,6 +576,7 @@ char** filename;
   } else {
     newspacing = 1;
   };
+  have_spacing_scheme = 0; /* [JA] 2021-05-25 */
   narg = getarg("-X", argc, argv);
   if (narg == -1) {
     newrefnos = 0;
@@ -1414,6 +1416,7 @@ static void set_complex_barpoint(timesig_details_t *timesig,
 void event_timesig (timesig)
   timesig_details_t *timesig;
 {
+  have_spacing_scheme = 0; /* default to no new spacing */
   emit_string ( "M:");
   switch (timesig->type) {
     default:
@@ -1459,6 +1462,7 @@ void event_timesig (timesig)
           set_complex_barpoint(
             &current_voice->timesig, &toabc_voice->bar_break);
         }
+        have_spacing_scheme = 1; /* [JA] 2021-05-25 */
       }
       break;
   }
@@ -1470,15 +1474,27 @@ void event_timesig (timesig)
 
     breakpoint.num = timesig->num;
     breakpoint.denom = timesig->denom;
+    if (timesig->num == 3) {  /* [JA] 2021-05-25 */
+      /* handles 3/2, 3/4, 3/8 */
+      breakpoint.num = timesig->num / 3;
+      breakpoint.denom = timesig->denom;
+      have_spacing_scheme = 1;
+    }
     if ((timesig->num == 9) || (timesig->num == 6)) {
       breakpoint.num = 3;
       breakpoint.denom = barlen.denom;
+      have_spacing_scheme = 1;
     };
     if (timesig->num % 2 == 0) {
       breakpoint.num = barlen.num / 2;
       breakpoint.denom = barlen.denom;
+      have_spacing_scheme = 1;
     };
     barend = timesig->num / breakpoint.num;
+  }
+  if (newspacing && !have_spacing_scheme) {
+    /* [JA] 2021-05-25 */
+    event_warning ("Do not know how to group notes in this time signature");
   }
   inmusic = 0;
 }
@@ -1874,7 +1890,7 @@ char* replist;
 
 void event_space()
 {
-  if (!newspacing) {
+  if (!(newspacing && have_spacing_scheme)) {
     emit_string(" ");
   };
 }
@@ -1929,7 +1945,7 @@ int n, q, r;
   if (tuplenotes != 0) {
     event_error("tuple within tuple not allowed");
   };
-  if (newspacing) {
+  if (newspacing && have_spacing_scheme) {
     emit_char(' ');
   }
   emit_int_sprintf("(%d", n);
@@ -2504,7 +2520,7 @@ int xoctave, n, m;
   if ((!ingrace) && (!inchord)) {
     addunits(n, m);
   };
-  if (newspacing) {
+  if (newspacing && have_spacing_scheme) {
     consider_break_after_note(prev_tuplenotes);
   };
 }
@@ -2594,7 +2610,7 @@ int xoctave, n, m;
   if ((!ingrace) && (!inchord)) {
     addunits(n, m);
   };
-  if (newspacing) {
+  if (newspacing && have_spacing_scheme) {
     barpoint.num = count.num * breakpoint.denom;
     barpoint.denom = breakpoint.num * count.denom;
     reduce(&barpoint.num, &barpoint.denom);

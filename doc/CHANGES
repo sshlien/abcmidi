@@ -14240,3 +14240,14 @@ to get these options working again.
 
 
 
+May 25 2021
+
+James Allwright added more security checks to stop the
+parser from reading numbers beyond the largest integer. Changes
+were made to parserabc.c and midi2abc.c
+
+The abc2abc -s spacing function was modified to ignore certain
+time signatures like M: none or M:7/8. The code for dealing with
+3/2, 3/4, 3/8 ... time signatures was improved.
+
+

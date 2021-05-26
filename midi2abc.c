@@ -45,8 +45,9 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.47 November 01 2020 midi2abc"
+#define VERSION "3.48 May 25 2021 midi2abc"
 
+#include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -3451,7 +3452,8 @@ char *num;
     p = p + 1;
     neg = -1;
   };
-  while (((int)*p >= '0') && ((int)*p <= '9')) {
+  /* [JA] 2021-05-25 */
+  while (((int)*p >= '0') && ((int)*p <= '9') && (t < (INT_MAX-9)/10)) {
     t = t * 10 + (int) *p - '0';
     p = p + 1;
   };
@@ -3467,10 +3469,15 @@ char **p;
   int t;
   
   t = 0;
-  while (((int)**p >= '0') && ((int)**p <= '9')) {
+  /* [JA] 2021-05-25 */
+  while (((int)**p >= '0') && ((int)**p <= '9') && (t < (INT_MAX-9)/10)) {
     t = t * 10 + (int) **p - '0';
     *p = *p + 1;
   };
+  /* advance over any spurious extra digits */
+  while (isdigit(**p)) {
+    *p = *p + 1;
+  }
   return t;
 }
 
