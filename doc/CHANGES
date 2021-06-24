@@ -14251,3 +14251,29 @@ time signatures like M: none or M:7/8. The code for dealing with
 3/2, 3/4, 3/8 ... time signatures was improved.
 
 
+June 24 2021
+
+abc2midi bug: in the following sample
+
+X:1
+T: octave
+M: 2/4
+L: 1/8
+K: none octave=1
+V:1
+C4|
+V:2
+C4|
+
+The octave=1 applies only to voice 1 and does not
+act as global variable applying to both voices.
+
+Analysis: event_octave either sets global.octaveshift or
+v.octaveshift depending upon the variable pastheader. Pastheader
+was set to 1 by headerprocess() in event_key() prior to calling
+event_octave which prevented global.octaveshift from being set.
+
+Fix: moved headerprocess(), getvoicecontext(), etc to after
+calling event_octave().
+
+

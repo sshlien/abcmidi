@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.57 May 25 2021 abc2midi" 
+#define VERSION "4.58 June 24 2021 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -5957,17 +5957,24 @@ int explict;
       copymap(&global);
       sf = sharps;
       mi = minor;
-      headerprocess();
 
-      v = getvoicecontext(1);
-      if (!inbody) v1index = notes; /* save position in case of split voice */
-    };
+      /* [SS] 2021-06-24 
+      ***headerprocess();
+
+      ***v = getvoicecontext(1);
+      ***if (!inbody) v1index = notes; /* save position in case of split voice */
+ 
     if (gotclef)
     {
       event_octave(clef->octave_offset, 0);
     }
     if (gotoctave) {
       event_octave(octave,0);
+    };
+    /* [SS] 2021-06-24 */
+    headerprocess();
+    v = getvoicecontext(1);
+    if (!inbody) v1index = notes; /* save position in case of split voice */
     };
   };
 }
