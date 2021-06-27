@@ -14277,3 +14277,101 @@ Fix: moved headerprocess(), getvoicecontext(), etc to after
 calling event_octave().
 
 
+June 27 2021
+
+midi2abc: bug
+For some midi files midi2abc returns something like this
+X: 1
+T: from gchordbreakdown1.mid
+M: 4/4
+L: 1/8
+Q:1/4=120
+K:C % 0 sharps
+V:1
+K:E % 16 sharps
+=c=d e=g e4| \
+
+
+Analysis, in the function handletext(), the local variable sf is
+declared as an integer but not initialized. The function
+sscanf(str,"%d %d",&sf,&mi);
+attempts to read sf and mi from str, but str does not contain
+any integers, and sf is not changed.
+Temporary fix: initialized sf to 0.
+
+
+June 27 2021
+
+abc2midi: %%MIDI gchordoff produces garbage. In the following file
+
+X:1
+T: gchord breakdown
+M: 4/4
+L: 1/8
+Q:1/4=120
+K:C
+%%MIDI gchord ghi2ihi2
+%%MIDI gchordoff
+"C" cd eg e4 |"Am" ag ag e4 |
+%%MIDI gchordon
+"Dm" defe d4 | "G7" g6z2 |
+
+The output in track 2 as seen by midi2abc looks like this.
+X: 1
+T: from gchordbreakdown1.mid
+M: 4/4
+L: 1/8
+Q:1/4=120
+K:C % 0 sharps
+V:1
+cd eg e4| \
+ag ag e4| \
+de fe d4| \
+g6 
+V:2
+F,,,,F,,,, F,,,,2 F,,,,F,,,, F,,,,2| \
+F,,,,F,,,, F,,,,2 F,,,,F,,,, F,,,,2| \
+D,F, A,2 A,F, A,2| \
+G,B, D2 DB, D2|
+
+instead of
+
+X: 1
+T: from gchordbreakdown1.mid
+M: 4/4
+L: 1/8
+Q:1/4=120
+K:C % 0 sharps
+V:1
+cd eg e4| \
+ag ag e4| \
+de fe d4| \
+g6 
+V:2
+z8| \
+z8| \
+D,F, A,2 A,F, A,2| \
+G,B, D2 DB, D2|
+
+Analysis: abc2midi works correctly without the
+%%MIDI gchord ghi2ihi2
+declaration. The problem occurs in the function dogchords().
+This function was expanded to handle alberti starting from May 1 2004.
+Unfortunately, the fix introduced in 2016-01-03 introduced this
+problem when %%MIDI gchordoff sets gchords to 0. The else branch
+outputs gchordnotes[gchordnotes_size] when in fact, no note should
+be queued out.
+
+Fix: prefixed the switch(action) statement with the line
+ if (gchords) /* [SS] 2021-06-27 */
+preventing any note output when gchords is 0.
+
+In addition, the case 'b' was missing a break, allowing the switch statement
+to continue to case 'c' and causing a different problem when
+%%MIDI gchord ffbb
+
+
+
+
+
+

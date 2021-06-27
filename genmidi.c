@@ -2389,6 +2389,7 @@ int j;
     if ((chordnum == -1) && (action == 'c')) {
       action = 'f';
     };
+    if (gchords) /* [SS] 2021-06-27 */
     switch (action) {
 
     case 'z':
@@ -2412,6 +2413,7 @@ int j;
         else
         save_note(g_num*len, g_denom, inversion+fun.base, 8192, fun.chan, fun.vel);
       };
+      break;  /* [SS] 2021-06-27 */
 /* There is no break here so the switch statement continues into the next case 'c' */ 
 
     case 'c':

@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.48 May 25 2021 midi2abc"
+#define VERSION "3.49 June 27 2021 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -2738,6 +2738,8 @@ int trackno;
   char* str;
   char ch;
   int type,sf,mi,nn,denom,bb;
+
+  sf = 0; /* [SS] 2021-06-27 */
 
   while (((*textplace) != NULL) && ((*textplace)->when <= t)) {
     str = (*textplace)->text;
