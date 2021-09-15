@@ -2412,9 +2412,9 @@ int j;
         save_note(g_num*len, g_denom, basepitch+fun.base, 8192, fun.chan, fun.vel);
         else
         save_note(g_num*len, g_denom, inversion+fun.base, 8192, fun.chan, fun.vel);
-      };
-      break;  /* [SS] 2021-06-27 */
-/* There is no break here so the switch statement continues into the next case 'c' */ 
+        }
+      /* break;  * [SS] 2021-06-27 2021-09-15 */
+/* There should not be a break here so the switch statement continues into the next case 'c' */ 
 
     case 'c':
       /* do chord with handling of any 'inversion' note */

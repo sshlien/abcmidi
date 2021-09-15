@@ -14371,7 +14371,11 @@ to continue to case 'c' and causing a different problem when
 %%MIDI gchord ffbb
 
 
+September 15 2021
 
-
-
+abc2midi bug:
+The last fix in June 27 2021 inserting a break introduced a new bug.
+The chord associated with the 'b' gchord code was missing. b and f
+codes were indistinguishable. Fix: removed the break in the switch
+statement for case b:
 
