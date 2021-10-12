@@ -81,6 +81,7 @@ extern char *malloc ();
 extern char *strchr ();
 #endif
 
+int note2midi (char** s); 
 int lineno;
 int parsing_started = 0;
 int parsing, slur;
@@ -939,8 +940,8 @@ int interpret_voice_label (char *s, int num, int *is_new)
   return num_voices;
 }
 
-/* The following three functions parseclefs, parsetranspose,
- * parseoctave are used to parse the K: field which not
+/* The following four functions parseclefs, parsetranspose,
+ * parsesound, parseoctave are used to parse the K: field which not
  * only specifies the key signature but also other descriptors
  * used for producing a midi file or postscript file.
  *
@@ -1019,6 +1020,49 @@ parsetranspose (s, word, gottranspose, transpose)
   return 1;
 };
 
+/* [SS] 2021-10-11 */
+int
+parsesound (s, word, gottranspose, transpose)
+/* parses string sound = 
+                 shift =
+                 instrument = note1note2 or note1/note2
+  for parsekey() or parsevoice()
+  and returns the transpose value
+*/
+     char **s;
+     char *word;
+     int *gottranspose;
+     int *transpose;
+  {   
+  int p1,p2;
+  if (casecmp(word,"sound") != 0
+     && casecmp(word,"shift") != 0
+     && casecmp(word,"instrument") != 0
+     )
+    return 0;
+  skipspace (s);
+  if (**s != '=')
+    {
+      event_error ("sound must be followed by '='");
+     return 0;
+     } else {
+      *s = *s + 1;
+      skipspace (s);
+      p1 = note2midi (s);
+      /* printf("midi note = %d\n",p1); */
+      p2 = note2midi (s);
+      if (p2 == p1) {
+          *gottranspose = 0;
+          *transpose = 0;
+          } else {
+          /* printf("midi note = %d\n",p2); */
+          *transpose = p2 - p1; 
+          /* printf("transpose = %d\n",*transpose); */
+          *gottranspose = 1;
+          }
+     }
+  return 1;
+  }
 
 int
 parseoctave (s, word, gotoctave, octave)
@@ -1382,6 +1426,9 @@ parsekey (str)
       if (!parsed)
 	parsed = parseoctave (&s, word, &gotoctave, &octave);
 
+      if (!parsed)
+        parsed = parsesound (&s, word, &gottranspose, &transpose);
+
       if ((parsed == 0) && (casecmp (word, "Hp") == 0))
 	{
 	  sf = 2;
@@ -1623,6 +1670,8 @@ parsevoice (s)
 			  &vparams.transpose);
       if (!parsed)
 	parsed = parseoctave (&s, word, &vparams.gotoctave, &vparams.octave);
+      if (!parsed)
+        parsed = parsesound (&s, word, &vparams.gottranspose, &vparams.transpose);
       if (!parsed)
 	parsed =
 	  parsename (&s, word, &vparams.gotname, vparams.namestring,
@@ -2660,6 +2709,156 @@ static void check_and_call_bar(int bar_type, char *replist)
   }
   event_bar (bar_type, replist);
 }
+
+
+/* [SS] 2021-10-11   */
+static int pitch2midi(note, accidental, mult, octave )
+/* computes MIDI pitch for note.
+*/
+char note, accidental;
+int mult, octave;
+{
+  int p;
+  char acc;
+  int mul, noteno;
+  int pitch;
+
+  static int scale[7] = {0, 2, 4, 5, 7, 9, 11};
+
+  static const char *anoctave = "cdefgab";
+  acc = accidental;
+  mul = mult;
+  noteno = (int)note - 'a';
+ 
+  p = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+  p = scale[p];
+  if (acc == '^') p = p + mul;
+  if (acc == '_') p = p - mul;
+  p = p + 12*octave + 60;
+return p; 
+}
+
+
+
+/* [SS] 2021-10-11   */
+int
+note2midi (char** s)
+{
+/* for implementing sound=, shift= and instrument= key signature options */
+
+/* check for accidentals */
+char note, accidental;
+char msg[80];
+int octave;
+int mult;
+int pitch;
+/*printf("note2midi: %c\n",**s); */
+if (**s == '\0') return 72;
+mult = 1;
+accidental = ' ';
+switch (**s)
+    {
+    case '_':
+      accidental = **s;
+      *s = *s + 1;
+      if (**s == '_')
+        {
+          *s = *s + 1;
+          mult = 2;
+        };
+      break;
+    case '^':
+      accidental = **s;
+      *s = *s + 1;
+      if (**s == '^')
+        {
+          *s = *s + 1;
+          mult = 2;
+        };
+      break;
+    case '=':
+      accidental = **s;
+      *s = *s + 1;
+      break;
+    default:
+      break;
+    };
+
+  if ((**s >= 'a') && (**s <= 'g'))
+    {
+      note = **s;
+      octave = 1;
+      *s = *s + 1;
+      while ((**s == '\'') || (**s == ',') || (**s == '/'))
+        {
+          if (**s == '\'')
+            {
+              octave = octave + 1;
+              *s = *s + 1;
+            };
+          if (**s == ',')
+            {
+              sprintf (msg, "Bad pitch specifier , after note %c", note);
+              event_error (msg); 
+              octave = octave - 1;
+              *s = *s + 1;
+            };
+          if (**s == '/')
+             {
+             /* skip / which occurs in instrument = command */
+              *s = *s + 1;
+/*  printf("note = %c  accidental = %c mult = %d octave= %d \n",note,accidental,mult,octave); */
+              pitch = pitch2midi(note, accidental, mult, octave);
+              return pitch;
+              }
+        };
+    }
+  else
+    {
+      octave = 0;
+      if ((**s >= 'A') && (**s <= 'G'))
+        {
+          note = **s + 'a' - 'A';
+          *s = *s + 1;
+          while ((**s == '\'') || (**s == ',') || (**s == '/'))
+            {
+              if (**s == ',')
+                {
+                  octave = octave - 1;
+                  *s = *s + 1;
+                };
+              if (**s == '\'')
+                {
+                  sprintf (msg, "Bad pitch specifier ' after note %c",
+                           note + 'A' - 'a');
+                  event_error (msg); 
+                  octave = octave + 1;
+                  *s = *s + 1;
+                };
+          if (**s == '/')
+             {
+             /* skip / which occurs in instrument = command */
+              *s = *s + 1;
+/*  printf("note = %c  accidental = %c mult = %d octave= %d \n",note,accidental,mult,octave); */
+              pitch = pitch2midi(note, accidental, mult, octave);
+              return pitch;
+            };
+        };
+    };
+ /* printf("note = %c  accidental = %c mult = %d octave= %d \n",note,accidental,mult,octave); */
+  } 
+  if (note == ' ')
+    {
+      event_error ("Malformed note : expecting a-g or A-G");
+    }
+  pitch = pitch2midi(note, accidental, mult, octave);
+  return pitch;
+}
+
+
+
+
+
 
 void
 parsemusic (field)

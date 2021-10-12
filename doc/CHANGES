@@ -14379,3 +14379,50 @@ The chord associated with the 'b' gchord code was missing. b and f
 codes were indistinguishable. Fix: removed the break in the switch
 statement for case b:
 
+
+October 11 2021
+
+abc2midi new feature:
+In compliance with the ABC draft standard 2.2, I introduced additional
+K: and V: options for transposition. You can now indicate the number
+of semitones to transpose by giving the original note and the 
+corresponding transposed note in the K: or V: field using either
+shift = note1note2
+sound = note1note2
+instrument = note1/note2
+The number of semitones is determined by the difference note2 - note1.
+
+Abcm2ps and abc2svg recognize this command, but abc2abc, yaps, and
+abcmatch ignore this new option.
+
+http://abcnotation.com/wiki/abc:standard:v2.2#transposition
+
+Here is a test sample:
+
+X:1
+T: standard 2.2 transposition
+M: 4/4
+L: 1/4
+K: C  
+V:1 
+Bcde|Bcde|
+V:2
+Bcde|Bcde|
+V:1 shift = Bc
+Bcde|Bcde|
+V:2
+Bcde|Bcde|
+V:1 sound = dc
+Bcde|Bcde|
+V:2
+Bcde|Bcde|
+V:1 instrument = c/^D
+Bcde|Bcde|
+V:2
+Bcde|Bcde|
+V:1 transpose = 0
+Bcde|Bcde|
+V:2 shift=DE,
+Bcde|Bcde|
+
+
