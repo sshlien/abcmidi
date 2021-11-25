@@ -14426,3 +14426,68 @@ V:2 shift=DE,
 Bcde|Bcde|
 
 
+October 15 2021
+
+Abc2abc -P bug
+
+
+
+X:1
+T: P bug
+M:4/4
+L:1/4
+V:1 clef=treble
+V:2 clef=bass
+%%staves [1 2]
+K:C
+V:1
+C2 D2  |  C4 |
+V:2
+C,2 G,2 | C,4|
+
+The command
+abc2abc t.abc -t 3 -P 1
+fails to transpose voice 1
+
+This bug has been around since this option was introduced in June 7 2011.
+Fortunately, it has not bothered anyone until recently.
+If you add another K:c after the first V:1 command in the body as
+shown below.
+
+X:1
+T: P bug
+M:4/4
+L:1/4
+V:1 clef=treble
+V:2 clef=bass
+%%staves [1 2]
+K:C
+V:1
+K:C
+C2 D2  |  C4 |
+V:2
+C,2 G,2 | C,4|
+
+then voice 1 will be transposed correctly. Unfortunately, there is
+no easy fix. When the -P option is present, abc2abc ignores the
+first K: field command. (In toabc.c line 1643 event_key aborts
+prior to setting up the arrays for a key transpose. Commenting
+out this return statement introduces another problem.)
+
+The main issue is that abc2abc only does one pass through the
+input file. It does not know whether there is a K: field command
+following V:1. If it assumes that there is none and forces a
+call to event_key in event_voice, there may be another problem
+when a different K: field command is found eventually. I have
+decided to suspend support to the -P option because it would be
+too complicated to fix this.
+
+
+November 25 2021
+
+abcmatch bug. The fix on 2021-03-27 made abcmatch non-operable. The
+number of bars *nbars is never incremented. The line was replaced
+with
+if (*nnotes > 0) { /* [SS] 2021-11-25 */
+in the function make_note_representation(...)
+
