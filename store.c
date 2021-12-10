@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.61 October 11 2021 abc2midi" 
+#define VERSION "4.63 December 10 2021 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -4494,13 +4494,15 @@ void event_handle_gchord(s)
 char* s;
 {
   int basepitch;
-  char accidental, note;
+  char accidental, accidental2, note; /* [SS] 2021-12-05 */
   char* p;
   char name[9];
   int i;
   int chordno;
   int bassnote;
   int inversion;
+  int mult;  /* [SS] 2021-12-05 */
+  mult = 1;
 
   if (ignore_guitarchords == 1) return; /* [SS] 2019-12-09 */
   if ((*s >= '0') && (*s <= '5')) {
@@ -4527,7 +4529,9 @@ char* s;
     };
   };
   p = get_accidental(p, &accidental);
-  basepitch = pitchof(note, accidental, 1, 0, 0) - middle_c;
+  p = get_accidental(p, &accidental2); /* [SS] 2021-12-05 */
+  if (accidental2 != '=') mult = 2;  /* [SS] 2021-12-05 */
+  basepitch = pitchof(note, accidental, mult, 0, 0) - middle_c;
   i = 0;
   while ((i<9) && (*p != ' ') && (*p != '\0') && (*p != '(')
                && (*p != '/') && (*p != ')')) {
@@ -4543,12 +4547,16 @@ char* s;
       note = (int)*p - 'A' + 'a';
       p = p + 1;
       p = get_accidental(p, &accidental);
-      inversion = pitchof(note, accidental, 1, 0, 0) - middle_c;
+      p = get_accidental(p, &accidental2); /* [SS] 2021-12-05 */
+      if (accidental2 != '=') mult = 2;  /* [SS] 2021-12-05 */
+      inversion = pitchof(note, accidental, mult, 0, 0) - middle_c;
     } else if ((*p >= 'a') && (*p <= 'g')) {
       note = (int)*p;
       p = p + 1;
       p = get_accidental(p, &accidental);
-      inversion = pitchof(note, accidental, 1, 0, 0) - middle_c;
+      p = get_accidental(p, &accidental2); /* [SS] 2021-12-05 */
+      if (accidental2 != '=') mult = 2;  /* [SS] 2021-12-05 */
+      inversion = pitchof(note, accidental, mult, 0, 0) - middle_c;
     } else if (!silent) {
       event_error(" / must be followed by A-G or a-g in gchord");
     };

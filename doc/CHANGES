@@ -14491,3 +14491,45 @@ with
 if (*nnotes > 0) { /* [SS] 2021-11-25 */
 in the function make_note_representation(...)
 
+
+December 05 2021
+
+abc2midi new feature. Abc2midi did not recognize double flats or double sharps
+in the gchord. For example
+
+X:1
+T: Double flat gchord
+M: 4/4
+L: 1/4
+K: C
+"Dbb" C4| C4 |
+
+returns the error message
+Error in line-char 6-0 : Unrecognized chord name "b"
+(Hint: use %MIDI chordname to define it. eg %MIDI chordname sus4 0 4 7).
+
+Fix: in event_handle_gchord in store.c, now check for a double accidental.
+
+
+December 10 2021
+
+abc2midi: introduced gchord elements k and K. A gchord string can
+contain and of the letters in zcfbghijkGHIJKx. Note that the chord
+elements j,J,k,K are only defined for gchords with 4 or 5 notes like
+M9 or M11. Here is a test example.
+
+X:1
+T: Gchord string
+M: 4/4
+L: 1/4
+K: C
+%%MIDI chordname x 0 3 5 7 9
+%%MIDI gchord fGHIJK
+"C11" C4 | C4 |
+"Cx"  C4 | C4|
+"C11/E" C4 | C4|
+"C11/G" C4 | C4|
+"C11/B" C4 | C4|
+
+
+

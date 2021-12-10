@@ -398,7 +398,8 @@ char* s;
   p = s;
   j = 0;
   seq_len = 0;
-    while ((strchr("zcfbghijGHIJx", *p) != NULL) && (j <39)) {
+    /* [SS] 2021-12-10 */
+    while ((strchr("zcfbghijkGHIJKx", *p) != NULL) && (j <39)) {
     if (*p == 0) break;
     gchord_seq[j] = *p;
     p = p + 1;
@@ -2453,6 +2454,13 @@ int j;
         save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
       break;
 
+    /* [SS] 2021-12-10 */
+    case 'k':
+      if(gchordnotes_size >4 && g_started && gchords)
+        save_note(g_num*len, g_denom, gchordnotes[4], 8192, gchord.chan, gchord.vel); 
+      else /* [SS] 2016-01-03 */
+        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
+
     case 'G':
       if(gchordnotes_size>0 && g_started && gchords)
         save_note(g_num*len, g_denom, gchordnotes[0]-12, 8192, gchord.chan, gchord.vel); 
@@ -2477,6 +2485,14 @@ int j;
     case 'J':
       if(gchordnotes_size >3 && g_started && gchords)
         save_note(g_num*len, g_denom, gchordnotes[3]-12, 8192, gchord.chan, gchord.vel); 
+      else /* [SS] 2016-01-03 */
+        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
+      break;
+
+    /* [SS] 2021-12-10 */
+    case 'K':
+      if(gchordnotes_size >3 && g_started && gchords)
+        save_note(g_num*len, g_denom, gchordnotes[4]-12, 8192, gchord.chan, gchord.vel); 
       else /* [SS] 2016-01-03 */
         save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
       break;
