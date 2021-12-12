@@ -14532,4 +14532,8 @@ K: C
 "C11/B" C4 | C4|
 
 
+December 12 2021
+
+abcmidi: changed bar length warning as suggested by James Allwright.
+
 

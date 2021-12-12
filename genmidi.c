@@ -531,7 +531,7 @@ int pass;
         if (bar_denom != 1) {
           sprintf(msg+strlen(msg), "/%d", bar_denom);
         };
-        sprintf(msg+strlen(msg), " units instead of %d", barsize);
+        sprintf(msg+strlen(msg), " time units while the time signature has %d", barsize);
         if (pass == 2) {
           strcat(msg, " in repeat");
         };
