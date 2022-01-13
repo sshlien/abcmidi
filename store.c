@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.64 December 12 2021 abc2midi" 
+#define VERSION "4.65 January 13 2022 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -3171,7 +3171,8 @@ char* value;
   else if (is_abcm2ps_option (key)) return;
 
   else {
-    sprintf(errmsg,"I: key \' %s\' not recognized", key);
+    /* [KG] 2022-01-13 stack overflow */
+    snprintf(errmsg, 80, "I: key \' %s\' not recognized", key);
     if (quiet == -1 && silent == 0) event_error(errmsg); /* [SS] 2018-04-01 */
     }
 }
@@ -4747,7 +4748,8 @@ if (nofnop == 0) {
    };
 
   if (done == 0 && quiet == -1) {    /* [SS] 2013-11-02 */
-    sprintf(buff, "instruction !%s! ignored", s);
+    snprintf(buff, MAXLINE, "instruction !%s! ignored", s);
+    /* [KG] 2022-01-13 static overflow */
     event_warning(buff);
   };
 }

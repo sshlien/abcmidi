@@ -14537,3 +14537,33 @@ December 12 2021
 abcmidi: changed bar length warning as suggested by James Allwright.
 
 
+January 13 2022
+
+abc2midi: stack overflow bugs reported by Kolja Grassmann
+<koljagrassman@mailbox.org>
+
+static int getword(place,w) in genmidi.c
+check that the syllable[200] array is not overrun
+in the while loop ((syllastus != postword)...) add && (i<199)
+
+static void karaokestarttrack in genmidi.c
+replace strcpy(atitle+2,atext[pitch[j]])
+with strncpy(atitle+2,atext[pitch[j]], 197)
+to prevent overflowing the atitle[200] array
+in three places.
+
+static int inlist(place, passno) in genmidi.c
+To prevent stack overflow in msg[100];
+use snprintf instead of sprintf
+snprintf(msg, 100, "Bad variant list : %s", atext[pitch[place]]);
+
+void event_handle_instruction(s) in store.c
+To prevent overrunning the array buff[MAXLINE]
+used snprintf instead of sprintf
+ snprintf(buff, MAXLINE, "instruction !%s! ignored", s);
+
+void event_info_key(key, value) in store.c
+To prevent overrunning the array errmsg[80]
+used snprintf instead of sprintf
+snprintf(errmsg, 80, "I: key \' %s\' not recognized", key);
+

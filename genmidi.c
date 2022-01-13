@@ -31,7 +31,10 @@
 /* for Microsoft Visual C++ Ver 6 and higher */
 #ifdef _MSC_VER
 #define ANSILIBS
+#define snprintf _snprintf
+#define strncasecmp strnicmp
 #endif
+
 
 #include "abc.h"
 #include "parseabc.h"
@@ -811,17 +814,17 @@ int track;
      if (feature[j] == TITLE) {
         if (track != 2)
            mf_write_meta_event(0L, sequence_name, atext[pitch[j]], strlen (atext[pitch[j]]));
-        strcpy(atitle+2, atext[pitch[j]]);
+        strncpy(atitle+2, atext[pitch[j]], 197); /* [KG] 2022-01-13 stack overflow bug */
         text_data(atitle);
         done--;
      }
      if (feature[j] == COMPOSER) {
-        strcpy(atitle+2, atext[pitch[j]]);
+        strncpy(atitle+2, atext[pitch[j]], 197); /* [KG] 2022-01-13 stack overflow bug */
         text_data(atitle);
         done--;
      }     
      if (feature[j] == COPYRIGHT) {
-        strcpy(atitle+2, atext[pitch[j]]);
+        strcpy(atitle+2, atext[pitch[j]]); /* [KG] 2022-01-13 stack overflow bug */
         text_data(atitle);
         done--;
      }
@@ -966,7 +969,8 @@ int w;
   syllstatus = empty;
   c = *(words[w]+(*place));
   isBig5 = 0;  /* [BI] 2012-10-03 */
-  while ((syllstatus != postword) && (syllstatus != failed)) {
+  while ((syllstatus != postword) && (syllstatus != failed) && (i<199)) {
+  /* [KG] 2022-01-13 stack overflow bug fix */
   syllable[i] = c;
     /* printf("syllstatus = %d c = %c i = %d place = %d row= %d \n",syllstatus,c,i,*place,w); */
 	if (isBig5) { /* [BI] 2012-10-03 */
@@ -1252,7 +1256,8 @@ int passno;
     found = 0;
     while ((found == 0) && (*p != '\0')) {
       if (!isdigit(*p)) {
-        sprintf(msg, "Bad variant list : %s", atext[pitch[place]]);
+        snprintf(msg, 100, "Bad variant list : %s", atext[pitch[place]]);
+/* [KG] 2022-01-13 stack overflow bug */
         event_error(msg);
         found = 1;
       };
