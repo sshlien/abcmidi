@@ -1420,8 +1420,6 @@ static void midi_re_tune (int channel) {
    this is done.
 */
 char data[2];
-data[0] = (char) (bend & 0x7f); /* least significant bits */
-data[1] = (char) ((bend >>7) & 0x7f);
 /* indicate that we are applying RPN fine and gross tuning using
    the following two control commands. 
    control 101 0  
@@ -1443,6 +1441,29 @@ data[0] = 38; /* control data entry for fine bits */
 data[1] = (char) (bend & 0x7f); /* least significant bits */
 write_event(control_change, channel, data, 2);
 } 
+
+/* [SS] 2022-01-27 */
+static void midiPitchBendRange (int semis) {
+/* by default the pitch whell maps 0 to 16383 to a range of 2
+ * semitones. This function uses the RPN control command to
+ * expand the range to semis semitones.
+ */ 
+char data[2];
+/* indicate that we are applying RPN fine and gross tuning using
+   the following two control commands. 
+   control 101 0  
+   control 100 0 */
+data[0] = 101; /* RPN command */
+data[1] = 0;   /* type of command */
+write_event(control_change, channel, data, 2);
+data[0] = 6; /* contains most significant byte */
+data[1] = semis;
+write_event(control_change, channel, data, 2);
+data[0] = 38; /* contains least significant byte (range in cents) */
+data[1] = 0;
+write_event(control_change, channel, data, 2);
+}
+
 
 
 
@@ -2098,6 +2119,14 @@ int noteson;
      done = 1;
      if (bendnvals == 1) bendtype = 3;
      else bendtype = 2;
+     }
+
+  /* [SS] 2022-01-27 */
+  else if (strcmp(command, "pitchbendrange") == 0) {
+     int semis;
+     semis = readsnump(&p);
+     midiPitchBendRange(semis);
+     done = 1;
      }
 
 

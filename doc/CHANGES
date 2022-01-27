@@ -14567,3 +14567,26 @@ To prevent overrunning the array errmsg[80]
 used snprintf instead of sprintf
 snprintf(errmsg, 80, "I: key \' %s\' not recognized", key);
 
+
+January 27 2022
+
+abcmidi: new feature
+%%MIDI pitchbendrange semi
+maps the pitchwheel 0 to 16383 to semi semitones. By default semi
+is set to 2. If you change it to 4, then the pitchwheel maps into
+4 semitones. This effects all microtones in the active channel
+when semi is not 2. %%MIDI temperament commands may not work
+correctly. Here is an example.
+
+X:1
+T: pitch bend with RPN
+M: 4/4
+L: 1/4
+K: G
+%%MIDI program 70
+G2 B2 |\
+%%MIDI bendstring 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500
+!bend! G4 |\
+%%MIDI pitchbendrange 7
+!bend! G4 |
+
