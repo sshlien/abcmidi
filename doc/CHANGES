@@ -14574,7 +14574,7 @@ abcmidi: new feature
 %%MIDI pitchbendrange semi
 maps the pitchwheel 0 to 16383 to semi semitones. By default semi
 is set to 2. If you change it to 4, then the pitchwheel maps into
-4 semitones. This effects all microtones in the active channel
++/-4 semitones. This effects all microtones in the active channel
 when semi is not 2. %%MIDI temperament commands may not work
 correctly. Here is an example.
 

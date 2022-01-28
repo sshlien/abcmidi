@@ -1444,7 +1444,7 @@ write_event(control_change, channel, data, 2);
 
 /* [SS] 2022-01-27 */
 static void midiPitchBendRange (int semis) {
-/* by default the pitch whell maps 0 to 16383 to a range of 2
+/* by default the pitch wheel maps 0 to 16383 to a range of 4
  * semitones. This function uses the RPN control command to
  * expand the range to semis semitones.
  */ 
