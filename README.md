@@ -13,7 +13,7 @@ Seymour added two more programs:
 1. abcmatch for finding common elements in a collection of abc tunes and,
 2. midicopy for copying parts of a midi file to a new midi file.
 
-Yaps has been superceded by [Jef Moine](http://moinejf.free.fr/) abcm2ps and abc2svg programs. Midi2abc has been expanded to include mftext and various other features for supporting the [runabc](https://ifdo.ca/~seymour/runabc/top.html) application. Abc2midi has numerous new features that are described in its own web page [abc2midi guide](https://ifdo.ca/~seymour/runabc/abcguide/abc2midi_guide.html).
+Yaps has been superceded by [Jef Moine](http://moinejf.free.fr/) abcm2ps and abc2svg programs. Midi2abc has been expanded to include mftext and various other features for supporting the [runabc](https://ifdo.ca/~seymour/runabc/top.html) application. Abc2midi has numerous new features that are described in its own web page [abc2midi guide](https://abcmidi.sourceforge.io).
 
 Components of the abcMIDI package are parts of numerous applications for creating and editing abc files. Compilations of these components for various operating systems can be found on [The ABC Plus Project](http://abcplus.sourceforge.net/) web page.
 
