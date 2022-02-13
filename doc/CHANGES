@@ -14590,3 +14590,12 @@ G2 B2 |\
 %%MIDI pitchbendrange 7
 !bend! G4 |
 
+February 12 2022
+Midi2abc -mftext: adjusted the pitchbend sensitivity bend2cents when
+a RPN control command is received (in function mftxt_parameter).
+
+February 13 2022
+abc2midi: added an optional third parameter to %%MIDI bendvelocity
+which specifies the number of MIDI pitchbend messages to create.
+If this parameter is missing, the default is 8 as before.
+

@@ -2074,14 +2074,17 @@ int noteson;
     skipspace(&p);
     val = readsnump(&p);
     bendacceleration = val;
+    skipspace(&p); /* [SS] 2022-02-13 */
+    val = readsnump(&p);
+    if (val > 0 && val < 100) bendnvals = val; 
+    else bendnvals = 8;
+
     /* [SS] 2015-08-11 */
-    bendnvals = 0;
     if (bendvelocity != 0 || bendacceleration != 0) {
-        for (i = 0; i<8; i++) {
+        for (i = 0; i<bendnvals; i++) {  /* [SS] 2022-02-13 */
             benddata[i] = bendvelocity;
             bendvelocity = bendvelocity + bendacceleration;
             }
-        bendnvals = 8;
         }
     /*bendtype = 1; [SS] 2015-08-11 */
     if (bendnvals == 1) bendtype = 3; /* [SS] 2014-09-22 */
