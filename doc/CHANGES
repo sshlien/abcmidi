@@ -14599,3 +14599,22 @@ abc2midi: added an optional third parameter to %%MIDI bendvelocity
 which specifies the number of MIDI pitchbend messages to create.
 If this parameter is missing, the default is 8 as before.
 
+
+February 18 2022
+abc2midi bug: the K: and V: score option transposes the music in the
+wrong direction. eg
+
+X:1
+T: transpose
+M: 4/4
+L: 1/4
+K: G sound = DC
+CDEF|GABc|
+
+CDEF... converted to BbCDE.. instead of DEF#G...
+
+Fix: swapped p2 and p1 in
+          *transpose = p2 - p1;
+in parsesound() in parseabc.c
+
+
