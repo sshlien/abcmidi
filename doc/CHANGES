@@ -14617,4 +14617,48 @@ Fix: swapped p2 and p1 in
           *transpose = p2 - p1;
 in parsesound() in parseabc.c
 
+February 21 2022
+abc2abc mangles text. eg
+input:
+
+X:1
+T: Text mangled by abc2abc 
+Q:1/2=120
+M:4/4
+L:1/8
+K:G bass octave=-2
+%%begintext center
+this text is mangled
+%%endtext
+%%
+!f! g2 z d g2 z d | gdgb d'2 z2 | c'2 z a c'2 z a | cafa d2 z2 | gggg gggg | [I:repeat] |
+
+abc2abc text.abc -t 2 >output.abc
+
+output:
+
+X:1
+T:Text mangled by abc2abc 
+Q:1/2=120
+M:4/4
+L:1/8
+K:Amaj clef=bass octave=-2
+%%begintext center
+this tfxt is mbnalfe
+%%endtext
+%%
+!f! a2 z e a2 z e | aeac' e'2 z2 | d'2 z b d'2 z b | dbgb e2 z2 | aaaa aaaa | [I:repeat] |
+
+Analysis:
+Parseline (line) in parseabc.c checks the line for %%begintext using strcmp.
+Unfortunately, it does not find a match because the line also contains
+the word 'center'.
+
+Fix: replaced 
+if (strcmp(line,"%%begintext") == 0) {
+with
+if (strstr(line,"%%begintext") != NULL) {
+which returns the pointer to %%begintext in the line.
+
+
 

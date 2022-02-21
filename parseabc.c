@@ -3353,11 +3353,11 @@ parseline (line)
 {
   char *p, *q;
 
-  /* [SS] 2020-01-03 */
-  if (strcmp(line,"%%begintext") == 0) {
+  /* [SS] 2020-01-03 2021-02-21 */
+  if (strstr(line,"%%begintext") != NULL) {
 	  ignore_line = 1;
           }
-  if (strcmp(line,"%%endtext") == 0) {
+  if (strstr(line,"%%endtext") != NULL) {
 	  ignore_line = 0;
           }
   /* [SS] 2021-05-09 */
