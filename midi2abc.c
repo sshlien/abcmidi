@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.49 June 27 2021 midi2abc"
+#define VERSION "3.52 March 04 2022 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -165,6 +165,7 @@ int header_keysig=  -50;  /* header key signature                     */
 int active_keysig = -50;  /* last key signature declared        */
 int xchannel;  /* channel number to be extracted. -1 means all  */
 int timeunits = 1; /*tells prtime to display time in beats [SS] 2018-10-25 */
+double bend2cents = 40.96; /* [SS] 2022-02-12 */
 
 
 /* structure for storing music notes */
@@ -809,7 +810,7 @@ char *mess;
   int n;
   char *p = mess;
   char *buff;
-  char buffer2[BUFFSIZE];
+  char buffer2[BUFFSIZE+4]; /* [SS] 2022-02-12 */
 
   if ((type < 1)||(type > unrecognized))
       type = unrecognized;
@@ -1148,6 +1149,8 @@ void stats_header (int format, int ntrks, int ldivision)
   for (i=0;i<17;i++) {
     trkdata.npulses[i] = 0;
     trkdata.pitchbend[i] = 0;
+    trkdata.cntlparam[i] = 0; /* [SS] 2022-03-04 */
+    trkdata.pressure[i] = 0; /* [SS] 2022-03-04 */
     progcolor[i] = 0;
     channel2prog[i] = -1;
     channel2nnotes[i] = 0;
@@ -1307,7 +1310,8 @@ for (i=0;i<17;i++) {
    printf("trkinfo ");
    printf("%d %d ",i,trkdata.program[i]); /* channel number and program*/
    printf("%d %d ",trkdata.notecount[i],trkdata.chordcount[i]);
-   printf("%d %d",trkdata.notemeanpitch[i], trkdata.notelength[i]);
+   printf("%d %d ",trkdata.notemeanpitch[i], trkdata.notelength[i]);
+   printf("%d %d ",trkdata.cntlparam[i],trkdata.pressure[i]); /* [SS] 2022-03-04 */
    printf("\n");
 
    channel2nnotes[i] += trkdata.notecount[i] + trkdata.chordcount[i];
@@ -1408,13 +1412,21 @@ void stats_noteoff(int chan,int pitch,int vol)
   if(Mf_currtime > last_tick[chan+1]) last_tick[chan+1] = Mf_currtime;
 }
 
-void mftxt_pressure(chan,pitch,press)
+void mftxt_polypressure(chan,pitch,press)
 int chan, pitch, press;
 {
   char *key;
   if (prtime(timeunits)) return;
   key = pitch2key(pitch);
-  printf("Pressure %2d   %3s %3d\n",chan+1,key,press);
+  printf("Polyphonic Key Pressure %2d   %3s %3d\n",chan+1,key,press);
+}
+void mftxt_chanpressure(chan,pitch,press)
+int chan, pitch, press;
+{
+  char *key;
+  if (prtime(timeunits)) return;
+  key = pitch2key(pitch);
+  printf("Channel Pressure %2d   %3s %3d\n",chan+1,key,press);
 }
 
 
@@ -1423,6 +1435,7 @@ int chan, lsb, msb;
 {
  float bend;
  int pitchbend;
+ double cents;
 /*
   if (onlychan >=0 && chan != onlychan) return;
 */
@@ -1430,8 +1443,8 @@ int chan, lsb, msb;
   /* [SS] 2014-01-05  2015-08-04*/
   pitchbend = (msb*128 + lsb);
   bend =  (float) (pitchbend - 8192);
-  bend = bend/40.96;
-  printf("Pitchbend %2d %d  bend = %6.3f (cents)\n",chan+1,pitchbend,bend);
+  cents = bend/bend2cents; /* [SS] 2022-02-12 */
+  printf("Pitchbend %2d %d  cents = %6.3f (cents)\n",chan+1,pitchbend,cents);
 }
 
 void stats_pitchbend(chan,lsb,msb)
@@ -1586,6 +1599,7 @@ int chan, control, value;
 /*  if (onlychan >=0 && chan != onlychan) return; */
   if (prtime(timeunits)) return;
 
+  if (control == 6) bend2cents = 8192.0/(100.0*value); /*[SS] 2022-02-12 */
   printf("CntlParm %2d %s = %d\n",chan+1, ctype[control],value);
 }
 
@@ -1776,11 +1790,11 @@ void initfunc_for_mftext()
     Mf_trackend = txt_trackend;
     Mf_noteon = mftxt_noteon;
     Mf_noteoff = mftxt_noteoff;
-    Mf_pressure =mftxt_pressure;
+    Mf_pressure =mftxt_polypressure;
     Mf_parameter = mftxt_parameter;
     Mf_pitchbend = mftxt_pitchbend;
     Mf_program = mftxt_program;
-    Mf_chanpressure = mftxt_pressure;
+    Mf_chanpressure = mftxt_chanpressure;
     Mf_sysex = no_op2;
     Mf_metamisc = no_op3;
     Mf_seqnum = no_op1;
