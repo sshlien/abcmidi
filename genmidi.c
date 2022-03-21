@@ -358,7 +358,9 @@ void configure_gchord()
 {
  int j;
  int inchord, note;
+
  gchordnotes_size = 0;
+ if (chordnum < 0) return; /* [SS] 2022-03-20 */
 
 inchord = 0;
 if (inversion != -1) {

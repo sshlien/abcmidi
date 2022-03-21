@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.70 February 22 2022 abc2midi" 
+#define VERSION "4.71 March 20 2022 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -1860,7 +1860,7 @@ nmidicmd++;
 /* [SS] 2015-06-01 For converting the %%MIDIx command to a
    %%MIDI command
 */
-void event_midi();
+void event_midi(char* s);  /* [SS] 2022-03-19 */
 
 
 void process_midix(s)
