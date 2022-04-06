@@ -14701,3 +14701,6 @@ The problem was identified to me by Jakob Englhauser. Jakob verified
 that this fix works.
 
 
+April 06 midi2abc: removal of spaces in text strings for control
+messages.
+

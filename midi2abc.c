@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.52 March 04 2022 midi2abc"
+#define VERSION "3.53 April 06 2022 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -1530,30 +1530,31 @@ if (trkdata.program[chan+1] != 0) {
 void mftxt_parameter(chan,control,value)
 int chan, control, value;
 {
+  /* removal of spaces [SS] 2022-04-06 in ctype array */
   static char *ctype[] = {
- "Bank Select",       "Modulation Wheel",     /*1*/
- "Breath controller", "unknown",              /*3*/
- "Foot Pedal",        "Portamento Time",      /*5*/
- "Data Entry",        "Volume",               /*7*/
+ "BankSelect",       "ModulationWheel",     /*1*/
+ "BreathController", "unknown",              /*3*/
+ "FootPedal",        "PortamentoTime",      /*5*/
+ "DataEntry",        "Volume",               /*7*/
  "Balance",           "unknown",              /*9*/
- "Pan position",      "Expression",           /*11*/
- "Effect Control 1",  "Effect Control 2",     /*13*/
+ "PanPosition",      "Expression",           /*11*/
+ "EffectControl1",  "EffectControl2",     /*13*/
  "unknown",           "unknown",              /*15*/
- "Slider 1",          "Slider 2",             /*17*/
- "Slider 3",          "Slider 4",             /*19*/
+ "Slider1",          "Slider2",             /*17*/
+ "Slider3",          "Slider4",             /*19*/
  "unknown",           "unknown",              /*21*/
  "unknown",           "unknown",              /*23*/
  "unknown",           "unknown",              /*25*/
  "unknown",           "unknown",              /*27*/
  "unknown",           "unknown",              /*29*/
  "unknown",           "unknown",              /*31*/
- "Bank Select (fine)",  "Modulation Wheel (fine)",    /*33*/
- "Breath controller (fine)",  "unknown",              /*35*/
- "Foot Pedal (fine)",   "Portamento Time (fine)",     /*37*/
- "Data Entry (fine)",   "Volume (fine)",              /*39*/
- "Balance (fine)",      "unknown",                    /*41*/
- "Pan position (fine)", "Expression (fine)",          /*43*/
- "Effect Control 1 (fine)",  "Effect Control 2 (fine)", /*45*/
+ "BankSelect(fine)",  "ModulationWheel(fine)",    /*33*/
+ "BreathController(fine)",  "unknown",              /*35*/
+ "FootPedal(fine)",   "PortamentoTime(fine)",     /*37*/
+ "DataEntry(fine)",   "Volume(fine)",              /*39*/
+ "Balance(fine)",      "unknown",                    /*41*/
+ "PanPosition(fine)", "Expression(fine)",          /*43*/
+ "EffectControl1(fine)",  "EffectControl2(fine)", /*45*/
  "unknown",           "unknown",             /*47*/
  "unknown",           "unknown",             /*49*/
  "unknown",           "unknown",             /*51*/
@@ -1563,25 +1564,25 @@ int chan, control, value;
  "unknown",           "unknown",             /*59*/
 "unknown",           "unknown",             /*61*/
  "unknown",           "unknown",             /*63*/
- "Hold Pedal",        "Portamento",          /*65*/
- "Susteno Pedal",     "Soft Pedal",          /*67*/
- "Legato Pedal",      "Hold 2 Pedal",        /*69*/
- "Sound Variation",   "Sound Timbre",        /*71*/
- "Sound Release Time",  "Sound Attack Time", /*73*/
- "Sound Brightness",  "Sound Control 6",     /*75*/
- "Sound Control 7",   "Sound Control 8",     /*77*/
- "Sound Control 9",   "Sound Control 10",    /*79*/
- "GP Button 1",       "GP Button 2",         /*81*/
- "GP Button 3",       "GP Button 4",         /*83*/
+ "HoldPedal",        "Portamento",          /*65*/
+ "SustenoPedal",     "SoftPedal",          /*67*/
+ "LegatoPedal",      "Hold2Pedal",        /*69*/
+ "SoundVariation",   "SoundTimbre",        /*71*/
+ "SoundReleaseTime",  "SoundAttackTime", /*73*/
+ "SoundBrightness",  "SoundControl6",     /*75*/
+ "SoundControl7",   "Sound Control8",     /*77*/
+ "SoundControl9",   "Sound Control10",    /*79*/
+ "GPButton1",       "GPButton2",         /*81*/
+ "GPButton3",       "GPButton4",         /*83*/
  "unknown",           "unknown",             /*85*/
  "unknown",           "unknown",             /*87*/
  "unknown",           "unknown",             /*89*/
- "unknown",           "Effects Level",       /*91*/
- "Tremolo Level",     "Chorus Level",        /*93*/
- "Celeste Level",     "Phaser Level",        /*95*/
- "Data button increment",  "Data button decrement", /*97*/
- "NRP (fine)",        "NRP (coarse)",        /*99*/
- "Registered parameter (fine)", "Registered parameter (coarse)", /*101*/
+ "unknown",           "EffectsLevel",       /*91*/
+ "TremoloLevel",     "ChorusLevel",        /*93*/
+ "CelesteLevel",     "PhaserLevel",        /*95*/
+ "DataButtonIncrement",  "DataButtonDecrement", /*97*/
+ "NRP(fine)",        "NRP(coarse)",        /*99*/
+ "RegisteredParameter(fine)", "RegisteredParameter(coarse)", /*101*/
  "unknown",           "unknown",             /*103*/
  "unknown",           "unknown",             /*105*/
  "unknown",           "unknown",             /*107*/
@@ -1591,10 +1592,10 @@ int chan, control, value;
  "unknown",           "unknown",             /*115*/
  "unknown",           "unknown",             /*117*/
  "unknown",           "unknown",             /*119*/
- "All Sound Off",     "All Controllers Off", /*121*/
- "Local Keyboard (on/off)","All Notes Off",  /*123*/
- "Omni Mode Off",     "Omni Mode On",        /*125*/
- "Mono Operation",    "Poly Operation"};
+ "AllSoundOff",     "AllControllersOff", /*121*/
+ "LocalKeyboard(on/off)","AllNotesOff",  /*123*/
+ "OmniModeOff",     "OmniModeOn",        /*125*/
+ "MonoOperation",    "PolyOperation"};
 
 /*  if (onlychan >=0 && chan != onlychan) return; */
   if (prtime(timeunits)) return;
