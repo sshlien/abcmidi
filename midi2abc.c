@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.53 April 06 2022 midi2abc"
+#define VERSION "3.54 April 28 2022 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -732,6 +732,7 @@ void stats_pressure(chan,press)
 int chan, press;
 {
 trkdata.pressure[0]++;
+trkdata.pressure[chan+1]++; /* [SS] 2022.04.28 */
 }
 
 void txt_parameter(chan,control,value)
@@ -1341,7 +1342,7 @@ void stats_trackend()
 {
  trkdata.npulses[tracknum] = Mf_currtime; 
  if (trkdata.npulses[0] < Mf_currtime) trkdata.npulses[0] = Mf_currtime;
- output_track_summary();
+ output_track_summary(); 
 }
 
 
@@ -1426,7 +1427,7 @@ int chan, pitch, press;
   char *key;
   if (prtime(timeunits)) return;
   key = pitch2key(pitch);
-  printf("Channel Pressure %2d   %3s %3d\n",chan+1,key,press);
+  printf("Pressure %2d   %3s %3d\n",chan+1,key,press); /* [SS] 2022.04.28 */
 }
 
 

@@ -14731,3 +14731,6 @@ Note that the command instrument=cF is not part of the abc standard
 and abc2svg does not recognize it.
 
 
+April 28 2022
+
+midi2abc: minor change for -stats function
