@@ -1056,7 +1056,7 @@ parsesound (s, word, gottranspose, transpose)
           *transpose = 0;
           } else {
           /* printf("midi note = %d\n",p2); */
-          *transpose = p1 - p2; /* [SS] 2022.02.18 */
+          *transpose = p2 - p1; /* [SS] 2022.02.18 2022.04.27 */
           /* printf("transpose = %d\n",*transpose); */
           *gottranspose = 1;
           }

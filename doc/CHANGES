@@ -14701,6 +14701,33 @@ The problem was identified to me by Jakob Englhauser. Jakob verified
 that this fix works.
 
 
-April 06 midi2abc: removal of spaces in text strings for control
+April 06 2022 midi2abc: removal of spaces in text strings for control
 messages.
+
+
+April 27 2022 abc2midi: Recanting change from February 18 2022.
+The swap was incorrect.
+Fix: swapped p2 and p1 in
+          *transpose = p2 - p1;
+in parsesound() in parseabc.c
+abc2midi now transposes this file correctly.
+
+
+X:1
+T: transposition
+M: 4/4
+L: 1/4
+K:Cm
+V:1 shift=cF
+cdef|gabc'|
+V:2 sound=cF
+cdef|gabc'|
+V:3 score=cF
+cdef|gabc'|
+V:4 instrument=cF
+cdef|gabc'|
+
+Note that the command instrument=cF is not part of the abc standard
+and abc2svg does not recognize it.
+
 
