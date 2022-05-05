@@ -14734,3 +14734,9 @@ and abc2svg does not recognize it.
 April 28 2022
 
 midi2abc: minor change for -stats function
+
+
+May 05 2022
+
+midicopy: introduced new options -nopressure and -nocntrl
+

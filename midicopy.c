@@ -52,7 +52,7 @@
 
 
 
-#define VERSION "1.37 October 10 2020 midicopy"
+#define VERSION "1.38 May 05 2022 midicopy"
 #include "midicopy.h"
 #define NULLFUNC 0
 #define NULL 0
@@ -112,6 +112,8 @@ int chosen_drum = 0;		/* [SS] 2013-10-01 */
 int drumvelocity = 0;		/* [SS] 2013-10-01 */
 int attenuation = 70;           /* [SS] 2017-11-27 */
 int nobends = 0;                /* [SS] 2017-12-15 */
+int nopressure = 0;             /* [SS] 2022-05-05 */
+int nocntrl = 0;                /* [SS] 2022-05-05 */
 int zerochannels = 0;           /* [SS] 2020-10-09 */
 
 long Mf_numbyteswritten = 0L;
@@ -1060,9 +1062,10 @@ chanmessage (int status, int c1, int c2)
 	copy_noteon (chan, c1, c2);
 	break;
       case 0xa0:
-	copy_pressure (chan, c1, c2);
+        if (nopressure == 0) copy_pressure (chan, c1, c2);
 	break;
       case 0xb0:
+        if (nocntrl == 0)
 	copy_parameter (chan, c1, c2);
 	break;
       case 0xe0:
@@ -1073,7 +1076,7 @@ chanmessage (int status, int c1, int c2)
 	copy_program (chan, c1);
 	break;
       case 0xd0:
-	copy_chanpressure (chan, c1);
+        if (nopressure == 0) copy_chanpressure (chan, c1);
 	break;
       }
    }
@@ -1851,6 +1854,8 @@ main (int argc, char *argv[])
       printf ("-focusonchannels n1,n2,...\n"); /* [SS] 2017-11-27 */
       printf ("-attenuation n\n"); /* [SS] 2017-11-27 */
       printf ("-nobends\n"); /* [SS] 2017-11-27 */
+      printf ("-nopressure\n"); /* [SS] 2022-05-05 */
+      printf ("-nocntrl\n"); /* [SS] 2022-05-05 */
       printf ("-indrums n1,n2,... (drums to include)\n"); /* [SS] 2019-12-22 */
       printf ("-xdrums n1,n2,... (drums to exclude)\n"); /* [SS] 2019-12-22 */
       printf ("-onlydrums (only channel 10)\n"); /* [SS] 2019-12-22 */
@@ -2091,6 +2096,12 @@ main (int argc, char *argv[])
   arg = getarg("-nobends",argc,argv);
   if (arg >=0) nobends=1;
 
+  /* [SS] 2022-05-05 */
+  arg = getarg("-nopressure",argc,argv);
+  if (arg >=0) nopressure=1;
+
+  arg = getarg("-nocntrl",argc,argv);
+  if (arg >=0) nocntrl = 1;
 
   repflag = getarg ("-replace", argc, argv);
   if (repflag >= 0)
