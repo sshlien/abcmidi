@@ -14740,3 +14740,42 @@ May 05 2022
 
 midicopy: introduced new options -nopressure and -nocntrl
 
+
+May 20 2022
+
+Improvements in parsing umlaut characters in the T: Q: commands
+and guitar chords in compliance with section 8.2 of the 2.2 Abc standard
+(mnemonics). Here are examples where the mnemonics occur.
+
+X:7
+T:Slurs and Ties
+T: Title with f\"unny chars like \005 Çéñô Àçäßö © …
+M:C|
+K:Ebm
+[| (CDEF) ((3efg) ((3gag)| "_demit\"asse" (C2 EF) (ef(ga)) | ((c2 (3(d)ef) e2)\
+ A2-|A4 c4-|(c4(e4)|a8) |]
+
+X: 1
+T: Traveller's Joy
+R: polka
+M: 2/4
+L: 1/8
+Q: "bl\"oop" 1/4=90
+K: Gmaj
+"^Duggie" f>g ag/2f/2 | "<G\"odel" gG B/2c/2d | "C" ee "G" dg/2B/2 | B/2A/2G/2B/2 "D" A2 |
+"D" f>g ag/2f/2 | "G" gG B/2c/2d | "C" ee "G"dg/2g/2 | "D" af "G" g2 :|
+%
+
+X: 2
+T: Tempo example
+M: 4/4
+L: 1/4
+Q: 1/4=90 "c\"ah\"o\"ots"
+K: G
+abcd|efga
+
+James Allwright added new functions to do the umlaut handling:
+umlaut_get_buffer()
+umlaut_build_string()
+and parsename/parsesname were combined into one function.
+

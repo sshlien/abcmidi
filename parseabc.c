@@ -52,6 +52,7 @@
 #ifdef _MSC_VER
 #define ANSILIBS
 #define casecmp stricmp
+#define strcasecmp _stricmp
 #define _CRT_SECURE_NO_WARNINGS
 #else
 #define casecmp strcasecmp
@@ -1089,114 +1090,96 @@ parseoctave (s, word, gotoctave, octave)
   return 1;
 };
 
+/* Function added JA 20 May 2022*/
+/* parse a string contained in quotes.
+ * strings may contain the close quote character because
+ * x umlaut is encoded as \"x, which complicates parsing.
+ * this is an unfortunate feature of the abc syntax.
+ *
+ * on entry, start points to the opening double quote.
+ * returns pointer to last character before closing quote.
+ */
+char *umlaut_get_buffer(char *start, char *buffer, int bufferlen)
+{
+  char *p;
+  int last_ch;
+  int i;
 
+  p = start;
+  i = 0;
+  while ((*p != '\0') &&
+         !((*p == '"') && (last_ch != '\\'))) {
+    if (i < bufferlen - 2) {
+      buffer[i] = *p;
+      i = i + 1;
+    }
+    last_ch = *p;
+    p = p + 1;
+  }
+  buffer[i] = '\0';
+  return p;
+}
+
+/* Function added JA 20 May 2022*/
+/* construct string using vstring */
+char *umlaut_build_string(char *start, struct vstring *gchord)
+{
+  int lastch = ' ';
+  char *p;
+
+  p = start;
+  //initvstring (&gchord);
+  /* need to allow umlaut sequence in guitar chords.
+   * e.g. \"a, \"u
+   */
+  while (!((*p == '\0') ||
+          ((*p == '"') && (lastch != '\\')))) {
+    addch (*p, gchord);
+    lastch = *p;
+    p = p + 1;
+  }
+  //printf("umlaut_build_string has >%s<\n", gchord->st);
+  return p;
+}
+
+/* Function modified JA 20 May 2022 */
 int
-parsename (s, word, gotname, namestring, maxsize)
+parsename (s, gotname, namestring, maxsize)
 /* parses string name= "string" in V: command 
    for compatability of abc2abc with abcm2ps
 */
      char **s;
-     char *word;
      int *gotname;
      char namestring[];
      int maxsize;
 {
   int i;
-  i = 0;
-  if (casecmp (word, "name") != 0)
-    return 0;
-  skipspace (s);
-  if (**s != '=')
-    {
-      event_error ("name must be followed by '='");
-    }
-  else
-    {
-      *s = *s + 1;
-      skipspace (s);
-      if (**s == '"')		/* string enclosed in double quotes */
-	{
-	  namestring[i] = (char) **s;
-	  *s = *s + 1;
-	  i++;
-	  while (i < maxsize && **s != '"' && **s != '\0')
-	    {
-	      namestring[i] = (char) **s;
-	      *s = *s + 1;
-	      i++;
-	    }
-	  namestring[i] = (char) **s;	/* copy double quotes */
-	  i++;
-	  namestring[i] = '\0';
-	}
-      else			/* string not enclosed in double quotes */
-	{
-	  while (i < maxsize && **s != ' ' && **s != '\0')
-	    {
-	      namestring[i] = (char) **s;
-	      *s = *s + 1;
-	      i++;
-	    }
-	  namestring[i] = '\0';
-	}
-      *gotname = 1;
-    }
-  return 1;
-};
 
-int
-parsesname (s, word, gotname, namestring, maxsize)
-/* parses string name= "string" in V: command 
-   for compatability of abc2abc with abcm2ps
-*/
-     char **s;
-     char *word;
-     int *gotname;
-     char namestring[];
-     int maxsize;
-{
-  int i;
   i = 0;
-  if (casecmp (word, "sname") != 0)
-    return 0;
   skipspace (s);
-  if (**s != '=')
-    {
-      event_error ("name must be followed by '='");
-    }
-  else
-    {
+  if (**s != '=') {
+    event_error ("name must be followed by '='");
+  } else {
+    *s = *s + 1;
+    skipspace (s);
+    if (**s == '"') {           /* string enclosed in double quotes */
+      namestring[i] = (char)**s;
       *s = *s + 1;
-      skipspace (s);
-      if (**s == '"')		/* string enclosed in double quotes */
-	{
-	  namestring[i] = (char) **s;
-	  *s = *s + 1;
-	  i++;
-	  while (i < maxsize && **s != '"' && **s != '\0')
-	    {
-	      namestring[i] = (char) **s;
-	      *s = *s + 1;
-	      i++;
-	    }
-	  namestring[i] = (char) **s;	/* copy double quotes */
-	  i++;
-	  namestring[i] = '\0';
-	}
-      else			/* string not enclosed in double quotes */
-	{
-	  while (i < maxsize && **s != ' ' && **s != '\0')
-	    {
-	      namestring[i] = (char) **s;
-	      *s = *s + 1;
-	      i++;
-	    }
-	  namestring[i] = '\0';
-	}
-      *gotname = 1;
+      *s = umlaut_get_buffer(*s, &namestring[1], maxsize-1);
+      *s = *s + 1; /* skip over closing double quote */
+      strcat(namestring, "\"");
+    } else {                    /* string not enclosed in double quotes */
+      while (i < maxsize && **s != ' ' && **s != '\0') {
+        namestring[i] = (char)**s;
+        *s = *s + 1;
+        i++;
+      }
+      namestring[i] = '\0';
     }
+    *gotname = 1;
+  }
   return 1;
-};
+}
 
 int
 parsemiddle (s, word, gotmiddle, middlestring, maxsize)
@@ -1665,27 +1648,30 @@ parsevoice (s)
         copy_clef (&voicecode[num - 1].clef, &vparams.new_clef);
       }
       if (!parsed)
-	parsed =
-	  parsetranspose (&s, word, &vparams.gottranspose,
-			  &vparams.transpose);
+        parsed =
+          parsetranspose (&s, word, &vparams.gottranspose,
+            &vparams.transpose);
       if (!parsed)
-	parsed = parseoctave (&s, word, &vparams.gotoctave, &vparams.octave);
+        parsed = parseoctave (&s, word, &vparams.gotoctave, &vparams.octave);
       if (!parsed)
         parsed = parsesound (&s, word, &vparams.gottranspose, &vparams.transpose);
+      /* Code changed JA 20 May 2022 */
+      if ((!parsed) && (strcasecmp (word, "name") == 0)) {
+        parsed =
+          parsename (&s, &vparams.gotname, vparams.namestring,
+            V_STRLEN);
+      }
+      if ((!parsed) && (strcasecmp (word, "sname") == 0)) {
+        parsed =
+          parsename (&s, &vparams.gotsname, vparams.snamestring,
+            V_STRLEN);
+      }
       if (!parsed)
-	parsed =
-	  parsename (&s, word, &vparams.gotname, vparams.namestring,
-		     V_STRLEN);
+        parsed =
+          parsemiddle (&s, word, &vparams.gotmiddle, vparams.middlestring,
+            V_STRLEN);
       if (!parsed)
-	parsed =
-	  parsesname (&s, word, &vparams.gotsname, vparams.snamestring,
-		      V_STRLEN);
-      if (!parsed)
-	parsed =
-	  parsemiddle (&s, word, &vparams.gotmiddle, vparams.middlestring,
-		       V_STRLEN);
-      if (!parsed)
-	parsed = parseother (&s, word, &vparams.gotother, vparams.other, V_STRLEN);	/* [SS] 2011-04-18 */
+        parsed = parseother (&s, word, &vparams.gotother, vparams.other, V_STRLEN);  /* [SS] 2011-04-18 */
     }
   /* [SS] 2015-05-13 allow octave= to change the clef= octave setting */
   /* cgotoctave may be set to 1 by a clef=. vparams.gotoctave is set  */
@@ -2063,89 +2049,78 @@ FILE * parse_abc_include (s)
   return NULL; 
 }
 
-
+/* Function mofied for umlaut handling JA 20 May 2022 */
 void
 parse_tempo (place)
      char *place;
 /* parse tempo descriptor i.e. Q: field */
 {
   char *p;
+  char *after_pre;
   int a, b;
   int n;
   int relative;
   char *pre_string;
   char *post_string;
+  struct vstring pre;
+  struct vstring post;
 
   relative = 0;
   p = place;
   pre_string = NULL;
-  if (*p == '"')
-    {
-      p = p + 1;
-      pre_string = p;
-      while ((*p != '"') && (*p != '\0'))
-	{
-	  p = p + 1;
-	};
-      if (*p == '\0')
-	{
-	  event_error ("Missing closing double quote");
-	}
-      else
-	{
-	  *p = '\0';
-	  p = p + 1;
-	  place = p;
-	};
-    };
+  initvstring (&pre);
+  if (*p == '"') {
+    p = p + 1; /* skip over opening double quote */
+    p = umlaut_build_string(p, &pre);
+    pre_string = pre.st;
+    if (*p == '\0') {
+      event_error ("Missing closing double quote");
+    } else {
+      p = p + 1; /* skip over closing double quote */
+      place = p;
+    }
+  }
+  after_pre = p;
+  /* do we have an "=" ? */
   while ((*p != '\0') && (*p != '='))
     p = p + 1;
-  if (*p == '=')
-    {
-      p = place;
-      skipspace (&p);
-      if (((*p >= 'A') && (*p <= 'G')) || ((*p >= 'a') && (*p <= 'g')))
-	{
-	  relative = 1;
-	  p = p + 1;
-	};
-      readlen (&a, &b, &p);
-      skipspace (&p);
-      if (*p != '=')
-	{
-	  event_error ("Expecting = in tempo");
-	};
+  if (*p == '=') {
+    p = place;
+    skipspace (&p);
+    if (((*p >= 'A') && (*p <= 'G')) || ((*p >= 'a') && (*p <= 'g'))) {
+      relative = 1;
       p = p + 1;
     }
-  else
-    {
-      a = 1;			/* [SS] 2013-01-27 */
-      /*a = 0;  [SS] 2013-01-27 */
-      b = 4;
-      p = place;
-    };
+    readlen (&a, &b, &p);
+    skipspace (&p);
+    if (*p != '=') {
+      event_error ("Expecting = in tempo");
+    }
+    p = p + 1;
+  } else {
+    /* no "=" found - default to 1/4 note */
+    a = 1;                      /* [SS] 2013-01-27 */
+    b = 4;
+    p = after_pre;
+  }
   skipspace (&p);
-  n = readnump (&p);
+  n = readnump (&p); /* read notes per minute value */
   post_string = NULL;
-  if (*p == '"')
-    {
-      p = p + 1;
-      post_string = p;
-      while ((*p != '"') && (*p != '\0'))
-	{
-	  p = p + 1;
-	};
-      if (*p == '\0')
-	{
-	  event_error ("Missing closing double quote");
-	}
-      else
-	{
-	  *p = '\0';
-	  p = p + 1;
-	};
-    };
+  initvstring (&post);
+  skipspace (&p);
+  if (*p == '"') {
+    p = p + 1; /* skip over opening double quote */
+    p = umlaut_build_string(p, &post);
+    post_string = post.st;
+    if (*p == '\0') {
+      event_error ("Missing closing double quote");
+    } else {
+      p = p + 1; /* skip over closing double quote */
+    }
+  }
   event_tempo (n, a, b, relative, pre_string, post_string);
+  freevstring (&pre);
+  freevstring (&post);
 }
 
 void appendfield(char *); /* links with store.c and yapstree.c */
@@ -2919,13 +2894,12 @@ parsemusic (field)
 	      {
 		struct vstring gchord;
 
-		p = p + 1;
 		initvstring (&gchord);
-		while ((*p != '"') && (*p != '\0'))
-		  {
-		    addch (*p, &gchord);
-		    p = p + 1;
-		  };
+    /* modified JA 20 May 2022 */
+    /* need to allow umlaut sequence in "guitar chords" which
+     * are being used for arbitrary text e.g. "_last time"
+     */
+    p = umlaut_build_string(p+1, &gchord);
 		if (*p == '\0')
 		  {
 		    event_error ("Guitar chord name not properly closed");
