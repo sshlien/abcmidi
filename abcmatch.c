@@ -49,7 +49,7 @@ Matching:
 
 
 
-#define VERSION "1.80 Novemeber 25 2021 abcmatch"
+#define VERSION "1.81 June 07 2021 abcmatch"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -111,14 +111,14 @@ extern int voicesused;
 */
 
 /* data structure for input to matcher. */
-int imidipitch[2000];		/* pitch-barline midi note representation of input tune */
-int inotelength[2000];		/* notelength representation of input tune */
+int imidipitch[10000];		/* pitch-barline midi note representation of input tune */
+int inotelength[10000];		/* notelength representation of input tune */
 int innotes;			/*number of notes in imidipitch,inotelength representation */
 int inbars;			/*number of bars in input tune */
-int ibarlineptr[500];		/*pointers to bar lines in imidipitch */
+int ibarlineptr[2000];		/*pointers to bar lines in imidipitch */
 int itimesig_num, itimesig_denom;
-int imaxnotes = 2000;		/* maximum limits of this program */
-int imaxbars = 200;
+int imaxnotes = 10000;		/* maximum limits of this program */
+int imaxbars = 2000;
 int resolution = 12;		/* default to 1/8 note resolution */
 int anymode = 0;		/* default to matching all bars */
 int ignore_simple = 0;		/* ignore simple bars */
@@ -295,12 +295,12 @@ make_note_representation (int *nnotes, int *nbars, int maxnotes, int maxbars,
 	default:
 	  break;
 	}
-      if (*nnotes > 2000)
+      if (*nnotes > imaxnotes)
 	{
 	  printf ("ran out of space for midipitch for xref %d\n",xrefno);
 	  exit (0);
 	}
-      if (*nbars > 599)
+      if (*nbars > imaxbars)
 	{
 	  printf ("ran out of space for barlineptr for xref %d\n",xrefno);
 	  exit (0);

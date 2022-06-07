@@ -4,7 +4,7 @@ midi2abc version 3.54 April 28 2022
 abc2midi version 4.73 May 20 2022
 abc2abc  version 2.17 May 20 2022
 yaps     version 1.89 May 20 2022
-abcmatch version 1.80 November 25 2021
+abcmatch version 1.81 June 07 2022
 midicopy version 1.38 May 06 2022
 
 24th January 2002
