@@ -52,6 +52,10 @@ struct fraction {
   int denom;
 };
 
+/* non-zero values for append in words_fn() */
+#define W_PLUS_FIELD 1
+#define PLUS_FIELD 2
+
 #ifndef KANDR
 extern int readnump(char **p);
 extern int readsnump(char **p);
@@ -117,7 +121,7 @@ extern void event_specific_in_header(char *package, char *s);
 extern void event_startinline(void);
 extern void event_closeinline(void);
 extern void event_field(char k, char *f);
-extern void event_words(char *p, int continuation);
+extern void event_words(char *p, int append, int continuation);
 extern void event_part(char *s);
 
 

@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.17 May 20 2022 abc2abc"
+#define VERSION "2.18 June 14 2022 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -1153,8 +1153,10 @@ char* p;
   freevstring(&syll);
 }
 
-void event_words(p, continuation)
+/* [JA] 2022.06.14 */
+void event_words(p, append, continuation)
 char* p;
+int append;
 int continuation;
 /* a w: field has been encountered */
 {
@@ -1163,13 +1165,21 @@ int continuation;
   if (xinbody && newbreaks) {
     parse_words(p);
   } else {
+    
     initvstring(&afield);
+    if (append == W_PLUS_FIELD) {
+      addtext("+ ", &afield);
+    }
     addtext(p, &afield);
     if (continuation) {
       addch(' ', &afield);
       addch('\\', &afield);
     };
-    event_field('w', afield.st);
+    if (append == PLUS_FIELD) {
+      event_field('+', afield.st);
+    } else {
+      event_field('w', afield.st);
+    }
   };
 }
 

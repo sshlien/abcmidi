@@ -289,7 +289,7 @@ char *featname[] = {
 "CHORDOFF", "CHORDOFFEX", "DRUMON", "DRUMOFF",
 "DRONEON", "DRONEOFF", "SLUR_TIE", "TNOTE",
 "LT", "GT", "DYNAMIC", "LINENUM",
-"MUSICLINE", "MUSICSTOP", "WORDLINE", "WORDSTOP",
+"MUSICLINE", "MUSICSTOP", "WORDLINE", "WORDSTOP", "WORDEXTEND",
 "INSTRUCTION", "NOBEAM", "CHORDNOTE", "CLEF",
 "PRINTLINE", "NEWPAGE", "LEFT_TEXT", "CENTRE_TEXT",
 "VSKIP", "COPYRIGHT", "COMPOSER", "ARPEGGIO",
@@ -812,7 +812,6 @@ int track;
      
   while ((j < notes) && (done > 0))
   {
-     j = j+1;
      if (feature[j] == TITLE) {
         if (track != 2)
            mf_write_meta_event(0L, sequence_name, atext[pitch[j]], strlen (atext[pitch[j]]));
@@ -830,7 +829,33 @@ int track;
         text_data(atitle);
         done--;
      }
+     j = j+1;
   }
+}
+
+/* [JA] 2022.06.14 */
+/* scan ahead to see if a WORDSTOP is cancelled by a subsequent WORDEXTEND */
+static int check_wordextend(int startplace)
+{
+  int place;
+  int result;
+  int this_feature;
+
+  place = startplace;
+  result = 0;
+  while ((result == 0) && (place < notes)  ) {
+    this_feature = feature[place];
+    if (this_feature == WORDEXTEND) {
+      return 1;
+    }
+    /* we should stop searching if we find any of these */
+    if ((this_feature == WORDLINE) || (this_feature == PART) ||
+        (this_feature == VOICE) || (this_feature == MUSICLINE)) {
+      return 0;
+    }
+    place = place + 1;
+  }
+  return 0;
 }
 
 static int findwline(startline)
@@ -875,14 +900,27 @@ int startline;
         };
         break;
       case WORDSTOP:
-        if (inwline) {
-          versecount = versecount + 1;
-        };
-        inwline = 0;
-        /* stop if we are part-way through a lyric set */
-        if  (extending) {
-          done = 1;
-        };
+        /* [JA] 2022-06-14 */
+        /* WORDSTOP marks the end of a w: field (i.e. no continuation).
+         * if it is followed by WORDEXTEND (indicating w: + or +:) then
+         * we over-ride it.
+         */
+        if (!check_wordextend(place)) {
+          if (inwline) {
+            versecount = versecount + 1;
+          };
+          inwline = 0;
+          /* stop if we are part-way through a lyric set */
+          if  (extending) {
+            done = 1;
+          };
+        }
+        break;
+      case WORDEXTEND:
+        /* don't need to do anything with WORDEXTEND here as we search
+         * foward for it when we find WORDSTOP
+         * [JA] 2022-06-14
+         */
         break;
       case PART:
         done = 1;

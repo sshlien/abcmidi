@@ -665,9 +665,11 @@ char *f;
   };
 }
 
-void event_words(p, continuation)
+/* [JA] 2022.06.14 */
+void event_words(p, append, continuation)
 /* handles a w: field in the abc */
 char* p;
+int append;
 int continuation;
 {
 }

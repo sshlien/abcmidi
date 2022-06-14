@@ -176,6 +176,7 @@ struct voice {
   float tuple_height;
   /* variables for assigning syllables to notes */
   struct feature* linestart;
+  struct feature* lyrics_end;
   struct feature* lineend;
   struct chord* thischord;
   struct feature* chordplace;

@@ -14779,3 +14779,61 @@ umlaut_get_buffer()
 umlaut_build_string()
 and parsename/parsesname were combined into one function.
 
+June 14 2022
+
+James Allwright has added support to the w:+ and +: lyric fields
+as defined in the 2.3 abc standard. The following examples tests
+the new feature.
+
+X:1
+T: Strange w: field example from abc 2.2 standard
+N: This example appears in section 3.3 of the standard, which says :
+N: The following is a legal continuation of the w: field, 
+N: although the usage not recommended
+M: 4/4
+L:1/4
+K:G
+abcd|efgz|
+%%vocalfont Times-Roman 14
+w:nor-mal
+% legal, but not recommended
+%%vocalfont Times-Italic *
++:i-ta-lic
+%%vocalfont Times-Roman *
++:nor-mal
+
+X:2
+T: Continuation Example
+M:4/4
+L:1/8
+K:G
+% legacy style continuation
+B3A | "G"G2D2 B,2D2 | G4 z2G2 | "D7"A2A2 A2A2 | A4 ||
+w: Oh, the Grand Old Duke of York, \
+w: he had ten thou-sand men.
+% + field style continuation
+B3A | "G"G2D2 B,2D2 | G4 z2G2 | "D7"A2A2 A2A2 | A4 || 
+w: Oh, the Grand Old Duke of York,
++: he had ten thou-sand men.
+% w: + style continuation
+B3A | "G"G2D2 B,2D2 | G4 z2G2 | "D7"A2A2 A2A2 | A4 z2 ||
+w: Oh, the Grand Old Duke of York,
+w: + he had ten thou-sand men.
+
+There are numerous small changes.
+In abc.h, added WORDEXTEND feature type.
+In parseabc.h defined W_PLUS_FIELD and PLUS_FIELD
+ and added a new integer parameter 'append' to the
+ function event_word
+In structs.h added lyrics_end
+In parseabc.c preparse_words() has been split into two
+ new functions preparse2_words() and preparse1_words()
+ new input parameter in the function event_words()
+In store.c, toabc.c, matchsup.c, and yapstree.c, modified
+ the function event_words.
+In genmidi.c introduced function check_wordextend()
+In drawtune.c added the case WORDEXTEND in functions sizevoice()
+ and printvoiceline().
+
+
+

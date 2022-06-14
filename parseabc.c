@@ -2130,17 +2130,24 @@ char key;
 char *s;
 {
 appendfield(s);
-} 
+}
 
-void
-preparse_words (s)
-     char *s;
-/* takes a line of lyrics (w: field) and strips off */
-/* any continuation character */
+/* [JA] 2022-06-14 */
+/* Second level of processing for a line of lyrics, takes either
+ * w: with any + at the start removed or +: .
+ * It then strips off any continuation character
+ * append is set to
+ *   PLUS_FIELD for +:
+ *   W_PLUS_FIELD for w: + <lyrics>
+ *   0 for regular w: <lyrics>
+ */
+void preparse2_words(char *field, int append)
 {
   int continuation;
   int l;
+  char *s;
 
+  s = field;
   /* printf("Parsing %s\n", s); */
   /* strip off any trailing spaces */
   l = strlen (s) - 1;
@@ -2156,7 +2163,6 @@ preparse_words (s)
   else
     {
       /* [SS] 2014-08-14 */
-      event_warning ("\\n continuation no longer supported in w: line");
       continuation = 1;
       /* remove continuation character */
       *(s + l) = '\0';
@@ -2167,7 +2173,28 @@ preparse_words (s)
 	  l = l - 1;
 	};
     };
-  event_words (s, continuation);
+  event_words (s, append, continuation);
+}
+
+/* first level of w: field processing
+ * takes a line of lyrics (w: field)  and handles
+ * any + after w:
+ */
+void preparse1_words (char *field)
+{
+  int append;
+  char *s;
+
+  /* look for '+' at the start of word field */
+  s = field;
+  append = 0;
+  skipspace(&s);
+  if (*s == '+') {
+    append = W_PLUS_FIELD;
+    s = s + 1;
+    skipspace(&s);
+  }
+  preparse2_words(s, append);
 }
 
 void
@@ -2506,7 +2533,11 @@ parsefield (key, field)
       };
       break;
     case 'w':
-      preparse_words (place);
+      preparse1_words (place);
+      break;
+    case '+':
+      /* implement +: field as meaning w: + <lyrics> */
+      preparse2_words(place, PLUS_FIELD);
       break;
     case 'd':
       /* decoration line in abcm2ps */
@@ -2515,10 +2546,6 @@ parsefield (key, field)
     case 's':
       event_field (key, place);	/* [SS] 2010-02-23 */
       break;
-    case '+':
-      if (lastfieldcmd == 'w') 
-          append_fieldcmd (key, place); /*[SS] 2014-08-15 */
-      break; /* [SS] 2014-09-07 */
     default:
       event_field (key, place);
     };
@@ -3413,7 +3440,7 @@ parseline (line)
 		  if (parsing)
 		    parsemusic (p);
 		}
-	      else if (inbody) preparse_words (p); /* [SS] 2017-10-23 */
+	      else if (inbody) preparse1_words (p); /* [SS] 2017-10-23 */
 	      else {
 		  if (parsing)
 		    event_text (p);

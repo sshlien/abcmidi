@@ -1636,6 +1636,8 @@ static void sizevoice(struct voice* v, struct tune* t)
       break;
     case WORDSTOP:
       break;
+    case WORDEXTEND:
+      break;
     case INSTRUCTION:
       break;
     case NOBEAM:
@@ -3368,6 +3370,8 @@ static int printvoiceline(struct voice* v)
     case WORDLINE: 
       break;
     case WORDSTOP: 
+      break;
+    case WORDEXTEND:
       break;
     case INSTRUCTION:
       break;

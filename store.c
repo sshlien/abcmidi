@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.73 May 20 2022 abc2midi" 
+#define VERSION "4.74 June 14 2022 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -2731,9 +2731,11 @@ char *f;
   };
 }
 
-void event_words(p, continuation)
+/* [JA] 2022.06.14 */
+void event_words(p, append, continuation)
 /* handles a w: field in the abc */
 char* p;
+int append;
 int continuation;
 {
 
@@ -2745,6 +2747,9 @@ int continuation;
   v->haswords = 1;
   wordvoice = v->indexno;
   words[wcount] = addstring(p);
+  if ((append == PLUS_FIELD) || (append == W_PLUS_FIELD)) {
+    addfeature(WORDEXTEND, 0, 0, 0);
+  };
   addfeature(WORDLINE, wcount, 0, 0);
   if (continuation == 0) {
     addfeature(WORDSTOP, 0, 0, 0);

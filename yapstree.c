@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.89 May 20 2022 yaps"
+#define VERSION "1.90 June 14 2022 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -852,6 +852,7 @@ static struct voice* newvoice(int n)
   v->instructions_pending = NULL;
   v->beamed_tuple_pending = 0;
   v->linestart = NULL;
+  v->lyrics_end = NULL;
   v->lineend = NULL;
   v->more_lyrics = 0;
   v->lyric_errors = 0;
@@ -1425,6 +1426,7 @@ void event_startmusicline()
 
   parser_voice = &voicecode[voicenum - 1];
   cv->linestart = addnumberfeature(MUSICLINE, 0);
+  cv->lyrics_end = NULL;
   if (cv->more_lyrics != 0) {
     event_error("Missing continuation w: field");
     cv->more_lyrics = 0;
@@ -1711,8 +1713,10 @@ struct feature* apply_syll(char* s, struct feature* wordplace, int* errors)
   return(ft);
 }
 
-void event_words(p, continuation)
+/* [JA] 2022.06.14 */
+void event_words(p, append, continuation)
 char* p;
+int append;
 int continuation;
 /* A line of lyrics (w: ) has been encountered in the abc */
 {
@@ -1728,7 +1732,11 @@ int continuation;
     };
     return;
   };
-  wordplace = cv->linestart;
+  if (append && (cv->lyrics_end != NULL)) {
+    wordplace = cv->lyrics_end;
+  } else {
+    wordplace = cv->linestart;
+  }
   if (cv->more_lyrics) {
     errors = cv->lyric_errors;
   } else {
@@ -1790,6 +1798,7 @@ int continuation;
       };
     }; 
   };
+  cv->lyrics_end = wordplace;
   if (continuation) {
     cv->more_lyrics = 1;
     cv->lyric_errors = errors;
@@ -1799,11 +1808,11 @@ int continuation;
     if (errors > 0) {
       event_error("Lyric line too long for music");
     } else {
-      clearvstring(&syll);
-      wordplace = apply_syll(syll.st, wordplace, &errors);
-      if (errors == 0) {
-        event_error("Lyric line too short for music");
-      };
+//      clearvstring(&syll);
+//      wordplace = apply_syll(syll.st, wordplace, &errors);
+//      if (errors == 0) {
+//        event_error("Lyric line too short for music");
+//      };
     };
   };
   freevstring(&syll);
