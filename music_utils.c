@@ -39,6 +39,7 @@ static const clef_item_t clef_conversion_table[] = {
   {"mezzosoprano", basic_clef_alto, 2, 0},
   {"tenor", basic_clef_alto, 4, 0},
   {"baritone", basic_clef_bass, 0, 0},
+  {"tab", tablature_not_implemented, 0, 0}, /* [SS] 2022.07.31 */
 };
 #define NUM_CLEFS (sizeof(clef_conversion_table)/sizeof(clef_item_t))
 

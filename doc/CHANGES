@@ -14835,5 +14835,16 @@ In genmidi.c introduced function check_wordextend()
 In drawtune.c added the case WORDEXTEND in functions sizevoice()
  and printvoiceline().
 
+July 31 2022
+
+The abcmidi package creates a new voice when it sees
+V: T clef=tab
+where tab indicates tablature. As a result abc2midi
+creates a separate track for this voice which can cause some
+problems.
+
+Fix: parseabc.c and music_utils.c was modified to ignore
+the clef=tab indication.
+
 
 

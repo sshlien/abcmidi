@@ -49,7 +49,8 @@ typedef enum basic_cleftype {
   basic_clef_undefined, /* for when we didn't find a clef */
   basic_clef_auto, /* drawing program has free choice of clef */
   basic_clef_perc, /* percussion */
-  basic_clef_none  /* from abc standard 2.2 what does this mean ? */
+  basic_clef_none,  /* from abc standard 2.2 what does this mean ? */
+  tablature_not_implemented  /* [SS] 2022.07.31 */
 } basic_cleftype_t;
 
 typedef struct new_cleftype {

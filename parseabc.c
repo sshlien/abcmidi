@@ -1643,6 +1643,9 @@ parsevoice (s)
     parsed =
       parseclef (&s, word, &vparams.gotclef, vparams.clefname,
                  &vparams.new_clef, &cgotoctave, &coctave);
+      /* printf("vparams.clefname =%s\n",vparams.clefname); */
+      /* do not create a tablature voice [SS] 2022.07.31 */
+      if (strcmp(vparams.clefname,"tab") == 0) return; 
       if (vparams.gotclef) {
         /* make clef an attribute of current voice */
         copy_clef (&voicecode[num - 1].clef, &vparams.new_clef);
