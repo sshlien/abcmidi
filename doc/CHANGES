@@ -14847,4 +14847,9 @@ Fix: parseabc.c and music_utils.c was modified to ignore
 the clef=tab indication.
 
 
+August 1 2022
+
+Fixed the abc parser so it does not report a malformed note
+when it encounters a dotted bar line .|  -- (in parsemusic() in parseabc.c).
+The dotted bar line is treated as a regular bar line.
 

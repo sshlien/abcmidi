@@ -2910,6 +2910,11 @@ parsemusic (field)
           p = p+1;
           }
 
+      if (*p == '.' && *(p+1) == '|') { /* [SS] 2022-08.01 dotted bar */
+         p = p +1;
+         /* ignore dotted bar */
+         }
+
       if (((*p >= 'a') && (*p <= 'g')) || ((*p >= 'A') && (*p <= 'G')) ||
 	  (strchr ("_^=", *p) != NULL) || (strchr (decorations, *p) != NULL))
 	{
