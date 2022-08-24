@@ -14853,3 +14853,7 @@ Fixed the abc parser so it does not report a malformed note
 when it encounters a dotted bar line .|  -- (in parsemusic() in parseabc.c).
 The dotted bar line is treated as a regular bar line.
 
+August 23 2022
+
+midi2abc -midistats introducing channel spread.
+

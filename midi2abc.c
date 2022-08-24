@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.54 April 28 2022 midi2abc"
+#define VERSION "3.56 August 24 2022 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -97,6 +97,7 @@ static FILE *outhandle; /* for producing the abc file */
 
 int tracknum=0;  /* track number */
 int division;    /* pulses per quarter note defined in MIDI header    */
+int quietLimit; /* minumum number of pulses with no activity */
 long tempo = 500000; /* the default tempo is 120 quarter notes/minute */
 int unitlen;     /* abc unit length usually defined in L: field       */
 int header_unitlen; /* first unitlen set                              */
@@ -265,6 +266,8 @@ struct trkstat {
   int program[17];
   int tempo[17];
   int npulses[17];
+  int lastNoteOff[17];
+  int quietTime[17];
   } trkdata;
 
 /* The trkstat references the individual channels in the midi file.
@@ -1141,6 +1144,7 @@ void stats_header (int format, int ntrks, int ldivision)
 {
   int i;
   division = ldivision;
+  quietLimit = ldivision*8;
   printf("ntrks %d\n",ntrks);
   printf("ppqn %d\n",ldivision);
   chordthreshold = ldivision/16; /* [SS] 2018-01-21 */
@@ -1152,6 +1156,7 @@ void stats_header (int format, int ntrks, int ldivision)
     trkdata.pitchbend[i] = 0;
     trkdata.cntlparam[i] = 0; /* [SS] 2022-03-04 */
     trkdata.pressure[i] = 0; /* [SS] 2022-03-04 */
+    trkdata.quietTime[i] = 0; /* [SS] 2022-08-22 */
     progcolor[i] = 0;
     channel2prog[i] = -1;
     channel2nnotes[i] = 0;
@@ -1193,6 +1198,7 @@ void stats_finish()
 int i; /* [SDG] 2020-06-03 */
 int npulses;
 int nprogs;
+double delta;
 
 npulses = trkdata.npulses[0]; 
 printf("npulses %d\n",trkdata.npulses[0]);
@@ -1247,6 +1253,14 @@ if (npulses > 0)
   for (i=1;i<17;i++) printf("%5.2f ",chnactivity[i]/(double) trkdata.npulses[0]);
 else 
   for (i=0;i<17;i++) printf("%5.2f ",(double) chnactivity[i]);
+printf("\nspread ");
+for (i=1;i<17;i++) {
+  delta = trkdata.npulses[0] - trkdata.quietTime[i];
+  if (trkdata.quietTime[i] < quietLimit) delta = trkdata.npulses[0];
+  delta = delta / (double) trkdata.npulses[0];
+  printf (" %5.3f ", delta);
+  }
+
 printf("\npitchentropy %f\n",histogram_entropy(pitchclass_activity,12));
 printf("\n");
 }
@@ -1363,12 +1377,22 @@ int chan, pitch, vol;
 void stats_noteon(chan,pitch,vol)
 int chan, pitch, vol;
 {
+ int delta;
  if (vol == 0) {
     /* treat as noteoff */
     stats_noteoff(chan,pitch,vol);
+    trkdata.lastNoteOff[chan+1] = Mf_currtime; /* [SS] 2022.08.22 */
     return;
     }
  trkdata.notemeanpitch[chan+1] += pitch;
+ if (trkdata.lastNoteOff[chan+1] >= 0) {
+	 delta = Mf_currtime - trkdata.lastNoteOff[chan+1];
+	 trkdata.lastNoteOff[chan+1] = -1; /* in case of chord */
+	 if (delta > quietLimit) {
+		 trkdata.quietTime[chan+1] += delta;
+	 }
+    }
+
  if (abs(Mf_currtime - last_on_tick[chan+1]) < chordthreshold) trkdata.chordcount[chan+1]++;
  else trkdata.notecount[chan+1]++; /* [SS] 2019-08-02 */
  last_tick[chan+1] = Mf_currtime;
@@ -1404,6 +1428,7 @@ void stats_noteoff(int chan,int pitch,int vol)
   if (last_tick[chan+1] == -1) return;
   length = Mf_currtime - last_tick[chan+1];
   trkdata.notelength[chan+1] += length;
+  trkdata.lastNoteOff[chan+1] = Mf_currtime; /* [SS] 2022.08.22 */
   chnactivity[chan+1] += length;
   if (chan == 9) return; /* drum channel */
   pitchclass_activity[pitch % 12] += length;
@@ -1412,6 +1437,12 @@ void stats_noteoff(int chan,int pitch,int vol)
   /* [SS] 2018-04-18 */
   if(Mf_currtime > last_tick[chan+1]) last_tick[chan+1] = Mf_currtime;
 }
+
+void stats_eot () {
+trkdata.lastNoteOff[0] = Mf_currtime; /* [SS] 2022.08.24 */
+}
+
+
 
 void mftxt_polypressure(chan,pitch,press)
 int chan, pitch, press;
@@ -1826,7 +1857,7 @@ void initfunc_for_stats()
     Mf_sysex = no_op2;
     Mf_metamisc = no_op3;
     Mf_seqnum = no_op1;
-    Mf_eot = no_op0;
+    Mf_eot = stats_eot;
     Mf_timesig = stats_timesig;
     Mf_smpte = no_op5;
     Mf_tempo = stats_tempo;
