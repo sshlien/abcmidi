@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.56 August 24 2022 midi2abc"
+#define VERSION "3.57 September 01 2022 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -1253,13 +1253,6 @@ if (npulses > 0)
   for (i=1;i<17;i++) printf("%5.2f ",chnactivity[i]/(double) trkdata.npulses[0]);
 else 
   for (i=0;i<17;i++) printf("%5.2f ",(double) chnactivity[i]);
-printf("\nspread ");
-for (i=1;i<17;i++) {
-  delta = trkdata.npulses[0] - trkdata.quietTime[i];
-  if (trkdata.quietTime[i] < quietLimit) delta = trkdata.npulses[0];
-  delta = delta / (double) trkdata.npulses[0];
-  printf (" %5.3f ", delta);
-  }
 
 printf("\npitchentropy %f\n",histogram_entropy(pitchclass_activity,12));
 printf("\n");
@@ -1327,6 +1320,8 @@ for (i=0;i<17;i++) {
    printf("%d %d ",trkdata.notecount[i],trkdata.chordcount[i]);
    printf("%d %d ",trkdata.notemeanpitch[i], trkdata.notelength[i]);
    printf("%d %d ",trkdata.cntlparam[i],trkdata.pressure[i]); /* [SS] 2022-03-04 */
+   printf("%d ",trkdata.quietTime[i]); /* [SS] 2022.09.01 */
+   trkdata.quietTime[i] = 0;
    printf("\n");
 
    channel2nnotes[i] += trkdata.notecount[i] + trkdata.chordcount[i];
