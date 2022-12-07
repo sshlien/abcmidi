@@ -612,8 +612,8 @@ echo 'BEGIN {' >"$tmp/subs1.awk" &&
 cat >>"$tmp/subs1.awk" <<\_ACAWK &&
 S["LTLIBOBJS"]=""
 S["LIBOBJS"]=""
-S["EGREP"]="/bin/grep -E"
-S["GREP"]="/bin/grep"
+S["EGREP"]="/usr/bin/grep -E"
+S["GREP"]="/usr/bin/grep"
 S["CPP"]="gcc -E"
 S["INSTALL_DATA"]="${INSTALL} -m 644"
 S["INSTALL_SCRIPT"]="${INSTALL}"

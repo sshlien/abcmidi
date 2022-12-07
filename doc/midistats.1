@@ -1,0 +1,82 @@
+.TH MIDISTATS 1 "3 December 2022"
+.SH NAME
+\fBmidistats\fP \- program to summarize the statistical properties of a midi file
+.SH SYNOPSIS
+midistats \fIinfile\fP
+
+.SH DESCRIPTION
+\fImidistats\fP analyzes the contents of a midi file and outputs key
+information and various statistical measures. Each line of output
+starts with the name of the variable or variable array and the
+associated values. The output is interpreted by the user interface
+midiexplorer.tcl. Both programs are still being improved. Here
+is an explanation of some of the output.
+.PP
+ntrks indicates the number of tracks in the midi file.
+.PP
+ppqn the number of midi pulses per quarter note.
+.PP
+keysig the key signature, followed by a major/minor flag,  the number
+of sharps (positive) or flats (negative) in the key, and the beat number
+where the key signature was found.
+.PP
+trk is followed by the track number for which the following information
+applies.
+.PP
+program is followed by the channel number and the General Midi Program
+number.
+.PP
+trkinfo is an array of 8 numbers which indicates the statistical properties
+of the track of interest. The following data is given:
+the channel number,
+the first program assigned to this channel,
+the number of notes for this channel counting any chords as one note,
+the total number of notes for this for this channel,
+the sum of the MIDI pitches for all the notes,
+the sum of the note durations in MIDI pulse units,
+the number of control parameter messages,
+and the number of pressure messages.
+
+.PP
+After processing all the individual tracks, the following information
+applies to the entire midi file.
+.PP
+rhythmPatterns indicates the number of distinct rhythm patterns for each
+channel. A large number likely implies that the melody line occurs in
+this channel, while a small number indicates that this channel probably
+is used for chordal support.
+.PP
+npulses is the length of the longest midi track in midi pulse units
+.PP
+tempocmds specifies the number of times the tempo is changed in this
+file.
+.PP
+pitchbends specifies the total number of pitchbends in this file.
+.PP
+progs is a list of all the midi programs addressed
+.PP
+progsact the amount of activity for each of the above midi programs.
+The activity is the sum of the note durations in midi pulse units.
+.PP
+progcolor: is a 17 dimensional vector where each component maps into
+a specific group of MIDI programs. Some of these groups are, keyboard
+instruments, brass instruments, wind instruments, and etc. More information
+can be found in the midiexplorer documentation.
+.PP
+drums is a list of all the percussion instruments (channel 9) that were
+used.
+.PP
+drumhits indicates the number of notes for each of the above percussion
+instruments.
+.PP
+pitches is a histogram for the 11 pitch classes (C, C#, D ...B)
+that occur in the midi file.
+.PP
+pitchact is a similar histogram but is weighted by the length of
+the notes.
+
+.SH AUTHOR
+Seymour Shlien <fy733@ncf.ca>
+
+
+

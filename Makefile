@@ -53,13 +53,13 @@ datadir = ${prefix}/share
 docdir = ${prefix}/share/doc/abcmidi
 mandir = ${prefix}/share/man/man1
 
-binaries=abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch
+binaries=abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch midistats
 
-all : abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch
+all : abc2midi midi2abc abc2abc mftext yaps midicopy abcmatch midistats
 
 OBJECTS_ABC2MIDI=parseabc.o store.o genmidi.o midifile.o queues.o parser2.o stresspat.o music_utils.o
 abc2midi : $(OBJECTS_ABC2MIDI)
-	$(CC) $(CFLAGS) -o abc2midi $(OBJECTS_ABC2MIDI) $(LDFLAGS) -lm
+	$(CC) $(CFLAGS) -o abc2midi $(OBJECTS_ABC2MIDI) $(LDFLAGS) 
 $(OBJECTS_ABC2MIDI): abc.h parseabc.h config.h Makefile
 
 OBJECTS_ABC2ABC=parseabc.o toabc.o music_utils.o
@@ -71,6 +71,11 @@ OBJECTS_MIDI2ABC=midifile.o midi2abc.o
 midi2abc : $(OBJECTS_MIDI2ABC)
 	$(CC) $(CFLAGS) -o midi2abc $(OBJECTS_MIDI2ABC) $(LDFLAGS)
 $(OBJECTS_MIDI2ABC): abc.h midifile.h config.h Makefile
+
+OBJECTS_MIDISTATS=midifile.o midistats.o
+midistats : $(OBJECTS_MIDISTATS)
+	$(CC) $(CFLAGS) -o midistats $(OBJECTS_MIDISTATS) $(LDFLAGS)
+$(OBJECTS_MIDISTATS): abc.h midifile.h config.h Makefile
 
 OBJECTS_MFTEXT=midifile.o mftext.o crack.o
 mftext : $(OBJECTS_MFTEXT)
@@ -114,6 +119,8 @@ midifile.o : midifile.c midifile.h
 
 midi2abc.o : midi2abc.c midifile.h
 
+midistats.o : midistats.c midifile.h
+
 midicopy.o : midicopy.c midicopy.h
 
 abcmatch.o: abcmatch.c abc.h
@@ -141,7 +148,7 @@ matchsup.o : matchsup.c abc.h parseabc.h parser2.h
 clean :
 	rm *.o ${binaries}
 
-install: abc2midi midi2abc abc2abc mftext midicopy yaps abcmatch
+install: abc2midi midi2abc abc2abc mftext midicopy yaps abcmatch midistats
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) -m 755 ${binaries} $(DESTDIR)$(bindir)
 
@@ -164,6 +171,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/abc2abc
 	rm -f $(DESTDIR)$(bindir)/yaps
 	rm -f $(DESTDIR)$(bindir)/midi2abc
+	rm -f $(DESTDIR)$(bindir)/midistats
 	rm -f $(DESTDIR)$(bindir)/mftext
 	rm -f $(DESTDIR)$(bindir)/abcmatch
 	rm -f $(DESTDIR)$(bindir)/midicopy

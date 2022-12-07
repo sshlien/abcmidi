@@ -14858,3 +14858,10 @@ August 23 2022, September 01 2022
 
 midi2abc -midistats introducing quietTime.
 
+December 5 2022
+
+Midi2abc has been getting too big and it is time to split it into
+separate applications.  Midistats is a new application that will replace
+the midi2abc -midistats option.
+
+
