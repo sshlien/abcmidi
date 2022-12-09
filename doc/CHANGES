@@ -14865,3 +14865,7 @@ separate applications.  Midistats is a new application that will replace
 the midi2abc -midistats option.
 
 
+December 9 2022
+
+Cleaning out -stats code in midi2abc.
+

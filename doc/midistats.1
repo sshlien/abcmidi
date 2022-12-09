@@ -1,4 +1,4 @@
-.TH MIDISTATS 1 "3 December 2022"
+.TH MIDISTATS 1 "9 December 2022"
 .SH NAME
 \fBmidistats\fP \- program to summarize the statistical properties of a midi file
 .SH SYNOPSIS
@@ -35,16 +35,11 @@ the total number of notes for this for this channel,
 the sum of the MIDI pitches for all the notes,
 the sum of the note durations in MIDI pulse units,
 the number of control parameter messages,
-and the number of pressure messages.
-
+the number of pressure messages.
+and the number of distinct rhythm patterns for each channel
 .PP
 After processing all the individual tracks, the following information
 applies to the entire midi file.
-.PP
-rhythmPatterns indicates the number of distinct rhythm patterns for each
-channel. A large number likely implies that the melody line occurs in
-this channel, while a small number indicates that this channel probably
-is used for chordal support.
 .PP
 npulses is the length of the longest midi track in midi pulse units
 .PP
@@ -74,7 +69,17 @@ that occur in the midi file.
 .PP
 pitchact is a similar histogram but is weighted by the length of
 the notes.
-
+.PP
+quietTime is used to compute the track/channel spread in midiexplorer.
+It is computed by summing up all the midi pulses which occur
+in gaps greater than 8 beats.
+.PP
+totalrhythmpatterns is the total number of bar rhythm patterns for
+all channels except the percussion channel.
+.PP
+collisions. Midistats counts the bar rhythm patterns using a hashing
+function. Presently collisions are ignored so occasionally two
+distinct rhythm patterns are counted as one.
 .SH AUTHOR
 Seymour Shlien <fy733@ncf.ca>
 

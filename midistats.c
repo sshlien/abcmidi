@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.56 December 07 2022 midistats"
+#define VERSION "0.58 December 08 2022 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -166,28 +166,34 @@ struct barPattern {
 } barChn[17];
 
 
-#define HashSize 255 
+#define HashSize 257 
 struct hashStruct {
 	int pattern[HashSize];
 	int count[HashSize];
 } hasher[17] = {0};
 
 int ncollisions = 0;
+int nrpatterns = 0;
+
+void handle_collision () {
+ncollisions++;
+}
 
 void put_pattern (int chan, int pattern) {
 int hashindex;
 hashindex = pattern % HashSize;
 if (hasher[chan].pattern[hashindex] == 0) {
 	hasher[chan].pattern[hashindex] = pattern;
+	nrpatterns++;
 	/*printf ("hasher[%d].pattern[%d] = %d\n",chan,hashindex,pattern);*/
-  } else {
-  if (hasher[chan].pattern[hashindex] != pattern) {
+  } else if (hasher[chan].pattern[hashindex] != pattern) {
 	 /* printf("collision\n"); */
-	  ncollisions++;
-          }
+	  handle_collision ();
+  } else {
+  hasher[chan].count[hashindex]++;
   }
-hasher[chan].count[hashindex]++;
 }
+
 
 int count_patterns_for (int chan) {
 int i;
@@ -204,14 +210,12 @@ return sum;
 
 void output_hasher_results () {
 int i;
-printf("rhythmPatterns ");
-for (i = 0; i<16; i++) {
+/* printf("rhythmPatterns ");*/
+for (i = 0; i<17; i++) {
 	trkdata.rhythmpatterns[i] = count_patterns_for(i);
-	printf("%d ",count_patterns_for (i));
+/*	printf("%d ",count_patterns_for (i)); */
        }
 printf("\n");
-printf("collisions %d\n",ncollisions);
-ncollisions = 0;
 }
 
 
@@ -493,6 +497,8 @@ for (i=1;i<17;i++) {
   }
 
 printf("\npitchentropy %f\n",histogram_entropy(pitchclass_activity,12));
+printf("totalrhythmpatterns =%d\n",nrpatterns);
+printf("collisions = %d\n",ncollisions);
 printf("\n");
 }
 
