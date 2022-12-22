@@ -14869,3 +14869,60 @@ December 9 2022
 
 Cleaning out -stats code in midi2abc.
 
+
+December 21 2022
+
+abc2midi:
+Wnen <note1> equals <note2> in the instrument=<note1>/<note2>  directive,
+note2 should be treated as c (midi pitch 72).  Fix: parsesound in
+parseabc.c was modified to return a midi pitch of 72 when the two
+notes are equal.
+
+test file:
+
+X:1
+T: transpose
+M: 4/4
+L: 1/4
+K: C instrument=F/F
+FGAB|cdef|
+
+produces a midi file which looks like
+
+X: 1
+T: from h1.mid
+M: 4/4
+L: 1/8
+Q:1/4=120
+K:C % 0 sharps
+V:1
+c2 d2 e2 ^f2| \
+g2 a2 b2 c'2|
+
+when it was translated back to abc using midi2abc.
+
+Note that this change also applies to sound= and shift= even though
+this may not be specified in the standard
+http://abcnotation.com/wiki/abc:standard:v2.2#transposing_instrument_examples
+
+
+December 22 2022
+
+abcmidi: segementation fault. The following file produced a
+segmentation fault.
+
+X:1
+T: transpose
+M: 4/4
+L: 1/4
+K: C instrument=F 
+FGAB|cdef|
+
+Analysis: there is an invisible space following F in the
+line K: C instrument=F . As a result the function note2midi
+called pitch2midi with an invalid note (a space). The line
+p = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+returned a bad index into the scale array.
+
+Fix: tested that p is in the range 0 to 7.
+

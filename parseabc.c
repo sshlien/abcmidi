@@ -1050,17 +1050,16 @@ parsesound (s, word, gottranspose, transpose)
       *s = *s + 1;
       skipspace (s);
       p1 = note2midi (s);
-      /* printf("midi note = %d\n",p1); */
+      /*printf("p1 midi note = %d\n",p1);*/ 
       p2 = note2midi (s);
+      /*printf("p2 midi note = %d\n",p2);*/ 
+
       if (p2 == p1) {
-          *gottranspose = 0;
-          *transpose = 0;
-          } else {
-          /* printf("midi note = %d\n",p2); */
-          *transpose = p2 - p1; /* [SS] 2022.02.18 2022.04.27 */
-          /* printf("transpose = %d\n",*transpose); */
-          *gottranspose = 1;
-          }
+          p2 = 72;  /* [SS] 2022.12.21 */
+          } 
+      *transpose = p2 - p1; /* [SS] 2022.02.18 2022.04.27 */
+       /* printf("transpose = %d\n",*transpose); */
+       *gottranspose = 1;
      }
   return 1;
   }
@@ -2736,6 +2735,10 @@ int mult, octave;
   noteno = (int)note - 'a';
  
   p = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+  if (p < 0 || p > 6) {    /* [SS] 2022-12-22 */
+	  printf("illegal note %c\n",note);
+	  return 72;
+  }
   p = scale[p];
   if (acc == '^') p = p + mul;
   if (acc == '_') p = p - mul;
@@ -2757,8 +2760,9 @@ char msg[80];
 int octave;
 int mult;
 int pitch;
-/*printf("note2midi: %c\n",**s); */
+/*printf("note2midi: %c\n",**s);*/
 if (**s == '\0') return 72;
+note = **s;
 mult = 1;
 accidental = ' ';
 switch (**s)
