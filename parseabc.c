@@ -82,7 +82,7 @@ extern char *malloc ();
 extern char *strchr ();
 #endif
 
-int note2midi (char** s); 
+int note2midi (char** s, char* word); /*[SS] 2022-12-27 added word */
 int lineno;
 int parsing_started = 0;
 int parsing, slur;
@@ -1049,16 +1049,19 @@ parsesound (s, word, gottranspose, transpose)
      } else {
       *s = *s + 1;
       skipspace (s);
-      p1 = note2midi (s);
+      p1 = note2midi (s,word);
       /*printf("p1 midi note = %d\n",p1);*/ 
-      p2 = note2midi (s);
+      p2 = note2midi (s,word);
       /*printf("p2 midi note = %d\n",p2);*/ 
 
       if (p2 == p1) {
           p2 = 72;  /* [SS] 2022.12.21 */
           } 
-      *transpose = p2 - p1; /* [SS] 2022.02.18 2022.04.27 */
-       /* printf("transpose = %d\n",*transpose); */
+      if (casecmp(word,"instrument") == 0) { /*2022.12.27 */
+          *transpose = p1 - p2; /* [SS] 2022.02.18 2022.04.27 */
+       } else {
+          *transpose = p2 - p1; /* [SS] 2022.02.18 2022.04.27 */
+       }
        *gottranspose = 1;
      }
   return 1;
@@ -2617,6 +2620,7 @@ print_inputline ()
 static void check_bar_repeats (int bar_type, char *replist)
 {
   voice_context_t *cv = &voicecode[voicenum];
+  char error_message[140];
 
   switch (bar_type) {
     case SINGLE_BAR:
@@ -2636,7 +2640,6 @@ static void check_bar_repeats (int bar_type, char *replist)
       break;
     case REP_BAR:
       if (!cv->expect_repeat) {
-        char error_message[80];
 
         if (cv->repeat_count == 0)
         {
@@ -2750,7 +2753,7 @@ return p;
 
 /* [SS] 2021-10-11   */
 int
-note2midi (char** s)
+note2midi (char** s, char *word)
 {
 /* for implementing sound=, shift= and instrument= key signature options */
 
@@ -2817,6 +2820,10 @@ switch (**s)
              /* skip / which occurs in instrument = command */
               *s = *s + 1;
 /*  printf("note = %c  accidental = %c mult = %d octave= %d \n",note,accidental,mult,octave); */
+	      if (casecmp(word,"instrument") != 0) { /* [SS] 2022-12-27 */
+                 event_warning("score and shift directives do not expect an embedded '/'");
+	          }
+
               pitch = pitch2midi(note, accidental, mult, octave);
               return pitch;
               }

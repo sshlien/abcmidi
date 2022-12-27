@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.77 December 21 2022 abc2midi" 
+#define VERSION "4.78 December 27 2022 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -3450,7 +3450,7 @@ static void brokenadjust()
     };
   };
   if (failed) {
-    event_error("Cannot apply broken rhythm");
+    event_error("Cannot apply broken rhythm. Notes not equal durations");
   } else {
 /*
     printf("Adjusting %d to %d and %d to %d\n",

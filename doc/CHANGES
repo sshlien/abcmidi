@@ -14926,3 +14926,31 @@ returned a bad index into the scale array.
 
 Fix: tested that p is in the range 0 to 7.
 
+
+December 27 2022
+
+abcmidi: The instrument=<note1>/<note2> is defined as a shorthand
+for score=<note1><note2> sound=c<note2>. For instrument=,<note1>
+indicates the key of the instrument and  <note2> is either c or C.
+The sound= directive specifies the note and how it is played.
+For example, sound=c_B indicates that the note c is played as
+_B on the instrument. Every note is transposed down by two semitones.
+The problem is that, the notes in the instrument directive are
+in the opposite order of the sound= and score= directives.
+The function parsesound() in parseabc.c treats takes care of
+the directives sound =, shift = and instrument =.
+Unfortunately, all these directives are treated in the same
+manner causing the instrument= directive to transpose
+in the wrong direction.
+
+Fix: for the special case, instrument=, transpose is set to
+p1 - p2 instead of p2 - p1.
+
+The '/' is only part of the instrument= syntax. Note2midi has
+an extra parameter, word, indicating the type of directive.
+It will issue a warning if it detects a '/' in the sound= or
+shift= directives.
+
+
+
+
