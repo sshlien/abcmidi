@@ -14951,6 +14951,28 @@ an extra parameter, word, indicating the type of directive.
 It will issue a warning if it detects a '/' in the sound= or
 shift= directives.
 
+December 30 2022
 
+abcmidi: The instrument=*/c is a special directive that suppresses
+a transpose.  For example:
+
+X:2
+T: transpose using instrument=_B/c
+T: clarinet coded in concert pitch, displayed in Bb (as in player part)
+M: 4/4
+L: 1/4
+K: C 
+V:1 nm="Flute"
+CDEF|GABc|cBAG|FEDC|
+V:2 instrument=_B/c  nm="Clarinet\nin Bb"
+CDEF|GABc|cBAG|FEDC|
+
+The notes in V:2 are displayed up using score=_Bc, but they are still
+played as written (sound=cc does nothing).
+Fix: the code in the block 
+if (casecmp(word,"instrument") == 0 {
+...
+}
+in parsesound() (parseabc.c) was rewritten.
 
 

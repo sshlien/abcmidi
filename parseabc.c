@@ -1022,8 +1022,7 @@ parsetranspose (s, word, gottranspose, transpose)
 };
 
 /* [SS] 2021-10-11 */
-int
-parsesound (s, word, gottranspose, transpose)
+int parsesound (s, word, gottranspose, transpose)
 /* parses string sound = 
                  shift =
                  instrument = note1note2 or note1/note2
@@ -1054,15 +1053,25 @@ parsesound (s, word, gottranspose, transpose)
       p2 = note2midi (s,word);
       /*printf("p2 midi note = %d\n",p2);*/ 
 
-      if (p2 == p1) {
-          p2 = 72;  /* [SS] 2022.12.21 */
+      if (p2 == p1 || p2 == 0) {
+          *transpose = 72 - p1;  /* [SS] 2022.12.30 */
           } 
       if (casecmp(word,"instrument") == 0) { /*2022.12.27 */
           *transpose = p1 - p2; /* [SS] 2022.02.18 2022.04.27 */
+	  if (p2 == 0) { /* <note2> is missing */
+            *transpose = p1 - 72;
+	     }
+          if (p2 == p1 || p2 == 0) {
+            *transpose = p1 - 72;  /* [SS] 2022.12.30 */
+          } 
+	   if (p2 == 72 && fileprogram == ABC2MIDI) {
+            *transpose = 0;
+	     }  /* [SS] 2022.12.30 */
        } else {
           *transpose = p2 - p1; /* [SS] 2022.02.18 2022.04.27 */
        }
        *gottranspose = 1;
+       /*printf("p1 = %d p2 = %d transpose = %d\n",p1,p2,*transpose);*/
      }
   return 1;
   }
@@ -2752,8 +2761,7 @@ return p;
 
 
 /* [SS] 2021-10-11   */
-int
-note2midi (char** s, char *word)
+int note2midi (char** s, char *word)
 {
 /* for implementing sound=, shift= and instrument= key signature options */
 
@@ -2865,7 +2873,7 @@ switch (**s)
   } 
   if (note == ' ')
     {
-      event_error ("Malformed note : expecting a-g or A-G");
+      return 0;
     }
   pitch = pitch2midi(note, accidental, mult, octave);
   return pitch;
