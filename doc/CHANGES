@@ -14976,3 +14976,22 @@ if (casecmp(word,"instrument") == 0 {
 in parsesound() (parseabc.c) was rewritten.
 
 
+January 05 2023
+
+abc2midi: instrument =F/D transposes cdec up by 3 semitones instead of
+down by 10 semitones in the following example.
+
+X:5
+T: wrong octave
+M: 4/4
+K:C
+V:1 instrument=F/D
+cdec z4
+V:2
+z4 c4
+
+Fix: Hudson Lacerda supplied me with pseudo-code (doc/hudsonshift.txt)
+which describes how all the transpose directives should work.
+This code was implemented in parseSoundScore() which now replaces
+parseSound(). It also fixes yaps.
+

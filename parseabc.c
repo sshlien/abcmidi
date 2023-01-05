@@ -942,7 +942,7 @@ int interpret_voice_label (char *s, int num, int *is_new)
 }
 
 /* The following four functions parseclefs, parsetranspose,
- * parsesound, parseoctave are used to parse the K: field which not
+ * parseSoundScore, parseoctave are used to parse the K: field which not
  * only specifies the key signature but also other descriptors
  * used for producing a midi file or postscript file.
  *
@@ -1021,6 +1021,97 @@ parsetranspose (s, word, gottranspose, transpose)
   return 1;
 };
 
+int parseSoundScore (char **s,
+		     char *word,
+		     int *gottranspose,
+		     int *transpose)
+/* parses sound, score, instrument, and shift
+ * according to Hudson Lacerda's pseudo code file
+ * doc/hudsonshift.txt.
+ */
+{
+int p1,p2;
+int transp_sound;
+int transp_score;
+
+transp_sound = 0;
+transp_score = 0;
+
+if (casecmp(word,"sound") != 0
+ && casecmp(word,"shift") != 0
+ && casecmp(word,"instrument") != 0
+ && casecmp(word,"score") != 0
+  )
+  return 0;
+
+skipspace (s);
+if (**s != '=')
+    {
+      event_error ("expecting  '=' after sound, score, instrument or shift");
+     return 0;
+     } else {
+      *s = *s + 1;
+      skipspace (s);
+      p1 = note2midi (s,word);
+      p2 = note2midi (s,word);
+      if (p1 == 0) {
+	      event_error ("<note1> missing. cannot do anything");
+              }
+      /* p2 = 0 implies that <note2> is not given */
+
+     if (casecmp(word,"sound") == 0) {
+         if (p2 == 0) event_error("sound = requires <note2>");
+	 transp_sound = p2-p1;
+	 /*
+          sound=<note1><note2> transposes the playback according to the
+          specified interval (the typeset score is not affected)
+         */
+	 }
+
+      if (casecmp(word,"score") == 0) {
+         if (p2 == 0) p2 = 72;
+         transp_score = p2 - p1;
+	 /*
+          score=<note1><note2> transposes the typeset score according to the
+          specified interval (the playback is not affected); if the second note
+          is omitted it is assumed to be a c (see writing abc code for
+          transposing instruments)
+         */
+	 }
+
+      if (casecmp(word,"instrument") == 0) {
+         if (p2 == 0) p2 = p1;
+         transp_score = p2 - p1;
+	 transp_sound = p2 - 72;
+
+	 /*
+          instrument=<note1>/<note2> is defined as
+	  score=<note1><note2> sound=c<note2>
+         */
+      }
+
+      if (casecmp(word,"shift") == 0) {
+         if (p2 == 0) event_error("shift = requires <note2>");
+         transp_score = p2 - p1;
+	 transp_sound = p2 - p1;
+	 /*
+         shift=<note1><note2> transposes the typeset score and the playback
+         according to the specified interval
+         */
+         }
+
+      *gottranspose = 1;
+
+      if (fileprogram == ABC2MIDI) *transpose = transp_sound;
+      if (fileprogram == YAPS) *transpose = transp_score;
+      return(1);
+     }
+}
+
+
+
+
+/* parsesound has been replaced with parseSoundScore */
 /* [SS] 2021-10-11 */
 int parsesound (s, word, gottranspose, transpose)
 /* parses string sound = 
@@ -1049,9 +1140,9 @@ int parsesound (s, word, gottranspose, transpose)
       *s = *s + 1;
       skipspace (s);
       p1 = note2midi (s,word);
-      /*printf("p1 midi note = %d\n",p1);*/ 
+      printf("p1 midi note = %d\n",p1); 
       p2 = note2midi (s,word);
-      /*printf("p2 midi note = %d\n",p2);*/ 
+      printf("p2 midi note = %d\n",p2); 
 
       if (p2 == p1 || p2 == 0) {
           *transpose = 72 - p1;  /* [SS] 2022.12.30 */
@@ -1071,7 +1162,7 @@ int parsesound (s, word, gottranspose, transpose)
           *transpose = p2 - p1; /* [SS] 2022.02.18 2022.04.27 */
        }
        *gottranspose = 1;
-       /*printf("p1 = %d p2 = %d transpose = %d\n",p1,p2,*transpose);*/
+       printf("p1 = %d p2 = %d transpose = %d\n",p1,p2,*transpose);
      }
   return 1;
   }
@@ -1421,7 +1512,7 @@ parsekey (str)
 	parsed = parseoctave (&s, word, &gotoctave, &octave);
 
       if (!parsed)
-        parsed = parsesound (&s, word, &gottranspose, &transpose);
+        parsed = parseSoundScore (&s, word, &gottranspose, &transpose);
 
       if ((parsed == 0) && (casecmp (word, "Hp") == 0))
 	{
@@ -1668,7 +1759,7 @@ parsevoice (s)
       if (!parsed)
         parsed = parseoctave (&s, word, &vparams.gotoctave, &vparams.octave);
       if (!parsed)
-        parsed = parsesound (&s, word, &vparams.gottranspose, &vparams.transpose);
+        parsed = parseSoundScore (&s, word, &vparams.gottranspose, &vparams.transpose);
       /* Code changed JA 20 May 2022 */
       if ((!parsed) && (strcasecmp (word, "name") == 0)) {
         parsed =

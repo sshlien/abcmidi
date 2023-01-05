@@ -1,0 +1,57 @@
+init:
+  transp_sound =  transp_score = 0;
+
+ABC2MIDI: use transp_sound;
+YAPS: use transp_score;
+ABC2ABC: ignore and replicate instructions to output;
+
+
+/******************************************/
+
+if (p1==0) error();
+
+
+  sound:
+    if (p2==0)
+      error();
+    transp_sound = p2-p1;
+/*
+ sound=<note1><note2> transposes the playback according to the
+ specified interval (the typeset score is not affected)
+*/
+
+
+  score:
+    if (p2==0)
+      p2 = ( 72 );
+    transp_score = p2-p1;
+/*
+ score=<note1><note2> transposes the typeset score according to the
+ specified interval (the playback is not affected); if the second note
+ is omitted it is assumed to be a c (see writing abc code for
+ transposing instruments)
+*/
+
+
+  instrument:
+    if (p2==0)
+      p2 = p1;
+    transp_score = p2-p1;
+    transp_sound = p2-( 72 );
+/*
+ instrument=<note1>/<note2> is defined as score=<note1><note2> sound=c<note2>
+*/
+
+
+  shift:
+    if (p2==0)
+      error();
+    transp_score = transp_sound = p2-p1;
+/*
+ shift=<note1><note2> transposes the typeset score and the playback
+ according to the specified interval
+*/
+
+
+/******************************************/
+
