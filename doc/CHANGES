@@ -14995,3 +14995,31 @@ which describes how all the transpose directives should work.
 This code was implemented in parseSoundScore() which now replaces
 parseSound(). It also fixes yaps.
 
+
+January 06 2023
+
+abcmidi ignores sound=cD in the following example.
+
+X:2
+T: sound + score
+M: 4/4
+K:C
+V:1 sound=cD score=FD
+cdec z4
+V:2
+z4 c4
+
+Analysis: *transpose is set to -10 by parseSoundScore when it
+processes sound=CD but when parseSoundScore is called again
+with score=FD it sets *transpose to 0, the initialized value
+of transp_sound. The last value of *transpose is used by
+event_voice.
+
+Fix: if parseSoundScore is called by the abc2midi executable,
+then *transpose is not set to transp_sound when the score=
+directive is processed. There is a similar issue when
+parseSoundScore is called by yaps. We do not want to set
+*transpose to transp_score when the sound= is processed.
+
+
+

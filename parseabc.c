@@ -1102,8 +1102,14 @@ if (**s != '=')
 
       *gottranspose = 1;
 
-      if (fileprogram == ABC2MIDI) *transpose = transp_sound;
-      if (fileprogram == YAPS) *transpose = transp_score;
+      if (fileprogram == ABC2MIDI) {
+	      /* [SS] 2023.01.06 */
+	      if (casecmp(word,"score") != 0) *transpose = transp_sound;
+              }
+      if (fileprogram == YAPS) {
+	      /* [SS] 2023.01.06 */
+	      if (casecmp(word,"sound") != 0) *transpose = transp_score;
+              }
       return(1);
      }
 }
