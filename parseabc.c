@@ -1024,7 +1024,8 @@ parsetranspose (s, word, gottranspose, transpose)
 int parseSoundScore (char **s,
 		     char *word,
 		     int *gottranspose,
-		     int *transpose)
+		     int *transpose
+		     )
 /* parses sound, score, instrument, and shift
  * according to Hudson Lacerda's pseudo code file
  * doc/hudsonshift.txt.
@@ -1040,9 +1041,11 @@ transp_score = 0;
 if (casecmp(word,"sound") != 0
  && casecmp(word,"shift") != 0
  && casecmp(word,"instrument") != 0
- && casecmp(word,"score") != 0
-  )
-  return 0;
+ && casecmp(word,"score") != 0) return 0;
+
+if ( fileprogram == ABC2ABC) {
+	return 0;
+  }
 
 skipspace (s);
 if (**s != '=')
@@ -1117,61 +1120,6 @@ if (**s != '=')
 
 
 
-/* parsesound has been replaced with parseSoundScore */
-/* [SS] 2021-10-11 */
-int parsesound (s, word, gottranspose, transpose)
-/* parses string sound = 
-                 shift =
-                 instrument = note1note2 or note1/note2
-  for parsekey() or parsevoice()
-  and returns the transpose value
-*/
-     char **s;
-     char *word;
-     int *gottranspose;
-     int *transpose;
-  {   
-  int p1,p2;
-  if (casecmp(word,"sound") != 0
-     && casecmp(word,"shift") != 0
-     && casecmp(word,"instrument") != 0
-     )
-    return 0;
-  skipspace (s);
-  if (**s != '=')
-    {
-      event_error ("sound must be followed by '='");
-     return 0;
-     } else {
-      *s = *s + 1;
-      skipspace (s);
-      p1 = note2midi (s,word);
-      printf("p1 midi note = %d\n",p1); 
-      p2 = note2midi (s,word);
-      printf("p2 midi note = %d\n",p2); 
-
-      if (p2 == p1 || p2 == 0) {
-          *transpose = 72 - p1;  /* [SS] 2022.12.30 */
-          } 
-      if (casecmp(word,"instrument") == 0) { /*2022.12.27 */
-          *transpose = p1 - p2; /* [SS] 2022.02.18 2022.04.27 */
-	  if (p2 == 0) { /* <note2> is missing */
-            *transpose = p1 - 72;
-	     }
-          if (p2 == p1 || p2 == 0) {
-            *transpose = p1 - 72;  /* [SS] 2022.12.30 */
-          } 
-	   if (p2 == 72 && fileprogram == ABC2MIDI) {
-            *transpose = 0;
-	     }  /* [SS] 2022.12.30 */
-       } else {
-          *transpose = p2 - p1; /* [SS] 2022.02.18 2022.04.27 */
-       }
-       *gottranspose = 1;
-       printf("p1 = %d p2 = %d transpose = %d\n",p1,p2,*transpose);
-     }
-  return 1;
-  }
 
 int
 parseoctave (s, word, gotoctave, octave)

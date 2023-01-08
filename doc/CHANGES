@@ -15021,5 +15021,15 @@ directive is processed. There is a similar issue when
 parseSoundScore is called by yaps. We do not want to set
 *transpose to transp_score when the sound= is processed.
 
+January 08 2023
+
+abc2abc should replicate the score=, shift=, sound=, and instrument=
+directives but otherwise ignore them.
+
+Fix:  parseSoundScore() in parseabc.c does nothing if it is
+called from abc2abc and return 0. The function parseother(),
+which is called from parsevoice() or parsekey(), will output
+all other directives in the K: or V: command.
+
 
 
