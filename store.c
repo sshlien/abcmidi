@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.82 January 06 2023 abc2midi" 
+#define VERSION "4.83 January 10 2023 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -4694,6 +4694,13 @@ if (nofnop == 0) {
     done = 1;
   };
 
+/* [SS] 2023-01-10 */
+  if (strcmp(p, "ped(") == 0) {
+    addfeature(PEDAL_ON, 0, 0, 0);
+    done = 1;
+  };
+
+
 /* [SS] 2011-10-19  [SS] 2018-05-02*/
   if (strcmp(p, "ped-end") == 0) {
     addfeature(PEDAL_OFF, 0, 0, 0);
@@ -4706,6 +4713,12 @@ if (nofnop == 0) {
 
 /* [SS] 2018-05-02 */
   if (strcmp(p, "ped-up") == 0) {
+    addfeature(PEDAL_OFF, 0, 0, 0);
+    done = 1;
+  };
+
+/* [SS] 2023-01-10 */
+  if (strcmp(p, "ped)") == 0) {
     addfeature(PEDAL_OFF, 0, 0, 0);
     done = 1;
   };

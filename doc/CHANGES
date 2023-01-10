@@ -15031,5 +15031,9 @@ called from abc2abc and return 0. The function parseother(),
 which is called from parsevoice() or parsekey(), will output
 all other directives in the K: or V: command.
 
+January 10 2023
+
+abcmidi: in event_handle_instruction(s), added code to recognize
+!ped(! and !ped)! in addition to !ped! and !ped-up!
 
 
