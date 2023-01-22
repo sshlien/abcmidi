@@ -15037,3 +15037,35 @@ abcmidi: in event_handle_instruction(s), added code to recognize
 !ped(! and !ped)! in addition to !ped! and !ped-up!
 
 
+January 20 2023
+
+abc2midi: as remarked around June 04-06 2005, split bars and
+parts were never fully working. For example,
+
+%%quiet
+X:1
+T: split-part
+M:5/4
+L:1/8
+Q:1/4=132
+P:A6
+K:none
+%%MIDI channel 10
+P:A
+CDCDC CDCDC & [I:MIDI channel 10] z2E3 E5 |
+
+does not convert correctly to a midi file.
+
+Fix: the code in partbreak() seems to have been at fault.
+The program returns the wrong position of the voice in the
+feature array, causing the wrong notes to be sent to the
+active midi track. Permanently eliminating the function
+fillvoice and always calling findvoice, fixed one of the
+problems. The second fix was to replace findpart() with
+findvoice() when the PART feature is encountered. Findvoice()
+automatically calls findpart(). The external integer array,
+dependent_voice(), is no longer used and is also eliminated.
+(See this file December 12 2006.) These changes also appear
+to fix the bug addressed at the same date.
+
+

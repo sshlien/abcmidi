@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.83 January 10 2023 abc2midi" 
+#define VERSION "4.84 January 20 2023 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -377,7 +377,6 @@ struct trackstruct trackdescriptor[40]; /* trackstruct defined in genmidi.h*/
  
 
 int detune_list[12]; /* [SS] 2020-06-30 */
-int dependent_voice[64]; /* flag to indicate type of voice */
 int voicecount;
 int numsplits=0;
 int splitdepth = 0;
@@ -1449,7 +1448,6 @@ if (v->fromsplitno == -1) {
   v->octaveshift = octaveshift;
   v->default_length = default_length; /* [SS] 2010-08-28 */
  }
-dependent_voice[v->indexno] = 1;
 /* when syncing the split voice we want to be sure that
    we do not include the notes in the last bar in the source
    voice the notes in the split voice take their place.
@@ -2977,7 +2975,6 @@ struct voice_params *vp;
     v = getvoicecontext(n); 
     addfeature(VOICE, v->indexno, 0, 0); 
     
-    dependent_voice[v->indexno] = 0;
     if (vp->gotclef)
     {
       event_octave(vp->new_clef.octave_offset, 1);
@@ -6376,7 +6373,6 @@ char *argv[];
   oldchordconvention = 0; /* for handling +..+ chords */
 
   for (i=0;i<DECSIZE;i++) decorators_passback[i]=0;
-  for (i=0;i<64;i++) dependent_voice[i]=0;
   set_control_defaults();
 
   event_init(argc, argv, &filename);

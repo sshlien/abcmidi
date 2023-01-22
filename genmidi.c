@@ -112,7 +112,6 @@ int partrepno;
 int err_num, err_denom;
 
 extern int voicesused;
-extern int dependent_voice[];
 
 /* Tempo handling (Q: field) */
 extern long tempo;
@@ -623,56 +622,6 @@ static int findchannel()
 }
 
 
-
-
-
-static void fillvoice(partno, xtrack, voice)
-/* check length of this voice at the end of a part */
-/* if it is zero, extend it to the correct length */
-int partno, xtrack, voice;
-{
-  char msg[100];
-  long now;
-
- if (partlabel <-1 || partlabel >25) printf("genmidi.c:fillvoice partlabel %d out of range\n",partlabel);
-
-  now = tracklen + delta_time;
-  if (partlabel == -1) {
-    if (xtrack == 1) {
-      introlen = now;
-    } else {
-      if (now == 0) {
-        delta_time = delta_time + introlen;
-        now = introlen;
-      } else {
-        if (now != introlen) {
-          sprintf(msg, "Time 0-%ld voice %d, has length %ld", 
-                  introlen, voice, now);
-          event_error(msg);
-        };
-      };
-    };
-  } else {
-    if (xtrack == 1) {
-      partlen[partlabel] = now - lastlen;
-    } else {
-      if (now - lastlen == 0) {
-        delta_time = delta_time + partlen[partlabel];
-        now = now + partlen[partlabel];
-      } else {
-        if (now - lastlen != partlen[partlabel]) {
-          sprintf(msg, "Time %ld-%ld voice %d, part %c has length %ld", 
-                  lastlen, lastlen+partlen[partlabel], voice, 
-                  (char) (partlabel + (int) 'A'), 
-                  now-lastlen);
-          event_error(msg);
-        };
-      };
-    };
-  };
-  lastlen = now;
-}
-
 static int findpart(j)
 int j;
 /* find out where next part starts and update partno */
@@ -715,13 +664,10 @@ int xtrack, voice, place;
   int newplace;
 
   newplace = place;
-  if (dependent_voice[voice]) return newplace;
-  if (xtrack > 0) {
-    fillvoice(partno, xtrack, voice);
-  };
+  
   if (parts != -1) {
     /* go to next part label */
-    newplace = findpart(newplace);
+    newplace = findpart(newplace); /* [SS] 2023.01.20 */
   };
   partlabel = (int) pitch[newplace] - (int)'A';
   return(newplace);
@@ -3239,7 +3185,9 @@ int xtrack;
       break;
     case PART:
       in_varend = 0;
-      j = partbreak(xtrack, trackvoice, j);
+      /*j = partbreak(xtrack, trackvoice, j); [SS] 2023.01.20 */
+      j = findvoice(j, trackvoice, xtrack);
+
       if (parts == -1) {
         char msg[1];
 
