@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.19 Jan 08 2022 abc2abc"
+#define VERSION "2.20 Feb 07 2023 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -84,6 +84,7 @@ struct fract breakpoint; /* used to break bar into beamed sets of notes */
 complex_barpoint_t master_bar_break;
 int barno; /* number of bar within tune */
 int newspacing; /* was -s option selected ? */
+int compact_lengths; /* was -c selected ? [JA] 2023-02-07 */
 int have_spacing_scheme; /* do we support spacing for time signature ? [JA] */
 int barcheck; /* indicate -b and -r options selected */
 int echeck; /* was error-checking turned off ? (-e option) */
@@ -530,9 +531,13 @@ char** filename;
 
   if ((getarg("-h", argc, argv) != -1) || (argc < 2)) {
     printf("abc2abc version %s\n",VERSION);
-    printf("Usage: abc2abc <filename> [-s] [-n X] [-b] [-r] [-e] [-t X]\n");
+    printf("Usage: abc2abc <filename> [-s] [-c] [-u] [-n X] [-b] [-r] [-e]\n");
+    printf("       [-t X] [-nda] [-nokeys] [-nokeyf] [-usekey n] [-useclef]\n");
     printf("       [-u] [-d] [-v] [-V X[,Y,,,]] [-P X[,Y...]] [-ver] [-X n]\n");
+    printf("       [-xref] [-OCC]\n");
     printf("  -s for new spacing\n");
+    printf("  -c compact note lengths use / instead of /2\n");
+    printf("  -u to update notation ([] for chords and () for slurs)\n");
     printf("  -n X to re-format the abc with a new linebreak every X bars\n");
     printf("  -b to remove bar checking\n");
     printf("  -r to remove repeat checking\n");
@@ -541,7 +546,6 @@ char** filename;
     printf("  -nda No double accidentals in guitar chords\n");
     printf("  -nokeys No key signature. Use sharps\n");
     printf("  -nokeyf No key signature. Use flats\n");
-    printf("  -u to update notation ([] for chords and () for slurs)\n");
     printf("  -usekey n Use key signature sf (sharps/flats)\n");
     printf("  -useclef (treble or bass)\n"); /* [SS] 2020-01-22 */
     printf("  -d to notate with doubled note lengths\n");
@@ -575,6 +579,12 @@ char** filename;
     newspacing = 0;
   } else {
     newspacing = 1;
+  };
+  /* [JA] 2023-02-07 */
+  if (getarg ("-c", argc, argv) == -1) {
+    compact_lengths = 0;
+  } else {
+    compact_lengths = 1;
   };
   have_spacing_scheme = 0; /* [JA] 2021-05-25 */
   narg = getarg("-X", argc, argv);
@@ -1751,30 +1761,19 @@ int explict;
 }
 
 
-/* [JM] 2018-02-22 (add code to treat / and // lengths when
-  SHORT_HALFS is defined during compilation
-*/
 static void printlen(a, b)
 int a, b;
 {
   if (a != 1) {
     emit_int(a);
   };
-#ifdef SHORT_HALFS
-  else {
-        if (b == 2) {
-            emit_string("/");
-            return;
-        }
-        if (b == 4) {
-            emit_string("//");
-            return;
-        }
-  }
-#endif
   if (b != 1) {
-    emit_int_sprintf("/%d", b);
-  };
+    emit_string ("/");
+    /* [JA] 2023-02-07 */
+    if ((!compact_lengths) || (b != 2)) {
+      emit_int (b);
+    }
+  }
 }
 
 void event_spacing(n, m)

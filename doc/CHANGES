@@ -15069,3 +15069,8 @@ dependent_voice(), is no longer used and is also eliminated.
 to fix the bug addressed at the same date.
 
 
+February 07 2023
+abc2abc: in toabc.c, James Allwright has introduced a new option -c
+which replaces /2 with /. He also fixed the -h output in
+event_init() so that all options are listed.
+

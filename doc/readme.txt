@@ -2,7 +2,7 @@ abcMIDI :   abc <-> MIDI conversion utilities
 
 midi2abc version 3.58 December 09 2022
 abc2midi version 4.84 January 06 2023
-abc2abc  version 2.19 January 08 2023
+abc2abc  version 2.20 February 07 2023
 yaps     version 1.92 January 06 2023
 abcmatch version 1.82 June 14 2022
 midicopy version 1.38 May 06 2022
