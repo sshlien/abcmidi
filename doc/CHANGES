@@ -15074,3 +15074,8 @@ abc2abc: in toabc.c, James Allwright has introduced a new option -c
 which replaces /2 with /. He also fixed the -h output in
 event_init() so that all options are listed.
 
+
+February 08 2023
+midi2abc, mftext, midistats: modified midifile.c so that it indicates where
+it encounters an unexpected byte in the input midi file.
+

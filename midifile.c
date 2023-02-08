@@ -198,6 +198,7 @@ char *s;
   int c;
 
   while ( n++<4 && (c=(*Mf_getc)()) != EOF ) {
+    Mf_bytesread++; /* [SS] 2023-02-08 */
     if ( c != *p++ ) {
       char buff[32];
       (void) strcpy(buff,"expecting ");
@@ -229,7 +230,7 @@ readheader()    /* read a header chunk */
     return;
 
   Mf_toberead = read32bit();
-  Mf_bytesread = 0;
+  /* Mf_bytesread = 0; [SS] 2023-01-08 */
   format = read16bit();
   ntrks = read16bit();
   division = read16bit();
@@ -281,7 +282,7 @@ readtrack()     /* read a track chunk */
 
   Mf_toberead = read32bit();
   Mf_currtime = 0;
-  Mf_bytesread =0;
+  /* Mf_bytesread =0; [SS] 2022.02.08 */
 
   if ( Mf_trackstart )
     (*Mf_trackstart)();
@@ -397,9 +398,9 @@ static void
 badbyte(c)
 int c;
 {
-  char buff[32];
+  char buff[96]; /* [SS] 2022.02.08 */
 
-  (void) sprintf(buff,"unexpected byte: 0x%02x",c);
+  (void) sprintf(buff,"unexpected byte: 0x%02x at byte %ld (0x%lX)",c,Mf_bytesread,Mf_bytesread);
   mferror(buff);
 }
 
