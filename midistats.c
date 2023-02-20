@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.59 February 08 2023 midistats"
+#define VERSION "0.60 February 20 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -72,17 +72,29 @@ int trackno;
 int maintrack;
 int format; /* MIDI file type                                   */
 int debug;
+int pulseanalysis;
+int corestats;
 int chordthreshold; /* number of maximum number of pulses separating note */
 int beatsPerBar = 4; /* 4/4 time */
 int divisionsPerBar;
 int unitDivision;
 
 
+struct eventstruc {int onsetTime;
+                   unsigned char channel;
+		   unsigned char pitch;
+		   unsigned char velocity;
+                   ;} midievents[20000];
+
+int lastEvent = 0;
+
 
 int tempocount=0;  /* number of tempo indications in MIDI file */
 
 int stats = 0; /* flag - gather and print statistics            */
 
+int pulseanalysis = 0;
+int corestats = 0;
 
 
 /* can cope with up to 64 track MIDI files */
@@ -159,6 +171,8 @@ static int progmapper[] = {
 16, 16, 16, 16, 16, 16, 16, 16
 };
 
+int pulseCounter[480];
+int pulseDistribution[24];
 
 struct barPattern {
 	int activeBarNumber;
@@ -776,7 +790,40 @@ int nn, dd, cc, bb;
   printf("timesig %d/%d %6.2f\n",nn,denom,beatnumber);
 } 
 
+void record_noteon(int chan,int pitch,int vol)
+{
+if (vol < 1) return; /* noteoff ? */
+midievents[lastEvent].onsetTime = Mf_currtime;
+midievents[lastEvent].channel = chan;
+midievents[lastEvent].pitch = pitch;
+midievents[lastEvent].velocity = vol;
+lastEvent++;
+if (lastEvent > 19999) {printf("ran out of space in midievents structure\n");
+	exit(1);
+        }
+}
 
+void record_noteoff(int chan,int pitch,int vol)
+{
+}
+void record_trackend()
+{
+}
+
+int int_compare_events(const void *a, const void *b) {
+   struct eventstruc *ia  = (struct eventstruc *)a;
+   struct eventstruc *ib  = (struct eventstruc *)b;
+   if (ib->onsetTime > ia->onsetTime)
+       return -1;
+   else if (ia ->onsetTime > ib->onsetTime)
+       return  1;
+   else return 0;
+   }
+
+void load_header (int format, int ntrks, int ldivision)
+{
+  division = ldivision;
+}
 
 
 void initfunc_for_stats()
@@ -804,6 +851,84 @@ void initfunc_for_stats()
     Mf_text = stats_metatext;
     Mf_arbitrary = no_op2;
 }
+
+
+void initfunc_for_loadNoteEvents()
+{
+    Mf_error = error;
+    Mf_header = load_header;
+    Mf_trackstart = no_op0;
+    Mf_trackend = record_trackend;
+    Mf_noteon = record_noteon;
+    Mf_noteoff = record_noteoff;
+    Mf_pressure = no_op3;
+    Mf_parameter = no_op3;
+    Mf_pitchbend = no_op3;
+    Mf_program = no_op0;
+    Mf_chanpressure = no_op3;
+    Mf_sysex = no_op2;
+    Mf_metamisc = no_op3;
+    Mf_seqnum = no_op1;
+    Mf_eot = no_op0;
+    Mf_timesig = no_op4;
+    Mf_smpte = no_op5;
+    Mf_tempo = no_op1;
+    Mf_keysig = no_op2;
+    Mf_seqspecific = no_op3;
+    Mf_text = no_op3;
+    Mf_arbitrary = no_op2;
+}
+
+void dumpMidievents (int from , int to)
+{
+int i;
+for (i = from; i < to; i++) {
+  printf("%5d %d %d %d\n",midievents[i].onsetTime, midievents[i].channel,
+		  midievents[i].pitch, midievents[i].velocity);
+  }
+}
+
+void load_finish()
+{
+qsort(midievents,lastEvent,sizeof(struct eventstruc),int_compare_events);
+/*dumpMidievents(0,50);*/
+}
+
+
+void pulseHistogram() {
+int i,j;
+int pulsePosition;
+int decimate;
+float fraction;
+for (i = 0; i< 480; i++) pulseCounter[i] = 0;
+for (i = 0; i < lastEvent; i++) {
+  pulsePosition = midievents[i].onsetTime % division;
+  pulseCounter[pulsePosition]++;
+  if (pulsePosition >= 480) {printf("pulsePosition = %d too large\n",pulsePosition);
+	     exit(1);
+             }
+  }
+for (i = 0; i < 24; i++) pulseDistribution[i] = 0;
+  /*for (i = 0; i < 480; i++) printf(" %d",pulseCounter[i]);
+  printf("\n");
+  */
+decimate = division/24;
+for (i = 0; i < division; i++) {
+   j = i/decimate;
+   pulseDistribution[j] += pulseCounter[i];
+   }
+for (i = 0; i < 24; i++)
+   {fraction = (float) pulseDistribution[i] / (float) lastEvent;
+    printf(" %8.4f",fraction);
+   }
+printf("\n");
+
+}
+  
+void corestatsOutput() {
+printf("%d\t%d\n", division,lastEvent);
+}
+
 
 
 int readnum(num) 
@@ -910,9 +1035,17 @@ int argc;
   if ((arg != -1) && (arg <argc)) {
    debug = readnum(argv[arg]);
    }
+  arg = getarg("-pulseanalysis",argc,argv);
+  if (arg != -1) {
+	  pulseanalysis = 1;
+	  stats = 0;
+          }
 
-
-
+  arg = getarg("-corestats",argc,argv);
+  if (arg != -1) {
+	  corestats = 1;
+	  stats = 0;
+          }
 
   arg = getarg("-o",argc,argv);
   if ((arg != -1) && (arg < argc))  {
@@ -934,6 +1067,8 @@ int argc;
   else {
     printf("midistats version %s\n  usage :\n",VERSION);
     printf("midistats filename <options>\n");
+    printf("         -corestats\n");
+    printf("         -pulseanalysis\n");
     printf("         -ver version number\n");
     printf("         -d <number> debug parameter\n");
     printf(" The input filename is assumed to be any string not\n");
@@ -955,6 +1090,15 @@ mfread();
 stats_finish();
 }
 
+void loadEvents() {
+initfunc_for_loadNoteEvents();
+Mf_getc = filegetc;
+mfread();
+load_finish();
+if (pulseanalysis) pulseHistogram(); 
+if (corestats) corestatsOutput();
+}
+
 
 
 int main(argc,argv)
@@ -966,5 +1110,6 @@ int argc;
 
   arg = process_command_line_arguments(argc,argv);
   if(stats == 1)  midistats(argc,argv);
+  if(pulseanalysis || corestats) loadEvents();
   return 0;
 }
