@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.60 February 20 2023 midistats"
+#define VERSION "0.62 March 08 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -73,18 +73,22 @@ int maintrack;
 int format; /* MIDI file type                                   */
 int debug;
 int pulseanalysis;
+int percanalysis;
+int percpattern;
 int corestats;
 int chordthreshold; /* number of maximum number of pulses separating note */
 int beatsPerBar = 4; /* 4/4 time */
 int divisionsPerBar;
 int unitDivision;
+int maximumPulse;
+int lastBeat;
 
 
 struct eventstruc {int onsetTime;
                    unsigned char channel;
 		   unsigned char pitch;
 		   unsigned char velocity;
-                   ;} midievents[20000];
+                   ;} midievents[40000];
 
 int lastEvent = 0;
 
@@ -94,6 +98,8 @@ int tempocount=0;  /* number of tempo indications in MIDI file */
 int stats = 0; /* flag - gather and print statistics            */
 
 int pulseanalysis = 0;
+int percanalysis = 0;
+int percpattern = 0;
 int corestats = 0;
 
 
@@ -142,7 +148,7 @@ struct trkstat {
  */
 
 int progcolor[17]; /* used by stats_program */
-int drumhistogram[82]; /* counts drum noteons */
+int drumhistogram[100]; /* counts drum noteons */
 int pitchhistogram[12]; /* pitch distribution for non drum notes */
 int channel2prog[17]; /* maps channel to program */
 int channel2nnotes[17]; /*maps channel to note count */
@@ -409,7 +415,7 @@ void stats_header (int format, int ntrks, int ldivision)
     channel2nnotes[i] = 0;
     chnactivity[i] = 0; /* [SS] 2018-02-02 */
     }
-  for (i=0;i<82;i++) drumhistogram[i] = 0;
+  for (i=0;i<100;i++) drumhistogram[i] = 0;
   for (i=0;i<12;i++) pitchhistogram[i] = 0; /* [SS] 2017-11-01 */
   for (i=0;i<12;i++) pitchclass_activity[i] = 0; /* [SS] 2018-02-02 */
   for (i=0;i<128;i++) progactivity[i] = 0; /* [SS] 2018-02-02 */
@@ -481,11 +487,11 @@ else
 printf("\n");
   
 printf("drums ");
-for (i=35;i<82;i++) {
+for (i=35;i<100;i++) {
   if (drumhistogram[i] > 0) printf("%d ",i);
   }
 printf("\ndrumhits ");
-for (i=35;i<82;i++) {
+for (i=35;i<100;i++) {
   if (drumhistogram[i] > 0) printf("%d ",drumhistogram[i]);
   }
 
@@ -654,7 +660,7 @@ int chan, pitch, vol;
 
 
  if (chan == 9) {
-   if (pitch < 0 || pitch > 81) 
+   if (pitch < 0 || pitch > 100) 
          printf("****illegal drum value %d\n",pitch);
    else  drumhistogram[pitch]++;
    }
@@ -792,13 +798,14 @@ int nn, dd, cc, bb;
 
 void record_noteon(int chan,int pitch,int vol)
 {
+if (maximumPulse < Mf_currtime) maximumPulse = Mf_currtime;
 if (vol < 1) return; /* noteoff ? */
 midievents[lastEvent].onsetTime = Mf_currtime;
 midievents[lastEvent].channel = chan;
 midievents[lastEvent].pitch = pitch;
 midievents[lastEvent].velocity = vol;
 lastEvent++;
-if (lastEvent > 19999) {printf("ran out of space in midievents structure\n");
+if (lastEvent > 39999) {printf("ran out of space in midievents structure\n");
 	exit(1);
         }
 }
@@ -900,6 +907,7 @@ int i,j;
 int pulsePosition;
 int decimate;
 float fraction;
+int resolution = 12;
 for (i = 0; i< 480; i++) pulseCounter[i] = 0;
 for (i = 0; i < lastEvent; i++) {
   pulsePosition = midievents[i].onsetTime % division;
@@ -908,25 +916,99 @@ for (i = 0; i < lastEvent; i++) {
 	     exit(1);
              }
   }
-for (i = 0; i < 24; i++) pulseDistribution[i] = 0;
+for (i = 0; i < resolution; i++) pulseDistribution[i] = 0;
   /*for (i = 0; i < 480; i++) printf(" %d",pulseCounter[i]);
   printf("\n");
   */
-decimate = division/24;
+decimate = division/resolution;
 for (i = 0; i < division; i++) {
    j = i/decimate;
    pulseDistribution[j] += pulseCounter[i];
    }
-for (i = 0; i < 24; i++)
+for (i = 0; i < resolution; i++)
    {fraction = (float) pulseDistribution[i] / (float) lastEvent;
-    printf(" %8.4f",fraction);
+    if (i == 0)
+      printf("%6.4f",fraction);
+    else
+      printf(",%6.4f",fraction);
    }
 printf("\n");
-
 }
+
+void drumanalysis () {
+int i;
+int channel;
+int pitch;
+for (i=0;i<100;i++) drumhistogram[i] = 0;
+for (i = 0; i < lastEvent; i++) {
+  channel = midievents[i].channel;
+  if (channel != 9) continue;
+  pitch = midievents[i].pitch;
+  if (pitch < 0 || pitch > 100) {
+    printf("illegal percussion instrument %d\n",pitch);
+    exit(1);
+    }
+  drumhistogram[pitch]++;
+  }
+}
+
+void drumpattern (int perc) {
+unsigned char drumpat[1000];
+int i;
+int channel;
+int pitch;
+int onset;
+int index;
+int quarter;
+int remainder;
+int part;
+quarter = division/4;
+for (i = 0; i<1000; i++) drumpat[i] = 0;
+for (i = 0; i <lastEvent; i++) {
+  channel = midievents[i].channel;
+  if (channel != 9) continue;
+  pitch = midievents[i].pitch;
+  if (pitch != perc) continue;
+  onset = midievents[i].onsetTime;
+  index = onset/division;
+  remainder = onset % division;
+  part = remainder/quarter;
+  drumpat[index] = drumpat[index] |= 1 << part;
+  }
+for (i=0;i<lastBeat;i++) printf("%d ",drumpat[i]);
+printf("\n");
+}
+
+void percsummary () {
+int i;
+int bassindex,snareindex;
+int bassmax,snaremax;
+int bassdrum[] = {35,36,41,45};
+int snaredrum[] = {37,38,39,40};
+bassmax = 0;
+snaremax = 0;
+for (i=0;i<4;i++) {
+  if(drumhistogram[bassdrum[i]] > bassmax) {
+      bassindex = bassdrum[i];
+      bassmax = drumhistogram[bassindex];
+      }
+  if(drumhistogram[snaredrum[i]] > snaremax) {
+      snareindex = snaredrum[i];
+      snaremax = drumhistogram[snareindex];
+      }
+  }
+if (bassmax && snaremax) {
+	printf("bass %d %d\n",bassindex,bassmax);
+	printf("snare %d %d\n",snareindex,snaremax);
+   } else {
+        printf("missing bass or snare\n");
+   }
+			
+}
+
   
 void corestatsOutput() {
-printf("%d\t%d\n", division,lastEvent);
+printf("%d\t%d\t%d\n", division,lastEvent,lastBeat);
 }
 
 
@@ -1047,6 +1129,18 @@ int argc;
 	  stats = 0;
           }
 
+  arg = getarg("-percanalysis",argc,argv);
+  if (arg != -1) {
+	  percanalysis = 1;
+	  stats = 0;
+          }
+
+  arg = getarg("-percpattern",argc,argv);
+  if (arg != -1) {
+	  percpattern = 1;
+	  stats = 0;
+          }
+
   arg = getarg("-o",argc,argv);
   if ((arg != -1) && (arg < argc))  {
     outhandle = efopen(argv[arg],"w");  /* open output abc file */
@@ -1069,6 +1163,8 @@ int argc;
     printf("midistats filename <options>\n");
     printf("         -corestats\n");
     printf("         -pulseanalysis\n");
+    printf("         -percanalysis\n");
+    printf("         -percpattern\n");
     printf("         -ver version number\n");
     printf("         -d <number> debug parameter\n");
     printf(" The input filename is assumed to be any string not\n");
@@ -1091,11 +1187,26 @@ stats_finish();
 }
 
 void loadEvents() {
+int i;
 initfunc_for_loadNoteEvents();
 Mf_getc = filegetc;
+maximumPulse = 0;
 mfread();
+lastBeat = maximumPulse/division;
 load_finish();
 if (pulseanalysis) pulseHistogram(); 
+if (percanalysis) {
+	drumanalysis();
+        for (i = 0; i< 100; i++) {
+          if (drumhistogram[i] > 0) printf("%d %d\t",i,drumhistogram[i]);
+        }
+        printf("\n");
+      }
+if (percanalysis) drumpattern(40);
+if (percpattern) {
+    drumanalysis();
+    percsummary();
+    }
 if (corestats) corestatsOutput();
 }
 
@@ -1110,6 +1221,6 @@ int argc;
 
   arg = process_command_line_arguments(argc,argv);
   if(stats == 1)  midistats(argc,argv);
-  if(pulseanalysis || corestats) loadEvents();
+  if(pulseanalysis || corestats || percanalysis || percpattern) loadEvents();
   return 0;
 }
