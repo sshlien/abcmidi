@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.62 March 08 2023 midistats"
+#define VERSION "0.65 March 12 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -75,6 +75,7 @@ int debug;
 int pulseanalysis;
 int percanalysis;
 int percpattern;
+int pdfpercpattern;
 int corestats;
 int chordthreshold; /* number of maximum number of pulses separating note */
 int beatsPerBar = 4; /* 4/4 time */
@@ -100,6 +101,7 @@ int stats = 0; /* flag - gather and print statistics            */
 int pulseanalysis = 0;
 int percanalysis = 0;
 int percpattern = 0;
+int pdfpercpattern = 0;
 int corestats = 0;
 
 
@@ -111,6 +113,8 @@ int notechan[2048],notechanvol[2048]; /*for linking on and off midi
 int last_tick[17]; /* for getting last pulse number in MIDI file */
 int last_on_tick[17]; /* for detecting chords [SS] 2019-08-02 */
 
+int histogram[256];
+unsigned char drumpat[8000];
 
 
 
@@ -953,7 +957,6 @@ for (i = 0; i < lastEvent; i++) {
 }
 
 void drumpattern (int perc) {
-unsigned char drumpat[1000];
 int i;
 int channel;
 int pitch;
@@ -963,7 +966,7 @@ int quarter;
 int remainder;
 int part;
 quarter = division/4;
-for (i = 0; i<1000; i++) drumpat[i] = 0;
+for (i = 0; i<8000; i++) drumpat[i] = 0;
 for (i = 0; i <lastEvent; i++) {
   channel = midievents[i].channel;
   if (channel != 9) continue;
@@ -973,11 +976,66 @@ for (i = 0; i <lastEvent; i++) {
   index = onset/division;
   remainder = onset % division;
   part = remainder/quarter;
+  if (index >= 8000) {printf("index too large in drumpattern\n");
+	              break;
+                      }
   drumpat[index] = drumpat[index] |= 1 << part;
   }
 for (i=0;i<lastBeat;i++) printf("%d ",drumpat[i]);
 printf("\n");
 }
+
+void dualDrumPattern (int perc1, int perc2) {
+int i;
+int channel;
+int pitch;
+int onset;
+int index;
+int quarter;
+int remainder;
+int part;
+quarter = division/4;
+for (i = 0; i<8000; i++) drumpat[i] = 0;
+for (i = 0; i <lastEvent; i++) {
+  channel = midievents[i].channel;
+  if (channel != 9) continue;
+  pitch = midievents[i].pitch;
+  if (pitch != perc1  && pitch != perc2) continue;
+  onset = midievents[i].onsetTime;
+  index = onset/division;
+  if (index >= 8000) {printf("index too large in drumpattern\n");
+	              break;
+                      }
+  remainder = onset % division;
+  part = remainder/quarter;
+  if (pitch == perc1) drumpat[index] = drumpat[index] |= 1 << part;
+  else drumpat[index] = drumpat[index] |= 16 * (1 << part);
+  }
+}
+
+void drumPatternHistogram () {
+int i;
+for (i=0;i<256;i++) {
+ histogram[i] = 0;
+}
+for (i=0;i<lastBeat;i++) {
+  histogram[drumpat[i]]++;
+  }
+for (i=1;i<256;i++) {
+  if (histogram[i] > 0) {printf("%d %d  ",i,histogram[i]);
+    }
+  }
+  printf("\n");
+}
+
+
+void output_drumpat () {
+int i;
+for (i=0;i<lastBeat;i++) printf("%d ",drumpat[i]);
+printf("\n");
+}
+
+
 
 void percsummary () {
 int i;
@@ -1002,8 +1060,9 @@ if (bassmax && snaremax) {
 	printf("snare %d %d\n",snareindex,snaremax);
    } else {
         printf("missing bass or snare\n");
+	return;
    }
-			
+dualDrumPattern(bassindex,snareindex);
 }
 
   
@@ -1141,6 +1200,13 @@ int argc;
 	  stats = 0;
           }
 
+  arg = getarg("-pdfpercpattern",argc,argv);
+  if (arg != -1) {
+	  pdfpercpattern = 1;
+	  stats = 0;
+          }
+
+
   arg = getarg("-o",argc,argv);
   if ((arg != -1) && (arg < argc))  {
     outhandle = efopen(argv[arg],"w");  /* open output abc file */
@@ -1165,6 +1231,7 @@ int argc;
     printf("         -pulseanalysis\n");
     printf("         -percanalysis\n");
     printf("         -percpattern\n");
+    printf("         -pdfpercpattern\n");
     printf("         -ver version number\n");
     printf("         -d <number> debug parameter\n");
     printf(" The input filename is assumed to be any string not\n");
@@ -1202,10 +1269,19 @@ if (percanalysis) {
         }
         printf("\n");
       }
-if (percanalysis) drumpattern(40);
+if (percanalysis) {
+   drumpattern(40);
+   output_drumpat();
+   }
 if (percpattern) {
     drumanalysis();
     percsummary();
+    output_drumpat();
+    }
+if (pdfpercpattern) {
+    drumanalysis();
+    percsummary();
+    drumPatternHistogram();
     }
 if (corestats) corestatsOutput();
 }
@@ -1221,6 +1297,7 @@ int argc;
 
   arg = process_command_line_arguments(argc,argv);
   if(stats == 1)  midistats(argc,argv);
-  if(pulseanalysis || corestats || percanalysis || percpattern) loadEvents();
+  if(pulseanalysis || corestats || percanalysis ||\
+		      percpattern || pdfpercpattern) loadEvents();
   return 0;
 }
