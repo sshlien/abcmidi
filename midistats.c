@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.65 March 12 2023 midistats"
+#define VERSION "0.67 March 14 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -75,7 +75,8 @@ int debug;
 int pulseanalysis;
 int percanalysis;
 int percpattern;
-int pdfpercpattern;
+int percpatternfor;
+int percpatternhist;
 int corestats;
 int chordthreshold; /* number of maximum number of pulses separating note */
 int beatsPerBar = 4; /* 4/4 time */
@@ -101,7 +102,8 @@ int stats = 0; /* flag - gather and print statistics            */
 int pulseanalysis = 0;
 int percanalysis = 0;
 int percpattern = 0;
-int pdfpercpattern = 0;
+int percpatternfor = 0;
+int percpatternhist = 0;
 int corestats = 0;
 
 
@@ -115,6 +117,7 @@ int last_on_tick[17]; /* for detecting chords [SS] 2019-08-02 */
 
 int histogram[256];
 unsigned char drumpat[8000];
+int percnum;
 
 
 
@@ -981,8 +984,6 @@ for (i = 0; i <lastEvent; i++) {
                       }
   drumpat[index] = drumpat[index] |= 1 << part;
   }
-for (i=0;i<lastBeat;i++) printf("%d ",drumpat[i]);
-printf("\n");
 }
 
 void dualDrumPattern (int perc1, int perc2) {
@@ -1013,6 +1014,14 @@ for (i = 0; i <lastEvent; i++) {
   }
 }
 
+void output_perc_pattern (int i) {
+int left,right;
+left = i/16;
+right = i % 16;
+printf(" (%d.%d)",left,right);
+}
+
+
 void drumPatternHistogram () {
 int i;
 for (i=0;i<256;i++) {
@@ -1022,9 +1031,12 @@ for (i=0;i<lastBeat;i++) {
   histogram[drumpat[i]]++;
   }
 for (i=1;i<256;i++) {
-  if (histogram[i] > 0) {printf("%d %d  ",i,histogram[i]);
+  if (histogram[i] > 0) {
+	  printf(" %d",i);
+	  output_perc_pattern(i);
+	  printf(" %d ", histogram[i]);
+         }
     }
-  }
   printf("\n");
 }
 
@@ -1032,6 +1044,7 @@ for (i=1;i<256;i++) {
 void output_drumpat () {
 int i;
 for (i=0;i<lastBeat;i++) printf("%d ",drumpat[i]);
+/*for (i=0;i<lastBeat;i++) output_perc_pattern(drumpat[i]);*/
 printf("\n");
 }
 
@@ -1188,21 +1201,31 @@ int argc;
 	  stats = 0;
           }
 
-  arg = getarg("-percanalysis",argc,argv);
+  arg = getarg("-panal",argc,argv);
   if (arg != -1) {
 	  percanalysis = 1;
 	  stats = 0;
           }
 
-  arg = getarg("-percpattern",argc,argv);
+  arg = getarg("-ppat",argc,argv);
   if (arg != -1) {
 	  percpattern = 1;
 	  stats = 0;
           }
 
-  arg = getarg("-pdfpercpattern",argc,argv);
+  arg = getarg("-ppatfor",argc,argv);
   if (arg != -1) {
-	  pdfpercpattern = 1;
+	  percpatternfor = 1;
+	  stats = 0;
+	  if (arg != -1 && arg <argc) {
+		  percnum = readnum(argv[arg]);
+	          printf("percnum = %d\n",percnum);
+                  }
+          }
+
+  arg = getarg("-ppathist",argc,argv);
+  if (arg != -1) {
+	  percpatternhist = 1;
 	  stats = 0;
           }
 
@@ -1229,13 +1252,14 @@ int argc;
     printf("midistats filename <options>\n");
     printf("         -corestats\n");
     printf("         -pulseanalysis\n");
-    printf("         -percanalysis\n");
-    printf("         -percpattern\n");
-    printf("         -pdfpercpattern\n");
+    printf("         -panal\n");
+    printf("         -ppat\n");
+    printf("         -ppatfor\n");
+    printf("         -ppathist\n");
     printf("         -ver version number\n");
     printf("         -d <number> debug parameter\n");
     printf(" The input filename is assumed to be any string not\n");
-    printf(" beginning with a - (hyphen). It may be placed anywhere.\n");
+    printf(" beginning with a - (hyphen).\n");
     exit(0);
   };
   return arg;
@@ -1269,16 +1293,16 @@ if (percanalysis) {
         }
         printf("\n");
       }
-if (percanalysis) {
-   drumpattern(40);
-   output_drumpat();
-   }
 if (percpattern) {
     drumanalysis();
     percsummary();
     output_drumpat();
     }
-if (pdfpercpattern) {
+if (percpatternfor) {
+    drumpattern(percnum);
+    output_drumpat();
+    }
+if (percpatternhist) {
     drumanalysis();
     percsummary();
     drumPatternHistogram();
@@ -1298,6 +1322,6 @@ int argc;
   arg = process_command_line_arguments(argc,argv);
   if(stats == 1)  midistats(argc,argv);
   if(pulseanalysis || corestats || percanalysis ||\
-		      percpattern || pdfpercpattern) loadEvents();
+    percpatternfor || percpattern || percpatternhist) loadEvents();
   return 0;
 }
