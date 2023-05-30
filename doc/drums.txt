@@ -40,9 +40,12 @@ number of occurrences. eg.
 -ppatfor n
 where n is the code number of the percussion instrument. Each beat
 is represented by a 4 bit number where the position of the on-bit
-indicates the time in the beat when the drum onset occurs. Thus
-0 indicates that there was no note onset in that beat, 1 indicates
-a note onset in the beginning of the beat, 4 indicates a note onset
+indicates the time in the beat when the drum onset occurs. The bits
+are ordered from left to right (higher order bits to lower order
+bits). This is the order of bits that you would expect in a
+time series.
+Thus 0 indicates that there was no note onset in that beat, 1 indicates
+a note onset at the end of the beat, 4 indicates a note onset
 in the middle of the beat, and etc. The function returns a string
 of numbers ranging from 0 to 7 indicating the presence of note onsets
 for the selected percussion instrument for the sequence of beats

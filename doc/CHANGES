@@ -15079,3 +15079,10 @@ February 08 2023
 midi2abc, mftext, midistats: modified midifile.c so that it indicates where
 it encounters an unexpected byte in the input midi file.
 
+
+March 24 2023
+More functions for the percussion track was added to midistats.c to
+support some future analysis.
+
+
+

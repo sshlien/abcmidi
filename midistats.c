@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.67 March 14 2023 midistats"
+#define VERSION "0.69 May 27 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -77,6 +77,7 @@ int percanalysis;
 int percpattern;
 int percpatternfor;
 int percpatternhist;
+int pitchclassanalysis;
 int corestats;
 int chordthreshold; /* number of maximum number of pulses separating note */
 int beatsPerBar = 4; /* 4/4 time */
@@ -104,6 +105,7 @@ int percanalysis = 0;
 int percpattern = 0;
 int percpatternfor = 0;
 int percpatternhist = 0;
+int pitchclassanalysis = 0;
 int corestats = 0;
 
 
@@ -982,6 +984,7 @@ for (i = 0; i <lastEvent; i++) {
   if (index >= 8000) {printf("index too large in drumpattern\n");
 	              break;
                       }
+  part = 3 - part; /* order the bits going left to right */
   drumpat[index] = drumpat[index] |= 1 << part;
   }
 }
@@ -1009,8 +1012,22 @@ for (i = 0; i <lastEvent; i++) {
                       }
   remainder = onset % division;
   part = remainder/quarter;
+  part = 3 - part; /* order the bits from left to right */
   if (pitch == perc1) drumpat[index] = drumpat[index] |= 1 << part;
   else drumpat[index] = drumpat[index] |= 16 * (1 << part);
+  }
+}
+
+void pitchClassAnalysis () {
+int i;
+int channel;
+int pitch;
+for (i=0;i<12;i++) pitchclass_activity[i] = 0;
+for (i = 0; i < lastEvent; i++) {
+  channel = midievents[i].channel;
+  if (channel == 9) continue;
+  pitch = midievents[i].pitch;
+  pitchclass_activity[pitch % 12]++;
   }
 }
 
@@ -1077,6 +1094,17 @@ if (bassmax && snaremax) {
    }
 dualDrumPattern(bassindex,snareindex);
 }
+
+void outputPitchClassHistogram() {
+int i;
+float activity;
+activity = 0;
+for (i=0;i<12;i++) activity += (float) pitchclass_activity[i];
+for (i=0;i<11;i++) printf("%5.3f,",pitchclass_activity[i]/activity);
+printf("%5.3f",pitchclass_activity[11]/activity);
+printf("\n");
+}
+
 
   
 void corestatsOutput() {
@@ -1229,6 +1257,12 @@ int argc;
 	  stats = 0;
           }
 
+  arg = getarg("-pitchclass",argc,argv);
+  if (arg != -1) {
+	  pitchclassanalysis = 1;
+	  stats = 0;
+          }
+
 
   arg = getarg("-o",argc,argv);
   if ((arg != -1) && (arg < argc))  {
@@ -1256,6 +1290,7 @@ int argc;
     printf("         -ppat\n");
     printf("         -ppatfor\n");
     printf("         -ppathist\n");
+    printf("         -pitchclass\n");
     printf("         -ver version number\n");
     printf("         -d <number> debug parameter\n");
     printf(" The input filename is assumed to be any string not\n");
@@ -1308,6 +1343,10 @@ if (percpatternhist) {
     drumPatternHistogram();
     }
 if (corestats) corestatsOutput();
+if (pitchclassanalysis) {
+   pitchClassAnalysis();
+   outputPitchClassHistogram(); 
+   }
 }
 
 
@@ -1322,6 +1361,7 @@ int argc;
   arg = process_command_line_arguments(argc,argv);
   if(stats == 1)  midistats(argc,argv);
   if(pulseanalysis || corestats || percanalysis ||\
-    percpatternfor || percpattern || percpatternhist) loadEvents();
+    percpatternfor || percpattern || percpatternhist ||\
+    pitchclassanalysis) loadEvents();
   return 0;
 }
