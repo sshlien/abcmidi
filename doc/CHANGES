@@ -15085,4 +15085,11 @@ More functions for the percussion track was added to midistats.c to
 support some future analysis.
 
 
+June 25 2023
+Midistats runs incorrectly if the midi file has no program channel
+commands. When a program channel command is missing, the program should
+be the acoutic piano (0) by default.
+
+If more than one channel with the same program color, they should be
+added together.
 

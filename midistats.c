@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.69 May 27 2023 midistats"
+#define VERSION "0.70 June 25 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -420,7 +420,7 @@ void stats_header (int format, int ntrks, int ldivision)
     trkdata.pressure[i] = 0; /* [SS] 2022-03-04 */
     trkdata.quietTime[i] = 0; /* [SS] 2022-08-22 */
     progcolor[i] = 0;
-    channel2prog[i] = -1;
+    channel2prog[i] = 0; /* [SS] 2023-06-25-8/
     channel2nnotes[i] = 0;
     chnactivity[i] = 0; /* [SS] 2018-02-02 */
     }
@@ -483,7 +483,7 @@ if (nprogs > 0) output_progs_data();
 else {
   for (i=0;i<17;i++) 
     if(chnactivity[i] > 0) 
-       progactivity[channel2prog[i]] = chnactivity[i];
+       progactivity[channel2prog[i]] += chnactivity[i]; /* [SS] 2023-06-25 */
   output_progs_data();
   }
 
@@ -730,7 +730,7 @@ if (trkdata.program[chan+1] != 0) {
   printf("program %d %d\n",chan+1,program);
   trkdata.program[chan+1] = program;
   }
-  if (channel2prog[chan+1]== -1) channel2prog[chan+1] = program;
+  if (channel2prog[chan+1]== 0) channel2prog[chan+1] = program; /* [SS] 2023-06-25*/
 }
 
 
