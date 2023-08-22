@@ -15093,3 +15093,14 @@ be the acoutic piano (0) by default.
 If more than one channel with the same program color, they should be
 added together.
 
+
+August 22 2023
+
+Midistats improved the calculation of the number of rhythm patterns
+in a channel (barChn[chan].rhythmPattern) by allowing for dithering
+of note onset. Introduced dithermargin variable in function
+stats_noteon(). In function, output_track_summary(), suppressed
+notemeanpitch for percussion channel.
+
+
+

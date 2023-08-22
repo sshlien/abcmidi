@@ -6,20 +6,18 @@ abc2abc  version 2.20 February 07 2023
 yaps     version 1.92 January 06 2023
 abcmatch version 1.82 June 14 2022
 midicopy version 1.38 May 06 2022
-midistats version 0.59 February 08 2023
+midistats version 0.71 August 222023
 
 24th January 2002
-
 Copyright James Allwright
-J.R.Allwright@westminster.ac.uk
+jamesallwright@yahoo.co.uk
 University of Westminster,
 London, UK
 
-October 2021
-
-Seymour Shlien
-Ottawa, Canada
+August 2023
+Copyright Seymour Shlien
 fy733@ncf.ca
+Ottawa, Canada
 
 This is free software. You may copy and re-distribute it under the terms of 
 the GNU General Public License version 2 or later, which is available from

@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.70 June 25 2023 midistats"
+#define VERSION "0.71 August 22 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -584,7 +584,10 @@ for (i=1;i<17;i++) {
    printf("trkinfo ");
    printf("%d %d ",i,trkdata.program[i]); /* channel number and program*/
    printf("%d %d ",trkdata.notecount[i],trkdata.chordcount[i]);
-   printf("%d %d ",trkdata.notemeanpitch[i], trkdata.notelength[i]);
+   /* [SS] 2023-08-22 */
+   if (i != 10) printf("%d %d ",trkdata.notemeanpitch[i], trkdata.notelength[i]);
+   else 
+     printf("-1  0 ");
    printf("%d %d ",trkdata.cntlparam[i],trkdata.pressure[i]); /* [SS] 2022-03-04 */
    printf("%d %d",trkdata.quietTime[i],trkdata.rhythmpatterns[i]);
    trkdata.quietTime[i] = 0;
@@ -628,7 +631,9 @@ int chan, pitch, vol;
  int delta;
  int barnum;
  int unit;
+ int dithermargin; /* [SS] 2023-08-22 */
 
+ dithermargin = unitDivision/2 - 1; 
  if (vol == 0) {
     /* treat as noteoff */
     stats_noteoff(chan,pitch,vol);
@@ -661,7 +666,7 @@ int chan, pitch, vol;
 	 barChn[chan].rhythmPattern = 0;
          barChn[chan].activeBarNumber = barnum;
     }
-  unit = (Mf_currtime % divisionsPerBar)/unitDivision;
+  unit = ((Mf_currtime+dithermargin) % divisionsPerBar)/unitDivision;
   //printf("unit = %d pattern = %d \n",unit,barChn[chan].rhythmPattern);
   barChn[chan].rhythmPattern = barChn[chan].rhythmPattern |= (1UL << unit);
   }
