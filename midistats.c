@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.71 August 22 2023 midistats"
+#define VERSION "0.72 August 31 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -52,7 +52,8 @@ void stats_finish();
 float histogram_entropy (int *histogram, int size); 
 void stats_noteoff(int chan,int pitch,int vol);
 void stats_eot ();
-
+#define max(a,b)  (( a > b ? a : b))
+#define min(a,b) (( a < b ? a : b))
 
 /* Global variables and structures */
 
@@ -114,8 +115,9 @@ int trackcount = 0;
 
 int notechan[2048],notechanvol[2048]; /*for linking on and off midi
 					channel commands            */
-int last_tick[17]; /* for getting last pulse number in MIDI file */
+int lastTick[2048]; /* for getting last pulse number for chan (0-15) and pitch (0-127) in MIDI file */
 int last_on_tick[17]; /* for detecting chords [SS] 2019-08-02 */
+int channel_active[17]; /* for dealing with chords [SS] 2023-08-30 */
 
 int histogram[256];
 unsigned char drumpat[8000];
@@ -131,7 +133,11 @@ struct trkstat {
   int notecount[17];
   int chordcount[17];
   int notemeanpitch[17];
+  int notepitchmin[17];
+  int notepitchmax[17];
   int notelength[17];
+  int notelengthmin[17];
+  int notelengthmax[17];
   int pitchbend[17];
   int pressure[17];
   int cntlparam[17];
@@ -589,7 +595,10 @@ for (i=1;i<17;i++) {
    else 
      printf("-1  0 ");
    printf("%d %d ",trkdata.cntlparam[i],trkdata.pressure[i]); /* [SS] 2022-03-04 */
-   printf("%d %d",trkdata.quietTime[i],trkdata.rhythmpatterns[i]);
+   printf("%d %d ",trkdata.quietTime[i],trkdata.rhythmpatterns[i]);
+   if (i != 10)  printf("%d %d %d %d",trkdata.notepitchmin[i],  trkdata.notepitchmax[i] ,trkdata.notelengthmin[i],  trkdata.notelengthmax[i]);
+   else
+     printf("-1 0");
    trkdata.quietTime[i] = 0;
    printf("\n");
 
@@ -607,13 +616,19 @@ void stats_trackstart()
   for (i=0;i<17;i++) {
      trkdata.notecount[i] = 0;
      trkdata.notemeanpitch[i] = 0;
+     trkdata.notepitchmin[i] = 128;
+     trkdata.notepitchmax[i] = 0;
      trkdata.notelength[i] = 0;
+     trkdata.notelengthmin[i] = 10000;
+     trkdata.notelengthmax[i] = 0;
      trkdata.chordcount[i] = 0;
      trkdata.cntlparam[i] = 0;
-     last_tick[i] = -1;
      last_on_tick[i] = -1;
+     channel_active[i] = 0;
      }
   printf("trk %d \n",tracknum);
+
+ for (i=0;i<2048;i++) lastTick[i] = -1;
 }
 
 void stats_trackend()
@@ -641,6 +656,8 @@ int chan, pitch, vol;
     return;
     }
  trkdata.notemeanpitch[chan+1] += pitch;
+ trkdata.notepitchmax[chan+1] = max(trkdata.notepitchmax[chan+1],pitch);
+ trkdata.notepitchmin[chan+1] = min(trkdata.notepitchmin[chan+1],pitch);
  if (trkdata.lastNoteOff[chan+1] >= 0) {
 	 delta = Mf_currtime - trkdata.lastNoteOff[chan+1];
 	 trkdata.lastNoteOff[chan+1] = -1; /* in case of chord */
@@ -651,7 +668,7 @@ int chan, pitch, vol;
 	 
  if (abs(Mf_currtime - last_on_tick[chan+1]) < chordthreshold) trkdata.chordcount[chan+1]++;
  else trkdata.notecount[chan+1]++; /* [SS] 2019-08-02 */
- last_tick[chan+1] = Mf_currtime;
+ lastTick[chan*128 + pitch] = Mf_currtime;
  last_on_tick[chan+1] = Mf_currtime; /* [SS] 2019-08-02 */
  /* last_on_tick not updated by stats_noteoff */
 
@@ -679,6 +696,8 @@ int chan, pitch, vol;
    else  drumhistogram[pitch]++;
    }
  else pitchhistogram[pitch % 12]++;  /* [SS] 2017-11-01 */
+
+ channel_active[chan+1]++;
 }
 
 
@@ -691,17 +710,27 @@ void stats_noteoff(int chan,int pitch,int vol)
   int length;
   int program;
   /* ignore if there was no noteon */
-  if (last_tick[chan+1] == -1) return;
-  length = Mf_currtime - last_tick[chan+1];
+  if (lastTick[chan*128+pitch] == -1) return;
+  length = Mf_currtime - lastTick[chan*128+pitch];
   trkdata.notelength[chan+1] += length;
+  trkdata.notelengthmax[chan+1] = max(trkdata.notelengthmax[chan+1],length);
+  trkdata.notelengthmin[chan+1] = min(trkdata.notelengthmin[chan+1],length);
+  if (length < 3) printf("chan = %d  lasttick = %d currtime = %ld\n",chan,lastTick[chan*128+pitch],Mf_currtime);
   trkdata.lastNoteOff[chan+1] = Mf_currtime; /* [SS] 2022.08.22 */
   chnactivity[chan+1] += length;
   if (chan == 9) return; /* drum channel */
   pitchclass_activity[pitch % 12] += length;
   program = trkdata.program[chan+1];
   progactivity[program] += length;
+  channel_active[chan+1]--;
   /* [SS] 2018-04-18 */
-  if(Mf_currtime > last_tick[chan+1]) last_tick[chan+1] = Mf_currtime;
+  if(Mf_currtime > lastTick[chan*128+pitch] && channel_active[chan+1] == 0) 
+    lastTick[chan*128+pitch] = Mf_currtime; /* [SS] 2023.08.30 handle chords */
+    
+  if (length > 4800) {
+     lastTick[chan*128+pitch] = Mf_currtime; /* handle stuck note [SS] 2023.08.30 */
+     channel_active[chan+1] = 0;
+     }
 }
 
 
