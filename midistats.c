@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.72 August 31 2023 midistats"
+#define VERSION "0.73 September 09 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -118,6 +118,7 @@ int notechan[2048],notechanvol[2048]; /*for linking on and off midi
 int lastTick[2048]; /* for getting last pulse number for chan (0-15) and pitch (0-127) in MIDI file */
 int last_on_tick[17]; /* for detecting chords [SS] 2019-08-02 */
 int channel_active[17]; /* for dealing with chords [SS] 2023-08-30 */
+int channel_used_in_track[17]; /* for dealing with quietTime [SS] 2023-09-06 */
 
 int histogram[256];
 unsigned char drumpat[8000];
@@ -522,14 +523,12 @@ if (npulses > 0)
   for (i=1;i<17;i++) printf("%5.2f ",chnactivity[i]/(double) trkdata.npulses[0]);
 else 
   for (i=0;i<17;i++) printf("%5.2f ",(double) chnactivity[i]);
-printf("\nquietTime ");
+/*printf("\nquietTime ");
 for (i=1;i<17;i++) {
-  delta = trkdata.npulses[0] - trkdata.quietTime[i];
-  if (trkdata.quietTime[i] < quietLimit) delta = 0;
-  delta = delta / (double) trkdata.npulses[0];
-  /* printf (" %5.3f ", delta); */
   printf (" %d ", trkdata.quietTime[i]);
   }
+  It is all zeros [SS] 2023-09-06 
+*/
 
 printf("\npitchentropy %f\n",histogram_entropy(pitchclass_activity,12));
 printf("totalrhythmpatterns =%d\n",nrpatterns);
@@ -599,7 +598,7 @@ for (i=1;i<17;i++) {
    if (i != 10)  printf("%d %d %d %d",trkdata.notepitchmin[i],  trkdata.notepitchmax[i] ,trkdata.notelengthmin[i],  trkdata.notelengthmax[i]);
    else
      printf("-1 0");
-   trkdata.quietTime[i] = 0;
+   trkdata.quietTime[i] = 0; /* in case channel i is used in another track */
    printf("\n");
 
    channel2nnotes[i] += trkdata.notecount[i] + trkdata.chordcount[i];
@@ -629,12 +628,15 @@ void stats_trackstart()
   printf("trk %d \n",tracknum);
 
  for (i=0;i<2048;i++) lastTick[i] = -1;
+ for (i=0;i<17;i++) channel_used_in_track[i] = 0; /* [SS] 2023-09-06 */
 }
 
 void stats_trackend()
 {
- trkdata.npulses[tracknum] = Mf_currtime; 
+ int chan;
  if (trkdata.npulses[0] < Mf_currtime) trkdata.npulses[0] = Mf_currtime;
+ for (chan = 1; chan < 17; chan++) /* [SS] 2023-09-06 */
+   if (channel_used_in_track[chan] > 0) trkdata.quietTime[chan] += (trkdata.npulses[0] - trkdata.lastNoteOff[chan]); 
  output_track_summary(); 
 }
 
@@ -648,6 +650,7 @@ int chan, pitch, vol;
  int unit;
  int dithermargin; /* [SS] 2023-08-22 */
 
+ channel_used_in_track[chan+1]++; /* [SS] 2023-09-06 */
  dithermargin = unitDivision/2 - 1; 
  if (vol == 0) {
     /* treat as noteoff */
@@ -715,7 +718,7 @@ void stats_noteoff(int chan,int pitch,int vol)
   trkdata.notelength[chan+1] += length;
   trkdata.notelengthmax[chan+1] = max(trkdata.notelengthmax[chan+1],length);
   trkdata.notelengthmin[chan+1] = min(trkdata.notelengthmin[chan+1],length);
-  if (length < 3) printf("chan = %d  lasttick = %d currtime = %ld\n",chan,lastTick[chan*128+pitch],Mf_currtime);
+  //if (length < 3) printf("chan = %d  lasttick = %d currtime = %ld\n",chan,lastTick[chan*128+pitch],Mf_currtime);
   trkdata.lastNoteOff[chan+1] = Mf_currtime; /* [SS] 2022.08.22 */
   chnactivity[chan+1] += length;
   if (chan == 9) return; /* drum channel */

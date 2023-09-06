@@ -36,7 +36,8 @@ the sum of the MIDI pitches for all the notes,
 the sum of the note durations in MIDI pulse units,
 the number of control parameter messages,
 the number of pressure messages.
-and the number of distinct rhythm patterns for each channel
+the number of distinct rhythm patterns for each channel
+the number of pulses the channel was inactive
 the minimum pitch value
 the maximum pitch value
 the minimum note length in pulses
@@ -73,10 +74,6 @@ that occur in the midi file.
 .PP
 pitchact is a similar histogram but is weighted by the length of
 the notes.
-.PP
-quietTime is used to compute the track/channel spread in midiexplorer.
-It is computed by summing up all the midi pulses which occur
-in gaps greater than 8 beats.
 .PP
 totalrhythmpatterns is the total number of bar rhythm patterns for
 all channels except the percussion channel.
