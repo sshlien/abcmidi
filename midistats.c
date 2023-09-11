@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.73 September 09 2023 midistats"
+#define VERSION "0.74 September 11 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -148,6 +148,7 @@ struct trkstat {
   int lastNoteOff[17];
   int quietTime[17];
   int rhythmpatterns[17];
+  int numberOfGaps[17];
   } trkdata;
 
 /* The trkstat references the individual channels in the midi file.
@@ -426,6 +427,7 @@ void stats_header (int format, int ntrks, int ldivision)
     trkdata.cntlparam[i] = 0; /* [SS] 2022-03-04 */
     trkdata.pressure[i] = 0; /* [SS] 2022-03-04 */
     trkdata.quietTime[i] = 0; /* [SS] 2022-08-22 */
+    trkdata.numberOfGaps[i] = 0; /* [SS] 2023-09-07 */
     progcolor[i] = 0;
     channel2prog[i] = 0; /* [SS] 2023-06-25-8/
     channel2nnotes[i] = 0;
@@ -523,13 +525,6 @@ if (npulses > 0)
   for (i=1;i<17;i++) printf("%5.2f ",chnactivity[i]/(double) trkdata.npulses[0]);
 else 
   for (i=0;i<17;i++) printf("%5.2f ",(double) chnactivity[i]);
-/*printf("\nquietTime ");
-for (i=1;i<17;i++) {
-  printf (" %d ", trkdata.quietTime[i]);
-  }
-  It is all zeros [SS] 2023-09-06 
-*/
-
 printf("\npitchentropy %f\n",histogram_entropy(pitchclass_activity,12));
 printf("totalrhythmpatterns =%d\n",nrpatterns);
 printf("collisions = %d\n",ncollisions);
@@ -595,10 +590,11 @@ for (i=1;i<17;i++) {
      printf("-1  0 ");
    printf("%d %d ",trkdata.cntlparam[i],trkdata.pressure[i]); /* [SS] 2022-03-04 */
    printf("%d %d ",trkdata.quietTime[i],trkdata.rhythmpatterns[i]);
-   if (i != 10)  printf("%d %d %d %d",trkdata.notepitchmin[i],  trkdata.notepitchmax[i] ,trkdata.notelengthmin[i],  trkdata.notelengthmax[i]);
+   if (i != 10)  printf("%d %d %d %d %d",trkdata.notepitchmin[i],  trkdata.notepitchmax[i] ,trkdata.notelengthmin[i],  trkdata.notelengthmax[i], trkdata.numberOfGaps[i]);
    else
      printf("-1 0");
    trkdata.quietTime[i] = 0; /* in case channel i is used in another track */
+   trkdata.numberOfGaps[i] = 0;
    printf("\n");
 
    channel2nnotes[i] += trkdata.notecount[i] + trkdata.chordcount[i];
@@ -663,9 +659,10 @@ int chan, pitch, vol;
  trkdata.notepitchmin[chan+1] = min(trkdata.notepitchmin[chan+1],pitch);
  if (trkdata.lastNoteOff[chan+1] >= 0) {
 	 delta = Mf_currtime - trkdata.lastNoteOff[chan+1];
-	 trkdata.lastNoteOff[chan+1] = -1; /* in case of chord */
 	 if (delta > quietLimit) {
 		 trkdata.quietTime[chan+1] += delta;
+                 trkdata.numberOfGaps[chan+1]++;
+	         trkdata.lastNoteOff[chan+1] = -1; /* in case of chord */
 	 }
     }
 	 
