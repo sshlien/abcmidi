@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.74 September 11 2023 midistats"
+#define VERSION "0.75 September 13 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -149,6 +149,7 @@ struct trkstat {
   int quietTime[17];
   int rhythmpatterns[17];
   int numberOfGaps[17];
+  float pitchEntropy[17];
   } trkdata;
 
 /* The trkstat references the individual channels in the midi file.
@@ -172,6 +173,7 @@ int channel2nnotes[17]; /*maps channel to note count */
 int chnactivity[17]; /* [SS] 2018-02-02 */
 int progactivity[128]; /* [SS] 2018-02-02 */
 int pitchclass_activity[12]; /* [SS] 2018-02-02 */
+int chanpitchhistogram[204]; /* [SS] 2023-09-13 */
 
 
 /* [SS] 2017-11-01 */
@@ -541,8 +543,10 @@ float histogram_entropy (int *histogram, int size)
   float e,p;
   total = 0;
   entropy = 0.0;
+  //printf("\nhistogram_entropy of:");
   for (i=0;i<size;i++) {
     total += histogram[i];
+    //printf(" %d",histogram[i]);
     } 
   for (i=0;i<size;i++) {
     if (histogram[i] < 1) continue;
@@ -550,6 +554,7 @@ float histogram_entropy (int *histogram, int size)
     e = p*log(p);
     entropy = entropy + e;
     } 
+  //printf("\n");
   return -entropy/log(2.0);
   } 
 
@@ -590,8 +595,9 @@ for (i=1;i<17;i++) {
      printf("-1  0 ");
    printf("%d %d ",trkdata.cntlparam[i],trkdata.pressure[i]); /* [SS] 2022-03-04 */
    printf("%d %d ",trkdata.quietTime[i],trkdata.rhythmpatterns[i]);
-   if (i != 10)  printf("%d %d %d %d %d",trkdata.notepitchmin[i],  trkdata.notepitchmax[i] ,trkdata.notelengthmin[i],  trkdata.notelengthmax[i], trkdata.numberOfGaps[i]);
-   else
+   if (i != 10)  {printf("%d %d %d %d %d",trkdata.notepitchmin[i],  trkdata.notepitchmax[i] ,trkdata.notelengthmin[i],  trkdata.notelengthmax[i], trkdata.numberOfGaps[i]);
+   printf(" %f",trkdata.pitchEntropy[i]);
+    } else
      printf("-1 0");
    trkdata.quietTime[i] = 0; /* in case channel i is used in another track */
    trkdata.numberOfGaps[i] = 0;
@@ -625,14 +631,21 @@ void stats_trackstart()
 
  for (i=0;i<2048;i++) lastTick[i] = -1;
  for (i=0;i<17;i++) channel_used_in_track[i] = 0; /* [SS] 2023-09-06 */
+ for (i=0;i<204;i++) chanpitchhistogram[i] = 0;  /* [SS] 2023-09-13 */
 }
 
 void stats_trackend()
 {
  int chan;
+ int i;
+ float entropy;
  if (trkdata.npulses[0] < Mf_currtime) trkdata.npulses[0] = Mf_currtime;
  for (chan = 1; chan < 17; chan++) /* [SS] 2023-09-06 */
    if (channel_used_in_track[chan] > 0) trkdata.quietTime[chan] += (trkdata.npulses[0] - trkdata.lastNoteOff[chan]); 
+ for (chan=0;chan<16;chan++) {  /* 2023-09-13 */
+   if (chan == 9 || channel_used_in_track[chan+1] == 0) continue;
+   trkdata.pitchEntropy[chan+1] = histogram_entropy(chanpitchhistogram +chan*12,11);
+   }
  output_track_summary(); 
 }
 
@@ -645,7 +658,9 @@ int chan, pitch, vol;
  int barnum;
  int unit;
  int dithermargin; /* [SS] 2023-08-22 */
+ int cpitch; /* [SS] 2023-09-13 */
 
+ cpitch = pitch % 12;
  channel_used_in_track[chan+1]++; /* [SS] 2023-09-06 */
  dithermargin = unitDivision/2 - 1; 
  if (vol == 0) {
@@ -686,6 +701,7 @@ int chan, pitch, vol;
   unit = ((Mf_currtime+dithermargin) % divisionsPerBar)/unitDivision;
   //printf("unit = %d pattern = %d \n",unit,barChn[chan].rhythmPattern);
   barChn[chan].rhythmPattern = barChn[chan].rhythmPattern |= (1UL << unit);
+  chanpitchhistogram[chan*12+cpitch]++;  /* [SS] 2023-09-13 */
   }
 
 
