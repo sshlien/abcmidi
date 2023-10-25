@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.75 September 13 2023 midistats"
+#define VERSION "0.77 October 25 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -63,6 +63,7 @@ static FILE *F;
 static FILE *outhandle; /* for producing the abc file */
 
 int tracknum=0;  /* track number */
+int lasttrack = 0; /* lasttrack */
 int division;    /* pulses per quarter note defined in MIDI header    */
 int quietLimit;  /* minimum number of pulses with no activity */
 long tempo = 500000; /* the default tempo is 120 quarter notes/minute */
@@ -171,6 +172,7 @@ int pitchhistogram[12]; /* pitch distribution for non drum notes */
 int channel2prog[17]; /* maps channel to program */
 int channel2nnotes[17]; /*maps channel to note count */
 int chnactivity[17]; /* [SS] 2018-02-02 */
+int trkactivity[40]; /* [SS] 2023-10-25 */
 int progactivity[128]; /* [SS] 2018-02-02 */
 int pitchclass_activity[12]; /* [SS] 2018-02-02 */
 int chanpitchhistogram[204]; /* [SS] 2023-09-13 */
@@ -417,6 +419,7 @@ void stats_header (int format, int ntrks, int ldivision)
   quietLimit = ldivision*8;
   divisionsPerBar = division*beatsPerBar;
   unitDivision = divisionsPerBar/24;
+  lasttrack = ntrks; /* [SS] 2023-10-25 */
   printf("ntrks %d\n",ntrks);
   printf("ppqn %d\n",ldivision);
   chordthreshold = ldivision/16; /* [SS] 2018-01-21 */
@@ -439,6 +442,7 @@ void stats_header (int format, int ntrks, int ldivision)
   for (i=0;i<12;i++) pitchhistogram[i] = 0; /* [SS] 2017-11-01 */
   for (i=0;i<12;i++) pitchclass_activity[i] = 0; /* [SS] 2018-02-02 */
   for (i=0;i<128;i++) progactivity[i] = 0; /* [SS] 2018-02-02 */
+  for (i=0;i<40;i++) trkactivity[i]=0; /* [SS] 2023-10-25 */
 }
 
 void determine_progcolor ()
@@ -524,9 +528,13 @@ else
   for (i=0;i<12;i++) printf("%5.2f ",(double) pitchclass_activity[i]);
 printf("\nchnact "); /* [SS] 2018-02-08 */
 if (npulses > 0)
-  for (i=1;i<17;i++) printf("%5.2f ",chnactivity[i]/(double) trkdata.npulses[0]);
+  for (i=1;i<17;i++) printf("%5.3f ",chnactivity[i]/(double) trkdata.npulses[0]);
 else 
-  for (i=0;i<17;i++) printf("%5.2f ",(double) chnactivity[i]);
+  for (i=0;i<17;i++) printf("%5.3f ",(double) chnactivity[i]);
+printf("\ntrkact ");
+  lasttrack++;
+  for (i=0;i<lasttrack;i++) printf("% 5d",trkactivity[i]);
+
 printf("\npitchentropy %f\n",histogram_entropy(pitchclass_activity,12));
 printf("totalrhythmpatterns =%d\n",nrpatterns);
 printf("collisions = %d\n",ncollisions);
@@ -734,6 +742,7 @@ void stats_noteoff(int chan,int pitch,int vol)
   //if (length < 3) printf("chan = %d  lasttick = %d currtime = %ld\n",chan,lastTick[chan*128+pitch],Mf_currtime);
   trkdata.lastNoteOff[chan+1] = Mf_currtime; /* [SS] 2022.08.22 */
   chnactivity[chan+1] += length;
+  trkactivity[tracknum]++;
   if (chan == 9) return; /* drum channel */
   pitchclass_activity[pitch % 12] += length;
   program = trkdata.program[chan+1];

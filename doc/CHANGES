@@ -15103,4 +15103,7 @@ stats_noteon(). In function, output_track_summary(), suppressed
 notemeanpitch for percussion channel.
 
 
+October 25 2023
+
+Midistats returns track activity (note on/off) for every track.
 
