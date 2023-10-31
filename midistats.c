@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.77 October 25 2023 midistats"
+#define VERSION "0.78 October 30 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -87,6 +87,7 @@ int divisionsPerBar;
 int unitDivision;
 int maximumPulse;
 int lastBeat;
+int hasLyrics = 0;
 
 
 struct eventstruc {int onsetTime;
@@ -150,6 +151,7 @@ struct trkstat {
   int quietTime[17];
   int rhythmpatterns[17];
   int numberOfGaps[17];
+  int chanvol[17];
   float pitchEntropy[17];
   } trkdata;
 
@@ -433,6 +435,7 @@ void stats_header (int format, int ntrks, int ldivision)
     trkdata.pressure[i] = 0; /* [SS] 2022-03-04 */
     trkdata.quietTime[i] = 0; /* [SS] 2022-08-22 */
     trkdata.numberOfGaps[i] = 0; /* [SS] 2023-09-07 */
+    trkdata.chanvol[i] = 0; /* [SS] 2023-10-30 */
     progcolor[i] = 0;
     channel2prog[i] = 0; /* [SS] 2023-06-25-8/
     channel2nnotes[i] = 0;
@@ -469,6 +472,24 @@ int i;
   }
 
 
+/* [SS] 2023-10-30 */
+void stats_interpret_pulseCounter () {
+int i;
+int maxcount,ncounts;
+int maxloc;
+maxcount = 0;
+ncounts = 0;
+for (i=0;i<division;i++) {
+  ncounts = ncounts + pulseCounter[i];
+  if (pulseCounter[i] > maxcount) {
+       maxloc = i;
+       maxcount = pulseCounter[i];
+       } 
+  } 
+//printf("maxpulse = %f at %d\n",(float) maxcount/(float) ncounts, maxloc); 
+if ((float) maxcount/(float) ncounts < 0.05) printf("unquantized\n");
+
+}
 
 void stats_finish()
 {
@@ -526,6 +547,8 @@ if (npulses > 0)
   for (i=0;i<12;i++) printf("%5.2f ",pitchclass_activity[i]/(double) npulses);
 else 
   for (i=0;i<12;i++) printf("%5.2f ",(double) pitchclass_activity[i]);
+printf("\nchanvol "); /* [SS] 2023-10-30 */
+for (i=1;i<17;i++) printf("%4d ",trkdata.chanvol[i]);
 printf("\nchnact "); /* [SS] 2018-02-08 */
 if (npulses > 0)
   for (i=1;i<17;i++) printf("%5.3f ",chnactivity[i]/(double) trkdata.npulses[0]);
@@ -534,10 +557,11 @@ else
 printf("\ntrkact ");
   lasttrack++;
   for (i=0;i<lasttrack;i++) printf("% 5d",trkactivity[i]);
-
 printf("\npitchentropy %f\n",histogram_entropy(pitchclass_activity,12));
 printf("totalrhythmpatterns =%d\n",nrpatterns);
 printf("collisions = %d\n",ncollisions);
+if (hasLyrics) printf("Lyrics\n");
+stats_interpret_pulseCounter ();
 printf("\n");
 }
 
@@ -667,6 +691,7 @@ int chan, pitch, vol;
  int unit;
  int dithermargin; /* [SS] 2023-08-22 */
  int cpitch; /* [SS] 2023-09-13 */
+ int pulsePosition;
 
  cpitch = pitch % 12;
  channel_used_in_track[chan+1]++; /* [SS] 2023-09-06 */
@@ -677,6 +702,11 @@ int chan, pitch, vol;
     trkdata.lastNoteOff[chan+1] = Mf_currtime; /* [SS] 2022.08.22 */
     return;
     }
+ pulsePosition = Mf_currtime % division;
+ pulseCounter[pulsePosition]++;
+ if (pulsePosition >= 480) {printf("pulsePosition = %d too large\n",pulsePosition);
+     exit(1);
+     }
  trkdata.notemeanpitch[chan+1] += pitch;
  trkdata.notepitchmax[chan+1] = max(trkdata.notepitchmax[chan+1],pitch);
  trkdata.notepitchmin[chan+1] = min(trkdata.notepitchmin[chan+1],pitch);
@@ -797,11 +827,16 @@ if (trkdata.program[chan+1] != 0) {
 void stats_parameter(chan,control,value)
 int chan, control, value;
 {
-/*if (control == 7) {
-  printf("cntrlvolume %d %d \n",chan+1,value);
-  }
+int chan1;
+chan1 = chan+1;
+/* There may be many volume commands for the same channel. Only
+   record the first one.
 */
-trkdata.cntlparam[chan+1]++;
+if (control == 7 && trkdata.chanvol[chan1] == 0) {
+  /*printf("cntrlvolume %d %d \n",chan+1,value);*/
+  trkdata.chanvol[chan1] = value; /* [SS] 2023-10-30 */
+  }
+trkdata.cntlparam[chan1]++;
 }
 
 
@@ -811,6 +846,7 @@ int type, leng;
 char *mess;
 {
 int i; 
+if (type == 5) hasLyrics = 1; /* [SS] 2023-10-30 */
 if (type != 3) return;
 printf("metatext %d ",type);
 for (i=0;i<leng;i++) printf("%c",mess[i]);
@@ -903,6 +939,7 @@ void load_header (int format, int ntrks, int ldivision)
 
 void initfunc_for_stats()
 {
+    int i;
     Mf_error = stats_error; /* [SS] 2017-11-19 */
     Mf_header = stats_header;
     Mf_trackstart = stats_trackstart;
@@ -925,6 +962,7 @@ void initfunc_for_stats()
     Mf_seqspecific = no_op3;
     Mf_text = stats_metatext;
     Mf_arbitrary = no_op2;
+    for (i = 0; i< 480; i++) pulseCounter[i] = 0;
 }
 
 
