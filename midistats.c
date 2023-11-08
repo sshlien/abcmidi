@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.78 October 30 2023 midistats"
+#define VERSION "0.79 November 08 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -94,7 +94,7 @@ struct eventstruc {int onsetTime;
                    unsigned char channel;
 		   unsigned char pitch;
 		   unsigned char velocity;
-                   ;} midievents[40000];
+                   ;} midievents[50000];
 
 int lastEvent = 0;
 
@@ -200,7 +200,7 @@ static int progmapper[] = {
 16, 16, 16, 16, 16, 16, 16, 16
 };
 
-int pulseCounter[480];
+int pulseCounter[1024];
 int pulseDistribution[24];
 
 struct barPattern {
@@ -474,9 +474,14 @@ int i;
 
 /* [SS] 2023-10-30 */
 void stats_interpret_pulseCounter () {
-int i;
+int i,j;
 int maxcount,ncounts;
 int maxloc;
+float threshold,peak;
+int decimate;
+float tripletsCriterion;
+int resolution = 12;
+threshold = 10.0/(float) division;
 maxcount = 0;
 ncounts = 0;
 for (i=0;i<division;i++) {
@@ -486,9 +491,19 @@ for (i=0;i<division;i++) {
        maxcount = pulseCounter[i];
        } 
   } 
-//printf("maxpulse = %f at %d\n",(float) maxcount/(float) ncounts, maxloc); 
-if ((float) maxcount/(float) ncounts < 0.05) printf("unquantized\n");
+for (i = 0; i < resolution; i++) pulseDistribution[i] = 0;
+decimate = division/resolution;
+for (i = 0; i < division; i++) {
+   j = i/decimate;
+   pulseDistribution[j] += pulseCounter[i];
+  }
 
+peak = (float) maxcount/ (float) ncounts;
+/*printf("maxcount = %d ncounts = %d peak = %f threshold = %f\n",maxcount,ncounts,peak,threshold); */
+if (peak < threshold)  printf("unquantized\n");
+tripletsCriterion = (float) pulseDistribution[8]/ (float) ncounts;
+/*printf("tripletsCriterion = %f\n",tripletsCriterion);*/
+if (tripletsCriterion > 0.15) printf("triplets\n");
 }
 
 void stats_finish()
@@ -704,7 +719,7 @@ int chan, pitch, vol;
     }
  pulsePosition = Mf_currtime % division;
  pulseCounter[pulsePosition]++;
- if (pulsePosition >= 480) {printf("pulsePosition = %d too large\n",pulsePosition);
+ if (pulsePosition >= 1023) {printf("pulsePosition = %d too large\n",pulsePosition);
      exit(1);
      }
  trkdata.notemeanpitch[chan+1] += pitch;
@@ -909,7 +924,7 @@ midievents[lastEvent].channel = chan;
 midievents[lastEvent].pitch = pitch;
 midievents[lastEvent].velocity = vol;
 lastEvent++;
-if (lastEvent > 39999) {printf("ran out of space in midievents structure\n");
+if (lastEvent > 49999) {printf("ran out of space in midievents structure\n");
 	exit(1);
         }
 }
@@ -934,6 +949,7 @@ int int_compare_events(const void *a, const void *b) {
 void load_header (int format, int ntrks, int ldivision)
 {
   division = ldivision;
+  lasttrack = ntrks;
 }
 
 
@@ -962,7 +978,7 @@ void initfunc_for_stats()
     Mf_seqspecific = no_op3;
     Mf_text = stats_metatext;
     Mf_arbitrary = no_op2;
-    for (i = 0; i< 480; i++) pulseCounter[i] = 0;
+    for (i = 0; i< 1023; i++) pulseCounter[i] = 0;
 }
 
 
@@ -1014,16 +1030,16 @@ int pulsePosition;
 int decimate;
 float fraction;
 int resolution = 12;
-for (i = 0; i< 480; i++) pulseCounter[i] = 0;
+for (i = 0; i< 1023; i++) pulseCounter[i] = 0;
 for (i = 0; i < lastEvent; i++) {
   pulsePosition = midievents[i].onsetTime % division;
   pulseCounter[pulsePosition]++;
-  if (pulsePosition >= 480) {printf("pulsePosition = %d too large\n",pulsePosition);
+  if (pulsePosition >= 1023) {printf("pulsePosition = %d too large\n",pulsePosition);
 	     exit(1);
              }
   }
 for (i = 0; i < resolution; i++) pulseDistribution[i] = 0;
-  /*for (i = 0; i < 480; i++) printf(" %d",pulseCounter[i]);
+  /*for (i = 0; i < 1023; i++) printf(" %d",pulseCounter[i]);
   printf("\n");
   */
 decimate = division/resolution;
@@ -1205,7 +1221,7 @@ printf("\n");
 
   
 void corestatsOutput() {
-printf("%d\t%d\t%d\n", division,lastEvent,lastBeat);
+printf("%d\t%d\t%d\t%d\n",lasttrack, division,lastEvent,lastBeat);
 }
 
 

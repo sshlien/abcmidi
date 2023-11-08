@@ -52,7 +52,7 @@
 
 
 
-#define VERSION "1.38 May 05 2022 midicopy"
+#define VERSION "1.39 November 07 2023 midicopy"
 #include "midicopy.h"
 #define NULLFUNC 0
 #define NULL 0
@@ -96,8 +96,9 @@ long max_currtime = 0;
 long Mf_currcopytime = 0L;	/* time of last copied event */
 char *trackdata = NULL;
 long trackdata_length, trackdata_size;
-char *trackstr[64]; /* [SS] 2017-10-20  2019-07-05*/
-int trackstr_length[64]; /* [SS] 2017-10-20 2019-07-05*/
+/* char *trackstr[64];  [SS] 2017-10-20  2019-07-05*/
+char *trackstr[150]; /* [SS] 2023-11-07 */
+int trackstr_length[150]; /* [SS] 2017-10-20 2019-07-05* 2023-11-07*/
 int trkid = 0;
 int activetrack;
 int nochanmsg = 1;
@@ -1290,7 +1291,7 @@ build_new_midi_file (format, ntracks, division, fp)
 
   get_tempo_info_from_track_1 ();
 
-  if (ntracks > 63) {printf("too many tracks\n"); exit(1); }
+  if (ntracks > 149) {printf("too many tracks\n"); exit(1); }
 
   /* The rest of the file is a series of tracks */
   for (i = 0; i < ntracks; i++)
@@ -1836,7 +1837,7 @@ main (int argc, char *argv[])
       printf ("-ver  version information\n");
       printf ("-trks n1,n2,..(starting from 1)\n");
       printf ("-xtrks n1,n2,.. (tracks to exclude)\n"); /* [SS] 2013-10-27 */
-      printf ("-xchns n1,n2,.. (tracks to exclude)\n"); /* [SS] 2017-12-06 */
+      printf ("-xchns n1,n2,.. (channels to exclude)\n"); /* [SS] 2022-11-12 */
       printf ("-chns n1,n2,..(starting from 1)\n");
       printf ("-from n (in midi ticks)\n");
       printf ("-to n   (in midi ticks)\n");

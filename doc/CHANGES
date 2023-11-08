@@ -15107,3 +15107,32 @@ October 25 2023
 
 Midistats returns track activity (note on/off) for every track.
 
+
+November 1 2023
+
+Midistats returns the control volume settings for every track,
+identifies midi files whose note timings are not quantized.
+
+
+November 2 2023
+
+abc2midi bug: In the following example, not all notes are
+tied correctly.
+
+X:1
+T: tied note
+M: 2/4
+L: 1/4
+K: C
+D2-|:D2 |[1CD-:|[2CD|
+
+No fix is available.
+
+
+November 8 2023
+
+midistats: extended the size of arrays (midievents and pulsecounter) to
+handle certain midi files. The function stats_interpret_pulseCounter()
+can detect midi files containing triplets and nonquantized notes.
+
+midicopy: extended to handle midi files with up to 150 tracks.
