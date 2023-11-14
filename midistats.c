@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.79 November 08 2023 midistats"
+#define VERSION "0.80 November 13 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -479,7 +479,7 @@ int maxcount,ncounts;
 int maxloc;
 float threshold,peak;
 int decimate;
-float tripletsCriterion;
+float tripletsCriterion8,tripletsCriterion4;
 int resolution = 12;
 threshold = 10.0/(float) division;
 maxcount = 0;
@@ -501,9 +501,11 @@ for (i = 0; i < division; i++) {
 peak = (float) maxcount/ (float) ncounts;
 /*printf("maxcount = %d ncounts = %d peak = %f threshold = %f\n",maxcount,ncounts,peak,threshold); */
 if (peak < threshold)  printf("unquantized\n");
-tripletsCriterion = (float) pulseDistribution[8]/ (float) ncounts;
+tripletsCriterion8 = (float) pulseDistribution[8]/ (float) ncounts;
+tripletsCriterion4 = (float) pulseDistribution[4]/ (float) ncounts;
 /*printf("tripletsCriterion = %f\n",tripletsCriterion);*/
-if (tripletsCriterion > 0.15) printf("triplets\n");
+if (tripletsCriterion8 > 0.10 || tripletsCriterion4 > 0.10) printf("triplets\n");
+if (pulseDistribution[0]/(float) ncounts > 0.95) printf("qnotes");
 }
 
 void stats_finish()
@@ -927,6 +929,7 @@ lastEvent++;
 if (lastEvent > 49999) {printf("ran out of space in midievents structure\n");
 	exit(1);
         }
+channel_active[chan+1]++;
 }
 
 void record_noteoff(int chan,int pitch,int vol)
@@ -948,8 +951,10 @@ int int_compare_events(const void *a, const void *b) {
 
 void load_header (int format, int ntrks, int ldivision)
 {
+  int i;
   division = ldivision;
   lasttrack = ntrks;
+  for (i=0;i<17;i++) channel_active[i] = 0; /* for counting number of channels*/
 }
 
 
@@ -1221,7 +1226,12 @@ printf("\n");
 
   
 void corestatsOutput() {
-printf("%d\t%d\t%d\t%d\n",lasttrack, division,lastEvent,lastBeat);
+int i;
+int nchannels;
+nchannels = 0;
+for (i=1;i<17;i++) 
+  if (channel_active[i] > 0) nchannels++;
+printf("%d\t%d\t%d\t%d\t%d\n",lasttrack,nchannels, division,lastEvent,lastBeat);
 }
 
 

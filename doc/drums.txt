@@ -15,9 +15,10 @@ track which distinguishes the MIDI files. This is attempted
 in the program midistats.  Here is a short description.
 
 -corestats
-Produces a line with 3 numbers separated by tabs. eg
-384	8349	448
-It returns the number of divisions per quarter note beat (ppqn),
+Produces a line with 5 numbers separated by tabs. eg
+1	8	384	4057	375
+It returns the number of tracks, the number of channels, the
+number of divisions per quarter note beat (ppqn),
 the number of note onsets in the midi file, and the maximum
 number of quarter note beats in midi file.
 
