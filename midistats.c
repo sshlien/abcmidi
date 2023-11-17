@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.80 November 13 2023 midistats"
+#define VERSION "0.80 November 17 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -49,7 +49,7 @@ extern char* strchr();
 #include "midifile.h"
 void initfuncs();
 void stats_finish();
-float histogram_entropy (int *histogram, int size); 
+float histogram_perplexity (int *histogram, int size); 
 void stats_noteoff(int chan,int pitch,int vol);
 void stats_eot ();
 #define max(a,b)  (( a > b ? a : b))
@@ -481,6 +481,7 @@ float threshold,peak;
 int decimate;
 float tripletsCriterion8,tripletsCriterion4;
 int resolution = 12;
+int nzeros;
 threshold = 10.0/(float) division;
 maxcount = 0;
 ncounts = 0;
@@ -498,8 +499,13 @@ for (i = 0; i < division; i++) {
    pulseDistribution[j] += pulseCounter[i];
   }
 
+/* count zeros */
+nzeros = 0;
+for (i=0;i<resolution;i++) if(pulseDistribution[i] == 0) nzeros++;
+if (nzeros > 7 && pulseDistribution[resolution-1] == 0) printf("clean_quantization");
+if (pulseDistribution[resolution-1] > 0.05) printf("dithered_quantization\n");
+
 peak = (float) maxcount/ (float) ncounts;
-/*printf("maxcount = %d ncounts = %d peak = %f threshold = %f\n",maxcount,ncounts,peak,threshold); */
 if (peak < threshold)  printf("unquantized\n");
 tripletsCriterion8 = (float) pulseDistribution[8]/ (float) ncounts;
 tripletsCriterion4 = (float) pulseDistribution[4]/ (float) ncounts;
@@ -574,7 +580,7 @@ else
 printf("\ntrkact ");
   lasttrack++;
   for (i=0;i<lasttrack;i++) printf("% 5d",trkactivity[i]);
-printf("\npitchentropy %f\n",histogram_entropy(pitchclass_activity,12));
+printf("\npitchentropy %f\n",histogram_perplexity(pitchclass_activity,12));
 printf("totalrhythmpatterns =%d\n",nrpatterns);
 printf("collisions = %d\n",ncollisions);
 if (hasLyrics) printf("Lyrics\n");
@@ -584,8 +590,9 @@ printf("\n");
 
 
 
-float histogram_entropy (int *histogram, int size) 
+float histogram_perplexity (int *histogram, int size) 
   {
+  /* The perplexity is 2 to the power of the entropy */
   int i;
   int total;
   float entropy;
@@ -604,7 +611,7 @@ float histogram_entropy (int *histogram, int size)
     entropy = entropy + e;
     } 
   //printf("\n");
-  return -entropy/log(2.0);
+  return pow(2.0,-entropy/log(2.0));
   } 
 
 
@@ -693,7 +700,7 @@ void stats_trackend()
    if (channel_used_in_track[chan] > 0) trkdata.quietTime[chan] += (trkdata.npulses[0] - trkdata.lastNoteOff[chan]); 
  for (chan=0;chan<16;chan++) {  /* 2023-09-13 */
    if (chan == 9 || channel_used_in_track[chan+1] == 0) continue;
-   trkdata.pitchEntropy[chan+1] = histogram_entropy(chanpitchhistogram +chan*12,11);
+   trkdata.pitchEntropy[chan+1] = histogram_perplexity(chanpitchhistogram +chan*12,11);
    }
  output_track_summary(); 
 }
