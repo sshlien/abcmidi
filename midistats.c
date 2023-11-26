@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.80 November 17 2023 midistats"
+#define VERSION "0.81 November 26 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -67,6 +67,7 @@ int lasttrack = 0; /* lasttrack */
 int division;    /* pulses per quarter note defined in MIDI header    */
 int quietLimit;  /* minimum number of pulses with no activity */
 long tempo = 500000; /* the default tempo is 120 quarter notes/minute */
+int bpm = 120; /*default tempo */
 long laston = 0; /* length of MIDI track in pulses or ticks           */
 int key[12];
 int sharps;
@@ -475,7 +476,7 @@ int i;
 /* [SS] 2023-10-30 */
 void stats_interpret_pulseCounter () {
 int i,j;
-int maxcount,ncounts;
+int maxcount,ncounts,npeaks,npositives,peaklimit;
 int maxloc;
 float threshold,peak;
 int decimate;
@@ -485,6 +486,7 @@ int nzeros;
 threshold = 10.0/(float) division;
 maxcount = 0;
 ncounts = 0;
+npeaks = 0;
 for (i=0;i<division;i++) {
   ncounts = ncounts + pulseCounter[i];
   if (pulseCounter[i] > maxcount) {
@@ -492,6 +494,10 @@ for (i=0;i<division;i++) {
        maxcount = pulseCounter[i];
        } 
   } 
+peaklimit = (int) (ncounts * 0.020);
+for (i=0;i<division;i++) {
+  if (pulseCounter[i] > peaklimit) npeaks++;
+  }
 for (i = 0; i < resolution; i++) pulseDistribution[i] = 0;
 decimate = division/resolution;
 for (i = 0; i < division; i++) {
@@ -501,17 +507,26 @@ for (i = 0; i < division; i++) {
 
 /* count zeros */
 nzeros = 0;
-for (i=0;i<resolution;i++) if(pulseDistribution[i] == 0) nzeros++;
-if (nzeros > 7 && pulseDistribution[resolution-1] == 0) printf("clean_quantization");
-if (pulseDistribution[resolution-1] > 0.05) printf("dithered_quantization\n");
-
+for (i=0;i<resolution;i++) if((float) pulseDistribution[i]/(float) ncounts < 0.015 ) nzeros++;
+npositives = resolution - nzeros;
+if (nzeros > 3 && (float) pulseDistribution[resolution-1]/(float) ncounts < 0.1) {printf("clean_quantization\n");
+ } else if ((float) pulseDistribution[resolution-1]/(float) ncounts > 0.09 ||
+            npeaks > npositives) {printf("dithered_quantization\n");
+ } else {
 peak = (float) maxcount/ (float) ncounts;
 if (peak < threshold)  printf("unquantized\n");
+}
+
 tripletsCriterion8 = (float) pulseDistribution[8]/ (float) ncounts;
 tripletsCriterion4 = (float) pulseDistribution[4]/ (float) ncounts;
-/*printf("tripletsCriterion = %f\n",tripletsCriterion);*/
 if (tripletsCriterion8 > 0.10 || tripletsCriterion4 > 0.10) printf("triplets\n");
 if (pulseDistribution[0]/(float) ncounts > 0.95) printf("qnotes");
+/*
+printf("pulseDistribution:");
+for (i=0;i<resolution;i++) printf("%6.3f",(float) pulseDistribution[i]/(float) ncounts);
+printf("\n");
+printf("nzeros = %d npeaks = %d \n",nzeros,npeaks);
+*/
 }
 
 void stats_finish()
@@ -580,7 +595,7 @@ else
 printf("\ntrkact ");
   lasttrack++;
   for (i=0;i<lasttrack;i++) printf("% 5d",trkactivity[i]);
-printf("\npitchentropy %f\n",histogram_perplexity(pitchclass_activity,12));
+printf("\npitchperplexity %f\n",histogram_perplexity(pitchclass_activity,12));
 printf("totalrhythmpatterns =%d\n",nrpatterns);
 printf("collisions = %d\n",ncollisions);
 if (hasLyrics) printf("Lyrics\n");
@@ -945,6 +960,12 @@ void record_noteoff(int chan,int pitch,int vol)
 void record_trackend()
 {
 }
+void record_tempo(long ltempo)
+{ 
+tempo = ltempo;
+if (bpm == 120) bpm = 60000000.0/tempo;
+tempocount++;
+}
 
 int int_compare_events(const void *a, const void *b) {
    struct eventstruc *ia  = (struct eventstruc *)a;
@@ -1013,7 +1034,7 @@ void initfunc_for_loadNoteEvents()
     Mf_eot = no_op0;
     Mf_timesig = no_op4;
     Mf_smpte = no_op5;
-    Mf_tempo = no_op1;
+    Mf_tempo = record_tempo;
     Mf_keysig = no_op2;
     Mf_seqspecific = no_op3;
     Mf_text = no_op3;
@@ -1238,7 +1259,8 @@ int nchannels;
 nchannels = 0;
 for (i=1;i<17;i++) 
   if (channel_active[i] > 0) nchannels++;
-printf("%d\t%d\t%d\t%d\t%d\n",lasttrack,nchannels, division,lastEvent,lastBeat);
+printf("%d\t%d\t%d\t%d\t%d\t%d\n",lasttrack,nchannels, division,bpm,lastEvent,lastBeat);
+/*printf("%d\n",tempocount);*/
 }
 
 
