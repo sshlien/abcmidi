@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
  
-#define VERSION "0.81 November 26 2023 midistats"
+#define VERSION "0.82 December 17 2023 midistats"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -81,6 +81,7 @@ int percpattern;
 int percpatternfor;
 int percpatternhist;
 int pitchclassanalysis;
+int nseqfor;
 int corestats;
 int chordthreshold; /* number of maximum number of pulses separating note */
 int beatsPerBar = 4; /* 4/4 time */
@@ -110,6 +111,7 @@ int percpattern = 0;
 int percpatternfor = 0;
 int percpatternhist = 0;
 int pitchclassanalysis = 0;
+int nseqfor = 0;
 int corestats = 0;
 
 
@@ -125,7 +127,9 @@ int channel_used_in_track[17]; /* for dealing with quietTime [SS] 2023-09-06 */
 
 int histogram[256];
 unsigned char drumpat[8000];
+unsigned char pseq[8000];
 int percnum;
+int nseqchn;
 
 
 
@@ -1135,6 +1139,44 @@ for (i = 0; i <lastEvent; i++) {
   }
 }
 
+static int pitch2noteseq[] = {
+ 0,  0,  1,  1,  2,  3,  3,  4,
+ 4,  5,  5,  6};
+
+void  noteseqmap(int chn) {
+int i;
+int half;
+int channel;
+int pitchclass;
+int onset;
+int index;
+int remainder;
+int noteNum;
+int part;
+printf("noteseqmap %d\n",chn);
+half = division/2;
+for (i = 0; i<8000; i++) pseq[i] = 0;
+for (i = 0; i <lastEvent; i++) {
+  channel = midievents[i].channel;
+  if (channel != chn) continue;
+  pitchclass = midievents[i].pitch % 12;
+  noteNum = pitch2noteseq[pitchclass];
+  onset = midievents[i].onsetTime;
+  index = onset/half;
+  if (index >= 8000) {printf("index too large in drumpattern\n");
+	              break;
+                      }
+  pseq[index] = pseq[index] |= 1 << noteNum;
+  /*printf("pitchclass = %d noteNum =%d index = %d pseq[index] %d \n",pitchclass, noteNum, index, pseq[index]); */
+  }
+printf("lastBeat = %d\n",lastBeat);
+for (i=0;i<(lastBeat+1)*2;i++) {
+   printf("%d ",pseq[i]);
+   if (i >= 8000) break;
+   }
+printf("\n");
+}
+
 void dualDrumPattern (int perc1, int perc2) {
 int i;
 int channel;
@@ -1403,6 +1445,16 @@ int argc;
                   }
           }
 
+  arg = getarg("-nseqfor",argc,argv);
+  if (arg != -1) {
+	  nseqfor = 1;
+	  stats = 0;
+	  if (arg != -1 && arg <argc) {
+		  nseqchn = readnum(argv[arg]);
+	          printf("nseqch = %d\n",nseqchn);
+                  }
+          }
+
   arg = getarg("-ppathist",argc,argv);
   if (arg != -1) {
 	  percpatternhist = 1;
@@ -1443,6 +1495,7 @@ int argc;
     printf("         -ppatfor\n");
     printf("         -ppathist\n");
     printf("         -pitchclass\n");
+    printf("         -nseqfor\n");
     printf("         -ver version number\n");
     printf("         -d <number> debug parameter\n");
     printf(" The input filename is assumed to be any string not\n");
@@ -1494,6 +1547,9 @@ if (percpatternhist) {
     percsummary();
     drumPatternHistogram();
     }
+if (nseqfor) {
+    noteseqmap(nseqchn);
+    }
 if (corestats) corestatsOutput();
 if (pitchclassanalysis) {
    pitchClassAnalysis();
@@ -1514,6 +1570,6 @@ int argc;
   if(stats == 1)  midistats(argc,argv);
   if(pulseanalysis || corestats || percanalysis ||\
     percpatternfor || percpattern || percpatternhist ||\
-    pitchclassanalysis) loadEvents();
+    pitchclassanalysis || nseqfor) loadEvents();
   return 0;
 }

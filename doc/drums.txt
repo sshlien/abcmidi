@@ -83,4 +83,25 @@ first two lines. In the next line the number of occurrences of
 each value in the -ppat listing is given. The number in parentheses
 splits the two 4-bit values with a period. Thus 33 = (2*16 + 1).
 
+-nseqfor -n
+
+Note sequence for channel n. This option produces a string for bytes
+indicating the presence of a note in a time unit corresponding to
+an eigth note. Thus each quarter note beat is represented by two
+bytes. The pitch class is represented by the line number on the
+staff, where 0 is C. Thus the notes on a scale are represented
+by 7 numbers, and sharps and flats are ignored. The line number is
+then converted to a bit position in the byte, so that the pitch
+classes are represented by the numbers 1,2,4,8, and etc. A chord
+of consisting of two note onsets would set two of the corresponding
+bits. If we were to represent the full chromatic scale consisting
+of 12 pitches, then we would require two-byte integers or
+twice of much memory.
+
+Though the pitch resolution is not sufficient to distinguish
+major or minor chords, it should be sufficient to be identify some
+repeating patterns.
+
+
+
 
