@@ -15151,3 +15151,37 @@ copying it to disk.
 midistats: Introducing a new option -nseqfor n where is a channel
 number. See drums.txt for a description.
 
+
+December 23 2023
+
+abc2midi: gchord bug
+
+The following example produces some strange artefacts on starting
+the midi file for some players.
+
+X:1
+T:Test
+L:1/8
+Q:1/2=30
+M:2/2
+%%MIDI gchord GHIc
+K:C
+GAB | "C"c4 C4 |
+
+Explanation: the output midi file plays a note with midi pitch 0
+in the accompaniment channel. The problem originates in the dogchords()
+function for switch case 'G': in genmidi.c. Since g_started is 0,
+the second branch of the if statement is executed, but the pitch
+value in gchordnotes[gchordnotes_size] contains 0.
+
+Fix: the switch statement should not be executed since g_started is
+0 (i.e. the gchord accompaniment does not start till "C" is encountered).
+The switch statement is now bypassed when either g_started 
+or gchords is 0. The tests for gchords and g_started in all the
+case statements were removed since they are unnecessary.
+
+
+
+
+
+
