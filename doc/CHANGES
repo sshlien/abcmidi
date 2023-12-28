@@ -15182,6 +15182,28 @@ case statements were removed since they are unnecessary.
 
 
 
+December 28 2023
 
+abc2midi: tuplet bug
+
+The following example produces the error
+
+Warning in line-char 7-8 : Different length notes in tuple
+
+X:1
+T:Test
+L:1/4
+Q:1/4=90
+M:3/4
+K:D
+(3[ac']/d'/[ac']/ [ac']/z/ |
+
+Analysis: though it is legal to have different length notes (and
+rests) in a tuple, this is clearly a bug. The message occurs in the
+function event_note() in store.c. tnote_num and tnote_denom should
+contain the expected length of the note in the tuple based on the
+first note encountered in the tuple. The value of tnote_denom was
+not adjusted by event_chordoff to compensate by the length value
+specified at the end of the [ac'] chord, resulting in the problem.
 
 

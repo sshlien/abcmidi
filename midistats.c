@@ -16,9 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
- */
+*/
  
-#define VERSION "0.82 December 17 2023 midistats"
+#define VERSION "0.83 December 27 2023 midistats"
+
+/* midistrats.c is a descendent of midi2abc.c which was becoming to
+   large. The object of the program is to extract statistical characterisitic 
+   of a midi file. It is mainly called by the midiexplorer.tcl application,
+   but it now used to create some databases using runstats.tcl which
+   comes with the midiexplorer package.
+
+   By default the program produces a summary that is described in the
+   midistats.1 man file. This is done by making a single pass through
+   the midi file. If the program is called with one of the runtime
+   options, the program extracts particular information by making more
+   than one pass. In the first pass it creates a table of all the
+   midievents which is stored in memory. The midievents are sorted in
+   time, and the requested information is extracted by going through
+   this table.
+*/
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -52,6 +68,7 @@ void stats_finish();
 float histogram_perplexity (int *histogram, int size); 
 void stats_noteoff(int chan,int pitch,int vol);
 void stats_eot ();
+void keymatch();
 #define max(a,b)  (( a > b ? a : b))
 #define min(a,b) (( a < b ? a : b))
 
@@ -584,6 +601,9 @@ for (i=35;i<100;i++) {
 
 printf("\npitches "); /* [SS] 2017-11-01 */
 for (i=0;i<12;i++) printf("%d ",pitchhistogram[i]);
+
+keymatch();
+
 printf("\npitchact "); /* [SS] 2018-02-02 */
 if (npulses > 0)
   for (i=0;i<12;i++) printf("%5.2f ",pitchclass_activity[i]/(double) npulses);
@@ -1253,6 +1273,117 @@ for (i=0;i<lastBeat;i++) printf("%d ",drumpat[i]);
 printf("\n");
 }
 
+/*
+The key match algorithm is based on the work of Craig Sapp
+Visual Hierarchical Key Analysis
+ https://ccrma.stanford.edu/~craig/papers/05/p3d-sapp.pdf
+published in Proceedings of the International Computer Music
+Conference,2001,
+and the work of Krumhansl and Schmukler.
+
+ Craig Sapp's simple coefficients (mkeyscape)
+ Major C scale
+
+The algorithm correlates the pitch class class histogram with
+the ssMj or ssMn coefficients trying all 12 key centers, and
+looks for a maximum.
+
+The algorithm returns the key, sf (the number of sharps or
+flats), and the maximum peak which is relatable to the
+level of confidence we have of the result.
+*/
+static float  ssMj[] = { 1.25, -0.75, 0.25, -0.75, 0.25, 0.25,
+  -0.75, 1.25, -0.75, 0.25, -0.75, 0.25};
+
+/* Minor C scale (3 flats)
+*/
+static float ssMn[] = { 1.25, -0.75, 0.25, 0.25, -0.75, 0.25,
+  -0.75, 1.25, 0.25, -0.75, 0.25, -0.75};
+
+static char *keylist[] = {"C", "C#", "D", "Eb", "E", "F",
+  "F#", "G", "Ab", "A", "Bb", "B"};
+
+static char *majmin[] = {"maj", "min"};
+
+/* number of sharps or flats for major keys in keylist */
+static int maj2sf[] = {0,  7,  2, -3,  4, -1,  6,  1, -4, 3, -2, 5};
+static int min2sf[] = {-3, 4, -1, -6, -4,  3, -4  -2, -7, 0, -5, 2};
+
+void keymatch () {
+int i;
+int r;
+int k;
+float c2M,c2m,h2,hM,hm;
+float rmaj[12],rmin[12];
+float hist[12];
+float best;
+int bestIndex,bestMode;
+int sf; /* number of flats or sharps (flats negative) */ 
+int total;
+float fnorm;
+
+c2M = 0.0;
+c2m = 0.0;
+h2 = 0.0;
+best = 0.0;
+bestIndex = 0;
+bestMode = -1;
+total =0;
+for (i=0;i<12;i++) {
+   total += pitchhistogram[i];
+   }
+for (i=0;i<12;i++) {
+   hist[i] = (float) pitchhistogram[i]/(float) total;
+   }
+fnorm = 0.0;
+for (i=0;i<12;i++) {
+   fnorm = hist[i]*hist[i] + fnorm;
+   }
+fnorm = sqrt(fnorm);
+for (i=0;i<12;i++) {
+   hist[i] = hist[i]/fnorm;
+   }
+
+for (i=0;i<12;i++) {
+  c2M += ssMj[i]*ssMj[i];
+  c2m += ssMn[i]*ssMn[i];
+  h2 += hist[i]*hist[i]; 
+  }
+if (h2 < 0.0001) {
+  printf("zero histogram\n");
+  return;
+  }
+for (r=0;r<12;r++) {
+  hM = 0.0;
+  hm = 0.0;
+  for (i=0;i<12;i++) {
+    k = (i - r) % 12;
+    if (k < 0) k = k + 12;
+    hM += hist[i]*ssMj[k];
+    hm += hist[i]*ssMn[k];
+    }
+  rmaj[r] = hM/sqrt(h2*c2M);
+  rmin[r] = hm/sqrt(h2*c2m);
+  }
+
+for (r=0;r<12;r++) {
+  if(rmaj[r] > best) {
+      best = rmaj[r];
+      bestIndex = r;
+      bestMode = 0;
+      }
+  if(rmin[r] > best) {
+      best = rmin[r];
+      bestIndex = r;
+      bestMode = 1;
+      }
+  }
+if (bestMode == 0) sf = maj2sf[bestIndex];
+else sf = min2sf[bestIndex];
+ 
+/*printf("\nkeymatch: best = %f bestIndex = %d bestMode = %d",best,bestIndex,bestMode);*/
+printf("\nkey %s%s %d %f",keylist[bestIndex],majmin[bestMode],sf,best);
+}
 
 
 void percsummary () {
