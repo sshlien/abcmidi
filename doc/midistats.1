@@ -1,4 +1,4 @@
-.TH MIDISTATS 1 "27 December 2023"
+.TH MIDISTATS 1 "02 January 2024"
 .SH NAME
 \fBmidistats\fP \- program to summarize the statistical properties of a midi file
 .SH SYNOPSIS
@@ -78,10 +78,17 @@ that occur in the midi file.
 .PP
 key indicates the key of the music, the number of sharps (positive) or
 flats (negative) in the key signature, and a measure of the confidence
-in this key signature. The key was estimated from the above pitch histogram.
-A confidence level below 0.4 indicates that the pitch histogram does
-not follow the histogram of a major or minor scale. (It may be the
-result of a mixture of two key signatures.)
+in this key signature. The key was estimated from the above pitch histogram
+by convolving with Craig Sapp's model. The peak of rmaj or rmin (below)
+indicates the key.  A correlation less than 0.4 indicates that the pitch
+histogram does not follow the histogram of a major or minor scale.
+(It may be the result of a mixture of two key signatures.)
+.PP
+rmaj the cross correlation coefficients with Craig Sapp's major key model
+for each of the 11 keys (C, C#, D, ...,B).
+.PP
+rmaj the cross correlation coefficients with Craig Sapp's minor key model
+for each of the 11 keys (C, C#, D, ...,B).
 .PP
 pitchact is a similar histogram but is weighted by the length of
 the notes.

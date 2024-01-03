@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.83 December 27 2023 midistats"
+#define VERSION "0.84 December 29 2023 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -1381,8 +1381,11 @@ for (r=0;r<12;r++) {
 if (bestMode == 0) sf = maj2sf[bestIndex];
 else sf = min2sf[bestIndex];
  
-/*printf("\nkeymatch: best = %f bestIndex = %d bestMode = %d",best,bestIndex,bestMode);*/
 printf("\nkey %s%s %d %f",keylist[bestIndex],majmin[bestMode],sf,best);
+printf("\nrmaj ");
+for (r=0;r<12;r++) printf("%7.3f",rmaj[r]);
+printf("\nrmin ");
+for (r=0;r<12;r++) printf("%7.3f",rmin[r]);
 }
 
 
