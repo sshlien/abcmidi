@@ -15207,3 +15207,23 @@ not adjusted by event_chordoff to compensate by the length value
 specified at the end of the [ac'] chord, resulting in the problem.
 
 
+January 15 2024
+
+abc2midi bug: the following example produces a warning, but the
+the output midi file is correct.
+
+Warning in line-char 7-23 : Track 1 Bar 1 has 1 time units while the time signature has 2
+
+X:1
+T:Test trill
+L:1/4
+M:2/2
+Q:1/2=60
+K:Dm
+ !trill!"C"g4- | g2^c2 |
+
+Analysis: this warning is produced by checkbar() in genmidi.c. This problem was
+reported in this file on November 23 2012. The code for handling tied notes is
+quite intricate and I do not understand it. I am hesitant in tampering with the code.
+ 
+

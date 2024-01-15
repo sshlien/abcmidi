@@ -1,4 +1,4 @@
-.TH MIDISTATS 1 "02 January 2024"
+.TH MIDISTATS 1 "04 January 2024"
 .SH NAME
 \fBmidistats\fP \- program to summarize the statistical properties of a midi file
 .SH SYNOPSIS
@@ -251,7 +251,7 @@ splits the two 4-bit values with a period. Thus 33 = (2*16 + 1).
 .br
 Returns the pitch class distribution for the entire midi file.
 .PP
--nseqfor
+-nseqfor n
 .br
 Note sequence for channel n. This option produces a string of bytes
 indicating the presence of a note in a time unit corresponding to
@@ -269,12 +269,14 @@ twice of much memory.
 Though the pitch resolution is not sufficient to distinguish
 major or minor chords, it should be sufficient to be identify some
 repeating patterns.
+.PP
+-nseq
+.br
+Same as above except it is applied to all channels except the
+percussion channel.
 
 
 -ver (version number)
-
-.B etc. (See drums.txt in doc folder.)
-
 
 
 .SH AUTHOR

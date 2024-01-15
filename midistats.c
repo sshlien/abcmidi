@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.84 December 29 2023 midistats"
+#define VERSION "0.85 January 04 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -1178,15 +1178,17 @@ half = division/2;
 for (i = 0; i<8000; i++) pseq[i] = 0;
 for (i = 0; i <lastEvent; i++) {
   channel = midievents[i].channel;
-  if (channel != chn) continue;
-  pitchclass = midievents[i].pitch % 12;
-  noteNum = pitch2noteseq[pitchclass];
-  onset = midievents[i].onsetTime;
-  index = onset/half;
-  if (index >= 8000) {printf("index too large in drumpattern\n");
+  if (channel == 9) continue; /* ignore percussion channel */
+  if (channel == chn || chn == -1) {
+    pitchclass = midievents[i].pitch % 12;
+    noteNum = pitch2noteseq[pitchclass];
+    onset = midievents[i].onsetTime;
+    index = onset/half;
+    if (index >= 8000) {printf("index too large in drumpattern\n");
 	              break;
                       }
-  pseq[index] = pseq[index] |= 1 << noteNum;
+    pseq[index] = pseq[index] |= 1 << noteNum;
+    }
   /*printf("pitchclass = %d noteNum =%d index = %d pseq[index] %d \n",pitchclass, noteNum, index, pseq[index]); */
   }
 printf("lastBeat = %d\n",lastBeat);
@@ -1589,6 +1591,13 @@ int argc;
                   }
           }
 
+  arg = getarg("-nseq",argc,argv);
+  if (arg != -1) {
+	  nseqfor = 1;
+	  stats = 0;
+          nseqchn = -1;
+          }
+
   arg = getarg("-ppathist",argc,argv);
   if (arg != -1) {
 	  percpatternhist = 1;
@@ -1626,10 +1635,11 @@ int argc;
     printf("         -pulseanalysis\n");
     printf("         -panal\n");
     printf("         -ppat\n");
-    printf("         -ppatfor\n");
+    printf("         -ppatfor pitch\n");
     printf("         -ppathist\n");
     printf("         -pitchclass\n");
-    printf("         -nseqfor\n");
+    printf("         -nseq\n");
+    printf("         -nseqfor channel\n");
     printf("         -ver version number\n");
     printf("         -d <number> debug parameter\n");
     printf(" The input filename is assumed to be any string not\n");
