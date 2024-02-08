@@ -1,5 +1,4 @@
-/* midistats - program to extract statistics from MIDI files
- * Derived from midi2abc.c
+/* Derived from midi2abc.c
  * Copyright (C) 1998 James Allwright
  * e-mail: J.R.Allwright@westminster.ac.uk
  *
@@ -18,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.85 January 04 2024 midistats"
+#define VERSION "0.86 February 04 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -69,6 +68,7 @@ float histogram_perplexity (int *histogram, int size);
 void stats_noteoff(int chan,int pitch,int vol);
 void stats_eot ();
 void keymatch();
+void outputNoteMemory(); 
 #define max(a,b)  (( a > b ? a : b))
 #define min(a,b) (( a < b ? a : b))
 
@@ -82,6 +82,7 @@ static FILE *outhandle; /* for producing the abc file */
 int tracknum=0;  /* track number */
 int lasttrack = 0; /* lasttrack */
 int division;    /* pulses per quarter note defined in MIDI header    */
+int halfdivision; /* pulses per eighth note */
 int quietLimit;  /* minimum number of pulses with no activity */
 long tempo = 500000; /* the default tempo is 120 quarter notes/minute */
 int bpm = 120; /*default tempo */
@@ -99,6 +100,7 @@ int percpatternfor;
 int percpatternhist;
 int pitchclassanalysis;
 int nseqfor;
+int pmove;
 int corestats;
 int chordthreshold; /* number of maximum number of pulses separating note */
 int beatsPerBar = 4; /* 4/4 time */
@@ -145,8 +147,11 @@ int channel_used_in_track[17]; /* for dealing with quietTime [SS] 2023-09-06 */
 int histogram[256];
 unsigned char drumpat[8000];
 unsigned char pseq[8000];
+unsigned char maxpitch[8000];
+int pseqhist[128];
 int percnum;
 int nseqchn;
+int nseqdistinct;
 
 
 
@@ -239,6 +244,7 @@ struct hashStruct {
 
 int ncollisions = 0;
 int nrpatterns = 0;
+int nseqdistinct = 0;
 
 void handle_collision () {
 ncollisions++;
@@ -440,6 +446,7 @@ void stats_header (int format, int ntrks, int ldivision)
 {
   int i;
   division = ldivision;
+  halfdivision = ldivision/2;
   quietLimit = ldivision*8;
   divisionsPerBar = division*beatsPerBar;
   unitDivision = divisionsPerBar/24;
@@ -625,6 +632,7 @@ printf("collisions = %d\n",ncollisions);
 if (hasLyrics) printf("Lyrics\n");
 stats_interpret_pulseCounter ();
 printf("\n");
+outputNoteMemory(); 
 }
 
 
@@ -744,6 +752,55 @@ void stats_trackend()
  output_track_summary(); 
 }
 
+struct notememory {int eighthUnit;
+                   int nowPitch;
+                   int beforePitch;
+                   int previousPitch;
+                   int zeroCount;
+                   int stepCount;
+                   int jumpCount;
+                   } nm[17];
+
+
+void clearNotememory () {
+ int i;
+ for (i=0;i<17;i++) {
+    nm[i].eighthUnit = 0;
+    nm[i].nowPitch = 0;
+    nm[i].beforePitch = 0;
+    nm[i].previousPitch = 0;
+    nm[i].zeroCount = 0;
+    nm[i].stepCount = 0;
+    nm[i].jumpCount = 0;
+    }
+}
+ 
+void updateNotememory (int unit, int chn, int pitch) {
+int deltaPitch;
+if (chn == 9) return;
+if (unit == nm[chn].eighthUnit) {
+   if (pitch > nm[chn].nowPitch)  nm[chn].nowPitch = pitch;
+   return;
+   }
+/* unit is different */
+nm[chn].beforePitch = nm[chn].nowPitch;
+nm[chn].nowPitch = pitch;
+if (nm[chn].previousPitch > 0)
+  {
+  deltaPitch = nm[chn].beforePitch - nm[chn].previousPitch;
+  if (deltaPitch < 0) deltaPitch = -deltaPitch;
+  if (deltaPitch == 0) nm[chn].zeroCount++;
+  else if (deltaPitch < 4) nm[chn].stepCount++;
+  else nm[chn].jumpCount++;
+  }
+if (nm[chn].beforePitch != 0) nm[chn].previousPitch = nm[chn].beforePitch;
+nm[chn].eighthUnit = unit;
+/*printf("%d, %d, %d, %d, %d, %d %d\n",unit,nm[chn].beforePitch,nm[chn].previousPitch,\
+  deltaPitch,nm[chn].zeroCount,nm[chn].stepCount,nm[chn].jumpCount);
+*/
+
+}
+
 
 
 void stats_noteon(chan,pitch,vol)
@@ -752,6 +809,7 @@ int chan, pitch, vol;
  int delta;
  int barnum;
  int unit;
+ int eigthunit;
  int dithermargin; /* [SS] 2023-08-22 */
  int cpitch; /* [SS] 2023-09-13 */
  int pulsePosition;
@@ -803,6 +861,9 @@ int chan, pitch, vol;
   //printf("unit = %d pattern = %d \n",unit,barChn[chan].rhythmPattern);
   barChn[chan].rhythmPattern = barChn[chan].rhythmPattern |= (1UL << unit);
   chanpitchhistogram[chan*12+cpitch]++;  /* [SS] 2023-09-13 */
+
+  eigthunit = Mf_currtime/halfdivision;
+  updateNotememory (eigthunit,  chan,  pitch); 
   }
 
 
@@ -975,6 +1036,7 @@ lastEvent++;
 if (lastEvent > 49999) {printf("ran out of space in midievents structure\n");
 	exit(1);
         }
+/*if (lastEvent < 20) {printf("record_noteon %d %d %d %ld\n",chan,pitch,vol,Mf_currtime/halfdivision);}*/
 channel_active[chan+1]++;
 }
 
@@ -1005,6 +1067,7 @@ void load_header (int format, int ntrks, int ldivision)
 {
   int i;
   division = ldivision;
+  halfdivision = ldivision/2;
   lasttrack = ntrks;
   for (i=0;i<17;i++) channel_active[i] = 0; /* for counting number of channels*/
 }
@@ -1173,7 +1236,6 @@ int index;
 int remainder;
 int noteNum;
 int part;
-printf("noteseqmap %d\n",chn);
 half = division/2;
 for (i = 0; i<8000; i++) pseq[i] = 0;
 for (i = 0; i <lastEvent; i++) {
@@ -1191,12 +1253,132 @@ for (i = 0; i <lastEvent; i++) {
     }
   /*printf("pitchclass = %d noteNum =%d index = %d pseq[index] %d \n",pitchclass, noteNum, index, pseq[index]); */
   }
-printf("lastBeat = %d\n",lastBeat);
+}
+
+void print_pseq () {
+int i;
 for (i=0;i<(lastBeat+1)*2;i++) {
    printf("%d ",pseq[i]);
    if (i >= 8000) break;
    }
 printf("\n");
+}
+
+int noteseqhist(int chan) {
+int nonzeros;
+int i;
+nonzeros = 0;
+noteseqmap(chan); 
+for (i=0;i<128;i++) {
+  pseqhist[i] = 0;
+  }
+for (i=0;i<lastBeat;i++) {
+  pseqhist[pseq[i]]++;
+  }
+for (i=0;i<128;i++) {
+  if (pseqhist[i] > 0)
+    nonzeros++;;
+  }
+return nonzeros;
+}
+
+void allDistinctNoteSeq() {
+int i;
+int nonzeros;
+for (i=0;i<17;i++) {
+  /*printf("\n%d,%d",i,channel_active[i+1]);*/
+  if (i == 9) continue;
+  if (channel_active[i+1] == 0) continue;
+  nonzeros = noteseqhist(i);
+  if (channel_active[i+1] > 0) printf("\t%d,%d",i+1,nonzeros);
+  }
+printf("\n");
+}
+
+
+void  maxpitchInInterval(int chn) {
+int i;
+int half;
+int channel;
+int pitch;
+int onset;
+int index;
+int remainder;
+int noteNum;
+int part;
+half = division/2;
+for (i = 0; i<8000; i++) maxpitch[i] = 0;
+for (i = 0; i <lastEvent; i++) {
+  channel = midievents[i].channel;
+  if (channel == 9) continue; /* ignore percussion channel */
+  if (channel == chn || chn == -1) {
+    pitch = midievents[i].pitch;
+    onset = midievents[i].onsetTime;
+    index = onset/half;
+    if (index >= 8000) {printf("index too large in drumpattern\n");
+	              break;
+                      }
+    if (pitch > maxpitch[index]) maxpitch[index] = pitch;
+    }
+  /*printf("pitchclass = %d noteNum =%d index = %d pseq[index] %d \n",pitchclass, noteNum, index, pseq[index]); */
+  }
+/*printf("maxpitch = \n");
+for (i=0;i<100;i++) printf(" %d,",maxpitch[i]);
+printf("\n");
+*/
+}
+
+
+void pitchDifference (int chn) {
+int i;
+int nzeros;
+int nsteps;
+int njumps;
+int lastmax;
+int pmax;
+int pdif;
+nzeros = 0;
+nsteps = 0;
+njumps = 0;
+lastmax = 0;
+pdif = 0;
+maxpitchInInterval(chn);
+for (i = 0; i <lastEvent; i++) {
+  if (maxpitch[i] > 0) {
+    pmax = maxpitch[i];
+    if (lastmax > 0) {
+       pdif = pmax - lastmax;
+       if (pdif == 0) nzeros++;
+       else if (abs(pdif) <4) nsteps++;
+       else njumps++;
+       }
+  lastmax = pmax;
+  /*if(i<40) printf("%d %d %d %d %d %d\n",pmax,lastmax,pdif,nzeros,nsteps,njumps);
+  */
+  }
+}
+printf("%d %d %d %d\n",chn+1,nzeros,nsteps,njumps);
+}
+
+void allPitchDifference() {
+int i;
+int nonzeros;
+for (i=0;i<17;i++) {
+  /*printf("\n%d,%d",i,channel_active[i+1]);*/
+  if (i == 9) continue;
+  if (channel_active[i+1] == 0) continue;
+  pitchDifference(i);
+  }
+printf("\n");
+}
+
+void outputNoteMemory() {
+int i;
+for (i=0;i<17;i++) {
+  if (i == 9) continue;
+  if ((nm[i].zeroCount + nm[i].stepCount+nm[i].jumpCount) == 0) continue;
+  printf("pmove:  %d %d %d %d\n",i+1,nm[i].zeroCount,nm[i].stepCount,nm[i].jumpCount);
+  }
 }
 
 void dualDrumPattern (int perc1, int perc2) {
@@ -1598,6 +1780,19 @@ int argc;
           nseqchn = -1;
           }
 
+  arg = getarg("-pmove",argc,argv);
+  if (arg != -1) {
+	  pmove = 1;
+	  stats = 0;
+          }
+
+  arg = getarg("-nseqtokens",argc,argv);
+  if (arg != -1) {
+	  nseqdistinct = 1;
+	  stats = 0;
+          }
+
+
   arg = getarg("-ppathist",argc,argv);
   if (arg != -1) {
 	  percpatternhist = 1;
@@ -1640,6 +1835,8 @@ int argc;
     printf("         -pitchclass\n");
     printf("         -nseq\n");
     printf("         -nseqfor channel\n");
+    printf("         -nseqtokens\n");
+    printf("         -pmove\n");
     printf("         -ver version number\n");
     printf("         -d <number> debug parameter\n");
     printf(" The input filename is assumed to be any string not\n");
@@ -1693,7 +1890,14 @@ if (percpatternhist) {
     }
 if (nseqfor) {
     noteseqmap(nseqchn);
+    print_pseq();  
     }
+if (nseqdistinct) {
+   allDistinctNoteSeq(); 
+   }
+if (pmove) {
+   allPitchDifference(); 
+   }
 if (corestats) corestatsOutput();
 if (pitchclassanalysis) {
    pitchClassAnalysis();
@@ -1714,6 +1918,7 @@ int argc;
   if(stats == 1)  midistats(argc,argv);
   if(pulseanalysis || corestats || percanalysis ||\
     percpatternfor || percpattern || percpatternhist ||\
-    pitchclassanalysis || nseqfor) loadEvents();
+    pitchclassanalysis || nseqfor || nseqdistinct ||\
+    pmove) loadEvents();
   return 0;
 }
