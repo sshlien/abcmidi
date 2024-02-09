@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.86 February 04 2024 midistats"
+#define VERSION "0.87 February 09 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -69,6 +69,8 @@ void stats_noteoff(int chan,int pitch,int vol);
 void stats_eot ();
 void keymatch();
 void outputNoteMemory(); 
+void clearTrackNm ();
+
 #define max(a,b)  (( a > b ? a : b))
 #define min(a,b) (( a < b ? a : b))
 
@@ -194,6 +196,17 @@ struct trkstat {
  * tempo is the number of times there is a tempo command.
  * npulses is the number of pulses.
  */
+
+struct notememory {int eighthUnit;
+                   int nowPitch;
+                   int beforePitch;
+                   int previousPitch;
+                   int zeroCount;
+                   int stepCount;
+                   int jumpCount;
+                   } nm[17];
+
+struct notememory tracknm;
 
 int progcolor[17]; /* used by stats_program */
 int drumhistogram[100]; /* counts drum noteons */
@@ -707,6 +720,7 @@ for (i=1;i<17;i++) {
    printf("\n");
 
    channel2nnotes[i] += trkdata.notecount[i] + trkdata.chordcount[i];
+   if (lasttrack > 1) printf("nzeros = %d nsteps = %d njumps = %d\n",tracknm.zeroCount,tracknm.stepCount,tracknm.jumpCount);
   }
 }
 
@@ -717,6 +731,7 @@ void stats_trackstart()
 {
   int i;
   tracknum++;
+  clearTrackNm (); 
   for (i=0;i<17;i++) {
      trkdata.notecount[i] = 0;
      trkdata.notemeanpitch[i] = 0;
@@ -752,15 +767,6 @@ void stats_trackend()
  output_track_summary(); 
 }
 
-struct notememory {int eighthUnit;
-                   int nowPitch;
-                   int beforePitch;
-                   int previousPitch;
-                   int zeroCount;
-                   int stepCount;
-                   int jumpCount;
-                   } nm[17];
-
 
 void clearNotememory () {
  int i;
@@ -773,6 +779,16 @@ void clearNotememory () {
     nm[i].stepCount = 0;
     nm[i].jumpCount = 0;
     }
+}
+
+void clearTrackNm () {
+    tracknm.eighthUnit = 0;
+    tracknm.nowPitch = 0;
+    tracknm.beforePitch = 0;
+    tracknm.previousPitch = 0;
+    tracknm.zeroCount = 0;
+    tracknm.stepCount = 0;
+    tracknm.jumpCount = 0;
 }
  
 void updateNotememory (int unit, int chn, int pitch) {
@@ -800,6 +816,34 @@ nm[chn].eighthUnit = unit;
 */
 
 }
+
+void updateTrackNotememory (int unit, int chn, int pitch) {
+int deltaPitch;
+if (chn == 9) return;
+if (unit == tracknm.eighthUnit) {
+   if (pitch > tracknm.nowPitch)  tracknm.nowPitch = pitch;
+   return;
+   }
+/* unit is different */
+tracknm.beforePitch = tracknm.nowPitch;
+tracknm.nowPitch = pitch;
+if (tracknm.previousPitch > 0)
+  {
+  deltaPitch = tracknm.beforePitch - tracknm.previousPitch;
+  if (deltaPitch < 0) deltaPitch = -deltaPitch;
+  if (deltaPitch == 0) tracknm.zeroCount++;
+  else if (deltaPitch < 4) tracknm.stepCount++;
+  else tracknm.jumpCount++;
+  }
+if (tracknm.beforePitch != 0) tracknm.previousPitch = tracknm.beforePitch;
+tracknm.eighthUnit = unit;
+/*printf("%d, %d, %d, %d, %d, %d %d\n",unit,nm[chn].beforePitch,nm[chn].previousPitch,\
+  deltaPitch,nm[chn].zeroCount,nm[chn].stepCount,nm[chn].jumpCount);
+*/
+
+}
+
+
 
 
 
@@ -864,6 +908,7 @@ int chan, pitch, vol;
 
   eigthunit = Mf_currtime/halfdivision;
   updateNotememory (eigthunit,  chan,  pitch); 
+  updateTrackNotememory (eigthunit,  chan,  pitch); 
   }
 
 
@@ -1377,8 +1422,18 @@ int i;
 for (i=0;i<17;i++) {
   if (i == 9) continue;
   if ((nm[i].zeroCount + nm[i].stepCount+nm[i].jumpCount) == 0) continue;
-  printf("pmove:  %d %d %d %d\n",i+1,nm[i].zeroCount,nm[i].stepCount,nm[i].jumpCount);
+  printf("nzeros: ");
+  for(i=0;i<16;i++) printf(" %d",nm[i].zeroCount);
+  printf("\nnsteps: ");
+  for(i=0;i<16;i++) printf(" %d",nm[i].stepCount);
+  printf("\nnjumps: ");
+  for(i=0;i<16;i++) printf(" %d",nm[i].jumpCount);
+  printf("\n");
   }
+
+
+/* printf("pmove:  %d %d %d %d\n",i+1,nm[i].zeroCount,nm[i].stepCount,nm[i].jumpCount);
+  }*/
 }
 
 void dualDrumPattern (int perc1, int perc2) {
