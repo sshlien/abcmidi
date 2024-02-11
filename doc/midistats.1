@@ -1,4 +1,4 @@
-.TH MIDISTATS 1 "04 January 2024"
+.TH MIDISTATS 1 "11 February 2024"
 .SH NAME
 \fBmidistats\fP \- program to summarize the statistical properties of a midi file
 .SH SYNOPSIS
@@ -26,7 +26,7 @@ applies.
 program is followed by the channel number and the General Midi Program
 number.
 .PP
-trkinfo is an array of 8 numbers which indicates the statistical properties
+trkinfo is an array of 19 numbers which indicates the statistical properties
 of the track of interest. The following data is given:
 the channel number,
 the first program assigned to this channel,
@@ -44,6 +44,10 @@ the minimum note length in pulses
 the maximum note length in pulses
 the number of gaps in the channel
 the entropy of the pitch class histogram for that channel
+the number of notes whose pitch were the same as the previous note
+the number of notes whose pitch changed by less than 4 semitones
+the number of notes whose pitch changed by 4 or more semitones
+(In event of a chords the maximum pitches are compared.) 
 .PP
 After processing all the individual tracks, the following information
 applies to the entire midi file.
@@ -107,6 +111,29 @@ all channels except the percussion channel.
 collisions. Midistats counts the bar rhythm patterns using a hashing
 function. Presently collisions are ignored so occasionally two
 distinct rhythm patterns are counted as one.
+.PP
+Midistats prints a number of arrays which may be useful in
+determining where the music in the track is a melody line or
+chordal rhythmic support. These arrays indicate the properties
+for each of the 16 channels. (The percussion channel 9 contains
+zeros.) In the case same channel occurs in several tracks, these
+numbers are the totals for all track containing that channel.
+Here is a description of these properties.
+.PP
+nnotes:  the total number of notes in each channel
+.br
+nzeros:  the number of notes whose previous note was the same pitch
+.br
+nsteps:  the number of notes whose pitch difference with the previous
+note was less than 4 semitones.
+.br
+njumps:  the number of notes whose pitch difference with the previous
+note was 4 or more semitones.
+.br
+rpats: the number of rhythmpatterns for each channels. This is a
+duplication of data printed previously.
+.br
+pavg: the average pitch of all the notes for each channel.
 .PP
 In addition the midistats may return other codes that describe
 other characteristics. They include
@@ -250,6 +277,7 @@ splits the two 4-bit values with a period. Thus 33 = (2*16 + 1).
 -pitchclass
 .br
 Returns the pitch class distribution for the entire midi file.
+
 .PP
 -nseqfor n
 .br
@@ -274,7 +302,16 @@ repeating patterns.
 .br
 Same as above except it is applied to all channels except the
 percussion channel.
-
+.br
+.PP
+-nseqtokens
+Returns the number of distinct sequence elements for each channel.
+The channel number and number of distinct elements separated by
+a comma is returned in a tab separated list for all active channels
+except the percussion channel. Here is an example.
+.br
+2,3	3,4	4,11	5,6	6,3	7,3	8,6	9,3	11,2	12,1
+.br
 
 -ver (version number)
 
