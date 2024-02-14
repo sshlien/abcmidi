@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.85 December 23 2023 abc2midi" 
+#define VERSION "4.86 February 14 2024 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -2946,6 +2946,7 @@ char* s;
       part_start[(int)*p - (int)'A'] = notes;
       addfeature(PART, (int)*p, 0, 0);
       checkbreak();
+      v1index = notes; /* [SS] 2024-02-14 */
       v = getvoicecontext(1);
     } else {
       parts = 0;

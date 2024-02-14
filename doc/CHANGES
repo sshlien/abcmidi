@@ -15227,3 +15227,90 @@ reported in this file on November 23 2012. The code for handling tied notes is
 quite intricate and I do not understand it. I am hesitant in tampering with the code.
  
 
+February 14 2024
+
+abc2midi: repeat bug
+
+For the following example:
+
+X:1
+T: Repeat bug 
+M: 1/4
+L: 1/4
+P:A
+K:C
+P:A
+A | B & C :|
+
+Abc2midi produces a midi file which looks like this
+V:1
+A | B |
+V:2
+Z | C | Z | C|
+
+the second voice is repeated by the first voice is not.
+
+Removing the P:A prior to K:C fixes the problem.
+Alternatively, inserting the missing left repeat |:
+(eg) |: A | B & C :|
+also resolves the problem.
+
+Apparently, abc2midi does not insert the left repeat in the
+correct position.
+
+Analysis: abc2midi produces an internal representation of the
+music using the feature[] array. Since this tune uses split
+voices using the & character, the internal representation now
+contains two voices. abc2midi then calls scan_for_missing_repeats()
+and add_missing_repeats() in store.c in order to insert the missing
+left repeats in the internal representation. Unfortunately,
+scan_for_missing_repeats puts the left repeat in the wrong place where
+it is ineffective. 
+
+The code in scan_for_missing_repeats is quite complicated
+because it has to work for either voices or parts. It searches
+for either VOICE or PART code in the feature array and inserts
+the left repeat immediately following this code. If both
+VOICE and PART are present, VOICE should immediately follow PART
+in order that scan_for_missing_repeats works correctly. Unfortunately,
+they occur in the opposite order. The function event_split_voice()
+inserts the VOICE code in the wrong position, mainly because
+the v1index address is incorrect.
+
+Fix: event_part() in store.c, I added the line
+v1index = notes; /* [SS] 2024-02-14 */
+following
+addfeature(PART, (int)*p, 0, 0);
+ 
+This appears to resolve this issue.
+ 
+
+abc2midi: another related repeat bug
+
+For the following example:
+
+X:1
+T: A related repeat bug
+P:A
+M:3/4
+L:1/4
+K:D
+P:X
+Z | zzz & b'b'b' :|
+P:A
+CCC | DDD  :|
+
+abc2midi produces incorrect output for this file. It does not
+insert the left repeats in the right place in its internal
+representation.
+
+Fix: for the present time you need to put the left repeats in the
+file like this.
+
+|:Z | zzz & b'b'b' :|
+P:A
+|:CCC | DDD  :|
+
+
+
+
