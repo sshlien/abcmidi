@@ -15313,4 +15313,30 @@ P:A
 
 
 
+February 19 2024
+
+abc2midi bug and fix submitted by James Allwright.
+
+The parser recognizes |: but not |::
+In the following example,
+
+X:1
+T: ||: bug
+M: 2/4
+L: 1/4
+K: G
+G||:AB|[1cz:||[2ed|
+
+the repeat goes back to 0th bar (containing G) instead of
+bar 1 (containing AB).
+
+Fix: in parsemusic() in parseabc.c, the following lines were
+added.
+
+if (*(p+1) == ':') {
+        /* handle ||: as a variant of |:  [JA] 2024-02-19 */
+        check_and_call_bar (BAR_REP, "");
+        p = p + 2;
+
+The change also has impact on yaps, abc2abc, and abcmatch.
 

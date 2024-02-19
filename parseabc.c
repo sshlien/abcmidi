@@ -3020,8 +3020,14 @@ parsemusic (field)
 		  p = p + 1;
 		  break;
 		case '|':
-		  check_and_call_bar (DOUBLE_BAR, "");
-		  p = p + 1;
+      if (*(p+1) == ':') {
+        /* handle ||: as a variant of |:  [JA] 2024-02-19 */
+        check_and_call_bar (BAR_REP, "");
+        p = p + 2;
+      } else {
+		    check_and_call_bar (DOUBLE_BAR, "");
+        p = p + 1;
+      }
 		  break;
 		case ']':
 		  check_and_call_bar (THIN_THICK, "");
