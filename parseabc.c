@@ -742,6 +742,33 @@ readword (word, s)
   return (p);
 }
 
+char *
+readword_with_ (word, s)
+/* This version allows ^ and _ characters to be embedded in*/
+/* the string. It is needed to parse clef=treble_8 or 
+/* clef=treble^8 . [SS] 2024-02-23 */ 
+     char word[];
+     char *s;
+{
+  char *p;
+  int i;
+
+  p = s;
+  i = 0;
+  /* [SS] 2015-04-08 */
+  while ((*p != '\0') && (*p != ' ') && (*p != '\t') && ((i == 0) ||
+							 ((*p != '='))))
+    {
+      if (i < 29)
+	{
+	  word[i] = *p;
+	  i = i + 1;
+	};
+      p = p + 1;
+    };
+  word[i] = '\0';
+  return (p);
+}
 void
 lcase (s)
 /* convert word to lower case */
@@ -965,7 +992,7 @@ parseclef (s, word, gotclef, clefstr, newclef, gotoctave, octave)
 {
   int successful;
   skipspace (s);
-  *s = readword (word, *s);
+  *s = readword_with_ (word, *s);
   successful = 0;
   if (casecmp (word, "clef") == 0)
     {
@@ -978,7 +1005,7 @@ parseclef (s, word, gotclef, clefstr, newclef, gotoctave, octave)
 	{
 	  *s = *s + 1;
 	  skipspace (s);
-	  *s = readword (clefstr, *s);
+	  *s = readword_with_ (clefstr, *s);
 	  if (isclef (clefstr, newclef, gotoctave, octave, 1))
 	    {
 	      *gotclef = 1;
@@ -1743,13 +1770,6 @@ parsevoice (s)
     }
   event_voice (num, s, &vparams);
 
-/*
-if (gottranspose) printf("transpose = %d\n", vparams.transpose);
- if (gotoctave) printf("octave= %d\n", vparams.octave);
- if (gotclef) printf("clef= %s\n", vparams.clefstr);
-if (gotname) printf("parsevoice: name= %s\n", vparams.namestring);
-if(gotmiddle) printf("parsevoice: middle= %s\n", vparams.middlestring);
-*/
 }
 
 

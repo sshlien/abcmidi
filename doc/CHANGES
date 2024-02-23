@@ -15377,7 +15377,7 @@ it is only called if the token was a clef.
 Fix: commented out the line in isclef() which zeros the octave_offset.
 
 
-February 22 2024
+February 23 2024
 
 abcmidi bug:
 
@@ -15387,7 +15387,33 @@ clef=treble^8 to be substituted for treble+8. abc2midi does not
 recognize these variants.
 
 Fix: extended the function get_clef_octave_offset in music_utils.c
-to recognize these variants.
+to recognize these variants. Unfortunately, readword() called by
+parseclef breaks the clef string when it encounters either a ^
+or _. This was necessary to handle sharps and flats in the
+K: declaration. (See note above April 8 2015.) It was necessary
+to create a replacement function, readword_with_() which does
+not break the string on underscore _ or caret ^.
+
+The following test file was used to verify the correct operation
+of this feature.
+
+X:1
+T: clef= variants
+M:4/4
+L:1/4
+V:1 clef=treble-8
+V:2 clef=treble_8
+V:3 clef=treble+8
+V:4 clef=treble^8
+K:C
+[V:1] z z C z |
+[V:2] z z z C |
+[V:3] C z z z |
+[V:4] z C z z |
+
+
+
+
 
 
 
