@@ -688,7 +688,7 @@ int isclef (char *s, cleftype_t * new_clef,
   int gotclef;
 
   gotclef = 0;
-  new_clef->octave_offset = 0;
+  /*new_clef->octave_offset = 0; [SS] 2024-02.22 */
   gotclef = get_standard_clef (s, new_clef);
   if (!gotclef && expect_clef) {
     /* do we have a clef in letter format ? e.g. C1, F3, G3 */

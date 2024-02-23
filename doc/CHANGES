@@ -15340,3 +15340,60 @@ if (*(p+1) == ':') {
 
 The change also has impact on yaps, abc2abc, and abcmatch.
 
+
+February 22 2024
+
+abc2midi bug
+
+Adding snm=something after a clef= declaration
+removes the offset from the clef. In the following
+example,
+
+X:1
+T: with snm
+M:4/4
+L:1/4
+V:1 clef=treble-8
+V:2 clef=treble-8 snm=anything
+K:C
+[V:1] z z C z |
+[V:2] z z z C |
+
+C in voice 1 is shifted down an octave but C in voice 2
+is untouched.
+
+Analysis: parsevoice attempts to parse each token (clef=, octave=,
+transpose=, sound=, name= and etc.) by calling various functions
+parseclef(), parsetranspose(), parseoctave(), and etc.) until it
+succeeds. parseclef is thus called on every token and returns either
+1 or 0 depending whether it was successful or not. parseclef calls
+the function isclef() to do the work. Unfortunately, isclef()
+zeros the variable new_clef->octave_offset whether or not a
+clef is declared in the token. Therefore the token snm=...
+causes new_clef->octave_offset to be zeroed. The next function
+which follows, get_extended_clef_details does set the octave_offset, but
+it is only called if the token was a clef.
+
+Fix: commented out the line in isclef() which zeros the octave_offset.
+
+
+February 22 2024
+
+abcmidi bug:
+
+Besides clef=treble-8, the abcmidi 2.2 standard also recognizes
+clef=treble_8 which it treats similarly. The standard also allows
+clef=treble^8 to be substituted for treble+8. abc2midi does not
+recognize these variants.
+
+Fix: extended the function get_clef_octave_offset in music_utils.c
+to recognize these variants.
+
+
+
+
+
+
+
+
+

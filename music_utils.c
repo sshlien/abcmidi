@@ -205,6 +205,18 @@ static int get_clef_octave_offset (char *clef_ending)
   if (strncmp (clef_ending, "-15", 2) == 0) {
     return -2;
   }
+  if (strncmp (clef_ending, "^8", 2) == 0) {
+    return 1;
+  }
+  if (strncmp (clef_ending, "^15", 2) == 0) {
+    return 2;
+  }
+  if (strncmp (clef_ending, "_8", 2) == 0) {
+    return -1;
+  }
+  if (strncmp (clef_ending, "_15", 2) == 0) {
+    return -2;
+  }
   return 0;
 }
 
