@@ -205,6 +205,13 @@ static int get_clef_octave_offset (char *clef_ending)
   if (strncmp (clef_ending, "-15", 2) == 0) {
     return -2;
   }
+/* ^8, ^15, _8, _15 does not transpose the notes in
+   the midi output according to the abc standard 2.2;
+   though it should display the appropriate symbol in
+   the clef. For the time being I am commenting
+   the other endings so abc2midi runs correctly.
+   [SS] 2024.02.24 
+
   if (strncmp (clef_ending, "^8", 2) == 0) {
     return 1;
   }
@@ -217,6 +224,7 @@ static int get_clef_octave_offset (char *clef_ending)
   if (strncmp (clef_ending, "_15", 2) == 0) {
     return -2;
   }
+*/
   return 0;
 }
 
