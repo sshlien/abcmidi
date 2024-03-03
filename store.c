@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.90 February 25 2024 abc2midi" 
+#define VERSION "4.91 March 02 2024 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -2976,10 +2976,11 @@ struct voice_params *vp;
     v = getvoicecontext(n); 
     addfeature(VOICE, v->indexno, 0, 0); 
     
-    if (vp->gotclef)
+    /*****if (vp->gotclef)
     {
       event_octave(vp->new_clef.octave_offset, 1);
-    }
+    }*** [SS] 2024-03.02 */
+
     if (vp->gotoctave) {
       event_octave(vp->octave,1);
     };
@@ -4304,11 +4305,16 @@ int xoctave, n, m;
     event_fatal_error("Internal error - no voice allocated");
   };
   if (gracenotes && ignore_gracenotes) return; /* [SS] 2010-01-08 */
-  if (v->octaveshift == 0) {  /* [JA] 2021-05-21 */
+
+/* [SS] 2024-03-02
+  printf("clef->octave_offset = %d v->octaveshift = %d\n",clef->octave_offset,v->octaveshift);
+  if (v->octaveshift == 0) {   [JA] 2021-05-21 
     octave = xoctave + clef->octave_offset;
   } else {
     octave = xoctave + v->octaveshift;
   }
+*/
+  octave = clef->octave_offset + v->octaveshift + xoctave;  /*[SS] 2024-03-02*/
   num = n;
   denom = m;
   if (v->inchord) v->chordcount = v->chordcount + 1;

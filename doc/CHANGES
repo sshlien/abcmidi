@@ -15379,7 +15379,7 @@ Fix: commented out the line in isclef() which zeros the octave_offset.
 
 February 25 2024
 
-abcmidi note:
+abc2midi note:
 
 Besides clef=treble-8, the abcmidi 2.2 standard also recognizes
 clef=treble_8, clef=treble^8 and etc. These clefs do not transpose
@@ -15395,4 +15395,58 @@ and flats in the K: declaration. (See note above April 8 2015.)
 It is necessary to use the new function, readword_with_()
 which does not break the string on encountering either
 the underscore _ or caret ^.
+
+
+March 02 2024
+
+abc2midi deviance from abc standard 2.2
+
+The clef=, octave=, and transpose= in the V: command are
+expected to be persistant and independent of each other. They
+are changed independently any time a new clef=, octave=,
+or transpose= appears.  These are stored in 3 variables.
+And the pitch of a note is assigned the sum of these values.
+
+Analysis:
+event_note computes the midi pitch from note (one of a,b,c,d,e,f,g),
+the xoctave, clef, accidental, and mult which are all input
+parameters to that function. In addition it accesses the global
+voice structure v of the active voice to get the octaveshift
+for that voice. The function computes the local variable octave
+from xoctave, clef->octave_offset and v->octaveshift. 
+
+Prior to this fix and since May 21 2021, the local variable
+octave was either assigned to the value of
+clef->octave_offset + xoctave or to v->octaveshift + xoctave when
+v->octaveshift is nonzero. In addition, event_voice also changes
+v->octaveshift when it encounters a new clef=.
+
+Fix:
+
+In order to comply with this standard, the code in event_voice
+was modified to prevent clef= from modifying v->octaveshift. In
+addition event_note now computes octave as below.
+ octave = clef->octave_offset + v->octaveshift + xoctave;  /*[SS] 2024-03-02*/
+
+Note this is a significant change as it could break some abc
+files. For example, if the user put clef=treble+8 and also
+octave=+1, just to be safe, then the resulting octave would be higher
+than expected. Fortunately, octave= is still rarely used.
+
+Here is the test file for verifying this fix.
+
+X:1
+T:Test for octave shifts in sound
+M:4/4
+K:C
+% The following seven notes should have equal sound
+V:1 clef=treble
+d8 |\
+[V:1 clef=treble+8] D8 |\ 
+[V:1 octave=-1] d8 |\  
+[V:1 transpose=12] D8 |\
+[V:1 clef=treble] d8 |\
+[V:1 octave=0] D8 |\
+[V:1 transpose=0] d8 |]
+
 
