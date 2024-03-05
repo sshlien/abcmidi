@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.87 February 11 2024 midistats"
+#define VERSION "0.88 March 05 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -1345,8 +1345,12 @@ printf("\n");
 
 void outputChannelSummary() {
 int i;
-for (i=0;i<17;i++) {
-  printf("nnotes: ");
+  
+  printf("\nprograms: ");
+  for(i=1;i<17;i++) printf(" %d",channel2prog[i]);
+  printf("\ncnotes: ");
+  for(i=1;i<17;i++) printf(" %d",channel2nnotes[i]);
+  printf("\nnnotes: ");
   for(i=0;i<16;i++) printf(" %d",nm[i].totalNotes);
   printf("\nnzeros: ");
   for(i=0;i<16;i++) printf(" %d",nm[i].zeroCount);
@@ -1360,7 +1364,6 @@ for (i=0;i<17;i++) {
   /* avoid dividing by 0 */
   for(i=0;i<16;i++) printf(" %d",nm[i].totalPitches/(1+nm[i].totalNotes));
   printf("\n"); 
-  }
 }
 
 void dualDrumPattern (int perc1, int perc2) {
