@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.88 March 05 2024 midistats"
+#define VERSION "0.89 March 13 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -204,6 +204,8 @@ struct notememory {int eighthUnit;
                    int jumpCount;
                    int totalNotes;
                    int totalPitches;
+                   int quietTime;
+                   int used;
                    } nm[17];
 
 struct notememory tracknm;
@@ -709,6 +711,8 @@ for (i=1;i<17;i++) {
    printf(" %f",trkdata.pitchEntropy[i]);
     } else
      printf("-1 0");
+   nm[i].quietTime += trkdata.quietTime[i];
+   nm[i].used = channel_used_in_track[i];
    trkdata.quietTime[i] = 0; /* in case channel i is used in another track */
    trkdata.numberOfGaps[i] = 0;
    if (lasttrack > 1) printf(" %d %d %d\n",tracknm.zeroCount,tracknm.stepCount,tracknm.jumpCount);
@@ -776,6 +780,8 @@ void clearNotememory () {
     nm[i].jumpCount = 0;
     nm[i].totalNotes =0;
     nm[i].totalPitches =0;
+    nm[i].quietTime = 0;
+    nm[i].used = 0;
     }
 }
 
@@ -1363,7 +1369,10 @@ int i;
   printf("\npavg:   "); 
   /* avoid dividing by 0 */
   for(i=0;i<16;i++) printf(" %d",nm[i].totalPitches/(1+nm[i].totalNotes));
-  printf("\n"); 
+  printf("\nspread: "); 
+  for(i=1;i<17;i++) if(nm[i].used > 0) printf(" %d",100*(trkdata.npulses[0] - nm[i].quietTime)/trkdata.npulses[0]);
+                    else printf(" %d",0);
+  printf("\n");
 }
 
 void dualDrumPattern (int perc1, int perc2) {

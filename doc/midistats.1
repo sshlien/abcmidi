@@ -1,4 +1,4 @@
-.TH MIDISTATS 1 "11 February 2024"
+.TH MIDISTATS 1 "18 February 2024"
 .SH NAME
 \fBmidistats\fP \- program to summarize the statistical properties of a midi file
 .SH SYNOPSIS
@@ -139,6 +139,11 @@ rpats: the number of rhythmpatterns for each channels. This is a
 duplication of data printed previously.
 .br
 pavg: the average pitch of all the notes for each channel.
+.br
+spread: the percentage of the track that each channel is active.
+.PP
+If some of the channels appear in more than one track, then
+some of the above values may be incorrect.
 .PP
 In addition the midistats may return other codes that describe
 other characteristics. They include
