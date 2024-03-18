@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.89 March 13 2024 midistats"
+#define VERSION "0.90 March 18 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -95,6 +95,7 @@ int trackno;
 int maintrack;
 int format; /* MIDI file type                                   */
 int debug;
+int noOutput;
 int pulseanalysis;
 int percanalysis;
 int percpattern;
@@ -133,6 +134,7 @@ int percpatternhist = 0;
 int pitchclassanalysis = 0;
 int nseqfor = 0;
 int corestats = 0;
+int noOutput = 0;
 
 
 /* can cope with up to 64 track MIDI files */
@@ -301,7 +303,6 @@ for (i = 0; i<17; i++) {
 	trkdata.rhythmpatterns[i] = count_patterns_for(i);
 /*	printf("%d ",count_patterns_for (i)); */
        }
-printf("\n");
 }
 
 
@@ -466,8 +467,8 @@ void stats_header (int format, int ntrks, int ldivision)
   divisionsPerBar = division*beatsPerBar;
   unitDivision = divisionsPerBar/24;
   lasttrack = ntrks; /* [SS] 2023-10-25 */
-  printf("ntrks %d\n",ntrks);
-  printf("ppqn %d\n",ldivision);
+  if (noOutput == 0) printf("ntrks %d\n",ntrks);
+  if (noOutput == 0) printf("ppqn %d\n",ldivision);
   chordthreshold = ldivision/16; /* [SS] 2018-01-21 */
   trkdata.tempo[0] = 0;
   trkdata.pressure[0] = 0;
@@ -481,7 +482,7 @@ void stats_header (int format, int ntrks, int ldivision)
     trkdata.numberOfGaps[i] = 0; /* [SS] 2023-09-07 */
     trkdata.chanvol[i] = 0; /* [SS] 2023-10-30 */
     progcolor[i] = 0;
-    channel2prog[i] = 0; /* [SS] 2023-06-25-8/
+    channel2prog[i] = 0; /* [SS] 2023-06-25-8*/
     channel2nnotes[i] = 0;
     chnactivity[i] = 0; /* [SS] 2018-02-02 */
     }
@@ -641,7 +642,6 @@ printf("collisions = %d\n",ncollisions);
 if (hasLyrics) printf("Lyrics\n");
 stats_interpret_pulseCounter ();
 printf("\n");
-outputChannelSummary(); 
 }
 
 
@@ -711,10 +711,6 @@ for (i=1;i<17;i++) {
    printf(" %f",trkdata.pitchEntropy[i]);
     } else
      printf("-1 0");
-   nm[i].quietTime += trkdata.quietTime[i];
-   nm[i].used = channel_used_in_track[i];
-   trkdata.quietTime[i] = 0; /* in case channel i is used in another track */
-   trkdata.numberOfGaps[i] = 0;
    if (lasttrack > 1) printf(" %d %d %d\n",tracknm.zeroCount,tracknm.stepCount,tracknm.jumpCount);
    else
              printf(" %d %d %d\n",nm[i-1].zeroCount,nm[i-1].stepCount,nm[i-1].jumpCount);
@@ -745,7 +741,7 @@ void stats_trackstart()
      last_on_tick[i] = -1;
      channel_active[i] = 0;
      }
-  printf("trk %d \n",tracknum);
+ if (noOutput == 0) printf("trk %d \n",tracknum);
 
  for (i=0;i<2048;i++) lastTick[i] = -1;
  for (i=0;i<17;i++) channel_used_in_track[i] = 0; /* [SS] 2023-09-06 */
@@ -764,7 +760,16 @@ void stats_trackend()
    if (chan == 9 || channel_used_in_track[chan+1] == 0) continue;
    trkdata.pitchEntropy[chan+1] = histogram_perplexity(chanpitchhistogram +chan*12,11);
    }
- output_track_summary(); 
+if (noOutput == 0)  output_track_summary();
+output_hasher_results();
+for (i=0;i<17;i++) {
+   if(trkdata.notecount[i] == 0 && trkdata.chordcount[i] == 0) continue; 
+   nm[i].quietTime += trkdata.quietTime[i];
+   nm[i].used = channel_used_in_track[i];
+   trkdata.quietTime[i] = 0; /* in case channel i is used in another track */
+   trkdata.numberOfGaps[i] = 0;
+   channel2nnotes[i] += trkdata.notecount[i] + trkdata.chordcount[i];
+   }
 }
 
 
@@ -985,11 +990,11 @@ int beatnumber;
 if (program <0 || program > 127) return; /* [SS] 2018-03-06 */
 if (trkdata.program[chan+1] != 0) {
   beatnumber = Mf_currtime/division;
-  printf("cprogram %d %d %d\n",chan+1,program,beatnumber);
+  if (noOutput == 0) printf("cprogram %d %d %d\n",chan+1,program,beatnumber);
   /* count number of times the program was modified for a channel */
   trkdata.program[0] = trkdata.program[0]+1;
   } else {
-  printf("program %d %d\n",chan+1,program);
+  if (noOutput == 0) printf("program %d %d\n",chan+1,program);
   trkdata.program[chan+1] = program;
   }
   if (channel2prog[chan+1]== 0) channel2prog[chan+1] = program; /* [SS] 2023-06-25*/
@@ -1021,6 +1026,7 @@ char *mess;
 int i; 
 if (type == 5) hasLyrics = 1; /* [SS] 2023-10-30 */
 if (type != 3) return;
+if (noOutput == 1) return; 
 printf("metatext %d ",type);
 for (i=0;i<leng;i++) printf("%c",mess[i]);
 printf("\n");
@@ -1042,9 +1048,11 @@ int sf, mi;
   index = sf + 7;
   if (index < 0 || index >12) return;
   if (mi)
-    printf("keysig %s %d %d %6.2f\n",minor[index],sf,mi,beatnumber);
+    if (noOutput == 0) 
+       printf("keysig %s %d %d %6.2f\n",minor[index],sf,mi,beatnumber);
   else
-    printf("keysig %s %d %d %6.2f\n",major[index],sf,mi,beatnumber);
+    if (noOutput == 0) 
+       printf("keysig %s %d %d %6.2f\n",major[index],sf,mi,beatnumber);
 }
 
 
@@ -1056,9 +1064,10 @@ long ltempo;
   float beatnumber;
   tempo = ltempo;
   beatnumber = Mf_currtime/division;
+  trkdata.tempo[0]++;
+  if (noOutput == 1) return;
   if (trkdata.tempo[0] == 0) printf("tempo %6.2f bpm\n",60000000.0/tempo);
   else if (trkdata.tempo[0] < 10) printf("ctempo  %6.2f %6.2f\n",60000000.0/tempo,beatnumber);
-  trkdata.tempo[0]++;
 }
 
 
@@ -1070,6 +1079,7 @@ int nn, dd, cc, bb;
   beatnumber = Mf_currtime/division;
   while ( dd-- > 0 )
     denom *= 2;
+  if (noOutput == 1) return;
   printf("timesig %d/%d %6.2f\n",nn,denom,beatnumber);
 } 
 
@@ -1347,12 +1357,30 @@ printf("\n");
 
 
 
+void outputChannelSummaryCsv() {
+FILE *f;
+int i;
+int spread;
+/*f = fopen("channelDescriptor.csv","w");*/
+f = stdout;
+fprintf(f,"programs,cnotes,nnotes,nzeros,nsteps,njumps,rpats,pavg,spread\n");
+for (i = 1; i<17; i++) {
+  if (nm[i].used > 0) spread = (100*(trkdata.npulses[0] - nm[i].quietTime)/trkdata.npulses[0]);
+  else spread=0;
+  fprintf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d\n",channel2prog[i],channel2nnotes[i],nm[i-1].totalNotes,\
+    nm[i-1].zeroCount,nm[i-1].stepCount,nm[i-1].jumpCount,\
+    trkdata.rhythmpatterns[i],nm[i-1].totalPitches/(1+nm[i-1].totalNotes),\
+    spread);
+  }
+//fclose(f);
+}
+
 
 
 void outputChannelSummary() {
 int i;
   
-  printf("\nprograms: ");
+  printf("programs: ");
   for(i=1;i<17;i++) printf(" %d",channel2prog[i]);
   printf("\ncnotes: ");
   for(i=1;i<17;i++) printf(" %d",channel2nnotes[i]);
@@ -1374,6 +1402,8 @@ int i;
                     else printf(" %d",0);
   printf("\n");
 }
+
+
 
 void dualDrumPattern (int perc1, int perc2) {
 int i;
@@ -1723,6 +1753,13 @@ int argc;
   if ((arg != -1) && (arg <argc)) {
    debug = readnum(argv[arg]);
    }
+
+  arg = getarg("-CSV",argc,argv);
+  if (arg != -1) {
+          noOutput = 1;
+          stats = 1;
+          }
+  
   arg = getarg("-pulseanalysis",argc,argv);
   if (arg != -1) {
 	  pulseanalysis = 1;
@@ -1816,6 +1853,7 @@ int argc;
     printf("midistats version %s\n  usage :\n",VERSION);
     printf("midistats filename <options>\n");
     printf("         -corestats\n");
+    printf("         -CSV\n");
     printf("         -pulseanalysis\n");
     printf("         -panal\n");
     printf("         -ppat\n");
@@ -1843,7 +1881,9 @@ int argc;
 initfunc_for_stats();
 Mf_getc = filegetc;
 mfread();
-stats_finish();
+if (noOutput == 0)  stats_finish(); 
+if (noOutput == 0) outputChannelSummary(); 
+if (noOutput == 1) outputChannelSummaryCsv();
 }
 
 void loadEvents() {

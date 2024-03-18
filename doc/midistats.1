@@ -1,16 +1,24 @@
-.TH MIDISTATS 1 "18 February 2024"
+.TH MIDISTATS 1 "18 March 2024"
 .SH NAME
 \fBmidistats\fP \- program to summarize the statistical properties of a midi file
 .SH SYNOPSIS
-midistats \fIinfile\fP
+This is a long manual because the program extracts many different parameters
+from the midi file depending upon the options selected. This manual
+attempts to describe these parameters and how they are computed.
+These parameters are formatted in a way so they can be read by other
+applications such midiexplorer.tcl, runstats.tcl, and numerous Python
+scripts. 
+
+Many of the options were designed specifically for analyzing the
+percussion track of the midi file. They are described in a separate
+section below (Other options).
+
 
 .SH DESCRIPTION
-\fImidistats\fP analyzes the contents of a midi file and outputs key
-information and various statistical measures. Each line of output
-starts with the name of the variable or variable array and the
-associated values. The output is interpreted by the user interface
-midiexplorer.tcl. Both programs are still being improved. Here
-is an explanation of some of the output.
+If you run midistats without any options other than the name of
+the midi input file, it will produce a table of values described
+here.  Each line of output starts with the name of the variable or
+variable array and the associated values.
 .PP
 ntrks indicates the number of tracks in the midi file.
 .PP
@@ -164,7 +172,17 @@ programcmd - there may be multiple program changes in a midi channel
 
 
 
-.SH Advanced Percussion Analysis Tools
+.SH Other options 
+
+It is recommended that you only select one of the options
+described here as the program was not designed to handle a
+multiple number of options.
+
+.PP
+If you run midistats with the -CSV option, it will return the
+results in a form of comma separated values that can be loaded
+into a Python panda dataframe. Each line refers to one of the
+16 midi channels.
 
 .PP
 The MIDI file devotes channel 9 to the percussion instruments
