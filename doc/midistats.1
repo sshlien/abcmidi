@@ -182,7 +182,26 @@ multiple number of options.
 If you run midistats with the -CSV option, it will return the
 results in a form of comma separated values that can be loaded
 into a Python panda dataframe. Each line refers to one of the
-16 midi channels.
+16 midi channels. The following Python 3 code illustrates
+how you would load the midistats output into a dataframe.
+
+.br
+import pandas as pd
+.br
+import io
+.br
+import subprocess
+.br
+cmd = ("midistats", "-CSV" , inputmidifilepath)
+.br
+process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+.br
+csv =  io.StringIO(process.stdout.read().decode())
+.br
+df = pd.read_csv(csv)
+
+where inputmidifilepath is the path to the midi file that
+you are using. (eg. 'clean_midi/Zero/Chi sei.mid')
 
 .PP
 The MIDI file devotes channel 9 to the percussion instruments
