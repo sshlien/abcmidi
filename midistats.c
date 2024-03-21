@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.90 March 18 2024 midistats"
+#define VERSION "0.91 March 21 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -65,6 +65,7 @@ extern char* strchr();
 void initfuncs();
 void stats_finish();
 float histogram_perplexity (int *histogram, int size); 
+float histogram_entropy (int *histogram, int size); 
 void stats_noteoff(int chan,int pitch,int vol);
 void stats_eot ();
 void keymatch();
@@ -637,6 +638,7 @@ printf("\ntrkact ");
   lasttrack++;
   for (i=0;i<lasttrack;i++) printf("% 5d",trkactivity[i]);
 printf("\npitchperplexity %f\n",histogram_perplexity(pitchclass_activity,12));
+printf("\npitchentropy %f\n",histogram_entropy(pitchclass_activity,12));
 printf("totalrhythmpatterns =%d\n",nrpatterns);
 printf("collisions = %d\n",ncollisions);
 if (hasLyrics) printf("Lyrics\n");
@@ -668,6 +670,30 @@ float histogram_perplexity (int *histogram, int size)
     } 
   //printf("\n");
   return pow(2.0,-entropy/log(2.0));
+  } 
+
+float histogram_entropy (int *histogram, int size) 
+  {
+  /* The perplexity is 2 to the power of the entropy */
+  int i;
+  int total;
+  float entropy;
+  float e,p;
+  total = 0;
+  entropy = 0.0;
+  //printf("\nhistogram_entropy of:");
+  for (i=0;i<size;i++) {
+    total += histogram[i];
+    //printf(" %d",histogram[i]);
+    } 
+  for (i=0;i<size;i++) {
+    if (histogram[i] < 1) continue;
+    p = (float) histogram[i]/total;
+    e = p*log(p);
+    entropy = entropy + e;
+    } 
+  //printf("\n");
+  return -entropy/log(2.0);
   } 
 
 
