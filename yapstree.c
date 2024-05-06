@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.93 February 19 2024 yaps"
+#define VERSION "1.94 April 30 2024 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -1525,9 +1525,8 @@ int make_open()
   return(1);
 }
 
-void event_specific(p, str)
-char *p;   /* first word after %% */
-char *str; /* string following first word */
+/* [JA] 2024-04-30 introducing in_I */
+void event_specific(char *p, char *str, int in_I)
 /* The special comment %% has been found */
 /* abc2midi uses it for the %%MIDI commands */
 /* yaps implements some of the abc2ps commands */

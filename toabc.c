@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.21 Feb 19 2024 abc2abc"
+#define VERSION "2.22 April 30 2024 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -908,13 +908,18 @@ char *s;
   inmusic = 0;
 }
 
-void event_specific(package, s)
-char *package, *s;
+/* [JA] 2024-04-30 */
+void event_specific(char *package, char *s, int in_I)
 {
   char command[40];
   int ch;
   char *p;
-  emit_string("%%");
+
+  if (in_I) { /* [JA] 2024-04-30 */
+    emit_string("I:");
+  } else {
+    emit_string("%%");
+  }
   emit_string(package);
   emit_string(s);
   inmusic = 0;

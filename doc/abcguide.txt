@@ -3,6 +3,9 @@ Guide to writing abc for abc2midi - minor revision [JA] 2021-05-24
 
 Updated June 1 2017. %%MIDI program ranges from 0 to 127 not 1 to 128.
 
+Updated April 30 2024: The [I:MIDI= ..] no longer works. You
+must use [I:MIDI ...] instead (without the equal sign).
+
 The abc notation language is described by the version 1.6 specification
 document and later modifications to this document referred to as
 version 2.1 and version 2.2. These can be found at abcnotation.com .
@@ -1244,12 +1247,12 @@ C2 D2|
 you can place the MIDI instruction inside an info field
 using the following syntax.
 
-A2 B2|[I:MIDI= drumon] C2 D2|
+A2 B2|[I:MIDI drumon] C2 D2|
 
 The '=' following the MIDI is very important. The info field
 syntax allows you to place several MIDI commands in one inline
 block, for example
-[I: MIDI = program 73 MIDI=chordprog 29]
+[I: MIDI program 73 MIDI chordprog 29]
 (Spaces are optional.)
 Other examples can be seen in the file CHANGES in the
 following the March 25 2005 entry.

@@ -116,7 +116,7 @@ extern void event_startmusicline(void);
 extern void event_endmusicline(char endchar);
 extern void event_eof(void);
 extern void event_comment(char *s);
-extern void event_specific(char *package, char *s);
+extern void event_specific(char *package, char *s, int in_I);
 extern void event_specific_in_header(char *package, char *s);
 extern void event_startinline(void);
 extern void event_closeinline(void);
@@ -133,7 +133,7 @@ extern void event_refno(int n);
 extern void event_tempo(int n, int a, int b, int rel, char *pre, char *post);
 extern void event_timesig(timesig_details_t *timesig);
 extern void event_octave(int num, int local);
-extern void event_info_key(char *key, char *value);
+/* extern void event_info_key(char *key, char *value); [JA] 2024-04-30 */
 extern void event_info(char *s);
 extern void event_key(int sharps, char *s, int modeindex, 
                char modmap[7], int modmul[7], struct fraction modmicro[7],
@@ -203,7 +203,7 @@ extern void event_refno();
 extern void event_tempo();
 extern void event_timesig();
 extern void event_octave();
-extern void event_info_key();
+/* extern void event_info_key(); [JA] 2024-04-30 */
 extern void event_info();
 extern void event_key();
 extern void event_microtone();

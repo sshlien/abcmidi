@@ -9,89 +9,21 @@
 #include "parseabc.h"
 #include "parser2.h"
 
-void event_info(s)
-char* s;
-/* An I: field has been encountered. This routine scans the following 
-   text to extract items of the form key=value. The equal sign is optional
-   if only one key (eg MIDI, octave, vol, etc.) occurs in the I: field.
-   Otherwise we need to follow each key with an equal sign so that we
-   know that the preceding item was a key.
+/* [JA] 2024-04-30 */
+void event_info(char* s)
+/* An I: field has been encountered. The 2.1 and 2.2 abc standards
+   specify that this field (stylesheet directive) is handled in the
+   same way as %% (pseudo-comment). If it isn't recognized it should
+   be silently ignored.
 */
 {
-  char* key;
-  char* endkey;
-  char* value;
-  char* endvalue;
-  char* lastendvalue;
-  char* newword;
-  char* lastnewword;
-  char* ptr;
-  int doval;
+  char package[40];
+  char *p;
 
-  ptr = s;
-  doval = 0;
-  while (*ptr != '\0') {
-    if (doval == 0) {
-      /* look for key */
-      skipspace(&ptr);
-      key = ptr;
-      while ((*ptr != '\0') && (*ptr != ' ') && (*ptr != '=')) {
-        ptr = ptr + 1;
-      };
-      endkey = ptr;
-      skipspace(&ptr);
-      if (*ptr == '=') {
-        doval = 1;
-        ptr = ptr + 1;
-        skipspace(&ptr);
-        value = ptr;
-        newword = ptr;
-        endvalue = NULL;
-        lastendvalue = NULL;
-      } else {
-      /* [SS] 2015-09-08 */
-      /* assume only one I: key occurs; grab the rest in value */
-        *endkey = '\0'; /* end the key ptr */
-        value = ptr;   /* start the value ptr here */
-        event_info_key(key,value);
-        return;
-      };
-    } else {
-      /* look for value */
-      skipspace(&ptr);
-      while ((*ptr != '\0') && (*ptr != ' ') && (*ptr != '=')) {
-        ptr = ptr + 1;
-      };
-      lastendvalue = endvalue;
-      endvalue = ptr;
-      skipspace(&ptr);
-      lastnewword = newword;
-      newword = ptr;
-      if (*ptr == '\0') {
-        *endkey = '\0';
-        *endvalue = '\0';
-        event_info_key(key, value);
-      } else {
-        if (*ptr == '=') {
-          *endkey = '\0';
-          if (lastendvalue == NULL) {
-            event_error("missing key or value in I: field");
-          } else {
-            *lastendvalue = '\0';
-            event_info_key(key, value);
-          };
-          key = lastnewword;
-          endkey = endvalue; 
-          doval = 1;
-          ptr = ptr + 1;
-          skipspace(&ptr);
-          value = ptr;
-          endvalue = NULL;
-          lastendvalue = NULL;
-        };
-      };
-    };
-  };
+  p = s;
+  skipspace(&p);
+  readstr (package, &p, 40);
+  event_specific (package, p, 1);
 }
 
 

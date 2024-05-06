@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.91 March 02 2024 abc2midi" 
+#define VERSION "4.92 April 30 2024 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -1936,6 +1936,11 @@ char *s;
     skipspace(&p);
     readstr(command, &p, 40);
 
+    if (s[0] == '=') {
+     event_warning("Do not use MIDI= in I: command. Just use MIDI");
+     done = 0;
+     } /*[SS] 2024.04.30 */
+
     if (strcmp(command, "channel") == 0) {
       skipspace(&p);
       ch = readnump(&p) - 1;
@@ -2362,10 +2367,9 @@ char *s;
     };
   }
 
-
-void event_specific(package, s)
 /* package-specific command found i.e. %%NAME */
-char *package, *s;
+/* [JA] 2024.04.30 introducing in_I */
+void event_specific(char *package, char *s, int in_I)
 {
   char msg[200], command[40];
   char *p;
@@ -2386,7 +2390,6 @@ char *package, *s;
      process_midix(s);
      }
 
- 
   if (strcmp(package, "MIDI") == 0) 
      event_midi(s); else {
      
@@ -2507,7 +2510,6 @@ char *package, *s;
    }
 #endif
 
-    event_comment(msg);
     }
   }
 }
@@ -3148,38 +3150,7 @@ int local;
   };
 }
 
-void event_info_key(key, value)
-char* key;
-char* value;
-{
-  int num;
-  char midicmd[64];
-  char errmsg[80];
-
-  if (strcmp(key, "octave")==0) {
-    num = readsnumf(value);
-    event_octave(num,0);
-  };
-  /* [SS] 2015-06-02 */
-  if (strcmp(key, "MIDI") == 0 || strcmp(key, "MIDIx") == 0 )
-         event_specific(key, value);
-
-  else if(strcmp(key, "volinc")  == 0 || strcmp(key,"vol") == 0)
-     {
-     midicmd[0] = 0;
-     strcat(midicmd, key);
-     strcat(midicmd, " ");
-     strcat(midicmd, value);
-     event_specific("MIDI",midicmd);
-     }
-  else if (is_abcm2ps_option (key)) return;
-
-  else {
-    /* [KG] 2022-01-13 stack overflow */
-    snprintf(errmsg, 80, "I: key \' %s\' not recognized", key);
-    if (quiet == -1 && silent == 0) event_error(errmsg); /* [SS] 2018-04-01 */
-    }
-}
+/* deleted event_info_key(key,value) [JA] 2024-04-30 */
 
 static void stack_broken(v)
 /* store away broken rhythm context on encountering grace notes */
@@ -4618,42 +4589,42 @@ char* s;
 /* add nofnop ... */
 if (nofnop == 0) {
   if (strcmp(p, "ppp") == 0) {
-    event_specific("MIDI", "beat 30 20 10 1");
+    event_specific("MIDI", "beat 30 20 10 1", 0); /* [JA] 2024-04-30 and etc */
     done = 1;
   };
   if (strcmp(p, "pp") == 0) {
-    event_specific("MIDI", "beat 45 35 20 1");
+    event_specific("MIDI", "beat 45 35 20 1", 0);
     done = 1;
   };
   if (strcmp(p, "p") == 0) {
-    event_specific("MIDI", "beat 60 50 35 1");
+    event_specific("MIDI", "beat 60 50 35 1", 0);
     done = 1;
   };
   if (strcmp(p, "mp") == 0) {
-    event_specific("MIDI", "beat 75 65 50 1");
+    event_specific("MIDI", "beat 75 65 50 1", 0);
     done = 1;
   };
   if (strcmp(p, "mf") == 0) {
-    event_specific("MIDI", "beat 90 80 65 1");
+    event_specific("MIDI", "beat 90 80 65 1", 0);
     done = 1;
   };
   if (strcmp(p, "f") == 0) {
-    event_specific("MIDI", "beat 105 95 80 1");
+    event_specific("MIDI", "beat 105 95 80 1", 0);
     done = 1;
   };
   if (strcmp(p, "ff") == 0) {
-    event_specific("MIDI", "beat 120 110 95 1");
+    event_specific("MIDI", "beat 120 110 95 1", 0);
     done = 1;
   };
   if (strcmp(p, "fff") == 0) {
-    event_specific("MIDI", "beat 127 125 110 1");
+    event_specific("MIDI", "beat 127 125 110 1", 0);
     done = 1;
   };
 
   if ((strcmp(p,"crescendo(") == 0) || (strcmp(p,"<(") == 0) || 
       (strcmp(p,"crescendo)") == 0) || (strcmp(p,"<)") == 0)) {
           sprintf(midimsg,"beatmod %d",velocitychange);
-          event_specific("MIDI", midimsg);
+          event_specific("MIDI", midimsg, 0); /* [JA] 2024-04-30 */
           done = 1;
    }
 
@@ -4661,7 +4632,7 @@ if (nofnop == 0) {
       (strcmp(p,"diminuendo)") == 0) || (strcmp(p,">)") == 0) || 
       (strcmp(p,"diminuendo(") == 0) || (strcmp(p,">(") == 0)) {
           sprintf(midimsg,"beatmod -%d",velocitychange);
-          event_specific("MIDI", midimsg);
+          event_specific("MIDI", midimsg, 0);
           done = 1;
    }
 

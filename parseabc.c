@@ -2100,7 +2100,7 @@ parse_precomment (s)
     {
       p = s + 1;
       readstr (package, &p, 40);
-      event_specific (package, p);
+      event_specific (package, p, 0); /* [JA] 2024-04-30 */
     }
   else
     {

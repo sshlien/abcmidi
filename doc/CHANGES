@@ -15450,3 +15450,22 @@ d8 |\
 [V:1 transpose=0] d8 |]
 
 
+April 30 2024
+
+According to the abc standards 2.1 and 2.2 the %% (pseudo comment)
+and the I: (stylesheet directive) should access the same functionality
+in the same way. Thus if
+%%MIDI program 10
+should appear in an I: command as I:MIDI program 10 and not as
+I:MIDI= program 10. James Allwright has updated abcMIDI C code
+to comply with the standards. If you need to run some of the older
+abc files that do not obey this standard and you do not want
+to edit these files, then you should use an older version of
+the abcMIDI package. 
+
+The following files were updated: matchsup.c, parseabc.h, pareseabc.c
+parser2.c, store.c, toabc.c. and yapstree.c. Look for the comments
+[JA] 2024-04-30.
+
+
+

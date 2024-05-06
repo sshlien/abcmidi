@@ -422,8 +422,10 @@ char *s;
 }
 
 
-void event_specific (package, s)
+/* [JA] 2024-04-30  added in_I argument */
+void event_specific (package, s, in_I)
 char *package, *s;
+int in_I;
 {
 }
 
