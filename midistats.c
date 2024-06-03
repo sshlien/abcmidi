@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.91 March 21 2024 midistats"
+#define VERSION "0.92 June 03 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -1092,7 +1092,7 @@ long ltempo;
   beatnumber = Mf_currtime/division;
   trkdata.tempo[0]++;
   if (noOutput == 1) return;
-  if (trkdata.tempo[0] == 0) printf("tempo %6.2f bpm\n",60000000.0/tempo);
+  if (trkdata.tempo[0] == 1) printf("tempo %6.2f bpm\n",60000000.0/tempo);
   else if (trkdata.tempo[0] < 10) printf("ctempo  %6.2f %6.2f\n",60000000.0/tempo,beatnumber);
 }
 

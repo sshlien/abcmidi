@@ -1941,6 +1941,8 @@ char *s;
      done = 0;
      } /*[SS] 2024.04.30 */
 
+    printf("%s\n",command);
+
     if (strcmp(command, "channel") == 0) {
       skipspace(&p);
       ch = readnump(&p) - 1;
@@ -3150,7 +3152,7 @@ int local;
   };
 }
 
-/* deleted event_info_key(key,value) [JA] 2024-04-30 */
+/* deleted event_info_key(key,value). It is now in parser2.c [JA] 2024-04-30 */
 
 static void stack_broken(v)
 /* store away broken rhythm context on encountering grace notes */
