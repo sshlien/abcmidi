@@ -415,8 +415,12 @@ int type;
   m = msg();
   switch  ( type ) {
   case 0x00:
-    if ( Mf_seqnum )
+    if ( Mf_seqnum ) {
+      if (leng < 1) {printf("Error: zero length meta seqnumber\n");
+                     exit(1);
+                    }
       (*Mf_seqnum)(to16bit(m[0],m[1]));
+      }
     break;
   case 0x01:  /* Text event */
   case 0x02:  /* Copyright notice */

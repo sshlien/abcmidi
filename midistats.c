@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.92 June 03 2024 midistats"
+#define VERSION "0.93 June 07 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -245,7 +245,7 @@ static int progmapper[] = {
 16, 16, 16, 16, 16, 16, 16, 16
 };
 
-int pulseCounter[1024];
+int pulseCounter[2048];
 int pulseDistribution[24];
 
 struct barPattern {
@@ -463,6 +463,14 @@ void stats_header (int format, int ntrks, int ldivision)
 {
   int i;
   division = ldivision;
+  if(division < 12) {
+    printf("Error: division (PPQN) is too small\n");
+    exit(1);
+    }
+  if(ntrks > 40) {
+    printf("Error: too many tracks = %d\n",ntrks);
+    exit(1);
+    }
   halfdivision = ldivision/2;
   quietLimit = ldivision*8;
   divisionsPerBar = division*beatsPerBar;
@@ -532,6 +540,7 @@ threshold = 10.0/(float) division;
 maxcount = 0;
 ncounts = 0;
 npeaks = 0;
+if (division > 2047) return; /* PPQN is too large for pulseCounter */
 for (i=0;i<division;i++) {
   ncounts = ncounts + pulseCounter[i];
   if (pulseCounter[i] > maxcount) {
@@ -903,10 +912,10 @@ int chan, pitch, vol;
     return;
     }
  pulsePosition = Mf_currtime % division;
- pulseCounter[pulsePosition]++;
- if (pulsePosition >= 1023) {printf("pulsePosition = %d too large\n",pulsePosition);
+ if (pulsePosition >= 2047) {printf("Error: pulsePosition = %d too large\n",pulsePosition);
      exit(1);
      }
+ pulseCounter[pulsePosition]++;
  trkdata.notemeanpitch[chan+1] += pitch;
  trkdata.notepitchmax[chan+1] = max(trkdata.notepitchmax[chan+1],pitch);
  trkdata.notepitchmin[chan+1] = min(trkdata.notepitchmin[chan+1],pitch);
@@ -1183,7 +1192,7 @@ void initfunc_for_stats()
     Mf_seqspecific = no_op3;
     Mf_text = stats_metatext;
     Mf_arbitrary = no_op2;
-    for (i = 0; i< 1023; i++) pulseCounter[i] = 0;
+    for (i = 0; i< 2047; i++) pulseCounter[i] = 0;
 }
 
 
@@ -1235,11 +1244,11 @@ int pulsePosition;
 int decimate;
 float fraction;
 int resolution = 12;
-for (i = 0; i< 1023; i++) pulseCounter[i] = 0;
+for (i = 0; i< 2047; i++) pulseCounter[i] = 0;
 for (i = 0; i < lastEvent; i++) {
   pulsePosition = midievents[i].onsetTime % division;
   pulseCounter[pulsePosition]++;
-  if (pulsePosition >= 1023) {printf("pulsePosition = %d too large\n",pulsePosition);
+  if (pulsePosition > 2047) {printf("pulsePosition = %d too large\n",pulsePosition);
 	     exit(1);
              }
   }
