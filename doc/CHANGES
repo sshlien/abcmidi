@@ -15468,4 +15468,7 @@ parser2.c, store.c, toabc.c. and yapstree.c. Look for the comments
 [JA] 2024-04-30.
 
 
+June 11 2024
+
+abc2midi: corrected the sus4 chord in store.c
 

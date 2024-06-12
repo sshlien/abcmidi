@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.93 June 07 2024 midistats"
+#define VERSION "0.94 June 12 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -358,7 +358,7 @@ char *mode;
 
     if ( (f=fopen(name,mode)) == NULL ) {
       char msg[256];
-      sprintf(msg,"Error - Cannot open file %s",name);
+      sprintf(msg,"Error: - Cannot open file %s",name);
       fatal_error(msg);
     }
     return(f);

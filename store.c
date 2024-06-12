@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.92 April 30 2024 abc2midi" 
+#define VERSION "4.93 June 06 2024 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -839,7 +839,7 @@ static void setup_chordnames()
   static int list_11[6] = {0, 4, 7, 10, 14, 17};
   static int list_dim9[5] = {0, 3, 6, 9, 13}; /* [SS] 2016-02-08 */
   static int list_sus[3] = {0, 5, 7};
-  static int list_sus4[3] = {0, 4, 7}; /* [SS] 2015-07-08 */
+  static int list_sus4[3] = {0, 3, 5}; /* [SS] 2015-07-08 2024-06-11 */
   static int list_sus9[3] = {0, 2, 7};
   static int list_7sus4[4] = {0, 5, 7, 10};
   static int list_7sus9[4] = {0, 2, 7, 10};
