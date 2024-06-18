@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.94 June 12 2024 midistats"
+#define VERSION "0.95 June 18 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -901,6 +901,7 @@ int chan, pitch, vol;
  int dithermargin; /* [SS] 2023-08-22 */
  int cpitch; /* [SS] 2023-09-13 */
  int pulsePosition;
+ int beatnumber;
 
  cpitch = pitch % 12;
  channel_used_in_track[chan+1]++; /* [SS] 2023-09-06 */
@@ -951,8 +952,10 @@ int chan, pitch, vol;
   chanpitchhistogram[chan*12+cpitch]++;  /* [SS] 2023-09-13 */
 
   eigthunit = Mf_currtime/halfdivision;
-  updateNotememory (eigthunit,  chan,  pitch); 
-  updateTrackNotememory (eigthunit,  chan,  pitch); 
+  beatnumber = Mf_currtime/division;
+
+  updateNotememory (beatnumber,  chan,  pitch); 
+  updateTrackNotememory (beatnumber,  chan,  pitch); 
   }
 
 
