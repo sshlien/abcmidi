@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.95 June 18 2024 midistats"
+#define VERSION "0.96 July 26 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -740,6 +740,7 @@ for (i=1;i<17;i++) {
    if (i != 10) printf("%d %d ",trkdata.notemeanpitch[i], trkdata.notelength[i]);
    else 
      printf("-1  0 ");
+   printf("%d ",trkdata.pitchbend[i]); /* [SS] 2024-07-26 */
    printf("%d %d ",trkdata.cntlparam[i],trkdata.pressure[i]); /* [SS] 2022-03-04 */
    printf("%d %d ",trkdata.quietTime[i],trkdata.rhythmpatterns[i]);
    if (i != 10)  {printf("%d %d %d %d %d",trkdata.notepitchmin[i],  trkdata.notepitchmax[i] ,trkdata.notelengthmin[i],  trkdata.notelengthmax[i], trkdata.numberOfGaps[i]);

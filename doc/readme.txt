@@ -6,7 +6,7 @@ abc2abc  version 2.22 April 30 2024
 yaps     version 1.94 April 30 2024
 abcmatch version 1.83 February 19 2024
 midicopy version 1.39 November 08 2022
-midistats version 0.95 June 18 2024
+midistats version 0.96 July 26 2024
 
 24th January 2002
 Copyright James Allwright

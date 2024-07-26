@@ -36,25 +36,26 @@ number.
 .PP
 trkinfo is an array of 19 numbers which indicates the statistical properties
 of the track of interest. The following data is given:
-the channel number,
-the first program assigned to this channel,
-the number of notes for this channel counting any chords as one note,
-the total number of notes for this for this channel,
-the sum of the MIDI pitches for all the notes,
-the sum of the note durations in MIDI pulse units,
-the number of control parameter messages,
-the number of pressure messages.
-the number of distinct rhythm patterns for each channel
-the number of pulses the channel was inactive
-the minimum pitch value
-the maximum pitch value
-the minimum note length in pulses
-the maximum note length in pulses
-the number of gaps in the channel
-the entropy of the pitch class histogram for that channel
-the number of notes whose pitch were the same as the previous note
-the number of notes whose pitch changed by less than 4 semitones
-the number of notes whose pitch changed by 4 or more semitones
+0 the channel number,
+1 the first program assigned to this channel,
+2 the number of notes for this channel counting any chords as one note,
+3 the total number of notes for this for this channel,
+4 the sum of the MIDI pitches for all the notes,
+5 the sum of the note durations in MIDI pulse units,
+6 the number of pitchbend messages,
+7 the number of control parameter messages,
+8 the number of pressure messages.
+9 the number of distinct rhythm patterns for each channel
+10 the number of pulses the channel was inactive
+11 the minimum pitch value
+12 the maximum pitch value
+13 the minimum note length in pulses
+14 the maximum note length in pulses
+15 the number of gaps in the channel
+16 the entropy of the pitch class histogram for that channel
+17 the number of notes whose pitch were the same as the previous note
+18 the number of notes whose pitch changed by less than 4 semitones
+19 the number of notes whose pitch changed by 4 or more semitones
 (In event of a chords the maximum pitches are compared.) 
 .PP
 After processing all the individual tracks, the following information
