@@ -20,6 +20,7 @@ midicopy \- Copy selected track, channel, time interval of a MIDI file to anothe
     [\fB-xdrums\fP \fIn1,n2,...\fP]\
     [\fB-onlydrums\fP]\
     [\fB-nodrums\fP]\
+    [\fB-transpose\fP \fIn (semitones)]\
  \fIinput.mid output.mid\fP
 .SH "DESCRIPTION"
 .PP
@@ -142,6 +143,9 @@ Only copy the percussion channel.
 .TP
 .B -nodrums
 Copy all channels except the percussion channel.
+.TP
+.B -transpose n (semitones)
+Transpose pitch for all channels except the percussion by n semitones.
 
 .SH EXAMPLE
 .B midicopy.exe -trks 1,5 -from 2669 -to 8634 uzicko.mid fragment.mid
@@ -154,4 +158,4 @@ Midicopy will copy tracks 1 and 5 starting from midi pulse position
 .SH AUTHOR
 This manual page was written by Seymour Shlien.
 .SH VERSION
-This man page describes midicopy version 1.33 from December 22 2019.
+This man page describes midicopy version 1.40 from August 11 2024.

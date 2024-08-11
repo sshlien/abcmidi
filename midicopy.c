@@ -52,7 +52,7 @@
 
 
 
-#define VERSION "1.39 November 07 2023 midicopy"
+#define VERSION "1.40 August 11 2024 midicopy"
 #include "midicopy.h"
 #define NULLFUNC 0
 #define NULL 0
@@ -116,6 +116,7 @@ int nobends = 0;                /* [SS] 2017-12-15 */
 int nopressure = 0;             /* [SS] 2022-05-05 */
 int nocntrl = 0;                /* [SS] 2022-05-05 */
 int zerochannels = 0;           /* [SS] 2020-10-09 */
+int transpose = 0;              /* [SS] 2024-08-11 */
 
 long Mf_numbyteswritten = 0L;
 long readvarinum ();
@@ -1042,6 +1043,7 @@ chanmessage (int status, int c1, int c2)
     switch (status & 0xf0)
       {
       case 0x80:
+        if (chan != 9 && transpose != 0) c1 = c1 + transpose; /* 2024-08-11 */ 
 	copy_noteoff (chan, c1, c2);
 	break;
       case 0x90:
@@ -1060,6 +1062,7 @@ chanmessage (int status, int c1, int c2)
              c2 = c2 - attenuation;
              if (c2 <0) c2 = 0;
              }
+        if (chan != 9 && transpose != 0) c1 = c1 + transpose; /* 2024-08-11 */ 
 	copy_noteon (chan, c1, c2);
 	break;
       case 0xa0:
@@ -1077,6 +1080,7 @@ chanmessage (int status, int c1, int c2)
 	copy_program (chan, c1);
 	break;
       case 0xd0:
+        if (chan != 9 && transpose != 0) c1 = c1 + transpose; /* 2024-08-11 */ 
         if (nopressure == 0) copy_chanpressure (chan, c1);
 	break;
       }
@@ -1862,6 +1866,7 @@ main (int argc, char *argv[])
       printf ("-onlydrums (only channel 10)\n"); /* [SS] 2019-12-22 */
       printf ("-nodrums (exclude channel 10)\n"); /* [SS] 2019-12-22 */
       printf ("-zerochannels  set all channel numbers to zero\n"); /* [SS] 2020-10-09 */
+      printf("-transpose n (semitones)\n");
       exit (1);
     }
 
@@ -2154,6 +2159,10 @@ main (int argc, char *argv[])
 
   arg = getarg("-zerochannels",argc,argv); /* [SS] 2020-10-09 */
   if (arg >=0) zerochannels = 1;
+
+  /* [SS] 2024-08-11 */
+  arg = getarg("-transpose",argc,argv);
+  if (arg >=0) sscanf (argv[arg], "%d", &transpose);
 
   F_in = fopen (argv[argc - 2], "rb");
   if (F_in == NULL)
