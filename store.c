@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.93 June 06 2024 abc2midi" 
+#define VERSION "4.94 August 13 2024 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -4479,7 +4479,7 @@ char* s;
   int basepitch;
   char accidental, accidental2, note; /* [SS] 2021-12-05 */
   char* p;
-  char name[9];
+  char name[10]; /* JA increased from 9 to 10  2024-08-13 */
   int i;
   int chordno;
   int bassnote;
