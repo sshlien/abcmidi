@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.94 August 13 2024 abc2midi" 
+#define VERSION "4.94 October 10 2024 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -1941,7 +1941,7 @@ char *s;
      done = 0;
      } /*[SS] 2024.04.30 */
 
-    printf("%s\n",command);
+    if (verbose > 1) printf("event_midi command: %s\n",command);
 
     if (strcmp(command, "channel") == 0) {
       skipspace(&p);

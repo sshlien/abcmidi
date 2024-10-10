@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.96 July 26 2024 midistats"
+#define VERSION "0.96 October 10 2024 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -1515,7 +1515,7 @@ for (i=1;i<256;i++) {
 
 void output_drumpat () {
 int i;
-for (i=0;i<lastBeat;i++) printf("%d ",drumpat[i]);
+for (i=0;i<=lastBeat;i++) printf("%d ",drumpat[i]);
 /*for (i=0;i<lastBeat;i++) output_perc_pattern(drumpat[i]);*/
 printf("\n");
 }
