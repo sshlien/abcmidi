@@ -15479,4 +15479,8 @@ August 13 2024
 abcmidi: in event_handle_gchord() in store.c increased the size
 of variable name to char name[10] to avoid potential buffer overflow.
 
+December 06 2024
+abcmidi: process_midix(s) in store.c can cause a segmentation error
+if it cannot match MIDIx with the corresponding MIDIdef. Fix:
+added a return statement after reporting the problem in event_error(msg).
 

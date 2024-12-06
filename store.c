@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.94 October 10 2024 abc2midi" 
+#define VERSION "4.95 December 06 2024 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -1888,6 +1888,7 @@ while (j > 0) {
     if (i == nmidicmd) {
         sprintf(msg, "cannot match %%%%MIDIx %s with corresponding MIDIdef", name);
         event_error(msg);
+        return; /* [SS] 2024.12.06 */
         }
     if (k > 0 && strncmp(midicmd[i],"controlstring",12) == 0)
         event_midi("controlcombo");
