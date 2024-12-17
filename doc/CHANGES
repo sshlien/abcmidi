@@ -15476,11 +15476,16 @@ August 11 2024
 midicopy: introduced -transpose option
 
 August 13 2024
-abcmidi: in event_handle_gchord() in store.c increased the size
+abc2midi: in event_handle_gchord() in store.c increased the size
 of variable name to char name[10] to avoid potential buffer overflow.
 
 December 06 2024
-abcmidi: process_midix(s) in store.c can cause a segmentation error
+abc2midi: process_midix(s) in store.c can cause a segmentation error
 if it cannot match MIDIx with the corresponding MIDIdef. Fix:
 added a return statement after reporting the problem in event_error(msg).
+
+December 16 2024
+abc2midi: corrections to the sus, sus4, sus2 and sus9 chords provided
+by Avik Topchyan were incorporated in the function setup_chordnames()
+into store.c
 

@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.95 December 06 2024 abc2midi" 
+#define VERSION "4.96 December 16 2024 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -838,9 +838,12 @@ static void setup_chordnames()
   /* static int list_11[6] = {0, 4, 7, 10, 2, 5}; */
   static int list_11[6] = {0, 4, 7, 10, 14, 17};
   static int list_dim9[5] = {0, 3, 6, 9, 13}; /* [SS] 2016-02-08 */
-  static int list_sus[3] = {0, 5, 7};
-  static int list_sus4[3] = {0, 3, 5}; /* [SS] 2015-07-08 2024-06-11 */
-  static int list_sus9[3] = {0, 2, 7};
+
+  static int list_sus[3] = {0, 5, 7}; /* [AT] sus is a synonym of sus4 */
+  static int list_sus4[3] = {0, 5, 7}; /* [SS] 2015-07-08 [AT] 2024-12-16*/
+  static int list_sus2[3] = {0, 2, 7}; /* [AT] 2024-12-16 */
+  static int list_sus9[4] = {0, 2, 5, 9}; /* [AT] 2024-12-16 */
+
   static int list_7sus4[4] = {0, 5, 7, 10};
   static int list_7sus9[4] = {0, 2, 7, 10};
   static int list_5[2] = {0, 7};
@@ -865,10 +868,12 @@ static void setup_chordnames()
   addchordname("M9", 5, list_M9);
   addchordname("11", 6, list_11);
   addchordname("dim9", 5, list_dim9);
-  addchordname("sus", 3, list_sus);
-  addchordname("sus4", 3, list_sus4); /* [SS] 2015-07-08 */
-  addchordname("sus9", 3, list_sus9);
-  addchordname("sus2", 3, list_sus9); /* [SS] 2015-07-08 */
+
+  addchordname("sus", 3, list_sus); /* [AT] sus is a synonym of sus4 */
+  addchordname("sus4", 3, list_sus4); /* [SS] 2015-07-08 [AT] 2024-12-16 */
+  addchordname("sus2", 3, list_sus2); /* [SS] 2015-07-08 [AT] 2024-12-16 */
+  addchordname("sus9", 3, list_sus9);  /* [AT] 2024-12-16 */
+
   addchordname("7sus2", 4, list_7sus9); /* [SS] 2015-07-08 */
   addchordname("7sus4", 4, list_7sus4);
   addchordname("7sus9", 4, list_7sus9);
