@@ -15485,6 +15485,7 @@ if it cannot match MIDIx with the corresponding MIDIdef. Fix:
 added a return statement after reporting the problem in event_error(msg).
 
 December 16 2024
+December 22 2024
 abc2midi: corrections to the sus, sus4, sus2 and sus9 chords provided
 by Avik Topchyan were incorporated in the function setup_chordnames()
 into store.c

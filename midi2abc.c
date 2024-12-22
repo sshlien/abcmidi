@@ -1274,7 +1274,7 @@ int chan, control, value;
   if (prtime(timeunits)) return;
 
   if (control == 6) bend2cents = 8192.0/(100.0*value); /*[SS] 2022-02-12 */
-  printf("CntlParm %2d %s = %d\n",chan+1, ctype[control],value);
+  printf("CntlParm %2d %s = %d %d\n",chan+1, ctype[control],control,value);
 }
 
 

@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.96 December 16 2024 abc2midi" 
+#define VERSION "4.96 December 22 2024 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -870,9 +870,9 @@ static void setup_chordnames()
   addchordname("dim9", 5, list_dim9);
 
   addchordname("sus", 3, list_sus); /* [AT] sus is a synonym of sus4 */
-  addchordname("sus4", 3, list_sus4); /* [SS] 2015-07-08 [AT] 2024-12-16 */
+  addchordname("sus4", 3, list_sus4); /* [SS] 2015-07-08 [AT] */
   addchordname("sus2", 3, list_sus2); /* [SS] 2015-07-08 [AT] 2024-12-16 */
-  addchordname("sus9", 3, list_sus9);  /* [AT] 2024-12-16 */
+  addchordname("sus9", 4, list_sus9);  /* [AT] 2024-12-16  2024-12-22*/
 
   addchordname("7sus2", 4, list_7sus9); /* [SS] 2015-07-08 */
   addchordname("7sus4", 4, list_7sus4);
