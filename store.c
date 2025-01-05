@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.96 December 22 2024 abc2midi" 
+#define VERSION "4.97 January 03 2025 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -3708,6 +3708,7 @@ int *pitchbend;
   char acc;
   int mul, noteno;
   float pitchvalue;
+  float microtoneshift; /* [SS] 2025-01-03 */
   int pitch,bend;
   int a,b;
   int j;
@@ -3729,13 +3730,26 @@ int *pitchbend;
   mul = mult;
   noteno = (int)note - 'a';
 
+
+
   /* [SS] 2015-08-18 */
   if (acc == ' ' && !microtone) {  /* no accidentals, apply current state */
     acc = v->workmap[noteno][octave+4];
     mul = v->workmul[noteno][octave+4];
     a = v->workmic[noteno][octave+4].num;   /* 2014-01-26 */
     b = v->workmic[noteno][octave+4].denom;
-    event_microtone(1,a,b);
+/* [SS} 2025-01-03
+   if the key signature contains microtones which applies to the
+   note, we call event_microtone which will return the globals
+   microtone, setmicrotone.num and setmicrotone.denom and
+   they are applied to the note.
+*/
+    
+    if(a != 0) {
+       /* [SS] 2025-01-03 */
+       //printf("calling event_microtone from pitchof_b\n");
+       event_microtone(1,a,b);
+       }
   } else {  /* some accidentals save the state if propagate_accs != 0 */
     if (propagate_accs) {
       if (propagate_accs == 1) {  /* accidentals applies to only current octave */
@@ -3762,8 +3776,6 @@ int *pitchbend;
   if ((temperament==TEMPERLN) || (temperament==TEMPEREQ))  {
  
     pitchvalue = tscale[p]/100.0; /* cents to semitones */
-    if (acc == '^') pitchvalue = pitchvalue + mul*accidental_size;
-    if (acc == '_') pitchvalue = pitchvalue - mul*accidental_size;
 
     pitchvalue =  pitchvalue + octave*octave_size/100.0 + middle_c;
     
@@ -3779,7 +3791,9 @@ int *pitchbend;
              * or
              * microstep_size is the octave fraction for temperamentequal
              * */
-           pitchvalue +=  setmicrotone.num * microstep_size/100.0;
+           /* [SS] 2025-01-03 */
+           microtoneshift =  setmicrotone.num * microstep_size/100.0;
+           pitchvalue += microtoneshift;
        }
 
 	else /* microtone relative to sharp step in the current temperament */
@@ -4328,9 +4342,10 @@ int xoctave, n, m;
   if (v->drumchannel) pitch = barepitch(note,accidental,mult,octave);
   /* [SS] 2015-08-18 */
   pitch = pitchof_b(note, accidental, mult, octave, propagate_accidentals,&active_pitchbend);
-#ifndef MAKAM
+/*#ifndef MAKAM
   pitch_noacc = pitchof_b(note, 0, 0, octave, 0,&dummy);
 #endif
+*/
   if (decorators[FERMATA] && !ignore_fermata) {
     if(fermata_fixed) addfract(&num,&denom,1,1);
     else num = num*2;
@@ -4798,7 +4813,6 @@ struct fraction modmic[7];
       v->basemul[i] = modmul[i];
       v->basemic[i].num = modmic[i].num;
       v->basemic[i].denom = modmic[i].denom;
-      /*printf("basemic[%d] = %d %d\n",i,modmic[i].num,modmic[i].denom);*/
     };
   };
 }

@@ -15490,3 +15490,39 @@ abc2midi: corrections to the sus, sus4, sus2 and sus9 chords provided
 by Avik Topchyan were incorporated in the function setup_chordnames()
 into store.c
 
+
+January 3 2025
+abc2midi: it was recently discovered that abc2midi does not respect
+the microtone key signature when dealing with Turkish makams.
+In the sample file
+
+X:1
+T: Microtone key signature
+M: 4/4
+L: 1/4
+%%MIDI temperamentequal 53
+K: C
+B,2 D2|\
+_1B,2 _4D2|
+K: C _1B _4D
+B,2 D2|
+
+The last bar B,2 D2 should be played as _1B,2 _4D.
+
+Fix: most of the code dealing with the microtone key signature
+was already present in the function pitchof_b, however the
+implementation was not complete. In order to complete the
+implementation, the pitchof_b detects whether the note is
+under the influence of the key signature and invokes event_microtone()
+when necessary. The pitch shift is then applied just as if
+the microtone was already present in the note.
+
+Comment: the code dealing with microtones is very messy. The
+function pitchof_b is more than 120 lines of code because it
+also handles trills, and other note decorations. Information
+is passed around through global variables like workmic, workmap,
+note, pitchbend, microtone, setmicrotone. event_microtone
+is called before event_note. It is hard to determine what is
+going on. Many people have worked on this code.
+
+ 
