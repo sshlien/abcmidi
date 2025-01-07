@@ -15526,3 +15526,34 @@ is called before event_note. It is hard to determine what is
 going on. Many people have worked on this code.
 
  
+January 07 2025
+
+abc2midi: works correctly with microtone shortcuts but does not
+handle the fraction expression of microtones. eg.
+
+X:1
+T: equaltempered 53
+M: 4/4
+L: 1/4
+%%MIDI temperamentequal 53
+K: none
+C ^12/53C ^24/53C ^36/53C |^48/53C _48/53D _36/53D _24/53D |_12/53D =D ^12/53D ^24/53D| ^36/53D ^48/53D _48/53E _36/53E |
+_24/53E _12/53E =E ^12/53E | ^24/53E ^36/53E F ^12/53F| ^24/53F ^36/53F ^48/53F _48/53G| _36/53G _24/53G _12/53G =G |
+^12/53G ^24/53G ^36/53G ^48/53G| _48/53A _36/53A _24/53A _12/53A | A ^12/53A ^24/53A ^36/53A| ^48/53A _48/53B _36/53B _24/53B|
+_12/53B =B ^12/53B ^24/53B _12/53c|
+
+Fix: there were numerous minor fixes to ensure that the variable
+setmicrotone.denom is initialized to 1 rather than 0 (to avoid division
+by 0). New code was inserted in pitchof_b() in store.c.
+ if (microtone) {
+        /* [SS] 2025-01-03  2025-01-06*/
+        if (setmicrotone.denom == 1)
+          /* microtone shortcut (eg _1B,) */
+          microtoneshift =  setmicrotone.num * microstep_size/100.0;
+        else
+          /* microtone fraction (eg _12/53B,) */
+          microtoneshift =  (float) setmicrotone.num /(float) setmicrotone.denom;
+In addition event_key was not receiving negative fractional microtones.
+The problem was traced to a missing check in process_microtones()
+in parseabc.c
+

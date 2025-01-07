@@ -674,7 +674,7 @@ ismicrotone (p, dir)
       return 1;
     }
   setmicrotone.num = 0;
-  setmicrotone.denom = 0;
+  setmicrotone.denom = 1;
   return 0;
 }
 
@@ -1347,6 +1347,7 @@ static void process_microtones (int *parsed,  char word[],
         if (j > 7) {
           j = (int) c - 'a';
         }
+        if (word[0] == '_') a = -a; /* [SS] 2025-01-07 */
         if (j > 7 || j < 0) {
           event_error ("Not a valid microtone");
           return;

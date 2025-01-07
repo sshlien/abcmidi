@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.97 January 03 2025 abc2midi" 
+#define VERSION "4.98 January 07 2025 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -3746,9 +3746,7 @@ int *pitchbend;
 */
     
     if(a != 0) {
-       /* [SS] 2025-01-03 */
-       //printf("calling event_microtone from pitchof_b\n");
-       event_microtone(1,a,b);
+       event_microtone(1,a,b); /* [SS] 2025-01-03 */
        }
   } else {  /* some accidentals save the state if propagate_accs != 0 */
     if (propagate_accs) {
@@ -3782,28 +3780,23 @@ int *pitchbend;
     /* [HL] 2020-06-27 Adjust for A=440.0 with zero pitchbend */
     pitchvalue += 9.0 - (3.0*fifth_size-octave_size)/100.0;
 
-    /* [HL] 2015-05-15 */
+    /* [HL] 2015-05-15  2025-01-06*/
     if (microtone) {
-	if (setmicrotone.denom == 100) /* microtone in cents */ 
-	  pitchvalue+=  setmicrotone.num / 100.0; /* [HL] 2020-07-28 */
-        else if (setmicrotone.denom == 0) { /* [HL] 2020-06-20 / 2020-06-27 */
-            /* microstep_size is accidental_size for temperamentlinear,
-             * or
-             * microstep_size is the octave fraction for temperamentequal
-             * */
-           /* [SS] 2025-01-03 */
-           microtoneshift =  setmicrotone.num * microstep_size/100.0;
-           pitchvalue += microtoneshift;
+        /* [SS] 2025-01-03  2025-01-06*/
+        if (setmicrotone.denom == 1) 
+          /* microtone shortcut (eg _1B,) */
+          microtoneshift =  setmicrotone.num * microstep_size/100.0;
+        else
+          /* microtone fraction (eg _12/53B,) */
+          microtoneshift =  (float) setmicrotone.num /(float) setmicrotone.denom;
+        /* printf("microtoneshift = %f for setmicrotone %d %d\n",microtoneshift, setmicrotone.num,setmicrotone.denom); */
+        pitchvalue += microtoneshift;
        }
 
-	else /* microtone relative to sharp step in the current temperament */
-	  pitchvalue +=  (((float)setmicrotone.num) / ((float)setmicrotone.denom)) * accidental_size; /* [HL] 2020-07-28 */
-
-	/* needed? */
 	microtone = 0;
-	setmicrotone.num = setmicrotone.denom = 0;
+	setmicrotone.num = 0; 
+        setmicrotone.denom = 1; /* [SS] 2025-01-06 */
 	active_pitchbend = 8192;
-    }
  
     pitch =  (int) (pitchvalue + 0.5);
     bend = (int) (0.5 + 8192.0 + 4096.0 * (pitchvalue - (float) pitch));
@@ -3822,13 +3815,14 @@ int *pitchbend;
 if (!microtone) *pitchbend = bend; /* don't override microtone */
 /* if (comma53) [SDG] 2020-06-03 ambiguous statement
  * should the following lines be included in if statement? */
-#ifdef MAKAM
+/*#ifdef MAKAM
  if (comma53) fprintf(fc53,"%c%d ",note,octave+4);
 #endif
+*/
  if (comma53) convert_to_comma53 (acc,  &pitch, pitchbend); 
  microtone = 0; /* [SS] 2014-01-25 */
  setmicrotone.num = 0; /* [SS] 2014-01-25 */
- setmicrotone.denom = 0;
+ setmicrotone.denom = 1; /* [SS] 2025-01-06 */
 return pitch; 
 }
 
@@ -4342,10 +4336,6 @@ int xoctave, n, m;
   if (v->drumchannel) pitch = barepitch(note,accidental,mult,octave);
   /* [SS] 2015-08-18 */
   pitch = pitchof_b(note, accidental, mult, octave, propagate_accidentals,&active_pitchbend);
-/*#ifndef MAKAM
-  pitch_noacc = pitchof_b(note, 0, 0, octave, 0,&dummy);
-#endif
-*/
   if (decorators[FERMATA] && !ignore_fermata) {
     if(fermata_fixed) addfract(&num,&denom,1,1);
     else num = num*2;
@@ -4455,7 +4445,7 @@ setmicrotone.denom = b;
 if (a == 0) {bend = 8192; /* [SS] 2014-01-19 */
              microtone = 0; /* [SS] 2014-01-20 */
              setmicrotone.num = 0; /* [SS] 2014-01-25 */
-             setmicrotone.denom = 0;
+             setmicrotone.denom = 1; /* [SS] 2025-01-06 */
              return;
             }
 else {
@@ -4464,6 +4454,8 @@ else {
   }
 active_pitchbend = bend;
 microtone=1;
+if (b == 0) setmicrotone.denom = 1; /* [SS] 2025-01-06 */
+return;
 }
 
 
