@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.98 January 07 2025 abc2midi" 
+#define VERSION "4.99 January 12 2025 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -3723,13 +3723,14 @@ int *pitchbend;
     fifth_size,
     (3*fifth_size-octave_size),
     (5*fifth_size-2*octave_size) };
-  /* in units cents  [SS] 2020-07-17 */
+  /* contains the pitches of c,d,etc in cent units after accounting
+     for fifth_size and octave_size
+  */
 
   static const char *anoctave = "cdefgab";
   acc = accidental;
   mul = mult;
   noteno = (int)note - 'a';
-
 
 
   /* [SS] 2015-08-18 */
@@ -3774,6 +3775,10 @@ int *pitchbend;
   if ((temperament==TEMPERLN) || (temperament==TEMPEREQ))  {
  
     pitchvalue = tscale[p]/100.0; /* cents to semitones */
+    /* respect accidentals when they do not occur in a microtone */
+    if (acc == '^' && !microtone) pitchvalue = pitchvalue + (float) mul; /* [SS] 2025-01-12 */
+    if (acc == '_' && !microtone) pitchvalue = pitchvalue - (float) mul;
+    /* printf("note = %c accidental = %c mul = %d p = %d pitchvalue = %f\n",note,accidental,mul,p,pitchvalue); */
 
     pitchvalue =  pitchvalue + octave*octave_size/100.0 + middle_c;
     
