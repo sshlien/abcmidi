@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.59 February 08 2023 midi2abc"
+#define VERSION "3.60 January 17 2025 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -229,6 +229,7 @@ struct dlistx {
 
 int notechan[2048],notechanvol[2048]; /*for linking on and off midi
 					channel commands            */
+int chanbend[17]; /* pitchbend for each channel */
 int last_tick[17]; /* for getting last pulse number in MIDI file */
 int last_on_tick[17]; /* for detecting chords [SS] 2019-08-02 */
 
@@ -668,6 +669,9 @@ int chan, control, value;
 void txt_pitchbend(chan,lsb,msb)
 int chan, msb, lsb;
 {
+  int pitchbend;
+  pitchbend = (msb*128 + lsb);
+  chanbend[chan+1] = pitchbend;
 }
 
 void txt_program(chan,program)
@@ -942,6 +946,27 @@ if (start_time >= 0)
 }
 
 
+void print_txt_noteoff_and_bends(chan, pitch, vol)
+int chan, pitch, vol;
+/* substitutes pitchbend for volume */
+{
+int start_time,initvol;
+
+start_time = close_note(chan, pitch, &initvol);
+if (start_time >= 0)
+/*
+    printf("%8.4f %8.4f %d %d %d %d\n",
+     (double) start_time/(double) division,
+     (double) Mf_currtime/(double) division,
+     trackno+1, chan+1, pitch,initvol);
+*/
+/*     printf("%6.2f %6.2f %d %d %d %d\n",
+       (double) start_time/(double) division, (double) Mf_currtime/(double) division, trackno+1, chan +1, pitch,chanbend[chan+1]);
+*/
+     printf("%6.2f  %d %d %d %d\n",
+       (double) start_time/(double) division,  trackno+1, chan +1, pitch,chanbend[chan+1]);
+    if(Mf_currtime > last_tick[chan+1]) last_tick[chan+1] = Mf_currtime;
+}
 
 /* In order to associate a channel note off message with its
  * corresponding note on message, we maintain the information
@@ -958,6 +983,11 @@ void init_notechan()
  for (i = 0; i < 2048; i++) notechan[i] = -1;
 }
 
+void init_chanbend()
+{
+int i;
+for (i= 0; i < 17; i++) chanbend[i] = 8192;
+}
 
 /* The next two functions update notechan when a channel note on
    or note off is encountered. The second function close_note,
@@ -1379,7 +1409,7 @@ void initfunc_for_midinotes()
     Mf_noteoff = print_txt_noteoff;
     Mf_pressure = no_op3;
     Mf_parameter = no_op3;
-    Mf_pitchbend = no_op3;
+    Mf_pitchbend =  txt_pitchbend;
     Mf_program = print_txt_program;
     Mf_chanpressure = no_op3;
     Mf_sysex = no_op2;
@@ -1394,6 +1424,13 @@ void initfunc_for_midinotes()
     Mf_text = no_op3;
     Mf_arbitrary = no_op2;
 }
+
+void initfunc_for_midipitch()
+{
+initfunc_for_midinotes();
+Mf_noteoff = print_txt_noteoff_and_bends;
+}
+    
 
 
 void initfunc_for_mftext()
@@ -3197,6 +3234,11 @@ int argc;
    {
    midiprint = 1;
    }
+  arg = getarg("-midinotes",argc,argv);
+  if (arg != -1) 
+   {
+   midiprint = 3;
+   }
 
 
   usesplits = 0;
@@ -3433,7 +3475,8 @@ int argc;
     printf("         -splitvoices  splits voices to avoid nonhomophonic chords\n");
     printf("         -title <string> Pastes title following\n");
     printf("         -origin <string> Adds O: field containing string\n");
-    printf("         -midigram   Prints midigram instead of abc file\n");
+    printf("         -midigram   Prints midigram \n");
+    printf("         -midinotes   Prints pitches with bends\n");
     printf("         -mftext mftext output in beats\n"); 
     printf("         -mftextpulses mftext output in midi pulses\n"); 
     printf("         -mftext mftext output in seconds\n"); 
@@ -3463,6 +3506,7 @@ int j;
 int ten,ninety;
 int argc;
 
+printf("calling midi2abc\n");
 
 /* initialization */
   trackno = 0;
@@ -3657,8 +3701,8 @@ int argc;
 {
 int i;
 int verylasttick;
-initfunc_for_midinotes();
 init_notechan();
+init_chanbend();
 for (i=0;i<17;i++) {last_tick[i]=0;}
 /*F = efopen(argv[argc -1],"rb");*/
 Mf_getc = filegetc;
@@ -3694,8 +3738,19 @@ int argc;
   int arg;
 
   arg = process_command_line_arguments(argc,argv);
-  if(midiprint ==1) { midigram(argc,argv);
-  } else if(midiprint ==2)  { mftext(argc,argv);
-  } else midi2abc(argc,argv); 
+  switch (midiprint) {
+    case 1:  initfunc_for_midinotes();
+             midigram(argc,argv);
+             break;
+    case 2:  mftext(argc,argv);
+             break;
+    case 3:  initfunc_for_midinotes();
+             initfunc_for_midipitch();
+             midigram(argc,argv);
+             break;
+    default:
+             midi2abc(argc,argv); 
+    }
+                            
   return 0;
 }

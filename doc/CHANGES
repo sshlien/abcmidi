@@ -15578,3 +15578,11 @@ Fix: in pitchof_b, for TEMPERLN or TEMPEREQ respect accidentals
 occurring outside of microtones.
 
 
+January 20 2025
+
+midi2abc
+
+Added new option -midinotes for listing the notes (including pitchbends)
+present in the midi file. This is useful for checking the accuracy
+of abc2midi or the abc notation representation.
+

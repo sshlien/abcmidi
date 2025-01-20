@@ -1,4 +1,4 @@
-.TH MIDI2ABC 1 "1 January 2017"
+.TH MIDI2ABC 1 "20 January 2025"
 .SH NAME
 \fBmidi2abc\fP \- program to convert MIDI format files to abc notation
 .SH SYNOPSIS
@@ -9,7 +9,8 @@ midi2abc \-f \fIinfile\fP [\-xa] [\-ga]
 [\-k \fIkey\fP] [\-c \fIchannel\fP] [\-obpl] [\-bpl \fibars\fP] [\-bps \fPbars\fP]
 [\-o \fIfilename\fP] [\-s] [\-sr \fiunits\fP] [\-sum] [\-nb] [\-nt]
 [\-splitvoices] [\-midigram] [\-mftext] [-mftextpulses] [\-nogr] [\-title \fistring\fP]
-[\-origin \fistring\fP]
+[\-origin \fistring\fP][\-midinotes]
+
 
 
 
@@ -172,6 +173,12 @@ the given string.
 .B -origin \fistring\fP
 Adds an O: field with the given string.
 .TP
+.B -midinotes
+Like -mftext, this option outputs the notes present in the
+midi file; however, the output is more consise (note-on and
+noteoff are combined) in order to make it easier to compare
+one or more midi files using dif, diffuse, or winmerge.
+
 
 
 .SS FEATURES
