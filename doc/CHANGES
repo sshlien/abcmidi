@@ -15579,10 +15579,12 @@ occurring outside of microtones.
 
 
 January 20 2025
+January 22 2025
 
 midi2abc
 
-Added new option -midinotes for listing the notes (including pitchbends)
-present in the midi file. This is useful for checking the accuracy
-of abc2midi or the abc notation representation.
+Added new options -midinotes and -midinotes-brief for listing the
+notes (including pitchbends) present in the midi file. This is 
+useful for checking the accuracy of abc2midi or the abc notation
+representation.
 

@@ -9,7 +9,7 @@ midi2abc \-f \fIinfile\fP [\-xa] [\-ga]
 [\-k \fIkey\fP] [\-c \fIchannel\fP] [\-obpl] [\-bpl \fibars\fP] [\-bps \fPbars\fP]
 [\-o \fIfilename\fP] [\-s] [\-sr \fiunits\fP] [\-sum] [\-nb] [\-nt]
 [\-splitvoices] [\-midigram] [\-mftext] [-mftextpulses] [\-nogr] [\-title \fistring\fP]
-[\-origin \fistring\fP][\-midinotes]
+[\-origin \fistring\fP][\-midinotes][\-midinotes-brief]
 
 
 
@@ -178,6 +178,13 @@ Like -mftext, this option outputs the notes present in the
 midi file; however, the output is more consise (note-on and
 noteoff are combined) in order to make it easier to compare
 one or more midi files using dif, diffuse, or winmerge.
+The time as beat number, track number, channel number, pitch,
+and pitch bend are presented.
+
+.TP
+.B -midinotes-brief
+Similar to -midinotes except only the pitch and pitch bend
+values are presented.
 
 
 

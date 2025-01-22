@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.60 January 17 2025 midi2abc"
+#define VERSION "3.61 January 22 2025 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -963,8 +963,9 @@ if (start_time >= 0)
 /*     printf("%6.2f %6.2f %d %d %d %d\n",
        (double) start_time/(double) division, (double) Mf_currtime/(double) division, trackno+1, chan +1, pitch,chanbend[chan+1]);
 */
-     printf("%6.2f  %d %d %d %d\n",
+     if (midiprint == 3) printf("%6.2f  %d %d %d %d\n",
        (double) start_time/(double) division,  trackno+1, chan +1, pitch,chanbend[chan+1]);
+     else printf("%d %d\n", pitch,chanbend[chan+1]);
     if(Mf_currtime > last_tick[chan+1]) last_tick[chan+1] = Mf_currtime;
 }
 
@@ -3239,6 +3240,11 @@ int argc;
    {
    midiprint = 3;
    }
+  arg = getarg("-midinotes-brief",argc,argv);
+  if (arg != -1) 
+   {
+   midiprint = 4;
+   }
 
 
   usesplits = 0;
@@ -3477,6 +3483,7 @@ int argc;
     printf("         -origin <string> Adds O: field containing string\n");
     printf("         -midigram   Prints midigram \n");
     printf("         -midinotes   Prints pitches with bends\n");
+    printf("         -midinotes-brief   Prints only pitches and bends\n");
     printf("         -mftext mftext output in beats\n"); 
     printf("         -mftextpulses mftext output in midi pulses\n"); 
     printf("         -mftext mftext output in seconds\n"); 
@@ -3745,6 +3752,10 @@ int argc;
     case 2:  mftext(argc,argv);
              break;
     case 3:  initfunc_for_midinotes();
+             initfunc_for_midipitch();
+             midigram(argc,argv);
+             break;
+    case 4:  initfunc_for_midinotes();
              initfunc_for_midipitch();
              midigram(argc,argv);
              break;
