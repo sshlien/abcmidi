@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.96 October 10 2024 midistats"
+#define VERSION "0.97 January 29 2025 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -1513,9 +1513,9 @@ for (i=1;i<256;i++) {
 }
 
 
-void output_drumpat () {
+void output_drumpat (char * c) {
 int i;
-for (i=0;i<=lastBeat;i++) printf("%d ",drumpat[i]);
+for (i=0;i<=lastBeat;i++) printf(c,drumpat[i]);
 /*for (i=0;i<lastBeat;i++) output_perc_pattern(drumpat[i]);*/
 printf("\n");
 }
@@ -1654,11 +1654,11 @@ for (i=0;i<4;i++) {
       snaremax = drumhistogram[snareindex];
       }
   }
-if (bassmax && snaremax) {
+if (bassmax || snaremax) {
 	printf("bass %d %d\n",bassindex,bassmax);
 	printf("snare %d %d\n",snareindex,snaremax);
    } else {
-        printf("missing bass or snare\n");
+        printf("missing bass and snare\n");
 	return;
    }
 dualDrumPattern(bassindex,snareindex);
@@ -1944,11 +1944,11 @@ if (percanalysis) {
 if (percpattern) {
     drumanalysis();
     percsummary();
-    output_drumpat();
+    output_drumpat("%x ");
     }
 if (percpatternfor) {
     drumpattern(percnum);
-    output_drumpat();
+    output_drumpat("%d ");
     }
 if (percpatternhist) {
     drumanalysis();

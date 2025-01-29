@@ -277,13 +277,9 @@ of numbers ranging from 0 to 7 indicating the presence of note onsets
 for the selected percussion instrument for the sequence of beats
 in the midi file. Here is a truncated sample of the output.
 .br
-
-0 0 0 0 0 0 0 0 1 0 0 4 1 0 0 4 1 0 0 4 1 0 0 4 1 0 0 4 1 0 0 4 1 4 4 0
-1 0 0 0 1 0 5 0 1 0 5 0 1 0 5 0 1 0 5 0 1 0 5 0 1 0 5 0 1 0 5 0 1 0 0 0
-1 0 5 0 1 0 5 0 1 etc. 
-
+11 71 c1 1 11 51 f1 c1 1 11 51 e1 1 11 d1 c1 31 1 1 1 21 b1 d1 d1 51
 .br
-One can see a repeating 4 beat pattern.
+51 51 51 51 41 71 c1 11 1 11 41 11 1 11 41 11 1 11 41 11 31 51 41 11
 
 .PP
 -ppat
@@ -294,7 +290,8 @@ If it is unsuccessful, it returns a message of its failue. Otherwise,
 encodes the position of these drum onsets in a 8 bit byte for each
 quarter note beat in the midi file. The lower (right) 4 bits encode the
 bass drum and the higher (left) 4 bits encode the snare drum in the
-same manner as described above for -ppatfor.
+same manner as described above for -ppatfor. The integers are printed
+in hexadecimal.
 .br
 0 0 0 0 0 0 0 0 0 0 33 145 33 145 33 145 33 145 33 145 33 145 33 145
 .br
