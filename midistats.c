@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "0.97 January 29 2025 midistats"
+#define VERSION "0.98 January 30 2025 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -1944,7 +1944,7 @@ if (percanalysis) {
 if (percpattern) {
     drumanalysis();
     percsummary();
-    output_drumpat("%x ");
+    output_drumpat("%02x ");
     }
 if (percpatternfor) {
     drumpattern(percnum);
