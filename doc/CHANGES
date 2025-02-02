@@ -15588,3 +15588,29 @@ notes (including pitchbends) present in the midi file. This is
 useful for checking the accuracy of abc2midi or the abc notation
 representation.
 
+
+February 02 2025
+
+abc2midi 
+
+X:2
+T: treble bug
+M:6/8
+K:G treble-8
+cCdDeE|
+
+abc2midi shifts the notes down by 2 octaves instead of 1
+
+Fix: in pitchof_b in store.c
+recanted the replacement of
+ if (v->octaveshift == 0) {   /*[JA] 2021-05-21 */
+    octave = xoctave + clef->octave_offset;
+  } else {
+    octave = xoctave + v->octaveshift;
+  }
+for
+  octave = clef->octave_offset + v->octaveshift + xoctave;  /*[SS] 2024-03-02*/
+
+(clef->octave_offset and v->octaveshift are both -1. We want to apply
+only one of those.)
+

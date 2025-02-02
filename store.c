@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "4.99 January 12 2025 abc2midi" 
+#define VERSION "5.00 February 02 2025 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -3824,6 +3824,7 @@ if (!microtone) *pitchbend = bend; /* don't override microtone */
  if (comma53) fprintf(fc53,"%c%d ",note,octave+4);
 #endif
 */
+/*printf("note = %c accidental= %c pitch = %d bend = %d\n",note,accidental,pitch,bend);*/
  if (comma53) convert_to_comma53 (acc,  &pitch, pitchbend); 
  microtone = 0; /* [SS] 2014-01-25 */
  setmicrotone.num = 0; /* [SS] 2014-01-25 */
@@ -4298,15 +4299,17 @@ int xoctave, n, m;
   };
   if (gracenotes && ignore_gracenotes) return; /* [SS] 2010-01-08 */
 
-/* [SS] 2024-03-02
-  printf("clef->octave_offset = %d v->octaveshift = %d\n",clef->octave_offset,v->octaveshift);
-  if (v->octaveshift == 0) {   [JA] 2021-05-21 
+/* [SS] 2024-03-02 2025-02-02 don't apply both clef->octave_offset and
+   v->octaveshift
+*/
+  //printf("clef->octave_offset = %d v->octaveshift = %d\n",clef->octave_offset,v->octaveshift);
+  if (v->octaveshift == 0) {   /*[JA] 2021-05-21 */
     octave = xoctave + clef->octave_offset;
   } else {
     octave = xoctave + v->octaveshift;
   }
-*/
-  octave = clef->octave_offset + v->octaveshift + xoctave;  /*[SS] 2024-03-02*/
+
+//  octave = clef->octave_offset + v->octaveshift + xoctave;  /*[SS] 2024-03-02*/
   num = n;
   denom = m;
   if (v->inchord) v->chordcount = v->chordcount + 1;
