@@ -4302,7 +4302,7 @@ int xoctave, n, m;
 /* [SS] 2024-03-02 2025-02-02 don't apply both clef->octave_offset and
    v->octaveshift
 */
-  //printf("clef->octave_offset = %d v->octaveshift = %d\n",clef->octave_offset,v->octaveshift);
+  /*printf("clef->octave_offset = %d v->octaveshift = %d\n",clef->octave_offset,v->octaveshift);*/
   if (v->octaveshift == 0) {   /*[JA] 2021-05-21 */
     octave = xoctave + clef->octave_offset;
   } else {
