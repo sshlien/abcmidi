@@ -1002,7 +1002,7 @@ int chan, pitch, vol;
 int start_time,initvol;
 int cents,centvalue,pitchbend;
 int newpitchint;
-float newpitch;
+float newpitch,fcents;
 
 start_time = close_note(chan, pitch, &initvol);
 if (start_time <= 0) return;
@@ -1015,7 +1015,8 @@ if (sysexBentPitches[pitch] >0.0) {
   }
 else
   {pitchbend = chanbend[chan+1];
-   cents = (pitchbend - 8192)/200;
+   fcents = 100.0 * (float) (pitchbend - 8192)/4096.0;
+   cents = (int) (fcents + 0.5);
    if (cents < 0) {
      pitch--;
      cents +-100;
