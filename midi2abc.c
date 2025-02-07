@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.61 January 22 2025 midi2abc"
+#define VERSION "3.62 February 07 2025 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -674,6 +674,55 @@ int chan, msb, lsb;
   chanbend[chan+1] = pitchbend;
 }
 
+unsigned char sysexsnt[7] = {240, 127, 0, 8, 2, 0, 1};
+
+float sysexBentPitches[128];
+
+void zeroBentPitches () {
+int i;
+for (i=0; i<128; i++) sysexBentPitches[i]=0.0;
+}
+
+void txt_sysex_snt (leng,mess)
+int leng;
+unsigned char *mess;
+{
+int i;
+int midipitch;
+int newpitch;
+int low,hi;
+int hilo;
+float ratio;
+float modifiedPitch;
+int cents;
+if (leng == 12) {
+  for (i=0;i<7;i++) {
+    if(i == 2) continue; /* device id */
+    if(mess[i] != sysexsnt[i]) {
+        printf("mess(%d) not equal to sysexnt[%d]\n",i,i);
+        return;
+        }
+      }
+  midipitch = mess[7];
+  newpitch = mess[8];
+  low = mess[9];
+  hi  = mess[10]; 
+  hilo = hi*128 + low;
+  ratio = (float) hilo/16384.0;
+  cents = (int) (0.5 + ratio*100.0);
+  modifiedPitch = (float) midipitch + ratio;
+  sysexBentPitches[newpitch] = modifiedPitch;
+  
+  /*printf("%d %d %d %d %f %d\n",midipitch,newpitch,low,hi,ratio,cents);
+  printf("sysext: %d %d\n",newpitch,cents);
+  */
+  return;
+  } else {
+  printf("leng was %d\n",leng);
+  return;
+  }
+}
+
 void txt_program(chan,program)
 int chan, program;
 {
@@ -951,22 +1000,32 @@ int chan, pitch, vol;
 /* substitutes pitchbend for volume */
 {
 int start_time,initvol;
+int cents,centvalue,pitchbend;
+int newpitchint;
+float newpitch;
 
 start_time = close_note(chan, pitch, &initvol);
-if (start_time >= 0)
-/*
-    printf("%8.4f %8.4f %d %d %d %d\n",
-     (double) start_time/(double) division,
-     (double) Mf_currtime/(double) division,
-     trackno+1, chan+1, pitch,initvol);
-*/
-/*     printf("%6.2f %6.2f %d %d %d %d\n",
-       (double) start_time/(double) division, (double) Mf_currtime/(double) division, trackno+1, chan +1, pitch,chanbend[chan+1]);
-*/
-     if (midiprint == 3) printf("%6.2f  %d %d %d %d\n",
-       (double) start_time/(double) division,  trackno+1, chan +1, pitch,chanbend[chan+1]);
-     else printf("%d %d\n", pitch,chanbend[chan+1]);
-    if(Mf_currtime > last_tick[chan+1]) last_tick[chan+1] = Mf_currtime;
+if (start_time <= 0) return;
+if (sysexBentPitches[pitch] >0.0) {
+  newpitch = sysexBentPitches[pitch];
+  newpitchint = (int) newpitch;
+  cents = (newpitch -newpitchint)*100;
+  centvalue = (newpitchint % 12)*100 + cents; 
+  printf("%f\t%d\t%d\n",sysexBentPitches[pitch],cents,centvalue);
+  }
+else
+  {pitchbend = chanbend[chan+1];
+   cents = (pitchbend - 8192)/200;
+   if (cents < 0) {
+     pitch--;
+     cents +-100;
+     }
+   centvalue = cents + (pitch % 12)*100;
+   newpitch = (float) pitch + cents/100.0;
+   printf("%f\t%d (%d)\t%d\n",newpitch,cents,pitchbend,centvalue);
+  }
+
+if(Mf_currtime > last_tick[chan+1]) last_tick[chan+1] = Mf_currtime;
 }
 
 /* In order to associate a channel note off message with its
@@ -1413,7 +1472,7 @@ void initfunc_for_midinotes()
     Mf_pitchbend =  txt_pitchbend;
     Mf_program = print_txt_program;
     Mf_chanpressure = no_op3;
-    Mf_sysex = no_op2;
+    Mf_sysex = txt_sysex_snt;
     Mf_metamisc = no_op3;
     Mf_seqnum = no_op1;
     Mf_eot = no_op0;
@@ -3240,11 +3299,6 @@ int argc;
    {
    midiprint = 3;
    }
-  arg = getarg("-midinotes-brief",argc,argv);
-  if (arg != -1) 
-   {
-   midiprint = 4;
-   }
 
 
   usesplits = 0;
@@ -3483,7 +3537,6 @@ int argc;
     printf("         -origin <string> Adds O: field containing string\n");
     printf("         -midigram   Prints midigram \n");
     printf("         -midinotes   Prints pitches with bends\n");
-    printf("         -midinotes-brief   Prints only pitches and bends\n");
     printf("         -mftext mftext output in beats\n"); 
     printf("         -mftextpulses mftext output in midi pulses\n"); 
     printf("         -mftext mftext output in seconds\n"); 
@@ -3718,7 +3771,7 @@ verylasttick = 0;
 for (i=0;i<17;i++) {
   if(verylasttick < last_tick[i]) verylasttick = last_tick[i];
   }
-printf("%d\n",verylasttick);
+/*printf("%d\n",verylasttick);*/
 }
 
 void mftext(argc,argv)
@@ -3744,6 +3797,8 @@ int argc;
   FILE *efopen();
   int arg;
 
+  zeroBentPitches ();
+ 
   arg = process_command_line_arguments(argc,argv);
   switch (midiprint) {
     case 1:  initfunc_for_midinotes();

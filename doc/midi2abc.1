@@ -9,7 +9,7 @@ midi2abc \-f \fIinfile\fP [\-xa] [\-ga]
 [\-k \fIkey\fP] [\-c \fIchannel\fP] [\-obpl] [\-bpl \fibars\fP] [\-bps \fPbars\fP]
 [\-o \fIfilename\fP] [\-s] [\-sr \fiunits\fP] [\-sum] [\-nb] [\-nt]
 [\-splitvoices] [\-midigram] [\-mftext] [-mftextpulses] [\-nogr] [\-title \fistring\fP]
-[\-origin \fistring\fP][\-midinotes][\-midinotes-brief]
+[\-origin \fistring\fP][\-midinotes]
 
 
 
@@ -174,17 +174,25 @@ the given string.
 Adds an O: field with the given string.
 .TP
 .B -midinotes
-Like -mftext, this option outputs the notes present in the
-midi file; however, the output is more consise (note-on and
-noteoff are combined) in order to make it easier to compare
-one or more midi files using dif, diffuse, or winmerge.
-The time as beat number, track number, channel number, pitch,
-and pitch bend are presented.
+Like -mftext, this option outputs the midi pitches present in the
+midi file, where middle C is 60, the deviation of the note from
+the equal tempered scale in units of cents, and the pitch value
+in cents of the note relative to C. If the pitchbend is used,
+then its value follows cents in parentheses. There are 100 cents in
+the semitone interval. Thus a pitch half way between C and C# would
+have a cent value of 50. There are 1200 cents in an octave,
+so the pitch value of D natural would be 200. The pitch value of
+B natural is 1100. These values are useful for verifying the
+pitch values in an equaltempered scale divided into more than
+12 tones. The pitch values are  determined from the
+pitchbend value in the midi file, which is normally 8192.
+However, for some midi players the pitch can also be altered
+using sysex (System Exclusive) messages. In particular, Jef
+Moine's abc2svg uses the latter rather than pitchbends which act
+on all the notes in a channel.
 
-.TP
-.B -midinotes-brief
-Similar to -midinotes except only the pitch and pitch bend
-values are presented.
+
+
 
 
 
