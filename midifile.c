@@ -1028,7 +1028,7 @@ int number,intfraction;
 float fraction;
 eputc(0); /* varinum delta_t (time to next event) */
 eputc(0xf0); /* sysex initiation */
- eputc(11);  /* 11 bytes included in sysex */
+eputc(11);  /* 11 bytes included in sysex */
 eputc(127); /* universal sysex command (0x7f) */
 eputc(0);    /* device id */
 eputc(8);    /* midi tuning */
@@ -1040,7 +1040,7 @@ eputc(kk);  /* MIDI key  0 - 127 */
 number = (int) midipitch;
 fraction = midipitch - (float) number;
 if (fraction < 0.0) fraction = -fraction;
-intfraction = (int) fraction*16384;
+intfraction = (int) (fraction*16384); /* [HML] 2025-02-09 */
 xx = 0x7f & number;
 yy = intfraction/128;
 zz = intfraction % 128;

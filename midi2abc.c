@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.62 February 07 2025 midi2abc"
+#define VERSION "3.63 February 13 2025 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -703,19 +703,23 @@ if (leng == 12) {
         return;
         }
       }
+  /* for (i=0;i<12;i++) printf(" %d,",mess[i]);
+   printf("\n");
+  */
   midipitch = mess[7];
   newpitch = mess[8];
-  low = mess[9];
-  hi  = mess[10]; 
+  hi = mess[9];
+  low  = mess[10]; 
   hilo = hi*128 + low;
-  ratio = (float) hilo/16384.0;
+  ratio = (float) (hilo/16384.0);
   cents = (int) (0.5 + ratio*100.0);
-  modifiedPitch = (float) midipitch + ratio;
-  sysexBentPitches[newpitch] = modifiedPitch;
+  modifiedPitch = (float) (midipitch + ratio);
+  sysexBentPitches[midipitch] = modifiedPitch; 
+  /*sysexBentPitches[newpitch] = modifiedPitch; /* why */
   
-  /*printf("%d %d %d %d %f %d\n",midipitch,newpitch,low,hi,ratio,cents);
-  printf("sysext: %d %d\n",newpitch,cents);
-  */
+  /*printf("%d %d %d %d %f %d\n",midipitch,newpitch,low,hi,ratio,cents);*/
+  /*printf("sysext: %d %d\n",newpitch,cents);*/
+
   return;
   } else {
   printf("leng was %d\n",leng);
@@ -1004,21 +1008,26 @@ int cents,centvalue,pitchbend;
 int newpitchint;
 float newpitch,fcents;
 
+
 start_time = close_note(chan, pitch, &initvol);
 if (start_time <= 0) return;
 if (sysexBentPitches[pitch] >0.0) {
   newpitch = sysexBentPitches[pitch];
   newpitchint = (int) newpitch;
   cents = (newpitch -newpitchint)*100;
+  if (cents >= 50) {newpitch = newpitch - 1.0; /* undo rounding */
+                newpitchint = (int) newpitch;
+                cents = (newpitch -newpitchint)*100;
+                }
   centvalue = (newpitchint % 12)*100 + cents; 
-  printf("%f\t%d\t%d\n",sysexBentPitches[pitch],cents,centvalue);
+  printf("%f\t%d\t%d\n",newpitch,cents,centvalue);
   }
 else
   {pitchbend = chanbend[chan+1];
    fcents = 100.0 * (float) (pitchbend - 8192)/4096.0;
    cents = (int) (fcents + 0.5);
    if (cents < 0) {
-     pitch--;
+     /*pitch--; already flattened without pitchbend*/
      cents +-100;
      }
    centvalue = cents + (pitch % 12)*100;

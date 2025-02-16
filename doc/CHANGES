@@ -15614,3 +15614,33 @@ for
 (clef->octave_offset and v->octaveshift are both -1. We want to apply
 only one of those.)
 
+
+February 15 2025
+
+abc2midi ignores accidentals when converting to a temperamentequal scale.
+In the following example:
+
+X:1
+T: temperamentequal 19
+M: 4/4
+L: 1/4
+%%MIDI temperamentequal 19
+K: none
+C ^C _D D | ^D _E E F | ^F _G G ^G| _A A ^A _B| B c z z|
+
+the accidentals were ignored when creating the midi file.
+
+Fix:
+
+Changed
+ /* respect accidentals when they do not occur in a microtone */
+    if (acc == '^' && !microtone) pitchvalue = pitchvalue + (float) mul; /* [SS] 2025-01-12 */
+    if (acc == '_' && !microtone) pitchvalue = pitchvalue - (float) mul;
+
+To
+
+  /* respect accidentals when they do not occur in a microtone */
+    if (acc == '^' && !microtone) pitchvalue = pitchvalue + (float) (mul*accidental_size); /* [SS] 2025-02-15 */
+    if (acc == '_' && !microtone) pitchvalue = pitchvalue - (float) (mul*accidental_size);
+
+

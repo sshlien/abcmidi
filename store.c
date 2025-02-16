@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "5.00 February 02 2025 abc2midi" 
+#define VERSION "5.01 February 15 2025 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -3775,9 +3775,10 @@ int *pitchbend;
   if ((temperament==TEMPERLN) || (temperament==TEMPEREQ))  {
  
     pitchvalue = tscale[p]/100.0; /* cents to semitones */
+
     /* respect accidentals when they do not occur in a microtone */
-    if (acc == '^' && !microtone) pitchvalue = pitchvalue + (float) mul; /* [SS] 2025-01-12 */
-    if (acc == '_' && !microtone) pitchvalue = pitchvalue - (float) mul;
+    if (acc == '^' && !microtone) pitchvalue = pitchvalue + (float) (mul*accidental_size); /* [SS] 2025-02-15 */
+    if (acc == '_' && !microtone) pitchvalue = pitchvalue - (float) (mul*accidental_size);
     /* printf("note = %c accidental = %c mul = %d p = %d pitchvalue = %f\n",note,accidental,mul,p,pitchvalue); */
 
     pitchvalue =  pitchvalue + octave*octave_size/100.0 + middle_c;
