@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "5.01 February 15 2025 abc2midi" 
+#define VERSION "5.02 February 16 2025 abc2midi" 
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -3796,7 +3796,7 @@ int *pitchbend;
           /* microtone fraction (eg _12/53B,) */
           microtoneshift =  (float) setmicrotone.num /(float) setmicrotone.denom;
         /* printf("microtoneshift = %f for setmicrotone %d %d\n",microtoneshift, setmicrotone.num,setmicrotone.denom); */
-        pitchvalue += microtoneshift;
+        pitchvalue += microtoneshift*accidental_size; /* [SS] 2025.02.16 */
        }
 
 	microtone = 0;

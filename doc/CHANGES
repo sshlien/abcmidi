@@ -15644,3 +15644,27 @@ To
     if (acc == '_' && !microtone) pitchvalue = pitchvalue - (float) (mul*accidental_size);
 
 
+February 16 2025
+
+abc2midi produced the wrong results for temperamentequal 31
+
+X:5
+T: temperamentequal 31 
+M:none
+L:1/2
+K:C
+%
+%%text \%\%MIDI temperamentequal 31
+%%MIDI temperamentequal 31
+"^Octave divided in 31 equal parts"\
+=c ^/c ^c ^3/c ^^c =d _/d _d _3/d __d =c2  |
+%
+
+Fix:
+In pitchof_b (store.c) it is necessary to scale the microtoneshift by the
+accidental_size prior to adding it to the pitchvalue.
+
+   pitchvalue += microtoneshift*accidental_size; /* [SS] 2025.02.16 */
+
+
+
