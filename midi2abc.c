@@ -45,7 +45,7 @@
  * based on public domain 'midifilelib' package.
  */
 
-#define VERSION "3.63 February 13 2025 midi2abc"
+#define VERSION "3.64 June 14 2025 midi2abc"
 
 #include <limits.h>
 /* Microsoft Visual C++ Version 6.0 or higher */
@@ -721,9 +721,6 @@ if (leng == 12) {
   /*printf("sysext: %d %d\n",newpitch,cents);*/
 
   return;
-  } else {
-  printf("leng was %d\n",leng);
-  return;
   }
 }
 
@@ -1007,9 +1004,11 @@ int start_time,initvol;
 int cents,centvalue,pitchbend;
 int newpitchint;
 float newpitch,fcents;
+int position;
 
 
 start_time = close_note(chan, pitch, &initvol);
+position = start_time*50/division;
 if (start_time <= 0) return;
 if (sysexBentPitches[pitch] >0.0) {
   newpitch = sysexBentPitches[pitch];
@@ -1020,7 +1019,7 @@ if (sysexBentPitches[pitch] >0.0) {
                 cents = (newpitch -newpitchint)*100;
                 }
   centvalue = (newpitchint % 12)*100 + cents; 
-  printf("%f\t%d\t%d\n",newpitch,cents,centvalue);
+  printf("%d\t%f\t%d\t%d\n",position,newpitch,cents,centvalue);
   }
 else
   {pitchbend = chanbend[chan+1];
@@ -1032,7 +1031,7 @@ else
      }
    centvalue = cents + (pitch % 12)*100;
    newpitch = (float) pitch + cents/100.0;
-   printf("%f\t%d (%d)\t%d\n",newpitch,cents,pitchbend,centvalue);
+   printf("%d\t%f\t%d (%d)\t%d\n",position,newpitch,cents,pitchbend,centvalue);
   }
 
 if(Mf_currtime > last_tick[chan+1]) last_tick[chan+1] = Mf_currtime;
@@ -1403,13 +1402,13 @@ char *mess;
   if (prtime(timeunits)) return;
   printf("Metatext (%s) ",ttype[type]);
   len = leng;
-  if (len > 15) len = 15;
+  if (len > 55) len = 55; /* [SS] 2025-06-14 */
   for ( n=0; n<len; n++ ) {
     c = (*p++) & 0xff;
     if(iscntrl(c)) {printf(" \\0x%02x",c); continue;} /* no <cr> <lf> */
     printf( (isprint(c)||isspace(c)) ? "%c" : "\\0x%02x" , c);
   }
-  if (leng>15) printf("...");
+  if (leng>55) printf("...");
   printf("\n");
 }
 
