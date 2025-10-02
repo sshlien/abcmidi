@@ -40,9 +40,7 @@
 extern struct tune thetune;
 extern double scaledwidth;
 
-static void addfract(f, n, m)
-struct fract* f;
-int n, m;
+static void addfract(struct fract *f, int n, int m)
 /* add n/m to fraction pointed to by f */
 /* like addunits(), but does not use unitlength */
 {
@@ -51,9 +49,7 @@ int n, m;
   reducef(f);
 }
 
-static void mulfract(f, n, m)
-struct fract* f;
-int n, m;
+static void mulfract(struct fract *f, int n, int m)
 /* multiply  n/m to fraction pointed to by f */
 /* like addunits(), but does not use unitlength */
 {

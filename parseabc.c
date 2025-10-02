@@ -139,9 +139,8 @@ int modeminor[10] = { 0, 1, 1,
 int modekeyshift[10] = { 0, 5, 5, 5, 6, 0, 1, 2, 3, 4 };
 
 int *
-checkmalloc (bytes)
+checkmalloc (int bytes)
 /* malloc with error checking */
-     int bytes;
 {
   int *p;
 
@@ -155,9 +154,8 @@ checkmalloc (bytes)
 }
 
 char *
-addstring (s)
+addstring (char *s)
 /* create space for string and store it in memory */
-     char *s;
 {
   char *p;
 
@@ -167,9 +165,7 @@ addstring (s)
 }
 
 /* [SS] 2014-08-16 [SDG] 2020-06-03 */
-char * concatenatestring(s1,s2)
-   char * s1;
-   char * s2;
+char * concatenatestring(char * s1, char * s2)
 { 
    int len = strlen(s1) + strlen(s2) + 1;
    char *p = (char *) checkmalloc(len);
@@ -183,8 +179,7 @@ char * concatenatestring(s1,s2)
 
 
 void
-initvstring (s)
-     struct vstring *s;
+initvstring (struct vstring *s)
 /* initialize vstring (variable length string data structure) */
 {
   s->len = 0;
@@ -194,8 +189,7 @@ initvstring (s)
 }
 
 void
-extendvstring (s)
-     struct vstring *s;
+extendvstring (struct vstring *s)
 /* doubles character space available in string */
 {
   char *p;
@@ -215,9 +209,7 @@ extendvstring (s)
 }
 
 void
-addch (ch, s)
-     char ch;
-     struct vstring *s;
+addch (char ch, struct vstring *s)
 /* appends character to vstring structure */
 {
   if (s->len >= s->limit)
@@ -230,9 +222,7 @@ addch (ch, s)
 }
 
 void
-addtext (text, s)
-     char *text;
-     struct vstring *s;
+addtext (char *text, struct vstring *s)
 /* appends a string to vstring data structure */
 {
   int newlen;
@@ -247,8 +237,7 @@ addtext (text, s)
 }
 
 void
-clearvstring (s)
-     struct vstring *s;
+clearvstring (struct vstring *s)
 /* set string to empty */
 /* does not deallocate memory ! */
 {
@@ -257,8 +246,7 @@ clearvstring (s)
 }
 
 void
-freevstring (s)
-     struct vstring *s;
+freevstring (struct vstring *s)
 /* deallocates memory allocated for string */
 {
   if (s->st != NULL)
@@ -286,8 +274,7 @@ parseroff ()
 }
 
 /* [SS] 2017-04-12 */
-void handle_abc2midi_parser (line) 
-char *line;
+void handle_abc2midi_parser (char *line)
 {
 char *p;
 p = line;
@@ -301,11 +288,8 @@ if (strncasecmp(p,"%%MidiOn",8) == 0) {
 
 
 int
-getarg (option, argc, argv)
+getarg (char *option, int argc, char *argv[])
 /* look for argument 'option' in command line */
-     char *option;
-     char *argv[];
-     int argc;
 {
   int j, place;
 
@@ -321,8 +305,7 @@ getarg (option, argc, argv)
 }
 
 void
-skipspace (p)
-     char **p;
+skipspace (char **p)
 {
   /* skip space and tab */
   while (((int) **p == ' ') || ((int) **p == TAB))
@@ -330,16 +313,14 @@ skipspace (p)
 }
 
 void
-skiptospace (p)
-     char **p;
+skiptospace (char **p)
 {
   while (((int) **p != ' ') && ((int) **p != TAB) && (int) **p != '\0')
     *p = *p + 1;
 }
 
 int
-readnumf (num)
-     char *num;
+readnumf (char *num)
 /* read integer from string without advancing character pointer */
 {
   int t;
@@ -364,8 +345,7 @@ readnumf (num)
 }
 
 int
-readsnumf (s)
-     char *s;
+readsnumf (char *s)
 /* reads signed integer from string without advancing character pointer */
 {
   char *p;
@@ -384,8 +364,7 @@ readsnumf (s)
 }
 
 int
-readnump (p)
-     char **p;
+readnump (char **p)
 /* read integer from string and advance character pointer */
 {
   int t;
@@ -405,8 +384,7 @@ readnump (p)
 }
 
 int
-readsnump (p)
-     char **p;
+readsnump (char **p)
 /* reads signed integer from string and advance character pointer */
 {
   if (**p == '-')
@@ -612,9 +590,7 @@ static void read_L_unitlen(int *num, int *denom, char **place)
 }
 
 void
-read_microtone_value (a, b, p)
-     int *a, *b;
-     char **p;
+read_microtone_value (int *a, int *b, char **p)
 /* read length part of a note and advance character pointer */
 {
   int t;
@@ -658,9 +634,7 @@ read_microtone_value (a, b, p)
 }
 
 int
-ismicrotone (p, dir)
-     char **p;
-     int dir;
+ismicrotone (char **p, int dir)
 {
   int a, b;
   char *chp; /* [HL] 2020-06-20 */
@@ -712,13 +686,11 @@ int isclef (char *s, cleftype_t * new_clef,
 }
 
 char *
-readword (word, s)
+readword (char word[], char *s)
 /* part of parsekey, extracts word from input line */
 /* besides the space, the symbols _, ^, and = are used */
 /* as separators in order to handle key signature modifiers. */
 /* [SS] 2010-05-24 */
-     char word[];
-     char *s;
 {
   char *p;
   int i;
@@ -743,12 +715,10 @@ readword (word, s)
 }
 
 char *
-readword_with_ (word, s)
+readword_with_ (char word[], char *s)
 /* This version allows ^ and _ characters to be embedded in*/
-/* the string. It is needed to parse clef=treble_8 or 
+/* the string. It is needed to parse clef=treble_8 or */
 /* clef=treble^8 . [SS] 2024-02-23 */ 
-     char word[];
-     char *s;
 {
   char *p;
   int i;
@@ -770,9 +740,8 @@ readword_with_ (word, s)
   return (p);
 }
 void
-lcase (s)
+lcase (char *s)
 /* convert word to lower case */
-     char *s;
 {
   char *p;
 
@@ -981,13 +950,14 @@ int interpret_voice_label (char *s, int num, int *is_new)
 
 
 int
-parseclef (s, word, gotclef, clefstr, newclef, gotoctave, octave)
-     char **s;
-     char *word;
-     int *gotclef;
-     char *clefstr;  /* [JA] 2020-10-19 */
-     cleftype_t * newclef;
-     int *gotoctave, *octave;
+parseclef (
+     char **s,
+     char *word,
+     int *gotclef,
+     char *clefstr,  /* [JA] 2020-10-19 */
+     cleftype_t * newclef,
+     int *gotoctave, int *octave
+     )
 /* extracts string clef= something */
 {
   int successful;
@@ -1024,12 +994,12 @@ parseclef (s, word, gotclef, clefstr, newclef, gotoctave, octave)
 
 
 int
-parsetranspose (s, word, gottranspose, transpose)
+parsetranspose (char **s,
+                char *word,
+                int *gottranspose,
+                int *transpose
+                )
 /* parses string transpose= number */
-     char **s;
-     char *word;
-     int *gottranspose;
-     int *transpose;
 {
   if (casecmp (word, "transpose") != 0)
     return 0;
@@ -1048,11 +1018,7 @@ parsetranspose (s, word, gottranspose, transpose)
   return 1;
 };
 
-int parseSoundScore (char **s,
-		     char *word,
-		     int *gottranspose,
-		     int *transpose
-		     )
+int parseSoundScore (char **s, char *word, int *gottranspose, int *transpose)
 /* parses sound, score, instrument, and shift
  * according to Hudson Lacerda's pseudo code file
  * doc/hudsonshift.txt.
@@ -1149,12 +1115,8 @@ if (**s != '=')
 
 
 int
-parseoctave (s, word, gotoctave, octave)
+parseoctave (char **s, char *word, int *gotoctave, int *octave)
 /* parses string octave= number */
-     char **s;
-     char *word;
-     int *gotoctave;
-     int *octave;
 {
   if (casecmp (word, "octave") != 0)
     return 0;
@@ -1227,14 +1189,10 @@ char *umlaut_build_string(char *start, struct vstring *gchord)
 
 /* Function modified JA 20 May 2022 */
 int
-parsename (s, gotname, namestring, maxsize)
+parsename (char **s, int *gotname, char namestring[], int maxsize)
 /* parses string name= "string" in V: command 
    for compatability of abc2abc with abcm2ps
 */
-     char **s;
-     int *gotname;
-     char namestring[];
-     int maxsize;
 {
   int i;
 
@@ -1265,15 +1223,10 @@ parsename (s, gotname, namestring, maxsize)
 }
 
 int
-parsemiddle (s, word, gotmiddle, middlestring, maxsize)
+parsemiddle (char **s, char *word, int *gotmiddle, char middlestring[], int maxsize)
 /* parse string middle=X in V: command
  for abcm2ps compatibility
 */
-     char **s;
-     char *word;
-     int *gotmiddle;
-     char middlestring[];
-     int maxsize;
 {
   int i;
   i = 0;
@@ -1303,13 +1256,9 @@ characters */
 }
 
 int
-parseother (s, word, gotother, other, maxsize)	/* [SS] 2011-04-18 */
+parseother (char **s, char *word, int *gotother, char other[], int maxsize)
+	/* [SS] 2011-04-18 */
 /* parses any left overs in V: command (eg. stafflines=1) */
-     char **s;
-     char *word;
-     int *gotother;
-     char other[];
-     int maxsize;
 {
   if (word[0] != '\0')
     {
@@ -1395,7 +1344,7 @@ static void set_voice_from_master(int voice_num)
 }
 
 int
-parsekey (str)
+parsekey (char *str)
 /* parse contents of K: field */
 /* this works by picking up a strings and trying to parse them */
 /* returns 1 if valid key signature found, 0 otherwise */
@@ -1422,7 +1371,6 @@ parsekey (str)
  * All of this information is extracted from the string str from the
  * K: command.
  */
-     char *str;
 {
   char *s;
   char word[30];
@@ -1685,8 +1633,7 @@ parsekey (str)
 }
 
 void
-parsevoice (s)
-     char *s;
+parsevoice (char *s)
 {
   int num;			/* voice number */
   struct voice_params vparams;
@@ -1775,8 +1722,7 @@ parsevoice (s)
 
 
 void
-parsenote (s)
-     char **s;
+parsenote (char **s)
 /* parse abc note and advance character pointer */
 {
   int decorators[DECSIZE];
@@ -1970,9 +1916,7 @@ parsenote (s)
 }
 
 char *
-getrep (p, out)
-     char *p;
-     char *out;
+getrep (char *p, char *out)
 /* look for number or list following [ | or :| */
 {
   char *q;
@@ -2026,8 +1970,7 @@ getrep (p, out)
 }
 
 int
-checkend (s)
-     char *s;
+checkend (char *s)
 /* returns 1 if we are at the end of the line 0 otherwise */
 /* used when we encounter '\' '*' or other special line end characters */
 {
@@ -2048,10 +1991,7 @@ checkend (s)
 }
 
 void
-readstr (out, in, limit)
-     char out[];
-     char **in;
-     int limit;
+readstr (char out[], char **in, int limit)
 /* copy across alpha string */
 {
   int i;
@@ -2068,10 +2008,7 @@ readstr (out, in, limit)
 
 /* [SS] 2015-06-01 required for parse_mididef() in store.c */
 /* Just like readstr but also allows anything except white space */
-int readaln (out, in, limit)
-     char out[];
-     char **in;
-     int limit;
+int readaln (char out[], char **in, int limit)
 /* copy across alphanumeric string */
 {
   int i;
@@ -2088,8 +2025,7 @@ int readaln (out, in, limit)
 }
 
 void
-parse_precomment (s)
-     char *s;
+parse_precomment (char *s)
 /* handles a comment field */
 {
   char package[40];
@@ -2110,8 +2046,7 @@ parse_precomment (s)
 }
 
 /* [SS] 2017-12-10 */
-FILE * parse_abc_include (s)
-  char *s;
+FILE * parse_abc_include (char *s)
 {
   char includefilename[80];
   FILE *includehandle;
@@ -2131,8 +2066,7 @@ FILE * parse_abc_include (s)
 
 /* Function mofied for umlaut handling JA 20 May 2022 */
 void
-parse_tempo (place)
-     char *place;
+parse_tempo (char *place)
 /* parse tempo descriptor i.e. Q: field */
 {
   char *p;
@@ -2205,9 +2139,9 @@ parse_tempo (place)
 
 void appendfield(char *); /* links with store.c and yapstree.c */
 
-void append_fieldcmd (key, s)  /* [SS] 2014-08-15 */
-char key;
-char *s;
+void append_fieldcmd (  /* [SS] 2014-08-15 */
+                      char key,
+                      char *s)
 {
 appendfield(s);
 }
@@ -2379,9 +2313,7 @@ static void resolve_unitlen()
 }
 
 void
-parsefield (key, field)
-     char key;
-     char *field;
+parsefield (char key, char *field)
 /* top-level routine handling all lines containing a field */
 {
   char *comment;
@@ -2638,8 +2570,7 @@ parsefield (key, field)
 }
 
 char *
-parseinlinefield (p)
-     char *p;
+parseinlinefield (char *p)
 /* parse field within abc line e.g. [K:G] */
 {
   char *q;
@@ -2794,11 +2725,9 @@ static void check_and_call_bar(int bar_type, char *replist)
 
 
 /* [SS] 2021-10-11   */
-static int pitch2midi(note, accidental, mult, octave )
+static int pitch2midi(char note, char accidental, int mult, int octave)
 /* computes MIDI pitch for note.
 */
-char note, accidental;
-int mult, octave;
 {
   int p;
   char acc;
@@ -2951,8 +2880,7 @@ switch (**s)
 
 
 void
-parsemusic (field)
-     char *field;
+parsemusic (char *field)
 /* parse a line of abc notes */
 {
   char *p;
@@ -3447,8 +3375,7 @@ parsemusic (field)
 }
 
 void
-parseline (line)
-     char *line;
+parseline (char *line)
 /* top-level routine for handling a line in abc file */
 {
   char *p, *q;
@@ -3580,8 +3507,7 @@ parseline (line)
 }
 
 void
-parsefile (name)
-     char *name;
+parsefile (char *name)
 /* top-level routine for parsing file */
 /* [SS] 2017-12-10 In order to allow including the directive
    "%%abc-include includefile.abc" to insert the includedfile.abc,

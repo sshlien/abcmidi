@@ -50,11 +50,8 @@
 
 /* output library of PostScript routines for drawing music symbols */
 
-static void ps_header(f, filename, boundingbox)
+static void ps_header(FILE *f, char *filename, struct bbox *boundingbox)
 /* create header section of PostScript file */
-FILE* f;
-char* filename;
-struct bbox* boundingbox;
 {
 
   if (eps_out) {
@@ -101,8 +98,7 @@ struct bbox* boundingbox;
   fprintf(f,"\n");
 }
 
-static void section1(f)
-FILE* f;
+static void section1(FILE *f)
 {
   fprintf(f,"%% Section 1 - Fonts and String Manipulation\n");
   fprintf(f,"\n");
@@ -185,8 +181,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section2(f)
-FILE* f;
+static void section2(FILE *f)
 {
   fprintf(f,"%% Section 2 - Clefs\n");
   fprintf(f,"\n");
@@ -286,8 +281,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section3(f)
-FILE* f;
+static void section3(FILE *f)
 {
   fprintf(f,"%% Section 3 - Note Heads, Stems and Beams\n");
   fprintf(f,"\n");
@@ -401,8 +395,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section4(f)
-FILE* f;
+static void section4(FILE *f)
 {
   fprintf(f,"%% Section 4 - Note Ornaments (Staccato, Roll, Trill etc.)\n");
   fprintf(f,"\n");
@@ -488,8 +481,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section5(f)
-FILE* f;
+static void section5(FILE *f)
 {
   fprintf(f,"%% Section 5 - helper lines\n");
   fprintf(f,"\n");
@@ -505,8 +497,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section6(f)
-FILE* f;
+static void section6(FILE *f)
 {
   fprintf(f,"%% Section 6 - Note tails \n");
   fprintf(f,"\n");
@@ -576,8 +567,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section7(f)
-FILE* f;
+static void section7(FILE *f)
 {
   fprintf(f,"%% Section 7 - Flats, Sharps and Naturals.\n");
   fprintf(f,"\n");
@@ -695,8 +685,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section8(f)
-FILE* f;
+static void section8(FILE *f)
 {
   fprintf(f,"%% Section 8 - Guitar Chords\n");
   fprintf(f,"\n");
@@ -706,8 +695,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section9(f)
-FILE* f;
+static void section9(FILE *f)
 {
   fprintf(f,"%% Section 9 - Rests\n");
   fprintf(f,"\n");
@@ -787,8 +775,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section10(f)
-FILE* f;
+static void section10(FILE *f)
 {
   fprintf(f,"%% Section 10 - Bar signs\n");
   fprintf(f,"\n");
@@ -849,8 +836,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section11(f)
-FILE* f;
+static void section11(FILE *f)
 {
   fprintf(f,"%% Section 11 - Grace Notes\n");
   fprintf(f,"\n");
@@ -924,8 +910,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section12(f)
-FILE* f;
+static void section12(FILE *f)
 {
   fprintf(f,"%% Section 12 - Time Signatures\n");
   fprintf(f,"\n");
@@ -960,8 +945,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-static void section13(f)
-FILE* f;
+static void section13(FILE *f)
 {
   fprintf(f,"%% Section 13 - Staff And Other things\n");
   fprintf(f,"\n");
@@ -1059,10 +1043,7 @@ FILE* f;
   fprintf(f,"\n");
 }
 
-void printlib(f, filename, boundingbox)
-FILE*f;
-char* filename;
-struct bbox* boundingbox;
+void printlib(FILE *f, char *filename, struct bbox *boundingbox)
 {
   ps_header(f, filename, boundingbox);
   section1(f);

@@ -48,7 +48,7 @@ extern int debugging;
 extern int pagenumbering;
 extern int barnums, nnbars;
 extern int make_open();
-extern void printlib();
+extern void printlib(FILE *f, char *filename, struct bbox *boundingbox);
 extern int count_dots(int *base, int *base_exp, int n, int m);
 
 extern void monospace(struct tune* t);
@@ -427,8 +427,7 @@ void setscaling(char* s)
   scale = f;
 }
 
-void setmargins(s)
-char* s;
+void setmargins(char *s)
 /* set margin values from string following -M in arglist */
 {
   int i, j;
@@ -446,8 +445,7 @@ char* s;
   };
 }
 
-void setpagesize(s)
-char* s;
+void setpagesize(char *s)
 /* set page size from string following -P in arglist */
 {
   int i, j;
@@ -483,12 +481,10 @@ char* s;
   scaledwidth = ((double)(pagewidth))/scale;
 }
 
-static void set_space(afont, s)
+static void set_space(struct font *afont, char *s)
 /* set vertical space to appear above a line in the given font */
 /* s is a string specifying space in points (default), centimetres */
 /* or inches */
-struct font* afont;
-char* s;
 {
   int count;
   double x;
@@ -506,10 +502,8 @@ char* s;
   };
 }
 
-static void init_font(afont, ptsize, spce, defnum, specialnum)
+static void init_font(struct font *afont, int ptsize, int spce, int defnum, int specialnum)
 /* initialize font structure with given values */
-struct font* afont;
-int ptsize, spce, defnum, specialnum;
 {
   afont->pointsize = ptsize;
   afont->space = spce;
@@ -2082,8 +2076,7 @@ static void define_font(struct font* thefont, char* s)
   };
 }
 
-int read_boolean(s)
-char *s;
+int read_boolean(char *s)
 /* set logical parameter from %%command */
 /* part of the handling for event_specific */
 {
@@ -2100,11 +2093,9 @@ char *s;
   return(result);
 }
 
-void font_command(p, s)
+void font_command(char *p, char *s)
 /* execute font-related %%commands */
 /* called from event_specific */
-char* p;
-char*s;
 {
   if (strcmp(p, "textfont") == 0) {
     define_font(&textfont, s);
@@ -2718,10 +2709,7 @@ static void measureline(struct feature* ft, double* height, double* descender,
   *descender = -min;
 }
 
-static void printtext(place, s, afont)
-enum placetype place;
-char* s;
-struct font* afont;
+static void printtext(enum placetype place, char *s, struct font *afont)
 /* print text a line of text in specified font at specified place */
 {
   newblock((double)(afont->pointsize + afont->space), 0.0);
@@ -2747,16 +2735,14 @@ void vskip(double gap)
   newblock(gap, 0.0);
 }
 
-void centretext(s)
-char* s;
+void centretext(char *s)
 /* print text centred in the middle of the page */
 /* used by %%centre command */
 {
   printtext(centre, s, &textfont);
 }
 
-void lefttext(s)
-char* s;
+void lefttext(char *s)
 /* print text up against the left hand margin */
 /* used by %%text command */
 {
@@ -2860,9 +2846,7 @@ void setup_fonts()
   staffsep = VERT_GAP;
 }
 
-void open_output_file(filename, boundingbox)
-char* filename;
-struct bbox* boundingbox;
+void open_output_file(char *filename,struct bbox *boundingbox)
 /* open output file and write the abc2ps library to it */
 {
   f = fopen(filename, "w");
@@ -2887,10 +2871,7 @@ void close_output_file()
   };
 }
 
-static int endrep(inend, end_string, x1, x2, yend)
-int inend;
-char* end_string;
-double x1, x2, yend;
+static int endrep(int inend, char *end_string, double x1, double x2, double yend)
 /* draws either 1st or 2nd ending marker */
 {
   if (inend != 0) {
@@ -3451,8 +3432,7 @@ static int finalsizeline(struct voice* v)
   return(1);
 }
 
-static void finalsizetune(t)
-struct tune* t;
+static void finalsizetune(struct tune *t)
 /* calculate beaming and calculate height of each music line */
 {
   struct voice* thisvoice;
@@ -3507,8 +3487,7 @@ static int getlineheight(struct voice* v, double* height)
   return(1);
 }
 
-static double tuneheight(t)
-struct tune* t;
+static double tuneheight(struct tune *t)
 /* measures the vertical space needed by the tune */
 {
   char* atitle;

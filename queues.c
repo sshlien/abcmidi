@@ -87,9 +87,7 @@ void set_control_defaults() {
 /* at the same as specifiedy abc standard, so the delay of the*/
 /* other notes cached in the Q structure should be set to zero.*/
 
-void addtoQ(num, denom, pitch, chan, effect, d)
-int num, denom, pitch, chan, d;
-int effect; /* [SS] 2012-12-11 */
+void addtoQ(int num, int denom, int pitch, int chan, int effect, int d)
 {
   int i, done;
   int wait;
@@ -135,8 +133,7 @@ int effect; /* [SS] 2012-12-11 */
   };
 }
 
-void removefromQ(i)
-int i;
+void removefromQ(int i)
 {
   if (i == -1) {
     printQ();
@@ -192,8 +189,7 @@ void printQ()
   printf("\n");
 }
 
-void advanceQ(t)
-int t;
+void advanceQ(int t)
 {
   if (Qhead == -1) {
     event_error("Internal error - empty queue");
@@ -365,9 +361,8 @@ void note_effect3() {
   } 
 
 /* [SS] 2015-07-26 */
-void note_effect4(chan)
-    int chan;
-    {
+void note_effect4(int chan)
+{
     /* Like %%MIDI bendstring, this procedure handles %%MIDI controlstring
        command. The first value of controlstring indicates the controller
        to modify. The following values are the values to send to the
@@ -404,7 +399,7 @@ void note_effect4(chan)
         delta_time -= delta;
         }
     midi_noteoff(delta_time, Q[Qhead].pitch, Q[Qhead].chan);
-    }
+}
 
 
 /* [SS] 2015-07-30 */
@@ -448,9 +443,8 @@ void output_eventlist (struct eventstruc *list, int nsize, int chan) {
     } 
 
 /* [SS] 2015-08-01 */
-void note_effect5(chan)
-    int chan;
-    {
+void note_effect5(int chan)
+{
     /* This procedure merges the controlstring with the
        bendstring and uses it to shape the note. The control
        commands are prepared and stored in the eventstruc
@@ -547,7 +541,7 @@ void note_effect5(chan)
       data[1] = (char) ((pitchbend>>7)&0x7f);
       write_event_with_delay(0,pitch_wheel,chan,data,2);
       }
-   }
+}
 
 
 
@@ -570,9 +564,7 @@ void note_effect5(chan)
 
 /* new: delta_time_track0 is declared in queues.h like delta_time */
 
-void timestep(t, atend)
-int t;
-int atend;
+void timestep(int t, int atend)
 {
   int time;
   int headtime;

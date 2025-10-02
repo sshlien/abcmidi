@@ -27,12 +27,9 @@ void event_info(char* s)
 }
 
 
-static void splitstring(s, sep, handler)
+static void splitstring(char *s, char sep, void (*handler)(char *))
 /* breaks up string into fields with sep as the field separator */
 /* and calls handler() for each sub-string */
-char* s;
-char sep;
-void (*handler)();
 {
   char* out;
   char* p;
@@ -53,22 +50,19 @@ void (*handler)();
   };
 }
 
-void event_gchord(s)
+void event_gchord(char *s)
 /* handles guitar chords " ... " */
-char* s;
 {
   splitstring(s, ';', event_handle_gchord);
 }
 
-void event_instruction(s)
+void event_instruction(char *s)
 /* handles a ! ... ! event in the abc */
-char* s;
 {
   splitstring(s, ';', event_handle_instruction);
 }
 
-void event_slur(t)
-int t;
+void event_slur(int t)
 /* handles old 's' notation for slur on/slur off */
 {
   if (t) {

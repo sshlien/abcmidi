@@ -295,9 +295,8 @@ char *featname[] = {
 "SPLITVOICE", "META", "PEDAL_ON", "PEDAL_OFF", "EFFECT"
 }; 
 
-void reduce(a, b)
+void reduce(int *a, int *b)
 /* elimate common factors in fraction a/b */
-int *a, *b;
 {
   int sign;
   int t, n, m;
@@ -325,10 +324,9 @@ int *a, *b;
   *b = *b/n;
 }
 
-int gtfract(anum,adenom, bnum,bdenom)
+int gtfract(int anum, int adenom, int bnum, int bdenom)
 /* compare two fractions  anum/adenom > bnum/bdenom */
 /* returns   (a > b)                       */
-int anum,adenom,bnum,bdenom;
 {
   if ((anum*bdenom) > (bnum*adenom)) {
     return(1);
@@ -339,9 +337,8 @@ int anum,adenom,bnum,bdenom;
 
 
 
-void addunits(a, b)
+void addunits(int a, int b)
 /* add a/b to the count of units in the bar */
-int a, b;
 {
   bar_num = bar_num*(b*b_denom) + (a*b_num)*bar_denom;
   bar_denom = bar_denom * (b*b_denom);
@@ -389,8 +386,7 @@ for (j=0; j<chordlen[chordnum]; j++) {
 
 
 
-void set_gchords(s)
-char* s;
+void set_gchords(char *s)
 /* set up a string which indicates how to generate accompaniment from */
 /* guitar chords (i.e. "A", "G" in abc). */
 /* called from dodeferred(), startfile() and setbeat() */
@@ -432,8 +428,7 @@ char* s;
 /*  printf("%s  %d %d\n",s,g_num,g_denom); */
 }
 
-void set_drums(s)
-char* s;
+void set_drums(char *s)
 /* set up a string which indicates drum pattern */
 /* called from dodeferred() */
 {
@@ -517,9 +512,8 @@ char* s;
   reduce(&drum_num, &drum_denom);
 }
 
-static void checkbar(pass)
+static void checkbar(int pass)
 /* check to see we have the right number of notes in the bar */
-int pass;
 {
   char msg[80];
   
@@ -565,9 +559,8 @@ int pass;
 
 }
 
-static void softcheckbar(pass)
+static void softcheckbar(int pass)
 /* allows repeats to be in mid-bar */
-int pass;
 {
   if (barchecking) {
     if ((bar_num-barsize*(bar_denom) >= 0) || (barno <= 0)) {
@@ -576,10 +569,8 @@ int pass;
   };
 }
 
-static void save_state(vec, a, b, c, d, e, f)
+static void save_state(int vec[6], int a, int b, int c, int d, int e, int f)
 /* save status when we go into a repeat */
-int vec[6];
-int a, b, c, d, e, f;
 {
   vec[0] = a;
   vec[1] = b;
@@ -589,10 +580,8 @@ int a, b, c, d, e, f;
   vec[5] = f; /* [SS] 2013-11-02 */
 }
 
-static void restore_state(vec, a, b, c, d, e, f)
+static void restore_state(int vec[6], int *a, int *b, int *c, int *d, int *e, int *f)
 /* restore status when we loop back to do second repeat */
-int vec[6];
-int *a, *b, *c, *d, *e, *f;
 {
   *a = vec[0];
   *b = vec[1];
@@ -622,8 +611,7 @@ static int findchannel()
 }
 
 
-static int findpart(j)
-int j;
+static int findpart(int j)
 /* find out where next part starts and update partno */
 {
   int place;
@@ -656,10 +644,9 @@ int j;
   return(place);
 }
 
-static int partbreak(xtrack, voice, place)
+static int partbreak(int xtrack, int voice, int place)
 /* come to part label in note data - check part length, then advance to  */
 /* next part if there was a P: field in the header */
-int xtrack, voice, place;
 {
   int newplace;
 
@@ -673,10 +660,8 @@ int xtrack, voice, place;
   return(newplace);
 }
 
-static int findvoice(initplace, voice, xtrack)
+static int findvoice(int initplace, int voice, int xtrack)
 /* find where next occurrence of correct voice is */
-int initplace;
-int voice, xtrack;
 {
   int foundvoice;
   int j;
@@ -705,17 +690,15 @@ int voice, xtrack;
   return(j);
 }
 
-static void text_data(s)
+static void text_data(char *s)
 /* write text event to MIDI file */
-char* s;
 {   
   mf_write_meta_event(delta_time, text_event, s, strlen(s));
   tracklen = tracklen + delta_time;
   delta_time = 0L;
 }
 
-static void karaokestarttrack (track)
-int track;
+static void karaokestarttrack (int track)
 /* header information for karaoke track based on w: fields */
 {
   int j;
@@ -804,8 +787,7 @@ static int check_wordextend(int startplace)
   return 0;
 }
 
-static int findwline(startline)
-int startline;
+static int findwline(int startline)
 /* Find next line of lyrics at or after startline. */
 {
   int place;
@@ -902,7 +884,7 @@ int startline;
 
 
 
-static int getword(place, w)
+static int getword(int *place, int w)
 /* picks up next syllable out of w: field.
  * It strips out all the control codes ~ - _  * in the
  * words and sends each syllable out to the Karaoke track.
@@ -922,8 +904,6 @@ static int getword(place, w)
  * karaoke track. The kspace variables signals that a
  * space was encountered.
  */
-int* place;
-int w;
 {
   char syllable[200];
   unsigned char c; /* [BY] 2012-10-03 */
@@ -1117,8 +1097,7 @@ int w;
 
 
 
-static void write_syllable(place)
-int place;
+static void write_syllable(int place)
 /* Write out a syllable. This routine must check that it has a line of 
  * lyrics and find one if it doesn't have one. The function is called
  * for each note encountered in feature[j] when the global variable
@@ -1217,9 +1196,7 @@ static void checksyllables()
   musicsyllables = 0;
 }
 
-static int inlist(place, passno)
-int place;
-int passno;
+static int inlist(int place, int passno)
 /* decide whether passno matches list/number for variant section */
 /* handles representation of [X in the abc */
 {
@@ -1266,9 +1243,8 @@ int passno;
   };
 }
 
-void set_meter(n, m)
+void set_meter(int n, int m)
 /* set up variables associated with meter */
-int n, m;
 {
   mtime_num = n;
   mtime_denom = m;
@@ -1295,9 +1271,8 @@ int n, m;
   };
 }
 
-static void write_meter(n, m)
+static void write_meter(int n, int m)
 /* write meter to MIDI file */
-int n, m;
 {
   int t, dd;
   char data[4];
@@ -1326,9 +1301,8 @@ else
   mf_write_meta_event(0L, time_signature, data, 4); /* [SS] 2010-04-15 2010-07-06*/
 }
 
-static void write_keysig(sf, mi)
+static void write_keysig(int sf, int mi)
 /* Write key signature to MIDI file */
-int sf, mi;
 {
   char data[2];
 
@@ -1337,10 +1311,8 @@ int sf, mi;
   mf_write_meta_event(0L, key_signature, data, 2);
 }
 
-static void midi_noteon(delta_time, pitch, pitchbend, chan, vel)
+static void midi_noteon(long delta_time, int pitch, int pitchbend, int chan, int vel)
 /* write note on event to MIDI file */
-long delta_time;
-int pitch, chan, vel, pitchbend;
 {
   char data[2];
 #ifdef NOFTELL
@@ -1371,10 +1343,8 @@ int pitch, chan, vel, pitchbend;
   };
 }
 
-void midi_noteoff(delta_time, pitch, chan)
+void midi_noteoff(long delta_time, int pitch, int chan)
 /* write note off event to MIDI file */
-long delta_time;
-int pitch, chan;
 {
   char data[2];
 
@@ -1388,9 +1358,8 @@ int pitch, chan;
   };
 }
 
-static void noteon_data(pitch, pitchbend, channel, vel)
+static void noteon_data(int pitch, int pitchbend, int channel, int vel)
 /* write note to MIDI file and adjust delta_time */
-int pitch, pitchbend, channel, vel;
 {
   midi_noteon(delta_time, pitch, pitchbend, channel, vel);
   tracklen = tracklen + delta_time;
@@ -1613,8 +1582,7 @@ void articulated_stress_factors (int n,  int *vel)
  }
 
 /* [SS] 2015-09-07 */
-int apply_velocity_increment_for_one_note (velocity)
-    int velocity;
+int apply_velocity_increment_for_one_note (int velocity)
     {
     velocity = velocity + single_velocity_inc;
     if (velocity < 0) velocity = 0;
@@ -1633,9 +1601,8 @@ int set_velocity_for_one_note ()
 
 
 /* [SS] 2011-07-04 */
-static void noteon(n)
+static void noteon(int n)
 /* compute note data and call noteon_data to write MIDI note event */
-int n;
 {
   int  vel;
   vel = 0; /* [SS] 2013-11-04 */
@@ -1654,9 +1621,8 @@ int n;
   else noteon_data(pitch[n] + transpose + global_transpose, bentpitch[n], channel, vel);
 }
 
-static void write_program(p, channel)
+static void write_program(int p, int channel)
 /* write 'change program' (new instrument) command to MIDI file */
-int p, channel;
 {
   char data[1];
 
@@ -1673,12 +1639,8 @@ int p, channel;
 }
 
 /* [SS] 2015-07-27 */
-void write_event_with_delay(delta,event_type, channel, data, n)
+void write_event_with_delay(int delta, int event_type, int channel, char data[], int n)
 /* write MIDI special event such as control_change or pitch_wheel */
-int delta;
-int event_type;
-int channel, n;
-char data[];
 {
   if (channel >= MAXCHANS) {
     event_error("Channel limit exceeded\n");
@@ -1687,11 +1649,8 @@ char data[];
   };
 }
 
-void write_event(event_type, channel, data, n)
+void write_event(int event_type, int channel, char data[], int n)
 /* write MIDI special event such as control_change or pitch_wheel */
-int event_type;
-int channel, n;
-char data[];
 {
   if (channel >= MAXCHANS) {
     event_error("Channel limit exceeded\n");
@@ -1701,9 +1660,7 @@ char data[];
   };
 }
 
-static char *select_channel(chan, s)
-char *s;
-int *chan;
+static char *select_channel(int *chan, char *s)
 /* used by dodeferred() to set channel to be used */
 /* reads 'bass', 'chord' or nothing from string pointed to by p */
 {
@@ -1726,8 +1683,7 @@ int *chan;
   return(p);
 }
 
-static int makechordchannels (n)
-int n;
+static int makechordchannels (int n)
 {
 /* Allocate channels for in voice chords containing microtones.
    n is the number of channels to allocate which should be
@@ -1889,14 +1845,11 @@ if (remainder == 0) {
 }
 
 /* [SS] 2020-08-09 */
-static void expand_array (shortarray, size, longarray, factor)
+static void expand_array (int shortarray[], int size, int longarray[], int factor)
 /* if shortarray = {21,-40} and factor = 4
  * longarray will be {5,6,5,5,-10,-10,-10,-10}
  * It is used for smoothing a bendstring.
  */
-int shortarray[], longarray[];
-int size;
-int factor;
 {
 float increment, accumulator;
 float last_accumulator;
@@ -1922,11 +1875,9 @@ for (i = 0; i< size; i++) {
 }
 
 
-static void dodeferred(s,noteson)
+static void dodeferred(char *s, int noteson)
 /* handle package-specific command which has been held over to be */
 /* interpreted as MIDI is being generated */
-char* s;
-int noteson;
 {
   char* p;
   char command[40];
@@ -2367,9 +2318,8 @@ int noteson;
   
 }
 
-static void delay(a, b, c)
+static void delay(int a, int b, int c)
 /* wait for time a/b */
-int a, b, c;
 {
   int dt;
 
@@ -2382,10 +2332,8 @@ int a, b, c;
   timestep(dt, 0);
 }
 
-static void save_note(num, denom, pitch, pitchbend, chan, vel)
+static void save_note(int num, int denom, int pitch, int pitchbend, int chan, int vel)
 /* output 'note on' queue up 'note off' for later */
-int num, denom;
-int pitch, pitchbend, chan, vel;
 {
 /* don't transpose drum channel */
   if(chan == 9) {noteon_data(pitch, pitchbend, chan, vel);
@@ -2397,14 +2345,13 @@ int pitch, pitchbend, chan, vel;
 
 
 
-void dogchords(i)
+void dogchords(int i)
 /* generate accompaniment notes */
 /* note no microtone or linear temperament support ! */
-int i;
 {
 int j;
   if (g_ptr >= (int) strlen(gchord_seq)) g_ptr = 0;
-  if ((i == g_ptr) ) {  /* [SS] 2018-06-23 */
+  if (i == g_ptr) {  /* [SS] 2018-06-23 */
     int len;
     char action;
 
@@ -2534,9 +2481,8 @@ int j;
     };
 };
 
-void dodrums(i)
+void dodrums(int i)
 /* generate drum notes */
-int i;
 {
   if (drum_ptr >= (int) strlen(drum_seq)) drum_ptr = 0; /* [SS] 2018-06-23 */
   if (i == drum_ptr) {  /* [SS] 2018-06-23 */
@@ -2586,8 +2532,7 @@ void stop_drone()
 
 
 
-void progress_sequence(i)
-int i;
+void progress_sequence(int i)
 {
   if (gchordson) {
     dogchords(i);
@@ -2853,9 +2798,8 @@ write_event(control_change, channel, data, 2);
 }
 
 
-long writetrack(xtrack)
+long writetrack(int xtrack)
 /* this routine writes a MIDI track  */
-int xtrack;
 {
   int trackvoice;
   int inchord;
@@ -3318,7 +3262,7 @@ int xtrack;
             if(feature[j] == VOICE) j = findvoice(j, trackvoice, xtrack);
           };
           barno = barno + 1;
-          if ((j == notes) /* || (feature[j] == PLAY_ON_REP) */) { 
+          if (j == notes /* || (feature[j] == PLAY_ON_REP) */) { 
           /* end of tune was encountered before finding end of */
           /* variant ending.  */
             sprintf(errmsg, 

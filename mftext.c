@@ -16,6 +16,8 @@
 
 void initfuncs();
 void midifile();
+extern char* crack(int argc, char *argv[], char *flags, int ign);
+extern FILE *efopen(char *name, char *mode);
 
 static FILE *F;
 int SECONDS;      /* global that tells whether to display seconds or ticks */
@@ -30,13 +32,9 @@ int filegetc()
 /* for crack */
 extern int arg_index;
 
-int main(argc,argv)
-int argc;
-char **argv;
+int main(int argc, char *argv[])
 {
-  FILE *efopen();
   char *ch;
-  char *crack();
 
   SECONDS = 0;
 
@@ -59,9 +57,7 @@ char **argv;
 }
 
 FILE *
-efopen(name,mode)
-char *name;
-char *mode;
+efopen(char *name, char *mode)
 {
   FILE *f;
 
@@ -72,8 +68,7 @@ char *mode;
   return(f);
 }
 
-void error(s)
-char *s;
+void error(char *s)
 {
   fprintf(stderr,"Error: %s\n",s);
 }
@@ -86,8 +81,7 @@ void prtime()
   printf("Time=%ld  ",Mf_currtime);
 }
 
-void txt_header(format,ntrks,ldivision)
-int format, ntrks, ldivision;
+void txt_header(int format, int ntrks, int ldivision)
 {
         division = ldivision; 
   printf("Header format=%d ntrks=%d division=%d\n",format,ntrks,division);
@@ -103,29 +97,25 @@ void txt_trackend()
   printf("Track end\n");
 }
 
-void txt_noteon(chan,pitch,vol)
-int chan, pitch, vol;
+void txt_noteon(int chan, int pitch, int vol)
 {
   prtime();
   printf("Note on, chan=%d pitch=%d vol=%d\n",chan+1,pitch,vol);
 }
 
-void txt_noteoff(chan,pitch,vol)
-int chan, pitch, vol;
+void txt_noteoff(int chan, int pitch, int vol)
 {
   prtime();
   printf("Note off, chan=%d pitch=%d vol=%d\n",chan+1,pitch,vol);
 }
 
-void txt_pressure(chan,pitch,press)
-int chan, pitch,press;
+void txt_pressure(int chan, int pitch, int press)
 {
   prtime();
   printf("Pressure, chan=%d pitch=%d press=%d\n",chan+1,pitch,press);
 }
 
-void txt_parameter(chan,control,value)
-int chan, control, value;
+void txt_parameter(int chan, int control, int value)
 {
   prtime();
   printf("Parameter, chan=%d c1=%d c2=%d\n",chan+1,control,value);
@@ -133,54 +123,43 @@ int chan, control, value;
 
 
 /* [SS] 2017-11-16 submitted by Jonathan Hough (msb,lsb interchanged) */
-void txt_pitchbend(chan,lsb,msb)
-int chan, msb, lsb;
+void txt_pitchbend(int chan, int lsb, int msb)
 {
   prtime();
   printf("Pitchbend, chan=%d lsb=%d msb=%d\n",chan+1,msb,lsb);
 }
 
-void txt_program(chan,program)
-int chan, program;
+void txt_program(int chan, int program)
 {
   prtime();
   printf("Program, chan=%d program=%d\n",chan+1,program);
 }
 
-void txt_chanpressure(chan,press)
-int chan, press;
+void txt_chanpressure(int chan, int pitch, int press)
 {
   prtime();
   printf("Channel pressure, chan=%d pressure=%d\n",chan+1,press);
 }
 
-void txt_sysex(leng,mess)
-int leng;
-char *mess;
+void txt_sysex(int leng, char *mess)
 {
   prtime();
   printf("Sysex, leng=%d\n",leng);
 }
 
-void txt_metamisc(type,leng,mess)
-int type, leng;
-char *mess;
+void txt_metamisc(int type, int leng, char *mess)
 {
   prtime();
   printf("Meta event, unrecognized, type=0x%02x leng=%d\n",type,leng);
 }
 
-void txt_metaspecial(type,leng,mess)
-int type, leng;
-char *mess;
+void txt_metaspecial(int type, int leng, char *mess)
 {
   prtime();
   printf("Meta event, sequencer-specific, type=0x%02x leng=%d\n",type,leng);
 }
 
-void txt_metatext(type,leng,mess)
-int type, leng;
-char *mess;
+void txt_metatext(int type, int leng, char *mess)
 {
   static char *ttype[] = {
     NULL,
@@ -209,8 +188,7 @@ char *mess;
   printf(">\n");
 }
 
-void txt_metaseq(num)
-int num;
+void txt_metaseq(int num)
 {
   prtime();
   printf("Meta event, sequence number = %d\n",num);
@@ -222,23 +200,20 @@ void txt_metaeot()
   printf("Meta event, end of track\n");
 }
 
-void txt_keysig(sf,mi)
-int sf,mi;
+void txt_keysig(int sf, int mi)
 {
   prtime();
   printf("Key signature, sharp/flats=%d  minor=%d\n",sf,mi);
 }
 
-void txt_tempo(ltempo)
-long ltempo;
+void txt_tempo(long ltempo)
 {
   tempo = ltempo;
   prtime();
   printf("Tempo, microseconds-per-MIDI-quarter-note=%ld\n",tempo);
 }
 
-void txt_timesig(nn,dd,cc,bb)
-int nn, dd, cc, bb;
+void txt_timesig(int nn, int dd, int cc, int bb)
 {
   int denom = 1;
   while ( dd-- > 0 )
@@ -248,17 +223,14 @@ int nn, dd, cc, bb;
     nn,denom,cc,bb);
 }
 
-void txt_smpte(hr,mn,se,fr,ff)
-int hr, mn, se, fr, ff;
+void txt_smpte(int hr, int mn, int se, int fr, int ff)
 {
   prtime();
   printf("SMPTE, hour=%d minute=%d second=%d frame=%d fract-frame=%d\n",
     hr,mn,se,fr,ff);
 }
 
-void txt_arbitrary(leng,mess)
-int leng; /* [SDE] 2020-06-03 */
-char *mess;
+void txt_arbitrary(int leng, char *mess)
 {
   prtime();
   printf("Arbitrary bytes, leng=%d\n",leng);
