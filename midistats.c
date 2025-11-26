@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "1.00 June 27 2025 midistats"
+#define VERSION "1.01 November 26 2025 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -182,6 +182,8 @@ struct trkstat {
   int rhythmpatterns[17];
   int numberOfGaps[17];
   int chanvol[17];
+  int velocity[17]; /* 2025.11.26 */
+  int velocity2[17]; /* 2025.11.26 */
   float pitchEntropy[17];
   } trkdata;
 
@@ -729,28 +731,38 @@ if (sum != 0) {
 
 void output_track_summary () {
 int i;
+int nnotes; /* 2025.11.26 */
+float avgvel, varvel; /* 2025.11.26 */
 /* find first channel containing data */
 output_hasher_results();
 for (i=1;i<17;i++) {
    if(trkdata.notecount[i] == 0 && trkdata.chordcount[i] == 0) continue; 
    printf("trkinfo ");
    printf("%d %d ",i,trkdata.program[i]); /* channel number and program*/
+   nnotes = trkdata.notecount[i]+trkdata.chordcount[i]; /* 2025.11.26 */
    printf("%d %d ",trkdata.notecount[i],trkdata.chordcount[i]);
    /* [SS] 2023-08-22 */
    if (i != 10) printf("%d %d ",trkdata.notemeanpitch[i], trkdata.notelength[i]);
    else 
      printf("-1  0 ");
+
    printf("%d ",trkdata.pitchbend[i]); /* [SS] 2024-07-26 */
    printf("%d %d ",trkdata.cntlparam[i],trkdata.pressure[i]); /* [SS] 2022-03-04 */
    printf("%d %d ",trkdata.quietTime[i],trkdata.rhythmpatterns[i]);
    if (i != 10)  {printf("%d %d %d %d %d",trkdata.notepitchmin[i],  trkdata.notepitchmax[i] ,trkdata.notelengthmin[i],  trkdata.notelengthmax[i], trkdata.numberOfGaps[i]);
    printf(" %f",trkdata.pitchEntropy[i]);
-    } else
-     printf("-1 0");
-   if (lasttrack > 1) printf(" %d %d %d\n",tracknm.zeroCount,tracknm.stepCount,tracknm.jumpCount);
-   else
-             printf(" %d %d %d\n",nm[i-1].zeroCount,nm[i-1].stepCount,nm[i-1].jumpCount);
+   /* 2025.11.26 next 6 lines */
+   printf(" %d %d %d",nm[i-1].zeroCount,nm[i-1].stepCount,nm[i-1].jumpCount);
+   avgvel = (float) trkdata.velocity[i]/(float) nnotes;
+   varvel = ((float) trkdata.velocity2[i] / (float) nnotes) - avgvel*avgvel;
+   if (varvel < 0.01) varvel = 0.01;
+   printf(" %d %d",(int) round(avgvel),(int) round(sqrt(varvel)));
    printf("\n");
+    } else
+     printf("-1 0\n");
+   if (lasttrack == 1) { /* 2025.11.26 */
+   printf(" %d %d %d\n",tracknm.zeroCount,tracknm.stepCount,tracknm.jumpCount);
+   }
 
    channel2nnotes[i] += trkdata.notecount[i] + trkdata.chordcount[i];
   }
@@ -774,6 +786,8 @@ void stats_trackstart()
      trkdata.notelengthmax[i] = 0;
      trkdata.chordcount[i] = 0;
      trkdata.cntlparam[i] = 0;
+     trkdata.velocity[i] = 0; /* 2025.11.26 */
+     trkdata.velocity2[i] = 0;
      last_on_tick[i] = -1;
      channel_active[i] = 0;
      }
@@ -921,6 +935,8 @@ int chan, pitch, vol;
  trkdata.notemeanpitch[chan+1] += pitch;
  trkdata.notepitchmax[chan+1] = max(trkdata.notepitchmax[chan+1],pitch);
  trkdata.notepitchmin[chan+1] = min(trkdata.notepitchmin[chan+1],pitch);
+ trkdata.velocity[chan+1] += vol;  /* 2025.11.26 */
+ trkdata.velocity2[chan+1] += vol*vol;
  if (trkdata.lastNoteOff[chan+1] >= 0) {
 	 delta = Mf_currtime - trkdata.lastNoteOff[chan+1];
 	 if (delta > quietLimit) {
