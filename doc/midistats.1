@@ -1,4 +1,4 @@
-.TH MIDISTATS 1 "26 November 2025"
+.TH MIDISTATS 1 "13 February 2026"
 .SH NAME
 \fBmidistats\fP \- program to summarize the statistical properties of a midi file
 .SH SYNOPSIS
@@ -322,6 +322,31 @@ splits the two 4-bit values with a period. Thus 33 = (2*16 + 1).
 -pitchclass
 .br
 Returns the pitch class distribution for the entire midi file.
+
+.PP
+-keystability
+.br
+Seqments the midi file into 8 beat units (probably 2 bars), and
+for each segment it uses Craig Sapp's algorithm to determine the
+key signature based on the distribution of the pitch classes.
+It returns the number of sharps (positive number) or the number
+of flats (negative number) for that key signature. For example,
+the key of G major or E minor would be represented by the value
+1.
+.br
+The list of sharp/flats is returned in the line
+.br
+localkeysf  0 0 0 0 0 1 0 0 0 0 0 0 3 0 0 0 0 0 -1 -5 -5 -5 -5
+.br
+For example, in the above sequence (ABBA/Money, Money, Money.7.mid)
+the key signature starts in A minor but switches to Bb minor in the
+last 8 bars.
+.br
+Beware of enharmonic keys. For example,
+B Major (5#) and Cb Major (7b) contain the same notes. 
+Similarly F# Major (6#) and Gb Major (6b), and
+C# Major (7#) and Db Major (5b), and all the
+minor key equivalents.
 
 .PP
 -nseqfor n

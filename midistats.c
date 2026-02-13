@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "1.01 November 26 2025 midistats"
+#define VERSION "1.02 February 08 2026 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -97,6 +97,7 @@ int maintrack;
 int format; /* MIDI file type                                   */
 int debug;
 int noOutput;
+int keystabilityAnalysis;
 int pulseanalysis;
 int percanalysis;
 int percpattern;
@@ -108,6 +109,7 @@ int corestats;
 int chordthreshold; /* number of maximum number of pulses separating note */
 int beatsPerBar = 4; /* 4/4 time */
 int divisionsPerBar;
+int divisionsPer4Bar;
 int unitDivision;
 int maximumPulse;
 int lastBeat;
@@ -127,6 +129,7 @@ int tempocount=0;  /* number of tempo indications in MIDI file */
 
 int stats = 0; /* flag - gather and print statistics            */
 
+int keystabilityAnalysis = 0;
 int pulseanalysis = 0;
 int percanalysis = 0;
 int percpattern = 0;
@@ -225,6 +228,7 @@ int trkactivity[40]; /* [SS] 2023-10-25 */
 int progactivity[128]; /* [SS] 2018-02-02 */
 int pitchclass_activity[12]; /* [SS] 2018-02-02 */
 int chanpitchhistogram[204]; /* [SS] 2023-09-13 */
+int local_pitchclass_activity[12]; /* [SS] 2026-02-08 */
 
 
 /* [SS] 2017-11-01 */
@@ -476,6 +480,7 @@ void stats_header (int format, int ntrks, int ldivision)
   halfdivision = ldivision/2;
   quietLimit = ldivision*8;
   divisionsPerBar = division*beatsPerBar;
+  divisionsPer4Bar = divisionsPerBar*4;
   unitDivision = divisionsPerBar/24;
   lasttrack = ntrks; /* [SS] 2023-10-25 */
   if (noOutput == 0) printf("ntrks %d\n",ntrks);
@@ -1182,6 +1187,8 @@ void load_header (int format, int ntrks, int ldivision)
   int i;
   division = ldivision;
   halfdivision = ldivision/2;
+  divisionsPerBar = division*beatsPerBar;
+  divisionsPer4Bar = divisionsPerBar*4;
   lasttrack = ntrks;
   for (i=0;i<17;i++) channel_active[i] = 0; /* for counting number of channels*/
 }
@@ -1489,6 +1496,35 @@ for (i = 0; i <lastEvent; i++) {
   }
 }
 
+
+int localKeyMatch (); 
+void reset_local_pitchclass_activity (int barIndex);
+
+void localPitchClassAnalysis () {
+int i;
+int channel;
+int pitch;
+int bar4Index, lastbar4Index;
+int sf;
+printf("localkeysf ");
+lastbar4Index = 0;
+for (i=0;i<12;i++) local_pitchclass_activity[i] = 0;
+for (i = 0; i < lastEvent; i++) {
+  channel = midievents[i].channel;
+  if (channel == 9) continue;
+  bar4Index = midievents[i].onsetTime/divisionsPer4Bar;
+  if (bar4Index != lastbar4Index) {
+       sf = localKeyMatch();
+       reset_local_pitchclass_activity(lastbar4Index);
+       printf(" %d",sf);
+       lastbar4Index = bar4Index;
+       }
+  pitch = midievents[i].pitch;
+  local_pitchclass_activity[pitch % 12]++;
+  }
+printf("\n");
+}
+
 void pitchClassAnalysis () {
 int i;
 int channel;
@@ -1500,6 +1536,17 @@ for (i = 0; i < lastEvent; i++) {
   pitch = midievents[i].pitch;
   pitchclass_activity[pitch % 12]++;
   }
+}
+
+
+void reset_local_pitchclass_activity (int barIndex) {
+int i;
+int sf;
+float dist[12];
+float maxdiscrepancy;
+float dif;
+//printf("%d\t",barIndex);
+for (i=0;i<12;i++) local_pitchclass_activity[i] = 0;
 }
 
 void output_perc_pattern (int i) {
@@ -1570,7 +1617,16 @@ static char *majmin[] = {"maj", "min"};
 
 /* number of sharps or flats for major keys in keylist */
 static int maj2sf[] = {0,  7,  2, -3,  4, -1,  6,  1, -4, 3, -2, 5};
-static int min2sf[] = {-3, 4, -1, -6, -4,  3, -4  -2, -7, 0, -5, 2};
+static int min2sf[] = {-3, 4, -1, -6, 1, -4, 3, -2, -7, 0, -5, 2};
+
+void verify_arrays () {
+int i;
+for (i == 0; i <11; i++) {
+  printf("%d %s %d %d\n",i, keylist[i], maj2sf[i], min2sf[i]);
+  }
+}
+
+
 
 void keymatch () {
 int i;
@@ -1597,14 +1653,6 @@ for (i=0;i<12;i++) {
    }
 for (i=0;i<12;i++) {
    hist[i] = (float) pitchhistogram[i]/(float) total;
-   }
-fnorm = 0.0;
-for (i=0;i<12;i++) {
-   fnorm = hist[i]*hist[i] + fnorm;
-   }
-fnorm = sqrt(fnorm);
-for (i=0;i<12;i++) {
-   hist[i] = hist[i]/fnorm;
    }
 
 for (i=0;i<12;i++) {
@@ -1649,6 +1697,100 @@ printf("\nrmaj ");
 for (r=0;r<12;r++) printf("%7.3f",rmaj[r]);
 printf("\nrmin ");
 for (r=0;r<12;r++) printf("%7.3f",rmin[r]);
+}
+
+/********
+int index2sf (int index, int bestMode) {
+int sf;
+if (bestMode == 0) sf = maj2sf[index];
+else sf = min2sf[index];
+printf("\t\t%s%s %d %d\t",keylist[index],majmin[bestMode],bestMode,sf);
+return sf;
+}
+********/
+
+int localKeyMatch () {
+int i;
+int r;
+int k;
+float c2M,c2m,h2,hM,hm;
+float rmaj[12],rmin[12];
+float best;
+float fnorm;
+float total;
+float hist[12];
+int bestIndex,bestMode;
+int sf; /* number of flats or sharps (flats negative) */ 
+
+for (i=0;i<12;i++) {
+  hist[i] = (float) local_pitchclass_activity[i];
+  }
+fnorm = 0.0;
+for (i=0;i<11;i++) fnorm += hist[i];
+for (i=0;i<12;i++) hist[i] = hist[i]/fnorm;
+
+c2M = 0.0;
+c2m = 0.0;
+h2 = 0.0;
+best = 0.0;
+bestIndex = 0;
+bestMode = -1;
+total =0;
+fnorm = 0.0;
+for (i=0;i<12;i++) {
+   fnorm = hist[i] + fnorm;
+   }
+//fnorm = sqrt(fnorm);
+for (i=0;i<12;i++) {
+   hist[i] = hist[i]/fnorm;
+   }
+
+for (i=0;i<12;i++) {
+  c2M += ssMj[i]*ssMj[i];
+  c2m += ssMn[i]*ssMn[i];
+  h2 += hist[i]*hist[i]; 
+  }
+if (h2 < 0.0001) {
+  printf("zero histogram\n");
+  return 0;
+  }
+for (r=0;r<12;r++) {
+  hM = 0.0;
+  hm = 0.0;
+  for (i=0;i<12;i++) {
+    k = (i - r) % 12;
+    if (k < 0) k = k + 12;
+    hM += hist[i]*ssMj[k];
+    hm += hist[i]*ssMn[k];
+    }
+  rmaj[r] = hM/sqrt(h2*c2M);
+  rmin[r] = hm/sqrt(h2*c2m);
+  }
+
+for (r=0;r<12;r++) {
+  if(rmaj[r] > best) {
+      best = rmaj[r];
+      bestIndex = r;
+      bestMode = 0;
+      }
+  if(rmin[r] > best) {
+      best = rmin[r];
+      bestIndex = r;
+      bestMode = 1;
+      }
+  }
+
+if (bestMode == 0) sf = maj2sf[bestIndex];
+else sf = min2sf[bestIndex];
+ 
+//printf("\nkey %s%s %d %f",keylist[bestIndex],majmin[bestMode],sf,best);
+//printf("hist:\t");
+//for (r=0;r<12;r++) printf("%5.2f",hist[r]);
+//printf("\nrmaj ");
+//for (r=0;r<12;r++) printf("%7.3f",rmaj[r]);
+//printf("\nrmin ");
+//for (r=0;r<12;r++) printf("%7.3f",rmin[r]);
+return sf;
 }
 
 
@@ -1814,6 +1956,13 @@ int argc;
           noOutput = 1;
           stats = 1;
           }
+
+  arg = getarg("-keystability",argc,argv);
+  if (arg != -1) {
+          keystabilityAnalysis = 1;
+          stats = 0;
+          }
+
   
   arg = getarg("-pulseanalysis",argc,argv);
   if (arg != -1) {
@@ -1909,6 +2058,7 @@ int argc;
     printf("midistats filename <options>\n");
     printf("         -corestats\n");
     printf("         -CSV\n");
+    printf("         -keystability\n");
     printf("         -pulseanalysis\n");
     printf("         -panal\n");
     printf("         -ppat\n");
@@ -1983,6 +2133,9 @@ if (pitchclassanalysis) {
    pitchClassAnalysis();
    outputPitchClassHistogram(); 
    }
+if (keystabilityAnalysis) {
+   localPitchClassAnalysis();
+   }
 }
 
 
@@ -1994,10 +2147,11 @@ int argc;
   FILE *efopen();
   int arg;
 
+  // verify_arrays();
   arg = process_command_line_arguments(argc,argv);
   if(stats == 1)  midistats(argc,argv);
   if(pulseanalysis || corestats || percanalysis ||\
     percpatternfor || percpattern || percpatternhist ||\
-    pitchclassanalysis || nseqfor || nseqdistinct) loadEvents();
+    pitchclassanalysis || nseqfor || nseqdistinct || keystabilityAnalysis) loadEvents();
   return 0;
 }

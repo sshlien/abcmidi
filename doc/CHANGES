@@ -15667,4 +15667,7 @@ accidental_size prior to adding it to the pitchvalue.
    pitchvalue += microtoneshift*accidental_size; /* [SS] 2025.02.16 */
 
 
+February 13 2026
+
+midistats: added new option -keystability.
 
