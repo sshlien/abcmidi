@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "1.02 February 08 2026 midistats"
+#define VERSION "1.03 February 20 2026 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -114,6 +114,7 @@ int unitDivision;
 int maximumPulse;
 int lastBeat;
 int hasLyrics = 0;
+int ntimesigs = 0;
 
 
 struct eventstruc {int onsetTime;
@@ -604,6 +605,10 @@ for (i=1;i<17;i++) {
 if (trkdata.pressure[0] > 0) 
   printf("pressure %d\n",trkdata.pressure[0]);
 printf("programcmd %d\n",trkdata.program[0]);
+
+if (ntimesigs > 1)
+  printf("ntimesig %d\n",ntimesigs);
+
 
 nprogs = 0; /* [SS] 2018-04-24 */
 for (i=1;i<128;i++)
@@ -1141,6 +1146,7 @@ int nn, dd, cc, bb;
     denom *= 2;
   if (noOutput == 1) return;
   printf("timesig %d/%d %6.2f\n",nn,denom,beatnumber);
+  ntimesigs++;
 } 
 
 void record_noteon(int chan,int pitch,int vol)
