@@ -2685,7 +2685,8 @@ void event_field(char k, char *f)
       break;
     case 'R':
       {
-        char* p; 
+        char* p;
+        char buff[258];
         p = f;
         /* strncpy(rhythmdesignator,f,32);  [SS] 2011-08-19 */
 	snprintf(rhythmdesignator,sizeof(rhythmdesignator),"%s",f); /* [SEG] 2020-06-04 */
@@ -2697,6 +2698,11 @@ void event_field(char k, char *f)
           ratio_a = 2; /* [SS] 2016-01-02 */
           ratio_b = 4;
         };
+        /* Also store as text feature for MIDI output */
+        if (strlen(f) < 256) {
+          sprintf(buff, "R:%s", f);
+          textfeature(TEXT, buff);
+        }
       };
       break;
     default:
@@ -6232,6 +6238,12 @@ void event_refno(int n)
       /* sprintf(outname, "%s%d.mid", outbase, n); */
     };
     startfile();
+    /* Store reference number as text feature for MIDI output */
+    {
+      char xbuf[40];
+      sprintf(xbuf, "X:%d", n);
+      textfeature(TEXT, xbuf);
+    }
   };
 }
 
