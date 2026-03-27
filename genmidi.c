@@ -3183,7 +3183,7 @@ int xtrack;
     case PART:
       in_varend = 0;
       if (parts == -1) {
-        /* No header P: spec, body labels only */
+        /* No header P: spec, body labels only: emit "Part X" */
         if (partmarkers && xtrack == 0 &&
             pitch[j] >= 'A' && pitch[j] <= 'Z') {
           char msg[8];
@@ -3193,13 +3193,15 @@ int xtrack;
           delta_time_track0 = 0L;
         }
       } else {
-        /* Parts active, navigate then emit marker */
+        /* Parts active, navigate then emit "Part X-N" marker
+           where N is the instance number (1-based) */
         /*j = partbreak(xtrack, trackvoice, j); [SS] 2023.01.20 */
         j = findvoice(j, trackvoice, xtrack);
         if (partmarkers && xtrack == 0 &&
             partlabel >= 0 && partlabel < 26) {
-          char msg[8];
-          snprintf(msg, sizeof(msg), "Part %c", (char)(partlabel + 'A'));
+          char msg[20];
+          snprintf(msg, sizeof(msg), "Part %c-%d",
+                   (char)(partlabel + 'A'), part_count[partlabel]);
           mf_write_meta_event(delta_time_track0, marker, msg, strlen(msg));
           tracklen = tracklen + delta_time_track0;
           delta_time_track0 = 0L;

@@ -64,9 +64,10 @@ Suppress some comments in the output MIDI file.
 .B -PMAR
 Emit MIDI marker meta-events for P: part labels. When a header P: field
 specifies a play order (e.g. P:(AB)3), a marker is emitted each time a
-section begins during the expanded playback. When no header P: field is
-present, inline P: labels in the body are emitted as section markers.
-The marker text has the form "Part A", "Part B", etc.
+section begins during the expanded playback, with an instance number
+appended (e.g. "Part A-1", "Part B-1", "Part A-2", "Part B-2").
+When no header P: field is present, inline P: labels in the body are
+emitted as simple section markers (e.g. "Part A", "Part B").
 .TP
 .B -OCC
 Accept old chord convention (eg +D2G2+ instead of [DG]2).
