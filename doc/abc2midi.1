@@ -2,7 +2,7 @@
 .SH NAME
 \fBabc2midi\fP \- converts abc file to MIDI file(s)
 .SH SYNOPSIS
-abc2midi \fIinfile\fP [\fIrefnum\fP] [\-c] [\-v] [\-ver] [\-t] [\-n limit] [\-CS] [\-quiet] [\-silent] [\-Q tempo] [\-NFNP] [\-NFER] [\-NGRA] [\-NGUI] [\-STFW] [\-OCC] [\-NCOM] [\-HARP] [\-BF] [\-TT] [\-o outfile] \-CSM [filename]
+abc2midi \fIinfile\fP [\fIrefnum\fP] [\-c] [\-v] [\-ver] [\-t] [\-n limit] [\-CS] [\-quiet] [\-silent] [\-Q tempo] [\-NFNP] [\-NFER] [\-NGRA] [\-NGUI] [\-STFW] [\-OCC] [\-NCOM] [\-PMAR] [\-HARP] [\-BF] [\-TT] [\-o outfile] \-CSM [filename]
 .SH DESCRIPTION
  The default action is to write a MIDI file for each abc tune
  with the filename <stem>N.mid, where <stem> is the filestem
@@ -60,6 +60,13 @@ Place lyric text in separate MIDI tracks.
 .TP
 .B -NCOM
 Suppress some comments in the output MIDI file.
+.TP
+.B -PMAR
+Emit MIDI marker meta-events for P: part labels. When a header P: field
+specifies a play order (e.g. P:(AB)3), a marker is emitted each time a
+section begins during the expanded playback. When no header P: field is
+present, inline P: labels in the body are emitted as section markers.
+The marker text has the form "Part A", "Part B", etc.
 .TP
 .B -OCC
 Accept old chord convention (eg +D2G2+ instead of [DG]2).

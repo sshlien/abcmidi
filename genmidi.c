@@ -105,7 +105,7 @@ int gchordbars;
 /* Part handling */
 extern struct vstring part;
 int parts, partno, partlabel;
-int partmarkers;
+int partmarkers; /* -PMAR flag: emit MIDI marker meta-events for P: parts */
 int part_start[26], part_count[26];
 long introlen, lastlen, partlen[26];
 int partrepno;
@@ -3183,7 +3183,7 @@ int xtrack;
     case PART:
       in_varend = 0;
       if (parts == -1) {
-        /* No header P: spec, body labels only (Scenario B) */
+        /* No header P: spec, body labels only */
         if (partmarkers && xtrack == 0 &&
             pitch[j] >= 'A' && pitch[j] <= 'Z') {
           char msg[8];
@@ -3193,7 +3193,7 @@ int xtrack;
           delta_time_track0 = 0L;
         }
       } else {
-        /* Parts active, navigate then emit marker (Scenario A) */
+        /* Parts active, navigate then emit marker */
         /*j = partbreak(xtrack, trackvoice, j); [SS] 2023.01.20 */
         j = findvoice(j, trackvoice, xtrack);
         if (partmarkers && xtrack == 0 &&
