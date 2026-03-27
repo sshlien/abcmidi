@@ -296,6 +296,7 @@ int retuning = 0; /* [SS] 2012-04-01 */
 int bend = 8192; /* [SS] 2012-04-01 */
 int comma53 = 0; /* [SS] 2014-01-12 */
 int silent = 0; /* [SS] 2014-10-16 */
+int error_count = 0; /* number of errors reported by event_error() */
 int no_more_free_channels; /* [SS] 2015-03-23 */
 void init_p48toc53 (); /* [SS] 2014-01-12 */ 
 void convert_to_comma53 (char acc, int *midipitch, int* midibend);  
@@ -1536,6 +1537,7 @@ void event_fatal_error(char *s)
 void event_error(char *s)
 /* generic error handler */
 {
+  error_count++;
 #ifdef NOFTELL
   extern int nullpass;
 
@@ -6278,6 +6280,6 @@ int main(int argc, char *argv[])
     parsefile(filename);
     free_abbreviations();
   };
-  return(0);
+  return(error_count > 0 ? 1 : 0);
 }
 
