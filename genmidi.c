@@ -105,6 +105,7 @@ int gchordbars;
 /* Part handling */
 extern struct vstring part;
 int parts, partno, partlabel;
+int partmarkers;
 int part_start[26], part_count[26];
 long introlen, lastlen, partlen[26];
 int partrepno;
@@ -3181,15 +3182,29 @@ int xtrack;
       break;
     case PART:
       in_varend = 0;
-      /*j = partbreak(xtrack, trackvoice, j); [SS] 2023.01.20 */
-      j = findvoice(j, trackvoice, xtrack);
-
       if (parts == -1) {
-        char msg[1];
-
-        msg[0] = (char) pitch[j];
-        mf_write_meta_event(0L, marker, msg, 1);
-      };
+        /* No header P: spec, body labels only (Scenario B) */
+        if (partmarkers && xtrack == 0 &&
+            pitch[j] >= 'A' && pitch[j] <= 'Z') {
+          char msg[8];
+          snprintf(msg, sizeof(msg), "Part %c", (char) pitch[j]);
+          mf_write_meta_event(delta_time_track0, marker, msg, strlen(msg));
+          tracklen = tracklen + delta_time_track0;
+          delta_time_track0 = 0L;
+        }
+      } else {
+        /* Parts active, navigate then emit marker (Scenario A) */
+        /*j = partbreak(xtrack, trackvoice, j); [SS] 2023.01.20 */
+        j = findvoice(j, trackvoice, xtrack);
+        if (partmarkers && xtrack == 0 &&
+            partlabel >= 0 && partlabel < 26) {
+          char msg[8];
+          snprintf(msg, sizeof(msg), "Part %c", (char)(partlabel + 'A'));
+          mf_write_meta_event(delta_time_track0, marker, msg, strlen(msg));
+          tracklen = tracklen + delta_time_track0;
+          delta_time_track0 = 0L;
+        }
+      }
       break;
     case VOICE:
       /* search on for next occurrence of voice */
