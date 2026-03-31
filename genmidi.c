@@ -105,7 +105,7 @@ int gchordbars;
 /* Part handling */
 extern struct vstring part;
 int parts, partno, partlabel;
-int partmarkers; /* -PMAR flag: emit MIDI marker meta-events for P: parts */
+int partmarkers; /* -PMAR flag: emit MIDI marker meta-events for P: parts [RK] 2026-03-30 */
 int part_start[26], part_count[26];
 long introlen, lastlen, partlen[26];
 int partrepno;
@@ -3180,7 +3180,7 @@ int xtrack;
         checksyllables();
       };
       break;
-    case PART:
+    case PART: /* [RK] 2026-03-30 */
       in_varend = 0;
       if (parts == -1) {
         /* No header P: spec, body labels only: emit "Part X" */

@@ -422,7 +422,7 @@ int apply_fermata_to_chord = 0; /* [SS] 2012-03-26 */
 /* Part handling */
 struct vstring part;
 extern int parts, partno, partlabel;
-extern int partmarkers;
+extern int partmarkers; /* [RK] 2026-03-30 */
 extern int part_start[26], part_count[26];
 
 int voicesused;
@@ -955,6 +955,7 @@ char **filename;
     nocom = 0;
   }
 
+  /* [RK] 2026-03-30 */
   if (getarg("-PMAR", argc, argv) != -1) {
     partmarkers = 1;
   } else {
@@ -1055,7 +1056,7 @@ char **filename;
     printf("        -Q default tempo (quarter notes/minute)\n");
     printf("        -NFNP don't process !p! or !f!-like fields\n");
     printf("        -NCOM suppress comments in output MIDI file\n");
-    printf("        -PMAR emit MIDI marker meta-events for P: part labels\n");
+    printf("        -PMAR emit MIDI marker meta-events for P: part labels\n"); /* [RK] 2026-03-30 */
     printf("        -NFER ignore all fermata markings\n");
     printf("        -NGRA ignore grace notes\n");
     printf("        -NGUI ignore guitar chord indications\n");
@@ -2945,7 +2946,7 @@ char* s;
   if (dotune) {
     p = s;
     skipspace(&p);
-    if (pastheader && parts == -1) {
+    if (pastheader && parts == -1) { /* [RK] 2026-03-30 */
       /* No header P: spec. If -PMAR, store body P: as section label */
       if (partmarkers && ((int)*p >= 'A') && ((int)*p <= 'Z')) {
         addfeature(PART, (int)*p, 0, 0);
