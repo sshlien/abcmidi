@@ -66,8 +66,8 @@
 
 
 /* Functions to be called while processing the MIDI file. */
-int (*Mf_arbitrary) () = NULLFUNC;
-int (*Mf_seqspecific) () = NULLFUNC;
+int (*Mf_arbitrary) (int, char *) = NULLFUNC;
+int (*Mf_seqspecific) (int, char *) = NULLFUNC;
 
 /* Functions to implement in order to write a MIDI file */
 int (*Mf_writetempotrack) () = NULLFUNC;
@@ -80,10 +80,13 @@ int mf_write_meta_event (int type, char *data, int size);
 void mf_write_track_chunk (int which_track, FILE * fp);
 void mferror (char *s);
 int eputc (char c);
-void append_to_string ();
+void append_to_string (int c);
 void winamp_compatibility_measure ();
 void writechanmsg_at_0 ();
 void copy_noteoff (int chan, int c1, int c2);
+static void write32bit(long);
+static void write16bit(int);
+
 
 int Mf_nomerge = 0;		/* 1 => continue'ed system exclusives are */
 		       /* not collapsed. */
@@ -121,9 +124,9 @@ int transpose = 0;              /* [SS] 2024-08-11 */
 long Mf_numbyteswritten = 0L;
 long readvarinum ();
 long read32bit ();
-long to32bit ();
+long to32bit (int,int,int,int);
 int read16bit ();
-int to16bit ();
+int to16bit (int, int);
 char *msg ();
 int seconds_to_tick (float seconds);
 float tick_to_seconds (int tick);
@@ -135,7 +138,7 @@ void sysex ();
 void chanmessage (int, int, int);
 void msginit ();
 int msgleng ();
-void msgadd ();
+void msgadd (int);
 void biggermsg ();
 void WriteVarLen (long);
 
@@ -389,8 +392,7 @@ copy_metatext (int type, int length, char *m)
 }
 
 void
-midicopy_timesig (c1, c2, c3, c4)
-int c1, c2, c3, c4;
+midicopy_timesig (int c1, int c2, int c3, int c4)
 {
   char data[4];
   data[0] = (char) c1;
@@ -401,8 +403,7 @@ int c1, c2, c3, c4;
 }
 
 void
-copy_keysig (c1, c2)
-int c1, c2;
+copy_keysig (int c1, int c2)
 {
   char data[2];
   data[0] = (char) c1;
@@ -414,8 +415,7 @@ int c1, c2;
 /* Metaevents */
 /* 2015-11-14 [SS] */
 void
-copy_metaseqnum (c1,  c2)
-unsigned char c1,c2;
+copy_metaseqnum (unsigned char c1,  unsigned char c2)
 {
   char data[2];
   data[0] = (char) c1;
@@ -441,7 +441,6 @@ copy_metamisc (int type, int length, char *m)
 void
 copy_metaeot ()
 {
-  void WriteVarLen ();
   WriteVarLen (10);
   Mf_currcopytime += 10;
   eputc ((char) 0xff);
@@ -490,7 +489,7 @@ alloc_trackdata ()
   if (trackdata != NULL)
     free (trackdata);
 /* double it since running status is not preserved [SS] 2013-10-08 */
-/* add another two bytes to cover winamp_compatibility
+/* add another two bytes to cover winamp_compatibility */
 /* for very short tracks. [SS] 2017-09-12 */
 /* There is no penalty for allocating to much. */
   if (Mf_toberead < 2) Mf_toberead = 64; /* to handle MIDI header */
@@ -506,8 +505,7 @@ alloc_trackdata ()
 
 
 int
-readmt (s)			/* read through the "MThd" or "MTrk" header string */
-     char *s;
+readmt (char *s)	/* read through the "MThd" or "MTrk" header string */
 {
   int n = 0;
   char *p = s;
@@ -935,8 +933,7 @@ get_tempo_info_from_track_1 ()
 
 
 void
-badbyte (c)
-     int c;
+badbyte (int c)
 {
   char buff[32];
 
@@ -1115,8 +1112,7 @@ readvarinum ()
 
 
 long
-to32bit (c1, c2, c3, c4)
-     int c1, c2, c3, c4;
+to32bit (int c1, int c2, int c3, int c4)
 {
   long value = 0L;
 
@@ -1131,8 +1127,7 @@ to32bit (c1, c2, c3, c4)
 
 
 int
-to16bit (c1, c2)
-     int c1, c2;
+to16bit (int c1, int c2)
 {
   return ((c1 & 0xff) << 8) + (c2 & 0xff);
 }
@@ -1283,12 +1278,9 @@ printf("\n");
  */
 
 void
-build_new_midi_file (format, ntracks, division, fp)
-     int format, ntracks, division;
-     FILE *fp;
+build_new_midi_file (int format, int ntracks, int division, FILE *fp)
 {
   int i,j;
-  void mf_write_track_chunk ();
   float track_time;
 
   seconds_output = 0.0;
@@ -1398,9 +1390,7 @@ replace_byte_in_file (int trknum, int loc, char val, FILE * fp, int ntracks)
 
 
 void
-mf_write_track_chunk (which_track, fp)
-     int which_track;
-     FILE *fp;
+mf_write_track_chunk (int which_track, FILE *fp)
 /* We may not know how many tracks that we will output, so
  * each track is transfered to a separate string in the
  * array trackstr[]. At the end these strings will be
@@ -1408,8 +1398,6 @@ mf_write_track_chunk (which_track, fp)
 */
 {
   long trkhdr, trklength;
-  void write16bit (), write32bit ();
-  void WriteVarLen ();
 
 
   trkhdr = MTrk;
@@ -1426,11 +1414,9 @@ mf_write_track_chunk (which_track, fp)
 
 
 void
-mf_write_header_chunk (format, ntracks, division)
-     int format, ntracks, division;
+mf_write_header_chunk (int format, int ntracks, int division)
 {
   long ident, length;
-  void write16bit (), write32bit ();
 
   ident = MThd;			/* Head chunk identifier                    */
   length = 6;			/* Chunk length                             */
@@ -1470,7 +1456,6 @@ int
 mf_write_midi_event (int type, int chan, char *data, int size)
 {
   int i;
-  void WriteVarLen ();
   char c;
 
   WriteVarLen (Mf_currtime - Mf_currcopytime);
@@ -1516,7 +1501,6 @@ int
 mf_write_meta_event (int type, char *data, int size)
 {
   int i;
-  void WriteVarLen ();
 
   WriteVarLen (Mf_currtime - Mf_currcopytime);
   if (!cut_beginning ())
@@ -1543,8 +1527,7 @@ mf_write_meta_event (int type, char *data, int size)
 
 
 void
-mf_get_tempo_event (tempo)
-     long tempo;
+mf_get_tempo_event (long tempo)
 {
   tempo_array[temposize].seconds
     = (float) (Mf_currtime - tempo_array[temposize - 1].tick) *
@@ -1559,14 +1542,11 @@ mf_get_tempo_event (tempo)
 
 
 void
-mf_write_tempo (tempo)
-     long tempo;
+mf_write_tempo (long tempo)
 {
   /* Write tempo */
   /* all tempos are written as 120 beats/minute, */
   /* expressed in microseconds/quarter note     */
-
-  void WriteVarLen ();
 
   if (Mf_currtime - Mf_currcopytime < 0)
     eputc (0);
@@ -1605,8 +1585,7 @@ mf_write_tempo (tempo)
  * Write multi-length bytes to MIDI format files
  */
 void
-WriteVarLen (value)
-     long value;
+WriteVarLen (long value)
 {
   long buffer;
 
@@ -1651,8 +1630,7 @@ WriteVarLen (value)
  *
  */
 void
-write32bit (data)
-     long data;
+write32bit (long data)
 {
   putc ((char) ((data >> 24) & 0xff), fp);
   putc ((char) ((data >> 16) & 0xff), fp);
@@ -1661,8 +1639,7 @@ write32bit (data)
 }
 
 void
-write16bit (data)
-     int data;
+write16bit (int data)
 {
   putc ((char) ((data & 0xff00) >> 8), fp);
   putc ((char) (data & 0xff), fp);

@@ -157,8 +157,7 @@ void transpose_note(char xaccidental,int xmult,char xnote,int xoctave,int transp
     char* accidental, int* mult, char* note, int* octave);
 
 
-static int purgespace(p)
-char* p;
+static int purgespace(char *p)
 /* if string p is empty or consists of spaces, set p to the empty string */
 /* and return 1, otherwise return 0. Used to test tmp */
 /* part of new linebreak option (-n) */
@@ -178,19 +177,15 @@ char* p;
   return(blank);
 }
 
-int zero_barcount(foundbar)
+int zero_barcount(int *foundbar)
 /* initialize bar counter for abctext elements */
 /* part of new linebreak option (-n) */
-int *foundbar;
 {
   *foundbar = 0;
   return(0);
 }
 
-int new_barcount(type, foundbar, oldcount)
-enum abctype type;
-int *foundbar;
-int oldcount;
+int new_barcount(enum abctype type, int *foundbar, int oldcount)
 /* work out whether we have reached the end of a bar in abctext elements */
 /* and increment barcount if we have */
 /* part of new linebreak option (-n) */
@@ -209,8 +204,7 @@ int oldcount;
 }
 
 
-static void setline(t)
-enum linestattype t;
+static void setline(enum linestattype t)
 /* generates newline, or continuation, or nothing at all */
 /* part of new linebreak option (-n) */
 {
@@ -223,9 +217,7 @@ enum linestattype t;
   linestat = t;
 }
 
-static int flush_abctext(bars, termination)
-int bars;
-enum linestattype termination;
+static int flush_abctext(int bars, enum linestattype termination)
 /* outputs up to the specified number of bars of stored music */
 /* and frees up the storage allocated for those bars. */
 /* returns the number of bars actually output */
@@ -324,11 +316,10 @@ enum linestattype termination;
   return(count);
 }
 
-void complete_bars(v)
+void complete_bars(struct voicetype *v)
 /* mark all bars as completed (i.e. having associated w: fields parsed) */
 /* and out put all music lines which contain the full set of bars */
 /* part of new linebreak option (-n) */
-struct voicetype *v;
 {
   int bars_done;
 
@@ -345,9 +336,7 @@ struct voicetype *v;
   };
 }
 
-void complete_all(v, termination)
-struct voicetype *v;
-enum linestattype termination;
+void complete_all(struct voicetype *v, enum linestattype termination)
 /* output all remaining music and fields */
 /* part of new linebreak option (-n) */
 {
@@ -365,8 +354,7 @@ enum linestattype termination;
   voice[this_voice].currentline = NULL;
 }
 
-static struct abctext* newabctext(t)
-enum abctype t;
+static struct abctext* newabctext(enum abctype t)
 /* called at newlines and barlines */
 /* adds current output text to linked list structure */
 /* part of new linebreak option (-n) */
@@ -446,8 +434,7 @@ static int nextnotes()
 }
 #endif
 
-static void reduce(a, b)
-int *a, *b;
+static void reduce(int *a, int *b)
 {
   int t, n, m;
 
@@ -481,8 +468,7 @@ int *a, *b;
  * at each chord end.  When called at chordoff time, make
  * sure that inchord is still true. [PHDM] 2013-03-10
  */
-static void addunits(n, m)
-int n, m;
+static void addunits(int n, int m)
 /* add fraction n/m to count */
 {
   if (inchord) { /* [PHDM] 2013-03-10 */
@@ -501,8 +487,7 @@ int n, m;
   reduce(&count.num, &count.denom);
 }
 
-void parse_voices_selection(voices_string) /* [PHDM] 2013-03-08 */
-char *voices_string;
+void parse_voices_selection(char *voices_string) /* [PHDM] 2013-03-08 */
 {
   char *s = voices_string;
 
@@ -515,16 +500,12 @@ char *voices_string;
   } while (*s++);
 }
 
-int must_emit_voice(n) /* [PHDM] 2013-03-08 */
-int n;
+int must_emit_voice(int n) /* [PHDM] 2013-03-08 */
 {
   return selected_voices & (1 << n);
 }
 
-void event_init(argc, argv, filename)
-int argc;
-char* argv[];
-char** filename;
+void event_init(int argc, char *argv[], char **filename)
 /* routine called on program start-up */
 {
   int targ, narg;
@@ -717,8 +698,7 @@ char** filename;
   totalnotes = 0;
 }
 
-void emit_string(s)
-char *s;
+void emit_string(char *s)
 /* output string */
 {
   if (output_on) {
@@ -726,8 +706,7 @@ char *s;
   };
 }
 
-void emit_char(ch)
-char ch;
+void emit_char(char ch)
 /* output single character */
 {
   char *place;
@@ -739,8 +718,7 @@ char ch;
   };
 }
 
-void emit_int(n)
-int n;
+void emit_int(int n)
 /* output integer */
 {
   if (output_on) {
@@ -748,9 +726,7 @@ int n;
   };
 }
 
-void emit_string_sprintf(s1, s2)
-char *s1;
-char *s2;
+void emit_string_sprintf(char *s1, char *s2)
 /* output string containing string expression %s */
 {
   if (output_on) {
@@ -758,9 +734,7 @@ char *s2;
   };
 }
 
-void emit_int_sprintf(s, n)
-char *s;
-int n;
+void emit_int_sprintf(char *s, int n)
 /* output string containing int expression %d */
 {
   if (output_on) {
@@ -813,22 +787,19 @@ void event_blankline()
   blankline = 1;
 }
 
-void event_text(p)
-char *p;
+void event_text(char *p)
 {
   emit_string_sprintf("%%%s", p);
   inmusic = 0;
 }
 
-void event_reserved(p)
-char p;
+void event_reserved(char p)
 {
   emit_char(p);
   inmusic = 0;
 }
 
-void event_tex(s)
-char *s;
+void event_tex(char *s)
 {
   emit_string(s);
   inmusic = 0;
@@ -872,30 +843,26 @@ void event_startmusicline()
   complete_bars(&voice[this_voice]);
 }
 
-void event_endmusicline(endchar)
-char endchar;
+void event_endmusicline(char endchar)
 /* encountered the end of a line of notes */
 {
 }
 
-void event_error(s)
-char *s;
+void event_error(char *s)
 {
   if (echeck && output_on) {     /* [SS] 2011-04-14 */
    printf("\n%%Error : %s\n", s);
   };
 }
 
-void event_warning(s)
-char *s;
+void event_warning(char *s)
 {
   if (echeck && output_on) {    /* [SS] 2011-04-14 */
    printf("\n%%Warning : %s\n", s);
   };
 }
 
-void event_comment(s)
-char *s;
+void event_comment(char *s)
 {
   if (newbreaks && (!purgespace(tmp))) {
     if (inmusic) {
@@ -938,18 +905,15 @@ void event_specific(char *package, char *s, int in_I)
 /*  printf("event_specific: next_voice = %d\n",next_voice); */
 }
 
-void event_info(f)
+void event_info(char *f)
 /* handles info field I: */
-char *f;
 {
   emit_string_sprintf("I:%s", f);
   inmusic = 0;
 }
 
 
-void event_field(k, f)
-char k;
-char *f;
+void event_field(char k, char *f)
 {
   emit_char(k);
   emit_char(':');
@@ -958,8 +922,7 @@ char *f;
   inmusic = 0;
 }
 
-struct abctext* getbar(place)
-struct abctext *place;
+struct abctext* getbar(struct abctext *place)
 /* find first element in list which is a bar of music */
 {
   struct abctext *newplace;
@@ -973,8 +936,7 @@ struct abctext *place;
   return(newplace);    
 }
 
-struct abctext* getnextbar(place)
-struct abctext *place;
+struct abctext* getnextbar(struct abctext *place)
 /* find next element in list which is a bar of music */
 {
   struct abctext *newplace;
@@ -986,9 +948,7 @@ struct abctext *place;
   return(newplace);
 };
 
-void append_lyrics(place, newwords)
-struct abctext *place;
-char *newwords;
+void append_lyrics(struct abctext *place, char *newwords)
 /* add lyrics to end of lyric list associated with bar */
 {
   struct lyricwords* new_words;
@@ -1014,12 +974,8 @@ char *newwords;
   };
 }
 
-struct abctext* apply_bar(syll, place, notesleft, barwords)
+struct abctext* apply_bar(char *syll, struct abctext *place, int *notesleft, struct vstring *barwords)
 /* advance to next bar (on finding '|' in a w: field) */
-char* syll;
-struct abctext *place;
-int *notesleft;
-struct vstring *barwords;
 {
   struct abctext* new_place;
 
@@ -1038,12 +994,8 @@ struct vstring *barwords;
   return(new_place); 
 }
 
-struct abctext* apply_syllable(syll, place, notesleft, barwords)
+struct abctext* apply_syllable(char *syll, struct abctext *place, int *notesleft, struct vstring *barwords)
 /* attach syllable to appropriate place in abctext structure */
-char* syll;
-struct abctext *place;
-int *notesleft;
-struct vstring *barwords;
 {
   struct abctext* new_place;
   char msg[80];
@@ -1068,8 +1020,7 @@ struct vstring *barwords;
   return(new_place); 
 }
 
-void parse_words(p)
-char* p;
+void parse_words(char *p)
 /* Break up a line of lyrics (w: ) into component syllables */
 {
   struct vstring syll;
@@ -1169,10 +1120,7 @@ char* p;
 }
 
 /* [JA] 2022.06.14 */
-void event_words(p, append, continuation)
-char* p;
-int append;
-int continuation;
+void event_words(char *p, int append, int continuation)
 /* a w: field has been encountered */
 {
   struct vstring afield;
@@ -1199,16 +1147,14 @@ int continuation;
 }
 
 /* [SS] 2014-09-07 */
-void appendfield (morewords)
-char *morewords;
+void appendfield (char *morewords)
 {
 emit_string("+: ");
 emit_string(morewords);
 }
 
 
-void event_part(s)
-char* s;
+void event_part(char *s)
 {
   if (xinbody) {
     complete_bars(&voice[this_voice]);
@@ -1241,8 +1187,7 @@ static void init_voice(int voice_index, int num)
   }
 }
 
-int setvoice(num)
-int num;
+int setvoice(int num)
 /* we need to keep track of current voice for new linebreak handling (-n) */
 /* change voice to num. If voice does not exist, start new one */
 {
@@ -1269,10 +1214,7 @@ int num;
   return(voice_index);
 }
 
-void event_voice(n, s, vp)
-int n;
-char *s;
-struct voice_params *vp;
+void event_voice(int n, char *s, struct voice_params *vp)
 {
   char output[300];  /* [SS] 2017-10-09 2017-10-11 2018-12-27*/
   if (xinbody) {
@@ -1319,8 +1261,7 @@ struct voice_params *vp;
   this_voice = n - 1; /* [SS] 2018-12-01 */
 }
 
-void event_length(n)
-int n;
+void event_length(int n)
 {
   struct fract newunit;
 
@@ -1334,15 +1275,13 @@ int n;
   inmusic = 0;
 }
 
-void event_default_length(n)
-     int n;
+void event_default_length(int n)
 {
   unitlen.num = 1;
   unitlen.denom = n;
 }
 
-void event_refno(n)
-int n;
+void event_refno(int n)
 {
   /* [SS] 2017-07-10 */
   if (xmatch == n || xmatch == -1)  parseron();
@@ -1368,11 +1307,7 @@ int n;
   inmusic = 0;
 }
 
-void event_tempo(n, a, b, relative, pre, post)
-int n, a, b;
-int relative;
-char *pre;
-char *post;
+void event_tempo(int n, int a, int b, int relative, char *pre, char *post)
 {
   struct fract newlen;
 
@@ -1438,8 +1373,7 @@ static void set_complex_barpoint(timesig_details_t *timesig,
 /* M: field in the source. Support M:none, M:C and M:C| as well as
  * normal M:n/m
  */
-void event_timesig (timesig)
-  timesig_details_t *timesig;
+void event_timesig (timesig_details_t *timesig)
 {
   have_spacing_scheme = 0; /* default to no new spacing */
   emit_string ( "M:");
@@ -1524,9 +1458,7 @@ void event_timesig (timesig)
   inmusic = 0;
 }
 
-static void setmap(sf, map)
-int sf;
-int map[7];
+static void setmap(int sf, int map[7])
 {
 /* map[0] to map[7] corresponds to keys a to g and indicates
    whether they are flattened or sharpened. sf encodes the
@@ -1632,20 +1564,9 @@ return 0;
 /* end of [SS] 2011-02-15 */
 
 
-void event_key(sharps, s, modeindex, modmap, modmul, modmicrotone,
-          gotkey, gotclef, clefname, new_clef,
-          octave, xtranspose, gotoctave, gottranspose, explict)
-int sharps;
-char *s;
-int modeindex;
-char modmap[7];
-int modmul[7];
-struct fraction modmicrotone[7]; /* [SS[ 2014-01-06 */
-int gotkey, gotclef;
-char* clefname;
-cleftype_t *new_clef;  /* [JA] 2020-10-19 */
-int octave, xtranspose, gotoctave, gottranspose;
-int explict;
+void event_key(int sharps, char *s, int modeindex, char modmap[7], int modmul[7], struct fraction modmicrotone[7],
+          int gotkey, int gotclef, char *clefname, cleftype_t *new_clef,
+          int octave, int xtranspose, int gotoctave, int gottranspose, int explict)
 {
   static char* keys[12] = {"Db", "Ab", "Eb", "Bb", "F", "C", 
                            "G", "D", "A", "E", "B", "F#"};
@@ -1766,8 +1687,7 @@ int explict;
 }
 
 
-static void printlen(a, b)
-int a, b;
+static void printlen(int a, int b)
 {
   if (a != 1) {
     emit_int(a);
@@ -1781,17 +1701,14 @@ int a, b;
   }
 }
 
-void event_spacing(n, m)
-int n, m;
+void event_spacing(int n, int m)
 {
   emit_string("y");
   printlen(n, m);
 }
 
 
-void event_rest(decorators,n,m,type)
-int n, m, type;
-int decorators[DECSIZE];
+void event_rest(int decorators[DECSIZE], int n, int m, int type)
 {
   struct fract newlen;
 
@@ -1814,9 +1731,7 @@ int decorators[DECSIZE];
   };
 }
 
-void event_mrest(n,m,c)
-int n, m;
-char c; /* [SS] 2017-04-19 to distinguish X from Z */
+void event_mrest(int n, int m, char c)
 {
   inmusic = 1;
   emit_char(c); /* [SS] 2017-04-19 */
@@ -1829,9 +1744,7 @@ char c; /* [SS] 2017-04-19 to distinguish X from Z */
   };
 }
 
-void event_bar(type, replist)
-int type;
-char* replist;
+void event_bar(int type, char *replist)
 {
   char msg[40];
 
@@ -1931,14 +1844,12 @@ void event_rep2()
   emit_string(" [2");
 }
 
-void event_playonrep(s)
-char*s;
+void event_playonrep(char *s)
 {
   emit_string_sprintf(" [%s", s);
 }
 
-void event_broken(type, n)
-int type, n;
+void event_broken(int type, int n)
 {
   int i;
 
@@ -1953,8 +1864,7 @@ int type, n;
   };
 }
 
-void event_tuple(n, q, r)
-int n, q, r;
+void event_tuple(int n, int q, int r)
 {
   if (tuplenotes != 0) {
     event_error("tuple within tuple not allowed");
@@ -2063,10 +1973,7 @@ void event_chordoff(int chord_n, int chord_m)
 
 void event_ignore () { };  /* [SS] 2018-12-21 */
 
-static void splitstring(s, sep, handler)
-char* s;
-char sep;
-void (*handler)();
+static void splitstring(char *s, char sep, void (*handler)(char *))
 /* this routine splits the string into fields using semi-colon */
 /* and calls handler for each sub-string                       */
 {
@@ -2089,10 +1996,9 @@ void (*handler)();
   };
 }
 
-void event_handle_gchord(s)
+void event_handle_gchord(char *s)
 /* deals with an accompaniment (guitar) chord */
 /* either copies it straight out or transposes it */
-char* s;
 {
   char newchord[50];
   static int offset[7] = {9, 11, 0, 2, 4, 5, 7};
@@ -2257,21 +2163,18 @@ char* s;
   };
 }
 
-void event_gchord(s)
-char* s;
+void event_gchord(char *s)
 {
   splitstring(s, ';', event_handle_gchord);
 }
 
-void event_instruction(s)
-char* s;
+void event_instruction(char *s)
 {
   if (oldchordconvention || noplus) emit_string_sprintf("!%s!", s);
   else emit_string_sprintf("+%s+", s);
 }
 
-void event_slur(t)
-int t;
+void event_slur(int t)
 {
   if (cleanup) {
     if (t) {
@@ -2284,14 +2187,12 @@ int t;
   };
 }
 
-void event_sluron(t)
-int t;
+void event_sluron(int t)
 {
   emit_string("(");
 }
 
-void event_sluroff(t)
-int t;
+void event_sluroff(int t)
 {
   emit_string(")");
 }
@@ -2301,9 +2202,7 @@ void event_tie()
   emit_string("-");
 }
 
-void event_lineend(ch, n)
-char ch;
-int n;
+void event_lineend(char ch, int n)
 {
   int i;
 
@@ -2318,13 +2217,8 @@ int n;
 /* [SS] 2016-05-05 */
 /* This function is used to transpose the key signature modifiers. */
 /* The code was borrowed from event_note1().                       */
-void transpose_note(xaccidental,xmult, xnote, xoctave, transpose,
-    accidental, mult, note, octave)
-char xaccidental, xnote;
-int xoctave, transpose;
-int xmult; /* 2017-07-11 */
-char *accidental, *note;
-int *octave, *mult;
+void transpose_note(char xaccidental, int xmult, char xnote, int xoctave, int transpose,
+    char *accidental, int *mult, char *note, int *octave)
 {
   *mult = 0; 
   if (transpose == 0 || drumchan) {
@@ -2424,12 +2318,7 @@ static void consider_break_after_note(int previous_tuplenotes)
   }
 }
 
-void event_note1(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m)
-int decorators[DECSIZE];
-cleftype_t *clef;  /* [JA] 2020-10-19 */
-int xmult;
-char xaccidental, xnote;
-int xoctave, n, m;
+void event_note1(int decorators[DECSIZE], cleftype_t *clef, char xaccidental, int xmult, char xnote, int xoctave, int n, int m)
 {
   int t;
   struct fract barpoint;
@@ -2574,13 +2463,8 @@ int accidental_to_code (char xaccidental)
 }
 
 
-void event_note2(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m)
+void event_note2(int decorators[DECSIZE], cleftype_t *clef, char xaccidental, int xmult, char xnote, int xoctave, int n, int m)
 /* this function is called if flag nokey is set */
-int decorators[DECSIZE];
-cleftype_t *clef;  /* [JA] 2020-10-19 */
-int xmult;
-char xaccidental, xnote;
-int xoctave, n, m;
 {
   int t;
   struct fract barpoint;
@@ -2636,12 +2520,7 @@ int xoctave, n, m;
 }
 
 
-void event_note(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m)
-int decorators[DECSIZE];
-cleftype_t *clef;  /* [JA] 2020-10-19 */
-int xmult;
-char xaccidental, xnote;
-int xoctave, n, m;
+void event_note(int decorators[DECSIZE], cleftype_t *clef, char xaccidental, int xmult, char xnote, int xoctave, int n, int m)
 {
 if (nokey)
   event_note2(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m);
@@ -2837,9 +2716,7 @@ while (p < MIDDLE - 12) {
 }
 
 
-int main(argc,argv)
-int argc;
-char *argv[];
+int main(int argc, char *argv[])
 {
   char *filename;
 

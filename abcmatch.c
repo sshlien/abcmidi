@@ -75,8 +75,6 @@ enum ACTION
 } action;
 
 
-int *checkmalloc (int);
-extern int getarg (char *, int, char **);
 void free_feature_representation ();
 
 /* variables shared with abcparse.c and abcstore.c */
@@ -1200,11 +1198,8 @@ analyze_abc_file (char *filename)
 
 
 void
-event_init (argc, argv, filename)
+event_init (int argc, char *argv[], char **filename)
 /* this routine is called first by abcparse.c */
-     int argc;
-     char *argv[];
-     char **filename;
 {
   int i,j;
 
@@ -1390,9 +1385,7 @@ event_init (argc, argv, filename)
 
 
 int
-main (argc, argv)
-     int argc;
-     char *argv[];
+main (int argc, char *argv[])
 {
   char *filename;
   int i;

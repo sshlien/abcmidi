@@ -48,7 +48,7 @@ char* strchr();
 #include "drawtune.h"
 
 extern void setscaling(char *s);
-extern void font_command();
+extern void font_command(char *p, char *s);
 extern void setup_fonts();
 extern void printtune(struct tune *t);
 extern void set_keysig(struct key *k, struct key *newval);
@@ -86,17 +86,14 @@ enum linestattype linestat;
  
 int dummydecorator[DECSIZE]; /* used in event_chord */
 
-void setfract(f, a, b)
-struct fract* f;
-int a, b;
+void setfract(struct fract *f, int a, int b)
 /* assign value to fraction */
 {
   f->num = a;
   f->denom = b;
 }
 
-void reducef(f)
-struct fract* f;
+void reducef(struct fract *f)
 /* reducef fraction to smallest terms */
 {
   int t, n, m;
@@ -712,14 +709,8 @@ static char* decstring(int decorators[])
   };
 }
 
-static struct note* newnote(decorators, clef, xaccidental, xmult, xnote, xoctave, 
-                            a, b)
-int decorators[DECSIZE];
-cleftype_t *clef; /* [JA] 2020-10-19 */
-int xmult;
-char xaccidental, xnote;
-int xoctave;
-int a, b;
+static struct note* newnote(int decorators[DECSIZE], cleftype_t *clef, char xaccidental, int xmult, char xnote, int xoctave, 
+                            int a, int b)
 /* create and set up the fields for a note structure */
 {
   struct note* n;
@@ -785,9 +776,7 @@ static struct rest* newrest(int a, int b, int multi)
   return(n);
 }
 
-static void addunits(f, n, m)
-struct fract* f;
-int n, m;
+static void addunits(struct fract *f, int n, int m)
 /* add n/m to fraction pointed to by f */
 {
   f->num = n*f->denom*(cv->unitlen.num) + f->num*(m*cv->unitlen.denom);
@@ -795,9 +784,7 @@ int n, m;
   reducef(f);
 }
 
-static void addfractions(f,n,m)
-struct fract* f;
-int n,m;
+static void addfractions(struct fract *f, int n, int m)
 {
   f->num = n*f->denom + f->num*m;
   f->denom = m*f->denom;
@@ -1110,10 +1097,7 @@ static int checkmatch(int refno)
   return(select);
 }
 
-void event_init(argc, argv, filename)
-int argc;
-char* argv[];
-char** filename;
+void event_init(int argc, char *argv[], char **filename)
 /* initialization routine - called once at the start of the program */
 /* interprets the parameters in argv */
 {
@@ -1346,22 +1330,17 @@ void event_blankline()
   parseroff();
 }
 
-void event_text(p)
+void event_text(char *p)
 /* Text outside an abc tune has been encountered */
-char *p;
 {
 }
 
-void event_x_reserved(p)
-char p;
+void event_x_reserved(char p)
 {
 }
 
-void event_abbreviation(symbol, string, container)
+void event_abbreviation(char symbol, char *string, char container)
 /* abbreviation declaratiion - handled by parser. Ignore it here */
-char symbol;
-char *string;
-char container;
 {
 }
 
@@ -1389,8 +1368,7 @@ addnumberfeature(SPLITVOICE, lineno);
 event_error("voice split not implemented in yaps");
 }
 
-void event_tex(s)
-char *s;
+void event_tex(char *s)
 /* A TeX command has been found in the abc */
 {
 }
@@ -1482,8 +1460,7 @@ void event_score_linebreak (char ch)
   }
 }
 
-void event_endmusicline(endchar)
-char endchar;
+void event_endmusicline(char endchar)
 /* We are at the end of a line of abc notes */
 {
   cv->lineend = addnumberfeature(MUSICSTOP, 0);
@@ -1494,22 +1471,19 @@ char endchar;
   };
 }
 
-void event_error(s)
-char *s;
+void event_error(char *s)
 /* report any error message */
 {
   printf("Error in line %d : %s\n", lineno, s);
 }
 
-void event_warning(s)
-char *s;
+void event_warning(char *s)
 /* report any warning message */
 {
   printf("Warning in line %d : %s\n", lineno, s);
 }
 
-void event_comment(s)
-char *s;
+void event_comment(char *s)
 /* A comment has been encountered in the input */
 {
 }
@@ -1597,9 +1571,7 @@ void event_specific(char *p, char *str, int in_I)
   font_command(p, s);
 }
 
-void event_field(k, f)
-char k;
-char *f;
+void event_field(char k, char *f)
 /* A field line has been encountered in the input abc */
 {
   switch (k) {
@@ -1713,10 +1685,7 @@ struct feature* apply_syll(char* s, struct feature* wordplace, int* errors)
 }
 
 /* [JA] 2022.06.14 */
-void event_words(p, append, continuation)
-char* p;
-int append;
-int continuation;
+void event_words(char *p, int append, int continuation)
 /* A line of lyrics (w: ) has been encountered in the abc */
 {
   struct vstring syll;
@@ -1818,14 +1787,12 @@ int continuation;
 }
 
 /* [SS] 2014-08-16 */
-void appendfield (morewords)
-char *morewords;
+void appendfield (char *morewords)
 {
 printf("appendfield not implemented here\n");
 }
 
-void event_part(s)
-char* s;
+void event_part(char *s)
 /* A part field (P: ) has been encountered in the abc */
 {
   char label[200]; /* [SS] 2010-12-12 */
@@ -1848,10 +1815,7 @@ char* s;
   };
 }
 
-void event_voice(n, s, vp)
-int n;
-char *s;
-struct voice_params *vp;
+void event_voice(int n, char *s, struct voice_params *vp)
 /* A voice field (V: ) has been encountered */
 {
   if (xinbody) {
@@ -1869,8 +1833,7 @@ struct voice_params *vp;
   };
 }
 
-void event_length(n)
-int n;
+void event_length(int n)
 /* A length field (L: ) has been encountered */
 {
   if (xinhead) {
@@ -1886,15 +1849,13 @@ int n;
   };
 }
 
-void event_default_length (n)
-     int n;
+void event_default_length (int n)
 /* Handles a missing L: field */
 {
   event_length(n);
 }
 
-void event_refno(n)
-int n;
+void event_refno(int n)
 /* A reference field (X: ) has been encountered. This indicates the start */
 /* of a new tune */
 {
@@ -1924,11 +1885,9 @@ int n;
   };
 }
 
-void event_tempo(n, a, b, relative, pre, post)
-int n, a, b;
-int relative;
-char *pre; /* text before tempo */
-char *post; /* text after tempo */
+void event_tempo(int n, int a, int b, int relative, char *pre, char *post)
+//char *pre; /* text before tempo */
+//char *post; /* text after tempo */
 /* A tempo field Q: has been encountered in the abc */
 /* Q:a/b=N will have relative = 0    */
 /* Q:N will have a=0 and b=0         */
@@ -1952,8 +1911,7 @@ char *post; /* text after tempo */
   };
 }
 
-void event_timesig (timesig)
-  timesig_details_t *timesig;
+void event_timesig (timesig_details_t *timesig)
 /* A time signature (M: ) has been encountered in the abc */
 {
   int checkbars;
@@ -2000,11 +1958,9 @@ void event_clef(char* clefstr, cleftype_t * new_clef)
   };
 }
 
-void setmap(sf, map, mult)
+void setmap(int sf, char map[7], int mult[7])
 /* work out accidentals to be applied to each note */
-int sf; /* number of sharps in key signature -7 to +7 */
-char map[7];
-int mult[7];
+//int sf; /* number of sharps in key signature -7 to +7 */
 {
   int j;
 
@@ -2028,10 +1984,8 @@ int mult[7];
   if (sf <= -7) map['f'-'a'] = '_';
 }
 
-void altermap(basemap, basemul, modmap, modmul)
+void altermap(char basemap[7], int basemul[7], char modmap[7], int modmul[7])
 /* apply modifiers to a set of accidentals */
-char basemap[7], modmap[7];
-int basemul[7], modmul[7];
 {
   int i;
 
@@ -2073,12 +2027,8 @@ static void start_body()
   };
 }
 
-void event_true_key(sharps, s, modeindex, modmap, modmul)
-int sharps;
-char *s;
-int modeindex; /* 0 major, 1,2,3 minor, 4 locrian, etc.  */
-char modmap[7];
-int modmul[7];
+void event_true_key(int sharps, char *s, int modeindex, char modmap[7], int modmul[7])
+//int modeindex; /* 0 major, 1,2,3 minor, 4 locrian, etc.  */
 /* key detected in K: field */
 {
   char basemap[7];
@@ -2119,20 +2069,9 @@ void event_octave(int num, int local)
   };
 }
 
-void event_key(sharps, s, minor, modmap, modmul, modmicrotone, gotkey,
-          gotclef, clefstr, new_clef,
-          octave, transpose, gotoctave, gottranspose, explict)
-int sharps;
-char *s;
-int minor;
-char modmap[7];
-int modmul[7];
-struct fraction modmicrotone[7]; /* [SS] 2014-01-06 */
-int gotkey, gotclef;
-char* clefstr;  /* [JA] 2020-10-19 */
-cleftype_t * new_clef;
-int octave, transpose, gotoctave, gottranspose;
-int explict;
+void event_key(int sharps, char *s, int minor, char modmap[7], int modmul[7], struct fraction modmicrotone[7], int gotkey,
+          int gotclef, char *clefstr, cleftype_t *new_clef,
+          int octave, int transpose, int gotoctave, int gottranspose, int explict)
 /* A key field (K: ) has been encountered */
 {
   if (xinhead || xinbody) {
@@ -2189,9 +2128,7 @@ static void checkbar(int type)
   };
 }
 
-void event_bar(type, playonrep_list)
-int type;
-char* playonrep_list;
+void event_bar(int type, char *playonrep_list)
 /* A bar has been encountered in the abc */
 {
   if (cv->inchord) {
@@ -2259,16 +2196,14 @@ void event_rep2()
   addfeature(REP2, NULL);
 }
 
-void event_playonrep(s)
-char* s;
+void event_playonrep(char *s)
 /* play on repeat(s) X - where X can be a list */
 {
   addfeature(PLAY_ON_REP, addstring(s));
 }
 
-void event_broken(type, mult)
+void event_broken(int type, int mult)
 /* handles > >> >>> < << <<< in the abc */
-int type, mult;
 {
   if (cv->inchord) {
     event_error("Broken rhythm not allowed in chord");
@@ -2283,8 +2218,7 @@ int type, mult;
   };
 }
 
-void event_tuple(n, q, r)
-int n, q, r;
+void event_tuple(int n, int q, int r)
 /* Start of a tuple has been  encountered (e.g. triplet) */
 /* Meaning is "play next r notes at q/n of notated value" */
 /* where all 3 exist, otherwise r defaults to n and ratio */
@@ -2327,8 +2261,7 @@ void event_closeinline()
 {
 }
 
-void event_handle_gchord(s)
-char* s;
+void event_handle_gchord(char *s)
 /* Guitar/Accompaniment chord placed in linked list for association */
 /* with next suitable note */
 {
@@ -2345,8 +2278,7 @@ char* s;
   };
 }
 
-void event_handle_instruction(s)
-char* s;
+void event_handle_instruction(char *s)
 /* An instruction (! !) has been encountered */
 {
   char* inst;
@@ -2442,8 +2374,7 @@ static void startslurs(struct feature* firstnote)
   };
 }
 
-void event_sluron(t)
-int t;
+void event_sluron(int t)
 /* start of slur */
 {
   struct slurtie* s;
@@ -2459,8 +2390,7 @@ int t;
   };
 }
 
-void event_sluroff(t)
-int t;
+void event_sluroff(int t)
 /* end of slur */
 {
   struct slurtie* s;
@@ -2542,17 +2472,13 @@ void event_tie()
   };
 }
 
-void event_lineend(ch, n)
-char ch;
-int n;
+void event_lineend(char ch, int n)
 /* Line ending with n copies of special character ch */
 {
 }
 
-static void lenmul(n, a, b)
+static void lenmul(struct feature *n, int a, int b)
 /* multiply note length by a/b */
-struct feature* n;
-int a, b;
 {
   struct note *anote;
   struct rest* arest;
@@ -2818,13 +2744,11 @@ void event_chordoff(int chord_n, int chord_m)
 }
 
 /* just a stub to ignore 'y' */
-void event_spacing(n, m)
-int n,m;
+void event_spacing(int n, int m)
 {
 }
 
-void xevent_rest(n, m, multi)
-int n, m, multi;
+void xevent_rest(int n, int m, int multi)
 /* A rest has been encountered in the abc */
 /* multi is 0 for ordinary rests or count for multibar rests */
 {
@@ -2870,28 +2794,20 @@ int n, m, multi;
   };
 }
 
-void event_rest(decorators,n,m,type)
-int n, m,type;
-int decorators[DECSIZE];
+void event_rest(int decorators[DECSIZE], int n, int m, int type)
 /* A rest has been encountered in the abc */
 {
   xevent_rest(n, m, 0);
 }
 
-void event_mrest(n,m,c)
-int n, m;
-char c; /* [SS] 2017-04-19 to distinguish X from Z in abc2abc */
+void event_mrest(int n, int m, char c)
+//char c; /* [SS] 2017-04-19 to distinguish X from Z in abc2abc */
 /* A multiple bar rest has been encountered in the abc */
 {
   xevent_rest(1, 1, n);
 }
 
-void event_note(decorators, clef, xaccidental, xmult, xnote, xoctave, n, m)
-int decorators[DECSIZE];
-cleftype_t *clef; /* [JA] 2020-10-19 */
-int xmult;
-char xaccidental, xnote;
-int xoctave, n, m;
+void event_note(int decorators[DECSIZE], cleftype_t *clef, char xaccidental, int xmult, char xnote, int xoctave, int n, int m)
 /* note found in abc */
 {
   struct note* nt;
@@ -2962,9 +2878,7 @@ void event_normal_tone()
 
 
 
-void event_info_key(key, value)
-char* key;
-char* value;
+void event_info_key(char *key, char *value)
 /* handles a (key,value) pair found in an I: field */
 {
   int num;
@@ -2989,9 +2903,7 @@ char* value;
 }
 
 
-int main(argc,argv)
-int argc;
-char *argv[];
+int main(int argc,char *argv[])
 {
   char *filename;
   int i;

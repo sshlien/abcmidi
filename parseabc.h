@@ -9,6 +9,7 @@
 #define KANDR
 #endif
 
+#include <stdio.h>
 #include "music_utils.h"
 
 /* the arg list to event_voice keeps growing; if we put the args into a structure
@@ -166,17 +167,18 @@ extern void event_gchord(char *s);
 extern void event_note(int decorators[DECSIZE], cleftype_t *clef,
                        char accidental, int mult, 
                        char note, int xoctave, int n, int m);
+extern void event_ignore();
 extern void event_abbreviation(char symbol, char *string, char container);
 extern void event_acciaccatura();
 extern void event_start_extended_overlay();
 extern void event_stop_extended_overlay();
 extern void event_split_voice();
-extern void event_temperament();
+extern void event_temperament(char* line);
 extern void print_voicecodes(void);
 extern void init_abbreviations();
 extern void free_abbreviations();
-extern void parsefile();
-extern int parsetune();
+extern void parsefile(char * name);
+extern int parsetune(FILE * fp);
 #else
 extern void event_init();
 extern void event_text();

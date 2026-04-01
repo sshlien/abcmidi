@@ -74,8 +74,7 @@ int arg_index = 0;
 char *arg_option;
 char *pvcon = NULL;
 
-char* crack(argc, argv, flags, ign)
-    int argc; char **argv; char *flags; int ign;
+char* crack(int argc, char *argv[], char *flags, int ign)
 {
     char *pv, *flgp, *strchr();
     while ((arg_index) < argc)

@@ -170,8 +170,7 @@ void showfeature(struct feature *ft)
 }
 
 
-static int showline(v)
-struct voice* v;
+static int showline(struct voice *v)
 /* draws one line of music from specified voice */
 {
   struct feature* ft;
@@ -181,7 +180,7 @@ struct voice* v;
   struct fract* afract;
   struct rest* arest;
   struct tuple* atuple;
-  cleftype_t* theclef; /* [JA] 2020-10-19 */
+  cleftype_t* theclef;*/ /* [JA] 2020-10-19 */
   int sharps;
   struct chord* thischord;
   int chordcount;

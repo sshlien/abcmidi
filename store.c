@@ -503,7 +503,7 @@ static void addfeature(int f,int p,int n,int d);
 static void replacefeature(int f, int p, int n, int d, int loc);
 void insertfeature(int f, int p, int n, int d, int loc);
 static void textfeature(int type, char *s);
-extern long writetrack();
+extern long writetrack(int xtrack);
 void init_drum_map();
 static void fix_enclosed_note_lengths(int from, int end);
 static int patchup_chordtie(int chordstart,int chordend);
@@ -511,7 +511,7 @@ static void copymap(struct voicecontext* v);
 void init_stresspat();
 void beat_modifier(int);
 void readstressfile (char * filename);
-int parse_stress_params();
+extern int parse_stress_params(char *input);
 void calculate_stress_parameters();
 extern int inbody; /* from parseabc.c [SS] 2009-12-18 */
 extern int lineposition; /* from parseabc.c [SS] 2011-07-18 */
@@ -519,7 +519,7 @@ extern int beatmodel; /* from genmidi.c [SS] 2011-08-26 */
 int stress_pattern_loaded; /* [SS] 2018-04-16 */
 int stressmodel;
 
-extern int nullputc();
+extern int nullputc(char c);
 void dumpfeat (int from, int to); /* defined in genmidi.c */
 char * concatenatestring(char * s1,char * s2); /* defined in parseabc.c */
 void read_custom_stress_file (char *filename); /* defined in stresspat.c */
@@ -527,9 +527,8 @@ void read_custom_stress_file (char *filename); /* defined in stresspat.c */
  
 extern long Mf_numbyteswritten; /* linking with midifile.c [SS] 2019-03-23 */
 
-static struct voicecontext* newvoice(n)
+static struct voicecontext* newvoice(int n)
 /* allocate and initialize the data for a new voice */
-int n;
 {
   struct voicecontext *s;
   int i,j;
@@ -586,9 +585,8 @@ int n;
   return(s);
 }
 
-static struct voicecontext* getvoicecontext(n)
+static struct voicecontext* getvoicecontext(int n)
 /* find the data structure for a given voice number */
-int n;
 {
   struct voicecontext *p;
   struct voicecontext *q;
@@ -747,9 +745,8 @@ static void clearvoicecontexts()
 
 
 
-static int getchordnumber(s)
+static int getchordnumber(char *s)
 /* looks through list of known chords for chord name given in s */
-char *s;
 {
   int i;
   int chordnumber;
@@ -766,11 +763,8 @@ char *s;
   return(chordnumber);
 }
 
-static void addchordname(s, len, notes)
+static void addchordname(char *s, int len, int notes[])
 /* adds chord name and note set to list of known chords */
-char *s;
-int notes[];
-int len;
 {
   int i, j, done;
 
@@ -880,16 +874,13 @@ static void setup_chordnames()
   addchordname("5", 2, list_5);
 }
 
-void event_init(argc, argv, filename)
+void event_init(int argc, char *argv[], char **filename)
 /* this routine is called first by parseabc.c */
-int argc;
-char* argv[];
-char **filename;
 {
   int j;
   int arg,m,n;
   float afreq,semitone_shift; /* [SS] 2012-04-01 */
-  double log10();
+  extern double log10(double);
 
   /* look for code checking option */
   if (getarg("-c", argc, argv) != -1) {
@@ -1158,9 +1149,8 @@ outbase = addstring(argv[1]); /* [RM] 2010-11-21 */
 }
 
 
-void event_text(s)
+void event_text(char *s)
 /* text found in abc file */
-char *s;
 {
   char msg[200];
 
@@ -1174,9 +1164,8 @@ char *s;
   if (quiet == -1) event_warning(msg); /* [JM] 2018-02-22 */
 }
 
-void event_x_reserved(p)
+void event_x_reserved(char p)
 /* reserved character H-Z found in abc file */
-char p;
 {
   char msg[200];
 
@@ -1184,11 +1173,8 @@ char p;
   if (quiet == -1) event_warning(msg); /* [JM] 2018-02-22 */
 }
 
-void event_abbreviation(symbol, string, container)
+void event_abbreviation(char symbol, char *string, char container)
 /* abbreviation encountered - this is handled within the parser */
-char symbol;
-char *string;
-char container;
 {
 }
 
@@ -1526,23 +1512,20 @@ while (v != NULL) {
 
 
 
-void event_tex(s)
+void event_tex(char *s)
 /* TeX command found - ignore it */
-char *s;
 {
 }
 
-void event_fatal_error(s)
+void event_fatal_error(char *s)
 /* print error message and halt */
-char *s;
 {
   event_error(s);
   exit(1);
 }
 
-void event_error(s)
+void event_error(char *s)
 /* generic error handler */
-char *s;
 {
 #ifdef NOFTELL
   extern int nullpass;
@@ -1555,9 +1538,8 @@ char *s;
 #endif
 }
 
-void event_warning(s)
+void event_warning(char *s)
 /* generic warning handler - for flagging possible errors */
-char *s;
 {
 #ifdef NOFTELL
   extern int nullpass;
@@ -1570,9 +1552,8 @@ char *s;
 #endif
 }
 
-static int autoextend(maxnotes)
+static int autoextend(int maxnotes)
 /* increase the number of abc elements the program can cope with */
-int maxnotes;
 {
   int newlimit;
   int *ptr,*ptr2,*ptr3,*ptr4,*ptr5;
@@ -1639,11 +1620,9 @@ int maxnotes;
   return(newlimit);
 }
 
-static int textextend(maxstrings, stringarray)
+static int textextend(int maxstrings, char ***stringarray)
 /* resize an array of pointers to strings */
 /* used with arrays words and atext */
-int maxstrings;
-char*** stringarray;
 {
   int i, newlimit;
   char** ptr;
@@ -1661,9 +1640,8 @@ char*** stringarray;
   return(newlimit);
 }
 
-static void addfeature(f, p, n, d)
+static void addfeature(int f, int p, int n, int d)
 /* place feature in internal table */
-int f, p, n, d;
 {
   feature[notes] = f;
   pitch[notes] = p;
@@ -1679,8 +1657,7 @@ int f, p, n, d;
   };
 }
 
-static void replacefeature(f, p, n, d, loc)
-int f, p, n, d, loc;
+static void replacefeature(int f, int p, int n, int d, int loc)
 {
   feature[loc] = f;
   pitch[loc] = p;
@@ -1689,9 +1666,8 @@ int f, p, n, d, loc;
 }
 
 
-void insertfeature(f, p, n, d, loc)
+void insertfeature(int f, int p, int n, int d, int loc)
 /* insert feature in internal table */
-int f,p,n,d,loc;
 { int i;
   notes = notes + 1;
   if (notes >= maxnotes) {
@@ -1717,8 +1693,7 @@ int f,p,n,d,loc;
   decotype[i] = 0;
 }
 
-static void removefeature(loc)
-int loc;
+static void removefeature(int loc)
 {
   int i;
   for (i=loc;i<notes;i++)
@@ -1737,10 +1712,9 @@ int loc;
 }
 
 
-static void interchange_features(loc1,loc2)
+static void interchange_features(int loc1, int loc2)
 /* The function switches the contents of the features in loc1 and loc2 */
 /* [SS] 2019-01-01                                                     */
-int loc1,loc2;
 {
 int tfeat,tpitch,tnum,tdenom,tpitchline,tbentpitch,tdecotype,tcharloc;
 tfeat = feature[loc2];
@@ -1769,8 +1743,7 @@ decotype[loc1] = tdecotype;
 charloc[loc1] = tcharloc;
 }
 
-static void removefeatures(locfrom,locto)
-int locfrom,locto;
+static void removefeatures(int locfrom, int locto)
 {
   int i;
   int offset;
@@ -1806,9 +1779,8 @@ void event_startmusicline()
   addfeature(MUSICLINE, 0, 0, 0);
 }
 
-void event_endmusicline(endchar)
+void event_endmusicline(char endchar)
 /* finished parsing line of abc music */
-char endchar;
 {
   addfeature(MUSICSTOP, 0, 0, 0);
 }
@@ -1825,9 +1797,8 @@ static void textfeature(int type, char *s)
   };
 }
 
-void event_comment(s)
+void event_comment(char *s)
 /* comment found in abc */
-char *s;
 {
   if (nocom) return;
   if (dotune) {
@@ -1839,11 +1810,10 @@ char *s;
   };
 }
 
-int readaln(); /* links to parseabc.c */
+extern int readaln(char out[], char **in, int limit); /* links to parseabc.c */
 
 /* [SS] 2015-06-01 For interpreting the %%MIDIdef command */
-void parse_mididef(s)
-char *s;
+void parse_mididef(char *s)
 {
 char *p;
 int i;
@@ -1866,8 +1836,7 @@ nmidicmd++;
 void event_midi(char* s);  /* [SS] 2022-03-19 */
 
 
-void process_midix(s)
-char *s;
+void process_midix(char *s)
 {
 /* The function handles the %%MIDIx command translating all the
    codewords into %%MIDI commands and sending the commands to
@@ -1884,7 +1853,7 @@ j = 1;
 k = 0;
 while (j > 0) {
     skipspace(&p);
-    j = readaln(&name,&p,31);
+    j = readaln(name,&p,31);
     if (j < 1) break;
     for (i=0; i<nmidicmd;i++) {
 	  if (strcmp(midicmdname[i],name) == 0) break;
@@ -1903,9 +1872,10 @@ while (j > 0) {
 }
 
 /* [SS] 2020-07-17 ; [HL] 2020-07-24 */
-float compute_fifth_size (octave_size, ndiv)
-float octave_size; /* in cents */
-int ndiv;
+float compute_fifth_size (
+        float octave_size, /* in cents */
+        int ndiv
+)
 /* rather than compute the fifth_size in cents directly
  * we subtract the octave from the third harmonic.
  * We do it this way  instead of the proportion 3/2 because the
@@ -1926,11 +1896,10 @@ return w; /* in cents */
 
 
 /* [SS] 2015-08-11 */
-void event_midi(s)
+void event_midi(char *s)
 /* Handles %%MIDI commands. It was originally part of
    event_specific.
 */
-char *s; 
     {
     int ch;
     char command[40];
@@ -2531,10 +2500,9 @@ int default_fermata_fixed = 0;
 int default_ratio_a = 2;
 int default_ratio_b = 6;
 
-void event_specific_in_header(package, s)
+void event_specific_in_header(char *package, char *s)
 /* package-specific command found i.e. %%NAME */
 /* only %%MIDI commands are actually handled */
-char *package, *s;
 {
   char  command[40];
   char *p;
@@ -2689,11 +2657,9 @@ void extract_filename(char *f)
   got_titlename = 1;
 }
 
-void event_field(k, f)
+void event_field(char k, char *f)
 /* Handles R: T: and any other field not handled elsewhere */
 /* Added code to handle C: field. */
-char k;
-char *f;
 {
   if (dotune) {
     switch (k) {
@@ -2740,11 +2706,8 @@ char *f;
 }
 
 /* [JA] 2022.06.14 */
-void event_words(p, append, continuation)
+void event_words(char *p, int append, int continuation)
 /* handles a w: field in the abc */
-char* p;
-int append;
-int continuation;
 {
 
   karaoke = 1;
@@ -2769,8 +2732,7 @@ int continuation;
 }
 
 /* [SS] 2014-08-16 */
-void append_words (morewords)
-char *morewords;
+void append_words (char *morewords)
 {
 char *p;
 p = concatenatestring(words[wcount-1],morewords);
@@ -2778,8 +2740,7 @@ words[wcount-1] = p;
 }
 
 /* [SS] 2014-08-16 */
-void appendfield (morewords)
-char *morewords;
+void appendfield (char *morewords)
 {
 append_words (morewords);
 }
@@ -2804,10 +2765,8 @@ static void checkbreak()
   };
 }
 
-static void char_out(part, ch)
+static void char_out(struct vstring* part, char ch)
 /* routine for building up part list */
-struct vstring* part;
-char ch;
 {
 /*
   if (*out - list >= MAXPARTS) {
@@ -2822,7 +2781,7 @@ char ch;
   parts = parts + 1;
 }
 
-static void read_spec(spec, part)
+static void read_spec(char spec[], struct vstring* part)
 /* converts a P: field to a list of part labels */
 /* e.g. P:A(AB)3(CD)2 becomes P:AABABABCDCD */
 
@@ -2832,8 +2791,6 @@ static void read_spec(spec, part)
 /* are ignored and only repeats implied by the part order statement    */
 /* are played).  */
 
-char spec[];
-struct vstring* part;
 {
   char* in;
   int i, j, k, spec_length;
@@ -2928,9 +2885,8 @@ struct vstring* part;
   };
 }
 
-void event_part(s)
+void event_part(char *s)
 /* handles a P: field in the abc */
-char* s;
 {
   char* p;
 
@@ -2969,11 +2925,8 @@ char* s;
   };
 }
 
-void event_voice(n, s, vp)
+void event_voice(int n, char *s, struct voice_params *vp)
 /* handles a V: field in the abc */
-int n;
-char *s;
-struct voice_params *vp;
 {
   if (!voicesused && bodystarted) {event_warning("First V: field occurs past body; will combine this body with this voice.");
      bodystarted = 0;
@@ -3002,9 +2955,8 @@ struct voice_params *vp;
   };
 }
 
-void event_length(n)
+void event_length(int n)
 /* handles an L: field in the abc */
-int n;
 {
   if (pastheader) {
     v->default_length = n;
@@ -3013,15 +2965,13 @@ int n;
   };
 }
 
-void event_default_length (n)
+void event_default_length (int n)
 /* handles a missing L: field in the abc */
-     int n;
 {
 }
 
-static void tempounits(t_num, t_denom)
+static void tempounits(int *t_num, int *t_denom)
 /* interprets Q: once default length is known */
-int *t_num, *t_denom;
 {
   /* calculate unit for tempo */
   if (tempo_num == 0) {
@@ -3038,8 +2988,7 @@ int *t_num, *t_denom;
   };
 }
 
-int get_tempo_from_name (s) /* [SS] 2010-12-07 */
-char *s;
+int get_tempo_from_name (char *s) /* [SS] 2010-12-07 */
 {
 int i,n;
 if (s == NULL) return 0; /* [SS] 2010-12-10 */
@@ -3052,8 +3001,7 @@ for (i=0;i<19;i++) {
 return 0;
 }
 
-int is_abcm2ps_option (s) /* [SS] 2018-12-17 */
-char *s;
+int is_abcm2ps_option (char *s) /* [SS] 2018-12-17 */
 {
 int i;
 if (s == NULL) return 0; 
@@ -3065,13 +3013,9 @@ return 0;
 }
 
 
-void event_tempo(n, a, b, rel, pre, post)
+void event_tempo(int n, int a, int b, int rel, char *pre, char *post)
 /* handles a Q: field e.g. Q: a/b = n  or  Q: Ca/b = n */
 /* strings before and after are ignored */
-int n;
-int a, b, rel;
-char *pre;
-char *post;
 {
   int t_num, t_denom;
   int new_div;
@@ -3105,9 +3049,8 @@ char *post;
   };
 }
 
-void event_timesig (timesig)
+void event_timesig (timesig_details_t *timesig)
 /* handles an M: field  M:n/m */
-  timesig_details_t *timesig;
 {
   int dochecking;
 
@@ -3143,11 +3086,9 @@ void event_timesig (timesig)
   };
 }
 
-void event_octave(num, local)
+void event_octave(int num, int local)
 /* used internally by other routines when octave=N is encountered */
 /* in I: or K: fields */
-int num;
-int local;
 {
   if (dotune) {
     if (pastheader || local) {
@@ -3160,9 +3101,8 @@ int local;
 
 /* deleted event_info_key(key,value). It is now in parser2.c [JA] 2024-04-30 */
 
-static void stack_broken(v)
+static void stack_broken(struct voicecontext *v)
 /* store away broken rhythm context on encountering grace notes */
-struct voicecontext* v;
 {
   v->broken_stack[0] = v->laststart;
   v->broken_stack[1] = v->lastend;
@@ -3178,9 +3118,8 @@ struct voicecontext* v;
   v->brokenpending = -1;
 }
 
-static void restore_broken(v)
+static void restore_broken(struct voicecontext *v)
 /* remember any broken rhythm context after grace notes */
-struct voicecontext* v;
 {
   if (v->brokenpending != -1) {
     event_error("Unresolved broken rhythm in grace notes");
@@ -3225,8 +3164,7 @@ void event_graceoff()
 }
 
 
-void event_playonrep(s)
-char* s;
+void event_playonrep(char *s)
 /* [X in the abc, where X is a list of numbers */
 {
   int num, converted;
@@ -3246,9 +3184,8 @@ char* s;
 
 
 
-void event_sluron(t)
+void event_sluron(int t)
 /* called when ( is encountered in the abc */
-int t;
 {
  if (v->inslur) event_warning("Slur within slur");
  else {
@@ -3257,9 +3194,8 @@ int t;
       }
 }
 
-void event_sluroff(t)
+void event_sluroff(int t)
 /* called when ) is encountered */
-int t;
 {
 if (v->inslur) {
     addfeature(SLUR_OFF, 0, 0, 0);
@@ -3288,17 +3224,14 @@ void event_space()
   /* printf("Space event\n"); */
 }
 
-void event_lineend(ch, n)
+void event_lineend(char ch, int n)
 /* called when \ or ! or * or ** is encountered at the end of a line */
-char ch;
-int n;
 {
   /* ignore */
 }
 
-void event_broken(type, mult)
+void event_broken(int type, int mult)
 /* handles > >> >>> < << <<< in the abc */
-int type, mult;
 {
   if (v->inchord) {
     event_error("Broken rhythm not allowed in chord");
@@ -3318,9 +3251,8 @@ int type, mult;
   };
 }
 
-void event_tuple(n, q, r)
+void event_tuple(int n, int q, int r)
 /* handles triplets (3 and general tuplets (n:q:r in the abc */
-int n, q, r;
 {
   if (tuplecount > 0) {
     event_error("nested tuples");
@@ -3373,9 +3305,8 @@ void event_chord()
 void event_ignore () { };  /* [SS] 2018-12-21 */
 
 
-static void lenmul(n, a, b)
+static void lenmul(int n, int a, int b)
 /* multiply note length by a/b */
-int n, a, b;
 {
   if ((feature[n] == NOTE) || (feature[n] == REST) || 
       (feature[n] == CHORDOFF)
@@ -3479,15 +3410,12 @@ static void marknote()
 }
 
 /* just a stub to ignore 'y' */
-void event_spacing(n, m)
-int n,m;
+void event_spacing(int n, int m)
 {
 }
 
-void event_rest(decorators,n,m,type)
+void event_rest(int decorators[DECSIZE], int n, int m, int type)
 /* rest of n/m in the abc */
-int n, m,type;
-int decorators[DECSIZE];
 {
   int num, denom;
 
@@ -3532,11 +3460,10 @@ int decorators[DECSIZE];
   };
 }
 
-void event_mrest(n,m,c)
+void event_mrest(int n, int m, char c)
 /* multiple bar rest of n/m in the abc */
 /* we check for m == 1 in the parser */
-int n, m;
-char c; /* [SS] 2017-04-19 to distinguish X from Z in abc2abc */
+//char c; /* [SS] 2017-04-19 to distinguish X from Z in abc2abc */
 {
   int i;
   int decorators[DECSIZE];
@@ -3625,22 +3552,18 @@ void event_chordoff(int chord_n, int chord_m)
   };
 }
 
-void event_finger(p)
+void event_finger(char *p)
 /* a 1, 2, 3, 4 or 5 has been found in a guitar chord field */
-char *p;
 {
   /* does nothing */
 }
 
-static int pitchof(note, accidental, mult, octave, propagate_accs)
+static int pitchof(char note, char accidental, int mult, int octave, int propagate_accs)
 /* This code is used for handling gchords */
 /* finds MIDI pitch value for note */
 /* if propagate_accs is 1, apply any accidental to all instances of  */
 /* that note in the bar. If propagate_accs is 0, accidental does not */
 /* apply to other notes */
-char note, accidental;
-int mult, octave;
-int propagate_accs;
 {
   int p;
   char acc;
@@ -3670,12 +3593,10 @@ int propagate_accs;
   return p + 12*octave + middle_c;
 }
 
-static int barepitch(note, accidental, mult, octave) 
+static int barepitch(char note, char accidental, int mult, int octave) 
 /* Computes MIDI pitch ignoring any key signature.
  * Required for drum track
  */
-char note, accidental;
-int mult, octave;
 {
 int p,pitch;
 int accidental_size = 1;
@@ -3689,7 +3610,7 @@ pitch = p + 12*octave + middle_c;
 return pitch;
 }
 
-static int pitchof_b(note, accidental, mult, octave, propagate_accs,pitchbend)
+static int pitchof_b(char note, char accidental, int mult, int octave, int propagate_accs, int *pitchbend)
 /* computes MIDI pitch for note. If global temperament is set,
    it will apply a linear temperament and return a
    pitchbend. If propagate_accs == 2, apply any accidental to all
@@ -3699,10 +3620,6 @@ static int pitchof_b(note, accidental, mult, octave, propagate_accs,pitchbend)
    If propagate_accs = 0, do not apply the accidental to other
    notes in the bar.
 */
-char note, accidental;
-int mult, octave;
-int propagate_accs;
-int *pitchbend;
 {
   int p;
   char acc;
@@ -3887,11 +3804,8 @@ bendvalue = c53midi - (float) *midipitch;
 
 
 
-static void doroll(note, octave, n, m, pitch)
+static void doroll(char note, int octave, int n, int m, int pitch)
 /* applies a roll to a note */
-char note;
-int octave, n, m;
-int pitch;
 {
   char up, down;
   int t;
@@ -3925,10 +3839,7 @@ int pitch;
 
 
 /* [SS] 2012-06-30 */
-static void doroll_setup(note,octave,n,m,pitch)
-char note;
-int octave, n, m;
-int pitch;
+static void doroll_setup(char note, int octave, int n, int m, int pitch)
 {
   char up, down;
   int t;
@@ -3962,8 +3873,7 @@ int pitch;
   if (notesdefined < 1000) notesdefined++;
 }
 
-static void doroll_output(i)
-int i;
+static void doroll_output(int i)
 {
 int deco_index;
 int pitch,pitchup,pitchdown,bend_up,bend_down;
@@ -4004,11 +3914,8 @@ bentpitch[i] = active_pitchbend;
 
 /* dotrill is nolonger used [SDG] 2020-06-03 */
 #if 0  
-static void dotrill(note, octave, n, m, pitch)
+static void dotrill(char note, int octave, int n, int m, int pitch)
 /* applies a trill to a note */
-char note;
-int octave, n, m;
-int pitch;
 {
   char up;
   int i, t;
@@ -4048,10 +3955,7 @@ int pitch;
 }
 #endif
 
-static void dotrill_setup(note, octave, n, m, pitch)
-char note;
-int octave, n, m;
-int pitch;
+static void dotrill_setup(char note, int octave, int n, int m, int pitch)
 {
   char up;
   int t;
@@ -4080,8 +3984,7 @@ int pitch;
   if (notesdefined < 1000) notesdefined++;
   }
 
-static void dotrill_output(i)
-int i;
+static void dotrill_output(int i)
 {
 int deco_index;
 int pitch,pitchup,pitchdown;
@@ -4153,8 +4056,7 @@ for (i=1;i<notesdefined;i++) {
 }  
   
 
-void makecut (mainpitch, shortpitch,mainbend,shortbend, n,m)
-int mainpitch,shortpitch,mainbend,shortbend,n,m;
+void makecut (int mainpitch, int shortpitch, int mainbend, int shortbend, int n, int m)
 {
 addfeature(GRACEON, 0, 0, 0);
 bentpitch[notes] = shortbend;
@@ -4164,8 +4066,7 @@ bentpitch[notes] = mainbend;
 addfeature(NOTE, mainpitch, 4*n,m*v->default_length);
 }
 
-void makeharproll (pitch, bend,n,m)   /* [JS] 2011-04-29 */
-int pitch,bend,n,m;
+void makeharproll (int pitch, int bend, int n, int m)   /* [JS] 2011-04-29 */
 {
 bentpitch[notes] = bend;
 addfeature(NOTE, pitch, 4*n/2,m*2*v->default_length);
@@ -4175,8 +4076,7 @@ bentpitch[notes] = bend;
 addfeature(NOTE, pitch, 4*n/2,m*v->default_length);
 }
 
-void makeharproll3 (pitch, bend,n,m) /* [JS] 2011-04-29 */
-int pitch,bend,n,m;
+void makeharproll3 (int pitch, int bend, int n, int m) /* [JS] 2011-04-29 */
 {
 int a=n-1;
 bentpitch[notes] = bend;
@@ -4188,11 +4088,8 @@ addfeature(NOTE, pitch, 4*(n/2+1),m*v->default_length);
 }
 
 
-static void doornament(note, octave, n, m, pitch)
+static void doornament(char note, int octave, int n, int m, int pitch)
 /* applies a roll to a note */
-char note;
-int octave, n, m;
-int pitch;
 {
   char up, down;
   int t;
@@ -4258,10 +4155,9 @@ int pitch;
 
 
 
-static void hornp(num, denom)
+static void hornp(int num, int denom)
 /* If we have used R:hornpipe, this routine modifies the rhythm by */
 /* applying appropriate broken rhythm */
-int num, denom;
 {
   if ((hornpipe) && (notes > 0) && (feature[notes-1] != GT)) {
     if ((num*last_denom == last_num*denom) && (num == 1) &&
@@ -4279,13 +4175,8 @@ int num, denom;
   };
 }
 
-void event_note(decorators, clef, accidental, mult, note, xoctave, n, m)
+void event_note(int decorators[DECSIZE], cleftype_t *clef, char accidental, int mult, char note, int xoctave, int n, int m)
 /* handles a note in the abc */
-int decorators[DECSIZE];
-cleftype_t *clef; /* [JA] 2020-10-19 */
-int mult;
-char accidental, note;
-int xoctave, n, m;
 {
   int num, denom;
   int octave;
@@ -4474,10 +4365,11 @@ void event_normal_tone()
 microtone = 0;
 }
 
-char *get_accidental(place, accidental)
-/* read in accidental - used by event_handle_gchord() */
-char *place; /* place in string being parsed */
-char *accidental; /* pointer to char variable */
+char *get_accidental(
+        /* read in accidental - used by event_handle_gchord() */
+        char *place, /* place in string being parsed */
+        char *accidental  /* pointer to char variable */
+        )
 {
   char *p;
 
@@ -4494,9 +4386,8 @@ char *accidental; /* pointer to char variable */
   return(p);
 }
 
-void event_handle_gchord(s)
+void event_handle_gchord(char *s)
 /* handler for the guitar chords */
-char* s;
 {
   int basepitch;
   char accidental, accidental2, note; /* [SS] 2021-12-05 */
@@ -4586,11 +4477,10 @@ char* s;
   addfeature(GCHORD, basepitch, inversion, chordno);
 }
 
-void event_handle_instruction(s)
+void event_handle_instruction(char *s)
 /* handler for ! ! instructions */
 /* does ppp pp p mp mf f ff fff */
 /* also does !drum! and !nodrum! */
-char* s;
 {
   char buff[MAXLINE];
   char* p;
@@ -4771,11 +4661,12 @@ if (nofnop == 0) {
   };
 }
 
-static void setmap(sf, map, mult)
+static void setmap(
 /* work out accidentals to be applied to each note */
-int sf; /* number of sharps in key signature -7 to +7 */
-char map[7];
-int mult[7];
+        int sf, /* number of sharps in key signature -7 to +7 */
+        char map[7],
+        int mult[7]
+        )
 {
   int j;
 
@@ -4799,12 +4690,8 @@ int mult[7];
   if (sf <= -7) map['f'-'a'] = '_';
 }
 
-static void altermap(v, modmap, modmul,modmic)
+static void altermap(struct voicecontext* v, char modmap[7], int modmul[7], struct fraction modmic[7])
 /* apply modifiers to a set of accidentals */
-struct voicecontext* v;
-char modmap[7];
-int modmul[7];
-struct fraction modmic[7];
 {
   int i;
 
@@ -4818,9 +4705,8 @@ struct fraction modmic[7];
   };
 }
 
-static void copymap(v)
+static void copymap(struct voicecontext* v)
 /* sets up working map at the start of each bar */
-struct voicecontext* v;
 {
   int i,j;
 
@@ -4838,8 +4724,7 @@ struct voicecontext* v;
 /* workaround for problems with PCC compiler */
 /* data may be written to an internal buffer */
 
-int myputc(c)
-char c;
+int myputc(char c)
 {
   return (putc(c,fp));
 }
@@ -4853,10 +4738,7 @@ void addfract(int *xnum, int *xdenom, int a, int b)
   reduce(xnum, xdenom);
 }
 
-void nondestructive_readstr(out, in, limit)
-char out[];
-char **in;
-int limit;
+void nondestructive_readstr(char out[], char **in, int limit)
 /* copy across alphanumeric string */
 {
   int i;
@@ -4869,11 +4751,10 @@ int limit;
 }
 
 
-static void dotie(j, xinchord,voiceno)
+static void dotie(int j, int xinchord, int voiceno)
 /* called in preprocessing stage to handle ties */
 /* we need the voiceno in case a tie is broken by a */
 /* voice switch.                                    */
-int j, xinchord,voiceno;
 {
   int tienote, place;
   int tietodo, done;
@@ -5134,8 +5015,7 @@ if (verbose >3) printf("tiefix finished\n");
 static void applygrace_orig(int);
 static void applygrace_new(int);
 
-static void applygrace(place)
-int place;
+static void applygrace(int place)
 {
 if (gfact_method)  applygrace_orig(place); 
 else applygrace_new(place);
@@ -5146,8 +5026,7 @@ removefeatures(start,end);
 } /* [SS]  2021-01-24 */
 
 
-static void applygrace_orig(place)
-int place;
+static void applygrace_orig(int place)
 /* assign lengths to grace notes before generating MIDI */
 /* This version adjusts the length of the grace notes
  * based on the length of the following note, the
@@ -5257,8 +5136,7 @@ int place;
   };
 }
 
-static void applygrace_new(place)
-int place;
+static void applygrace_new(int place)
 /* assign lengths to grace notes before generating MIDI */
 /* In this version each grace note has a predetermined
  * length, eg, (1/64 th note) and the total length of
@@ -5438,13 +5316,11 @@ static void zerobar()
   bar_denom = 1;
 }
 
-void event_bar(type, replist)
+void event_bar(int type, char *replist)
 /* handles bar lines of various types in the abc */
 /* This function was reorganized on 2013-12-02 [SS] to 
    handle play on repeats when there are split voices.
 */
-int type;
-char* replist;
 {
   int newtype;
   int depth;
@@ -5494,9 +5370,8 @@ char* replist;
 
 
 
-static void placeendrep(j)
+static void placeendrep(int j)
 /* patch up missing repeat */
-int j;
 {
   if (quiet == -1) event_warning("Assuming repeat");
   switch(feature[j]) {
@@ -5516,9 +5391,8 @@ int j;
   };
 }
 
-static void placestartrep(j)
+static void placestartrep(int j)
 /* patch up missing repeat */
-int j;
 {
   if (quiet == -1) event_warning("Assuming repeat");
   switch(feature[j]) {
@@ -5946,20 +5820,24 @@ static void headerprocess()
   voicesused = 0;
 }
 
-void event_key(sharps, s, modeindex, modmap, modmul, modmicrotone, gotkey, gotclef, clefname, clef,
-          octave, transpose, gotoctave, gottranspose, explict)
+void event_key(
 /* handles a K: field */
-int sharps; /* sharps is number of sharps in key signature */
-char *s; /* original string following K: */
-int modeindex; /* 0 major, 1,2,3 minor, 4 locrian, etc.  */
-char modmap[7]; /* array of accidentals to be applied */
-int  modmul[7]; /* array giving multiplicity of each accent (1 or 2) */
-struct fraction modmicrotone[7]; /* [SS] 2014-01-06 */
-int gotkey, gotclef;
-char* clefname;
-cleftype_t *clef;  /* [JA] 2020-10-19 */
-int octave, transpose, gotoctave, gottranspose;
-int explict;
+	int sharps, /* sharps is number of sharps in key signature */
+	char *s, /* original string following K: */
+	int modeindex, /* 0 major, 1,2,3 minor, 4 locrian, etc.  */
+	char modmap[7], /* array of accidentals to be applied */
+	int  modmul[7], /* array giving multiplicity of each accent (1 or 2) */
+	struct fraction modmicrotone[7], /* [SS] 2014-01-06 */
+	int gotkey,
+	int gotclef,
+	char* clefname,
+	cleftype_t *clef,  /* [JA] 2020-10-19 */
+	int octave,
+	int transpose,
+	int gotoctave,
+	int gottranspose,
+	int explict
+	)
 {
   int minor;
   minor =0;
@@ -5988,7 +5866,7 @@ int explict;
       ***headerprocess();
 
       ***v = getvoicecontext(1);
-      ***if (!inbody) v1index = notes; /* save position in case of split voice */
+      ***if (!inbody) v1index = notes;***/ /* save position in case of split voice */
  
     if (gotclef)
     {
@@ -6251,7 +6129,7 @@ static void finishfile()
         event_fatal_error("File open failed");
       };
       if (!silent) printf("writing MIDI file %s\n", outname);
-      Mf_putc = myputc;
+      Mf_putc = &myputc;
       Mf_writetrack = writetrack;
       header_time_num = time_num;
       header_time_denom = time_denom;
@@ -6289,9 +6167,8 @@ void event_blankline()
   };
 }
 
-void event_refno(n)
+void event_refno(int n)
 /* handles an X: field (which indicates the start of a tune) */
-int n;
 {
   char numstr[23]; /* Big enough for a 64-bit int! */
   char newname[256];
@@ -6365,9 +6242,7 @@ void event_eof()
 
 void set_control_defaults(); /* from queues.c */
 
-int main(argc,argv)
-int argc;
-char *argv[];
+int main(int argc, char *argv[])
 {
   char *filename;
   int i;

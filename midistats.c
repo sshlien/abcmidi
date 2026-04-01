@@ -320,8 +320,7 @@ int filegetc()
 }
 
 
-void fatal_error(s)
-char* s;
+void fatal_error(char *s)
 /* fatal error encounterd - abort program */
 {
   fprintf(stderr, "%s\n", s);
@@ -329,8 +328,7 @@ char* s;
 }
 
 
-void event_error(s)
-char *s;
+void event_error(char *s)
 /* problem encountered but OK to continue */
 {
   char msg[256];
@@ -340,9 +338,8 @@ char *s;
 }
 
 
-int* checkmalloc(bytes)
+int* checkmalloc(int bytes)
 /* malloc with error checking */
-int bytes;
 {
   int *p;
 
@@ -357,9 +354,7 @@ int bytes;
 
 
 FILE *
-efopen(name,mode)
-char *name;
-char *mode;
+efopen(char *name, char *mode)
 {
     FILE *f;
 
@@ -371,16 +366,14 @@ char *mode;
     return(f);
 }
 
-void error(s)
-char *s;
+void error(char *s)
 {
     fprintf(stderr,"Error: %s\n",s);
 }
 
 
 /* [SS] 2017-11-19 */
-void stats_error(s)
-char *s;
+void stats_error(char *s)
 {
     fprintf(stderr,"Error: %s\n",s);
     fprintf(stderr,"activetrack %d\n",tracknum);
@@ -395,7 +388,9 @@ char *s;
  void no_op0() {}
  void no_op1(int dummy1) {}
  void no_op2(int dummy1, int dummy2) {}
+ void no_op2_is(int dummy1, char *dummy2) {}
  void no_op3(int dummy1, int dummy2, int dummy3) { }
+ void no_op3_iis(int dummy1, int dummy2, char *dummy3) { }
  void no_op4(int dummy1, int dummy2, int dummy3, int dummy4) { }
  void no_op5(int dummy1, int dummy2, int dummy3, int dummy4, int dummy5) { }
 
@@ -442,8 +437,7 @@ char* s = name;
 }
 
 
-void pitch2drum(midipitch)
-int midipitch;
+void pitch2drum(int midipitch)
 {
 static char *drumpatches[] = {
  "Acoustic Bass Drum", "Bass Drum 1", "Side Stick", "Acoustic Snare",
@@ -720,9 +714,7 @@ float histogram_entropy (int *histogram, int size)
 
 
 
-void output_count_trkdata(data_array,name)
-int data_array[];
-char *name;
+void output_count_trkdata(int data_array[], char *name)
 {
 int i,sum;
 sum = 0;
@@ -916,8 +908,7 @@ tracknm.eighthUnit = unit;
 
 
 
-void stats_noteon(chan,pitch,vol)
-int chan, pitch, vol;
+void stats_noteon(int chan, int pitch, int vol)
 {
  int delta;
  int barnum;
@@ -956,7 +947,7 @@ int chan, pitch, vol;
 	 }
     }
 	 
- if (abs(Mf_currtime - last_on_tick[chan+1]) < chordthreshold) trkdata.chordcount[chan+1]++;
+ if (labs(Mf_currtime - last_on_tick[chan+1]) < chordthreshold) trkdata.chordcount[chan+1]++;
  else trkdata.notecount[chan+1]++; /* [SS] 2019-08-02 */
  lastTick[chan*128 + pitch] = Mf_currtime;
  last_on_tick[chan+1] = Mf_currtime; /* [SS] 2019-08-02 */
@@ -1032,15 +1023,13 @@ void stats_noteoff(int chan,int pitch,int vol)
 }
 
 
-void stats_pitchbend(chan,lsb,msb)
-int chan, lsb, msb;
+void stats_pitchbend(int chan, int lsb, int msb)
 {
 trkdata.pitchbend[0]++;
 trkdata.pitchbend[chan+1]++;
 }
 
-void stats_pressure(chan,press)
-int chan, press;
+void stats_pressure(int chan, int pitch, int press)
 {
 trkdata.pressure[0]++;
 trkdata.pressure[chan+1]++; /* [SS] 2022.04.28 */
@@ -1048,8 +1037,7 @@ trkdata.pressure[chan+1]++; /* [SS] 2022.04.28 */
 
 
 
-void stats_program(chan,program)
-int chan, program;
+void stats_program(int chan, int program)
 {
 int beatnumber;
 if (program <0 || program > 127) return; /* [SS] 2018-03-06 */
@@ -1067,8 +1055,7 @@ if (trkdata.program[chan+1] != 0) {
 
 
 
-void stats_parameter(chan,control,value)
-int chan, control, value;
+void stats_parameter(int chan, int control, int value)
 {
 int chan1;
 chan1 = chan+1;
@@ -1084,9 +1071,7 @@ trkdata.cntlparam[chan1]++;
 
 
 
-void stats_metatext(type,leng,mess)
-int type, leng;
-char *mess;
+void stats_metatext(int type, int leng, char *mess)
 {
 int i; 
 if (type == 5) hasLyrics = 1; /* [SS] 2023-10-30 */
@@ -1100,8 +1085,7 @@ printf("\n");
 
 
 /* [SS] 2018-01-02 */
-void stats_keysig(sf,mi)
-int sf, mi;
+void stats_keysig(int sf, int mi)
 {
   float beatnumber;
   static char *major[] = {"Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F",
@@ -1112,19 +1096,19 @@ int sf, mi;
   beatnumber = Mf_currtime/division;
   index = sf + 7;
   if (index < 0 || index >12) return;
-  if (mi)
-    if (noOutput == 0) 
+  if (noOutput == 0) { 
+    if (mi) {
        printf("keysig %s %d %d %6.2f\n",minor[index],sf,mi,beatnumber);
-  else
-    if (noOutput == 0) 
+    } else {
        printf("keysig %s %d %d %6.2f\n",major[index],sf,mi,beatnumber);
+    }
+  }
 }
 
 
 
 /* [SS] 2018-01-02 */
-void stats_tempo(ltempo)
-long ltempo;
+void stats_tempo(long ltempo)
 {
   float beatnumber;
   tempo = ltempo;
@@ -1136,8 +1120,7 @@ long ltempo;
 }
 
 
-void stats_timesig(nn,dd,cc,bb)
-int nn, dd, cc, bb;
+void stats_timesig(int nn, int dd, int cc, int bb)
 {
   float beatnumber;
   int denom = 1;
@@ -1203,56 +1186,56 @@ void load_header (int format, int ntrks, int ldivision)
 void initfunc_for_stats()
 {
     int i;
-    Mf_error = stats_error; /* [SS] 2017-11-19 */
-    Mf_header = stats_header;
-    Mf_trackstart = stats_trackstart;
-    Mf_trackend = stats_trackend;
-    Mf_noteon = stats_noteon;
-    Mf_noteoff = stats_noteoff;
-    Mf_pressure = no_op3;
-    Mf_parameter = stats_parameter;
-    Mf_pitchbend = stats_pitchbend;
-    Mf_program = stats_program;
-    Mf_chanpressure = stats_pressure;
-    Mf_sysex = no_op2;
-    Mf_metamisc = no_op3;
-    Mf_seqnum = no_op1;
-    Mf_eot = stats_eot;
-    Mf_timesig = stats_timesig;
-    Mf_smpte = no_op5;
-    Mf_tempo = stats_tempo;
-    Mf_keysig = stats_keysig;
-    Mf_seqspecific = no_op3;
-    Mf_text = stats_metatext;
-    Mf_arbitrary = no_op2;
+    Mf_error = &stats_error; /* [SS] 2017-11-19 */
+    Mf_header = &stats_header;
+    Mf_trackstart = &stats_trackstart;
+    Mf_trackend = &stats_trackend;
+    Mf_noteon = &stats_noteon;
+    Mf_noteoff = &stats_noteoff;
+    Mf_pressure = &no_op3;
+    Mf_parameter = &stats_parameter;
+    Mf_pitchbend = &stats_pitchbend;
+    Mf_program = &stats_program;
+    Mf_chanpressure = &stats_pressure;
+    Mf_sysex = &no_op2_is;
+    Mf_metamisc = &no_op3_iis;
+    Mf_seqnum = &no_op1;
+    Mf_eot = &stats_eot;
+    Mf_timesig = &stats_timesig;
+    Mf_smpte = &no_op5;
+    Mf_tempo = &stats_tempo;
+    Mf_keysig = &stats_keysig;
+    Mf_seqspecific = &no_op3;
+    Mf_text = &stats_metatext;
+    Mf_arbitrary = &no_op2;
     for (i = 0; i< 2047; i++) pulseCounter[i] = 0;
 }
 
 
 void initfunc_for_loadNoteEvents()
 {
-    Mf_error = error;
-    Mf_header = load_header;
-    Mf_trackstart = no_op0;
-    Mf_trackend = record_trackend;
-    Mf_noteon = record_noteon;
-    Mf_noteoff = record_noteoff;
-    Mf_pressure = no_op3;
-    Mf_parameter = no_op3;
-    Mf_pitchbend = no_op3;
-    Mf_program = no_op0;
-    Mf_chanpressure = no_op3;
-    Mf_sysex = no_op2;
-    Mf_metamisc = no_op3;
-    Mf_seqnum = no_op1;
-    Mf_eot = no_op0;
-    Mf_timesig = no_op4;
-    Mf_smpte = no_op5;
-    Mf_tempo = record_tempo;
-    Mf_keysig = no_op2;
-    Mf_seqspecific = no_op3;
-    Mf_text = no_op3;
-    Mf_arbitrary = no_op2;
+    Mf_error = &error;
+    Mf_header = &load_header;
+    Mf_trackstart = &no_op0;
+    Mf_trackend = &record_trackend;
+    Mf_noteon = &record_noteon;
+    Mf_noteoff = &record_noteoff;
+    Mf_pressure = &no_op3;
+    Mf_parameter = &no_op3;
+    Mf_pitchbend = &no_op3;
+    Mf_program = &no_op0;
+    Mf_chanpressure = &no_op3;
+    Mf_sysex = &no_op2_is;
+    Mf_metamisc = &no_op3_iis;
+    Mf_seqnum = &no_op1;
+    Mf_eot = &no_op0;
+    Mf_timesig = &no_op4;
+    Mf_smpte = &no_op5;
+    Mf_tempo = &record_tempo;
+    Mf_keysig = &no_op2;
+    Mf_seqspecific = &no_op3;
+    Mf_text = &no_op3;
+    Mf_arbitrary = &no_op2;
 }
 
 void dumpMidievents (int from , int to)
@@ -1852,10 +1835,9 @@ printf("%d\t%d\t%d\t%d\t%d\t%d\n",lasttrack,nchannels, division,bpm,lastEvent,la
 
 
 
-int readnum(num) 
+int readnum(char *num) 
 /* read a number from a string */
 /* used for processing command line */
-char *num;
 {
   int t;
   char *p;
@@ -1877,10 +1859,9 @@ char *num;
 }
 
 
-int readnump(p) 
+int readnump(char **p) 
 /* read a number from a string (subtly different) */
 /* used for processing command line */
-char **p;
 {
   int t;
   
@@ -1898,11 +1879,8 @@ char **p;
 }
 
 
-int getarg(option, argc, argv)
+int getarg(char *option, int argc, char *argv[])
 /* extract arguments from command line */
-char *option;
-char *argv[];
-int argc;
 {
   int j, place;
 
@@ -1915,11 +1893,9 @@ int argc;
   return (place);
 }
 
-int huntfilename(argc, argv)
+int huntfilename(int argc, char *argv[])
 /* look for filename argument if -f option is missing */
 /* assumes filename does not begin with '-'           */
-char *argv[];
-int argc;
 {
   int j, place;
 
@@ -1941,9 +1917,7 @@ int argc;
   return(place);
 }
 
-int process_command_line_arguments(argc,argv)
-char *argv[];
-int argc;
+int process_command_line_arguments(int argc, char *argv[])
 {
   int val;
   int arg;
@@ -2085,9 +2059,7 @@ int argc;
 
 
 
-void midistats(argc,argv)
-char *argv[];
-int argc;
+void midistats(int argc,char *argv[])
 {
 initfunc_for_stats();
 Mf_getc = filegetc;
@@ -2146,11 +2118,8 @@ if (keystabilityAnalysis) {
 
 
 
-int main(argc,argv)
-char *argv[];
-int argc;
+int main(int argc, char *argv[])
 {
-  FILE *efopen();
   int arg;
 
   // verify_arrays();

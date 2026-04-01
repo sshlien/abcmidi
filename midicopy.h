@@ -1,6 +1,5 @@
 /* definitions for MIDI file writing code */
-float mf_ticks2sec();
-long mf_sec2ticks();
+long mf_sec2ticks(float secs, int division, long tempo);
 void mfwrite();
 void mfread();
 
