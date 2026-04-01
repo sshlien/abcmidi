@@ -105,6 +105,7 @@ int gchordbars;
 /* Part handling */
 extern struct vstring part;
 int parts, partno, partlabel;
+int partmarkers; /* -PMAR flag: emit MIDI marker meta-events for P: parts [RK] 2026-03-30 */
 int part_start[26], part_count[26];
 long introlen, lastlen, partlen[26];
 int partrepno;
@@ -3123,17 +3124,33 @@ long writetrack(int xtrack)
         checksyllables();
       };
       break;
-    case PART:
+    case PART: /* [RK] 2026-03-30 */
       in_varend = 0;
-      /*j = partbreak(xtrack, trackvoice, j); [SS] 2023.01.20 */
-      j = findvoice(j, trackvoice, xtrack);
-
       if (parts == -1) {
-        char msg[1];
-
-        msg[0] = (char) pitch[j];
-        mf_write_meta_event(0L, marker, msg, 1);
-      };
+        /* No header P: spec, body labels only: emit "Part X" */
+        if (partmarkers && xtrack == 0 &&
+            pitch[j] >= 'A' && pitch[j] <= 'Z') {
+          char msg[8];
+          snprintf(msg, sizeof(msg), "Part %c", (char) pitch[j]);
+          mf_write_meta_event(delta_time_track0, marker, msg, strlen(msg));
+          tracklen = tracklen + delta_time_track0;
+          delta_time_track0 = 0L;
+        }
+      } else {
+        /* Parts active, navigate then emit "Part X-N" marker
+           where N is the instance number (1-based) */
+        /*j = partbreak(xtrack, trackvoice, j); [SS] 2023.01.20 */
+        j = findvoice(j, trackvoice, xtrack);
+        if (partmarkers && xtrack == 0 &&
+            partlabel >= 0 && partlabel < 26) {
+          char msg[20];
+          snprintf(msg, sizeof(msg), "Part %c-%d",
+                   (char)(partlabel + 'A'), part_count[partlabel]);
+          mf_write_meta_event(delta_time_track0, marker, msg, strlen(msg));
+          tracklen = tracklen + delta_time_track0;
+          delta_time_track0 = 0L;
+        }
+      }
       break;
     case VOICE:
       /* search on for next occurrence of voice */

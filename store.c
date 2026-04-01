@@ -422,6 +422,7 @@ int apply_fermata_to_chord = 0; /* [SS] 2012-03-26 */
 /* Part handling */
 struct vstring part;
 extern int parts, partno, partlabel;
+extern int partmarkers; /* [RK] 2026-03-30 */
 extern int part_start[26], part_count[26];
 
 int voicesused;
@@ -945,6 +946,13 @@ void event_init(int argc, char *argv[], char **filename)
     nocom = 0;
   }
 
+  /* [RK] 2026-03-30 */
+  if (getarg("-PMAR", argc, argv) != -1) {
+    partmarkers = 1;
+  } else {
+    partmarkers = 0;
+  }
+
   if (getarg("-STFW",argc,argv) != -1) {
     separate_tracks_for_words = 1;
   } else {
@@ -1025,7 +1033,7 @@ void event_init(int argc, char *argv[], char **filename)
     printf("abc2midi version %s\n",VERSION);
     printf("Usage : abc2midi <abc file> [reference number] [-c] [-v] ");
     printf("[-o filename]\n");
-    printf("        [-t] [-n <value>] [-CS] [-NFNP] [-NCOM] [-NFER] [-NGRA] [-NGUI] [-HARP]\n");
+    printf("        [-t] [-n <value>] [-CS] [-NFNP] [-NCOM] [-NFER] [-NGRA] [-NGUI] [-HARP] [-PMAR]\n");
     printf("        [reference number] selects a tune\n");
     printf("        -c  selects checking only\n");
     printf("        -v  selects verbose option\n");
@@ -1039,6 +1047,7 @@ void event_init(int argc, char *argv[], char **filename)
     printf("        -Q default tempo (quarter notes/minute)\n");
     printf("        -NFNP don't process !p! or !f!-like fields\n");
     printf("        -NCOM suppress comments in output MIDI file\n");
+    printf("        -PMAR emit MIDI marker meta-events for P: part labels\n"); /* [RK] 2026-03-30 */
     printf("        -NFER ignore all fermata markings\n");
     printf("        -NGRA ignore grace notes\n");
     printf("        -NGUI ignore guitar chord indications\n");
@@ -2893,7 +2902,13 @@ void event_part(char *s)
   if (dotune) {
     p = s;
     skipspace(&p);
-    if (pastheader && parts == -1) return; /* [SS] 2014-04-10 */
+    if (pastheader && parts == -1) { /* [RK] 2026-03-30 */
+      /* No header P: spec. If -PMAR, store body P: as section label */
+      if (partmarkers && ((int)*p >= 'A') && ((int)*p <= 'Z')) {
+        addfeature(PART, (int)*p, 0, 0);
+      }
+      return;
+    }
     if (pastheader) {
       if (((int)*p < 'A') || ((int)*p > 'Z')) {
         if (!silent) event_error("Part must be one of A-Z");

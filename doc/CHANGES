@@ -15675,3 +15675,16 @@ February 24 2026
 
 midistats: the summary includes ntimesig, triplets, unquantized when appropriate.
 
+March 30 2026 [RK]
+
+abc2midi: added -PMAR option to emit MIDI marker meta-events (0x06) for
+P: part labels. When a header P: field specifies a play order (e.g.
+P:(AB)3), a marker is emitted each time a section begins during the
+expanded playback, with an instance number (e.g. "Part A-1", "Part B-2").
+When no header P: field is present, inline P: labels in the body are
+emitted as simple section markers (e.g. "Part A"). The existing code at
+genmidi.c:3187 that was meant to write markers was unreachable dead code;
+it has been restructured. Changes in genmidi.c (PART case in writetrack,
+partmarkers global) and store.c (event_part, event_init for -PMAR flag).
+Man page updated in doc/abc2midi.1.
+
