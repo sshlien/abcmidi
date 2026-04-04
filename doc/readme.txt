@@ -40,6 +40,22 @@ http://www.harmony-central.com/MIDI/midifilelib.tar.gz
 
 If you have the source distribution and intend to re-compile the code,
 read the file coding.txt.
+
+Building with autoconf (legacy):
+
+  ./configure
+  make
+  sudo make install
+
+Building with CMake (modern):
+
+  cmake --preset default
+  cmake --build --preset default
+  cmake --install build/default
+
+Available CMake presets: default (Release), debug, sanitize (ASan+UBSan).
+Run "cmake --list-presets" to see all available presets.
+You can override settings in a personal CMakeUserPresets.json file.
 ---------------------------------------------------------------------
 midi2abc - program to convert MIDI format files to abc notation. 
 

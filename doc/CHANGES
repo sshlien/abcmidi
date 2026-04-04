@@ -15688,3 +15688,12 @@ it has been restructured. Changes in genmidi.c (PART case in writetrack,
 partmarkers global) and store.c (event_part, event_init for -PMAR flag).
 Man page updated in doc/abc2midi.1.
 
+2026 April 01
+build: added CMake build system (CMakeLists.txt, CMakePresets.json)
+alongside the existing autoconf build.  Three presets are provided:
+default (Release), debug, and sanitize (ASan+UBSan).  Shared source
+files (midifile.c, parseabc.c, music_utils.c, parser2.c) are compiled
+once via OBJECT libraries.  The build exports compile_commands.json
+for LSP/clangd support.  Note: the codebase requires -std=gnu89 until
+the K&R-to-ANSI prototype migration is completed.
+

@@ -20,3 +20,42 @@ Components of the abcMIDI package are parts of numerous applications for creatin
 
 The latest version of the abcMIDI package supported by James Allwright can be found can be found [here](http://abc.sourceforge.net/abcMIDI/original/). More recent versions can be found on [sourceforge](https://sourceforge.net/projects/abc/) and on the [runabc](https://ifdo.ca/~seymour/runabc/top.html) web page.
 
+
+### Building
+
+#### Autoconf (legacy)
+
+The traditional build uses autoconf:
+
+```sh
+./configure
+make
+sudo make install
+```
+
+#### CMake (modern)
+
+A CMake build system is available alongside the legacy one, with
+[presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html)
+for common configurations:
+
+```sh
+# Configure and build (pick a preset: default, debug, sanitize)
+cmake --preset default
+cmake --build --preset default
+
+# Install
+cmake --install build/default
+```
+
+Available presets:
+
+| Preset     | Build type | Description                                  |
+|------------|------------|----------------------------------------------|
+| `default`  | Release    | Optimized build                              |
+| `debug`    | Debug      | Debug symbols, no optimization               |
+| `sanitize` | Debug      | Debug + AddressSanitizer + UndefinedBehaviorSanitizer |
+
+The CMake build generates `compile_commands.json` for use with
+clangd and other LSP-based editors.
+
