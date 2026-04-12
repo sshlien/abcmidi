@@ -1,5 +1,7 @@
 ### abcMIDI package
 
+[![Tests](https://github.com/keryell/abcmidi/actions/workflows/test.yml/badge.svg)](https://github.com/keryell/abcmidi/actions/workflows/test.yml)
+
 abcMIDI is a package of programs written in C for handling [abc music notation](http://abcnotation.com/) files. The software was created by James Allwright in the early 1990 and presently maintained by Seymour Shlien. It initially included the following programs:
 
 1. abc2midi for converting an abc file to a midi file,

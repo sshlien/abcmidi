@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+    branches: [master, future]
+  pull_request:
+    branches: [master, future]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tool:
+          - abc2midi
+          - abc2abc
+          - midi2abc
+          - midistats
+          - mftext
+          - yaps
+          - midicopy
+          - abcmatch
+    name: ${{ matrix.tool }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Configure
+        run: cmake --preset default
+
+      - name: Build
+        run: cmake --build --preset default
+
+      - name: Test ${{ matrix.tool }}
+        run: ctest --preset default -R '^(smoke_${{ matrix.tool }}_ver|${{ matrix.tool }}_)'
