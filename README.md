@@ -59,3 +59,30 @@ Available presets:
 The CMake build generates `compile_commands.json` for use with
 clangd and other LSP-based editors.
 
+### Testing
+
+The CMake build includes a test suite covering all 8 programs:
+
+- **Smoke tests** verify each binary runs cleanly with `-ver`.
+- **Golden-file tests** run each program on a sample input and compare the
+  (normalized) output to a checked-in reference. Binary MIDI outputs are
+  piped through `mftext` to produce diffable text. Volatile lines (version
+  banners, dates, temporary paths) are stripped before comparison.
+
+```sh
+# Run all tests
+ctest --preset debug
+
+# Run only golden-file tests / only smoke tests
+ctest --preset debug -L golden
+ctest --preset debug -L smoke
+```
+
+To regenerate the golden files after an intentional behavioural change,
+review the diff, then commit:
+
+```sh
+cmake --build build/debug --target update-golden
+git diff tests/golden/
+```
+
