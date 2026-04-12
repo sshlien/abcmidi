@@ -29,11 +29,13 @@ endif()
 file(MAKE_DIRECTORY "${TMPDIR}")
 get_filename_component(stem "${SAMPLE}" NAME_WE)
 
-set(raw "${TMPDIR}/${TYPE}_${stem}.raw")
-set(out "${TMPDIR}/${TYPE}_${stem}.out")
+set(raw     "${TMPDIR}/${TYPE}_${stem}.raw")
+set(out     "${TMPDIR}/${TYPE}_${stem}.out")
+set(midfile "${TMPDIR}/${TYPE}_${stem}.mid")
 
-# --- Run the binary (and any pipeline steps) ---
+# --- Command helpers ---------------------------------------------------------
 
+# Run a command; abort with a detailed message on non-zero exit.
 function(run_or_die)
   execute_process(
     COMMAND ${ARGN}
@@ -43,67 +45,84 @@ function(run_or_die)
   )
   if(NOT rc EQUAL 0)
     message(FATAL_ERROR
-      "Command failed (rc=${rc}):\n  ${ARGN}\n--- stdout ---\n${captured_out}\n--- stderr ---\n${captured_err}")
+      "Command failed (rc=${rc}):\n  ${ARGN}\n"
+      "--- stdout ---\n${captured_out}\n"
+      "--- stderr ---\n${captured_err}")
   endif()
-  set(LAST_STDOUT "${captured_out}" PARENT_SCOPE)
 endfunction()
 
-if(TYPE STREQUAL "abc2midi")
-  # ABC -> MIDI -> mftext
-  set(midfile "${TMPDIR}/abc2midi_${stem}.mid")
-  run_or_die("${ABC2MIDI}" "${SAMPLE}" -o "${midfile}" -quiet -silent)
-  run_or_die("${MFTEXT}" "${midfile}")
-  file(WRITE "${raw}" "${LAST_STDOUT}")
+# Run a command and capture its stdout into a file.
+function(run_to_file outfile)
+  execute_process(
+    COMMAND ${ARGN}
+    OUTPUT_FILE "${outfile}"
+    RESULT_VARIABLE rc
+    ERROR_VARIABLE  captured_err
+  )
+  if(NOT rc EQUAL 0)
+    message(FATAL_ERROR
+      "Command failed (rc=${rc}):\n  ${ARGN}\n--- stderr ---\n${captured_err}")
+  endif()
+endfunction()
 
-elseif(TYPE STREQUAL "abc2abc")
-  run_or_die("${ABC2ABC}" "${SAMPLE}")
-  file(WRITE "${raw}" "${LAST_STDOUT}")
+# Convert ${SAMPLE} to MIDI, then run ${bin} on the resulting MIDI file and
+# capture its stdout.  Any extra arguments are inserted BEFORE the MIDI path
+# (needed e.g. for "midi2abc -f <file>").
+function(run_via_mid outfile bin)
+  run_or_die("${ABC2MIDI}" "${SAMPLE}" -o "${midfile}" -quiet -silent)
+  run_to_file("${outfile}" "${bin}" ${ARGN} "${midfile}")
+endfunction()
+
+# Run ${bin} directly on ${SAMPLE} and capture its stdout.  Extra arguments
+# are appended after the sample path.
+function(run_on_sample outfile bin)
+  run_to_file("${outfile}" "${bin}" "${SAMPLE}" ${ARGN})
+endfunction()
+
+# --- Dispatch: populate ${raw} based on TYPE ---------------------------------
+#
+# The binary path is derived from TYPE via TOUPPER + double-dereference:
+# for TYPE=midistats, ${bin} resolves to ${MIDISTATS}.  The only exception is
+# abc2midi, where we render the MIDI output through mftext for diffing — it
+# is therefore an alias for the mftext test.
+
+string(TOUPPER "${TYPE}" TYPE_UPPER)
+if(TYPE STREQUAL "abc2midi")
+  set(bin "${MFTEXT}")
+else()
+  set(bin "${${TYPE_UPPER}}")
+endif()
+
+if(TYPE MATCHES "^(abc2midi|mftext|midistats)$")
+  run_via_mid("${raw}" "${bin}")
 
 elseif(TYPE STREQUAL "midi2abc")
-  # ABC -> MIDI (via abc2midi) -> ABC (via midi2abc)
-  set(midfile "${TMPDIR}/midi2abc_${stem}.mid")
-  run_or_die("${ABC2MIDI}" "${SAMPLE}" -o "${midfile}" -quiet -silent)
-  run_or_die("${MIDI2ABC}" -f "${midfile}")
-  file(WRITE "${raw}" "${LAST_STDOUT}")
+  run_via_mid("${raw}" "${bin}" -f)
 
-elseif(TYPE STREQUAL "midistats")
-  set(midfile "${TMPDIR}/midistats_${stem}.mid")
-  run_or_die("${ABC2MIDI}" "${SAMPLE}" -o "${midfile}" -quiet -silent)
-  run_or_die("${MIDISTATS}" "${midfile}")
-  file(WRITE "${raw}" "${LAST_STDOUT}")
+elseif(TYPE STREQUAL "abc2abc")
+  run_on_sample("${raw}" "${bin}")
 
-elseif(TYPE STREQUAL "mftext")
-  set(midfile "${TMPDIR}/mftext_${stem}.mid")
-  run_or_die("${ABC2MIDI}" "${SAMPLE}" -o "${midfile}" -quiet -silent)
-  run_or_die("${MFTEXT}" "${midfile}")
-  file(WRITE "${raw}" "${LAST_STDOUT}")
+elseif(TYPE STREQUAL "abcmatch")
+  # -pitch_hist gives a short, deterministic, useful summary of the tune.
+  run_on_sample("${raw}" "${bin}" -pitch_hist)
 
 elseif(TYPE STREQUAL "yaps")
   set(psfile "${TMPDIR}/yaps_${stem}.ps")
-  run_or_die("${YAPS}" "${SAMPLE}" -o "${psfile}")
-  file(READ "${psfile}" raw_content)
-  file(WRITE "${raw}" "${raw_content}")
+  run_or_die("${bin}" "${SAMPLE}" -o "${psfile}")
+  configure_file("${psfile}" "${raw}" COPYONLY)
 
 elseif(TYPE STREQUAL "midicopy")
   # ABC -> MIDI -> midicopy -> mftext
-  set(midfile "${TMPDIR}/midicopy_${stem}_in.mid")
-  set(copied  "${TMPDIR}/midicopy_${stem}_out.mid")
+  set(copied "${TMPDIR}/midicopy_${stem}_out.mid")
   run_or_die("${ABC2MIDI}" "${SAMPLE}" -o "${midfile}" -quiet -silent)
-  run_or_die("${MIDICOPY}" "${midfile}" "${copied}")
-  run_or_die("${MFTEXT}" "${copied}")
-  file(WRITE "${raw}" "${LAST_STDOUT}")
-
-elseif(TYPE STREQUAL "abcmatch")
-  # Self-similarity: a tune always matches itself.  Use -pitch_hist for a
-  # short, deterministic, useful summary of the tune.
-  run_or_die("${ABCMATCH}" "${SAMPLE}" -pitch_hist)
-  file(WRITE "${raw}" "${LAST_STDOUT}")
+  run_or_die("${bin}" "${midfile}" "${copied}")
+  run_to_file("${raw}" "${MFTEXT}" "${copied}")
 
 else()
   message(FATAL_ERROR "Unknown TYPE: ${TYPE}")
 endif()
 
-# --- Normalize: strip non-deterministic lines ---
+# --- Normalize: strip non-deterministic lines --------------------------------
 #
 # Each program prints a version line as the first line of stdout.  yaps
 # PostScript output contains a CreationDate.  Filenames embedded in output
@@ -115,7 +134,7 @@ file(READ "${raw}" content)
 string(REGEX REPLACE "[0-9]+\\.[0-9]+ +[A-Za-z]+ +[0-9]+ +[0-9]+ +[a-z2]+\n" "" content "${content}")
 
 # Strip yaps PostScript volatile headers
-string(REGEX REPLACE "%%Title:[^\n]*\n" "%%Title: <stripped>\n" content "${content}")
+string(REGEX REPLACE "%%Title:[^\n]*\n"        "%%Title: <stripped>\n"        content "${content}")
 string(REGEX REPLACE "%%CreationDate:[^\n]*\n" "%%CreationDate: <stripped>\n" content "${content}")
 
 # Strip absolute paths to TMPDIR (filenames embedded in some outputs)
@@ -123,7 +142,7 @@ string(REPLACE "${TMPDIR}/" "" content "${content}")
 
 file(WRITE "${out}" "${content}")
 
-# --- Update or compare ---
+# --- Update or compare -------------------------------------------------------
 
 if(DEFINED ENV{ABCMIDI_UPDATE_GOLDEN})
   get_filename_component(golden_dir "${GOLDEN}" DIRECTORY)

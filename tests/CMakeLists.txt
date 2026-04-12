@@ -30,29 +30,29 @@ endforeach()
 
 # --- Golden tests ---
 
+# Build a list of "-D<BIN>=$<TARGET_FILE:bin>" args, one per binary, so that
+# run_test.cmake receives all binary paths uniformly.
+set(BINARY_DEFS)
+foreach(bin IN LISTS ABCMIDI_BINARIES)
+  string(TOUPPER "${bin}" BIN_UPPER)
+  list(APPEND BINARY_DEFS "-D${BIN_UPPER}=$<TARGET_FILE:${bin}>")
+endforeach()
+
 # Helper: register a golden test for one program against one sample
 function(add_golden_test)
   cmake_parse_arguments(T "" "TYPE;SAMPLE" "" ${ARGN})
 
   get_filename_component(stem "${T_SAMPLE}" NAME_WE)
   set(test_name "${T_TYPE}_${stem}")
-  set(golden    "${GOLDEN_DIR}/${test_name}.txt")
 
   add_test(
     NAME "${test_name}"
     COMMAND "${CMAKE_COMMAND}"
       -DTYPE=${T_TYPE}
       -DSAMPLE=${SAMPLES_DIR}/${T_SAMPLE}
-      -DGOLDEN=${golden}
+      -DGOLDEN=${GOLDEN_DIR}/${test_name}.txt
       -DTMPDIR=${TEST_TMPDIR}
-      -DABC2MIDI=$<TARGET_FILE:abc2midi>
-      -DABC2ABC=$<TARGET_FILE:abc2abc>
-      -DMIDI2ABC=$<TARGET_FILE:midi2abc>
-      -DMIDISTATS=$<TARGET_FILE:midistats>
-      -DMFTEXT=$<TARGET_FILE:mftext>
-      -DYAPS=$<TARGET_FILE:yaps>
-      -DMIDICOPY=$<TARGET_FILE:midicopy>
-      -DABCMATCH=$<TARGET_FILE:abcmatch>
+      ${BINARY_DEFS}
       -P "${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake"
   )
   set_tests_properties("${test_name}" PROPERTIES LABELS "golden")
