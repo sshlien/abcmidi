@@ -3168,7 +3168,7 @@ long writetrack(int xtrack)
                           strlen(atext[pitch[j]]));
       };
       break;
-    case COMPOSER:
+    case COMPOSER: /* [RK] 2026-03-31 */
       if (texton) {
         char cbuf[300];
         snprintf(cbuf, sizeof(cbuf), "C:%s", atext[pitch[j]]);
