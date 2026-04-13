@@ -2363,7 +2363,7 @@ void event_specific(char *package, char *s, int in_I)
   char *p;
   int done;
 
-/* [SS] 2015-06-01 */
+/* [SS] 2015-06-01 [RK] 2026-03-31 */
 /* %%MIDIdef macros are context-independent and valid anywhere */
   if (strcmp(package,"MIDIdef") == 0) {
      parse_mididef(s);
