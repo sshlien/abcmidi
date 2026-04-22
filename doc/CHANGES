@@ -15714,3 +15714,4 @@ files (midifile.c, parseabc.c, music_utils.c, parser2.c) are compiled
 once via OBJECT libraries.  The build exports compile_commands.json
 for LSP/clangd support.  Note: the codebase requires -std=gnu89 until
 the K&R-to-ANSI prototype migration is completed.
+
