@@ -15706,16 +15706,6 @@ in event_refno() in store.c.
 
 Man page updated in doc/abc2midi.1.
 
-March 31 2026 [RK]
-
-abc2midi: allow %%MIDIdef macros to be defined anywhere, including
-before the first X: field (outside any tune). Previously %%MIDIdef was
-only handled inside event_specific() after the started_parsing check,
-so macros defined in the file header were silently ignored. The
-%%MIDIdef handling has been moved before the started_parsing check in
-event_specific() in store.c since macro definitions are
-context-independent.
-
 2026 April 01
 build: added CMake build system (CMakeLists.txt, CMakePresets.json)
 alongside the existing autoconf build.  Three presets are provided:
@@ -15724,3 +15714,4 @@ files (midifile.c, parseabc.c, music_utils.c, parser2.c) are compiled
 once via OBJECT libraries.  The build exports compile_commands.json
 for LSP/clangd support.  Note: the codebase requires -std=gnu89 until
 the K&R-to-ANSI prototype migration is completed.
+
