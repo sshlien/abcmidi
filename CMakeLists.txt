@@ -138,5 +138,12 @@ install(FILES
   DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
 )
 
-# TODO: when adding CTest, include an install-validation test that verifies
-# all binaries, doc files, and man pages are installed to the expected paths.
+# --- Tests ---
+
+include(CTest)
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
+
+# TODO: install-validation test that verifies all binaries, doc files, and man
+# pages are installed to the expected paths.
