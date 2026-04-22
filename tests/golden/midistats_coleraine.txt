@@ -1,0 +1,56 @@
+ntrks 5
+ppqn 480
+trk 1 
+tempo 142.00 bpm
+keysig Amin 0 1   0.00
+timesig 6/8   0.00
+metatext 3 Coleraine
+trk 2 
+program 1 26
+metatext 3 Coleraine
+cprogram 1 72 0
+trkinfo 1 26 165 1 11778 45914 0 2 0 26 8 64 81 159 1199 0 5.665032 16 45 25 95 8
+trk 3 
+program 3 3
+program 2 3
+trkinfo 2 3 64 1 2746 15535 0 0 0 266 4 36 45 239 239 0 3.010735 22 2 38 65 0
+trkinfo 3 3 63 151 12443 51146 0 0 0 506 4 48 65 239 239 0 5.702527 18 33 10 64 0
+trk 4 
+trkinfo 10 0 191 1 -1  0 0 0 0 26 0 -1 0
+trk 5 
+timesig 6/8   0.00
+trkinfo 10 0 186 0 -1  0 0 0 0 506 0 -1 0
+npulses 46106
+tempocmds 1
+pitchbends 0
+programcmd 1
+ntimesig 2
+progs  3 26
+progsact  66681 45914
+progcolor  1.45  0.00  0.00  0.00  1.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00 
+drums 43 45 50 65 66 
+drumhits 102 84 32 33 127 
+pitches 60 0 45 0 118 6 2 14 41 98 0 61 
+key Amin 0 0.609575
+rmaj   0.305 -0.394  0.316 -0.360  0.354  0.157 -0.476  0.264 -0.368  0.530 -0.225 -0.105
+rmin  -0.201  0.058  0.322 -0.480  0.522 -0.315  0.071 -0.111 -0.152  0.610 -0.469  0.144
+pitchact  0.33  0.00  0.23  0.00  0.64  0.03  0.01  0.08  0.21  0.58  0.00  0.32 
+chanvol  115    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0 
+chnact 0.996 0.337 1.109 0.000 0.000 0.000 0.000 0.000 0.000 1.689 0.000 0.000 0.000 0.000 0.000 0.000 
+trkact     0    0  166  279  192  186
+pitchperplexity 6.420275
+
+pitchentropy 2.682635
+totalrhythmpatterns =16
+collisions = 0
+clean_quantization
+
+programs:  26 3 3 0 0 0 0 0 0 0 0 0 0 0 0 0
+cnotes:  332 130 428 0 0 0 0 0 0 756 0 0 0 0 0 0
+nnotes:  87 63 63 0 0 0 0 0 0 0 0 0 0 0 0 0
+nzeros:  16 22 18 0 0 0 0 0 0 0 0 0 0 0 0 0
+nsteps:  45 2 33 0 0 0 0 0 0 0 0 0 0 0 0 0
+njumps:  25 38 10 0 0 0 0 0 0 0 0 0 0 0 0 0
+rpats:   8 4 4 0 0 0 0 0 0 0 0 0 0 0 0 0
+pavg:    70 41 53 0 0 0 0 0 0 0 0 0 0 0 0 0
+spread:  99 99 98 0 0 0 0 0 0 98 0 0 0 0 0 0

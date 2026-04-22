@@ -1,0 +1,1780 @@
+%!PS-Adobe-3.0
+%%Title: <stripped>
+%%Creator: yaps (abc to PostScript converter)
+%%CreationDate: <stripped>
+%%LanguageLevel: 2
+%%EndComments
+
+%
+%  This is the abc2ps PostScript Music Library,
+%  containing Postscript for generating musical symbols.
+%  Original Copyright (c) 1999 Michael Methfessel.
+%  This Library may be re-distributed under the
+%  terms of the GNU General Public License.
+%  This form of the library created by James
+%  Allwright, July 1999.
+%
+
+%%BeginSetup
+
+% Section 1 - Fonts and String Manipulation
+
+/Times-Roman findfont
+dup length dict begin
+   {1 index /FID ne {def} {pop pop} ifelse} forall
+   /Encoding ISOLatin1Encoding def
+   currentdict
+end
+/Times-Roman-ISO exch definefont pop
+/F0 { /Times-Roman-ISO exch selectfont } bind def
+
+/Times-Italic findfont
+dup length dict begin
+   {1 index /FID ne {def} {pop pop} ifelse} forall
+   /Encoding ISOLatin1Encoding def
+   currentdict
+end
+/Times-Italic-ISO exch definefont pop
+/F1 { /Times-Italic-ISO exch selectfont } bind def
+
+/Times-Bold findfont
+dup length dict begin
+   {1 index /FID ne {def} {pop pop} ifelse} forall
+   /Encoding ISOLatin1Encoding def
+   currentdict
+end
+/Times-Bold-ISO exch definefont pop
+/F2 { /Times-Bold-ISO exch selectfont } bind def
+
+/Helvetica findfont
+dup length dict begin
+   {1 index /FID ne {def} {pop pop} ifelse} forall
+   /Encoding ISOLatin1Encoding def
+   currentdict
+end
+/Helvetica-ISO exch definefont pop
+/F3 { /Helvetica-ISO exch selectfont } bind def
+
+/setISOfont { % usage /Name-ISO /Name setISOfont
+              % define ISO encoding variant of font
+  findfont
+  dup length dict begin
+     {1 index /FID ne {def} {pop pop} ifelse} forall
+     /Encoding ISOLatin1Encoding def
+     currentdict
+  end
+  definefont pop
+} def
+
+/cshow { % usage: string cshow  - center at current pt
+   dup stringwidth pop 2 div neg 0 rmoveto
+   currentpoint pop dup 0 lt {neg 0 rmoveto} {pop} ifelse
+   show
+} bind def
+
+/lshow { % usage: string lshow - show left-aligned
+   dup stringwidth pop neg 0 rmoveto show
+} bind def
+
+/boxshow {  % usage: x y h string boxshow - text in a box
+  3 index 2 add 3 index 2 add moveto
+  dup show
+  3 index 3 index moveto
+  stringwidth pop 4 add exch dup 0 exch rlineto
+  exch 0 rlineto
+  neg 0 exch rlineto
+  closepath stroke
+} bind def
+
+/wd { moveto show } bind def
+
+/wln {
+dup 3 1 roll moveto gsave 0.6 setlinewidth lineto stroke grestore
+} bind def
+
+/whf {moveto gsave 0.5 1.2 scale (-) show grestore} bind def
+
+% Section 2 - Clefs
+
+/tclef {  % usage:  x tclef  - treble clef 
+  0 moveto
+  -2.22 5.91 rmoveto
+  -0.74 -1.11 rlineto
+  -2.22 2.22 -0.74 8.12 3.69 8.12 rcurveto
+  2.22 0.74 7.02 -1.85 7.02 -6.65 rcurveto
+  0.00 -4.43 -4.06 -6.65 -7.75 -6.65 rcurveto
+  -4.43 0.00 -8.49 2.22 -8.49 8.49 rcurveto
+  0.00 2.58 0.37 5.54 5.91 9.97 rcurveto
+  6.28 4.43 6.28 7.02 6.28 8.86 rcurveto
+  0.00 1.85 -0.37 3.32 -1.11 3.32 rcurveto
+  -1.85 -1.48 -3.32 -5.17 -3.32 -7.38 rcurveto
+  0.00 -13.66 4.43 -16.25 4.80 -25.85 rcurveto
+  0.00 -3.69 -2.22 -5.54 -5.54 -5.54 rcurveto
+  -2.22 0.00 -4.06 1.85 -4.06 3.69 rcurveto
+  0.00 1.85 1.11 3.32 2.95 3.32 rcurveto
+  3.69 0.00 3.69 -5.91 0.37 -4.80 rcurveto
+  0.37 -2.22 5.54 -1.11 5.54 2.95 rcurveto
+  -0.74 12.18 -5.17 14.40 -5.17 28.06 rcurveto
+  0.00 4.06 1.11 7.38 4.43 8.86 rcurveto
+  2.22 -1.48 4.06 -4.06 3.69 -6.65 rcurveto
+  0.00 -4.06 -2.58 -7.02 -5.91 -10.34 rcurveto
+  -2.22 -2.58 -5.91 -4.43 -5.91 -9.60 rcurveto
+  0.00 -4.43 2.58 -6.65 5.54 -6.65 rcurveto
+  2.95 0.00 5.54 1.85 5.54 4.80 rcurveto
+  0.00 3.32 -2.95 4.43 -4.80 4.43 rcurveto
+  -2.58 0.00 -4.06 -1.85 -2.95 -3.69 rcurveto
+   fill
+} bind def
+
+/stclef {
+  0.85 div gsave 0.85 0.85 scale tclef grestore
+} bind def
+
+/bclef {  % usage:  x bclef  - bass clef 
+  0 moveto
+  -9.80 2.50 rmoveto
+  8.30 4.00 12.80 9.00 12.80 13.00 rcurveto
+  0.00 4.50 -2.00 7.50 -4.30 7.30 rcurveto
+  -1.00 0.20 -4.20 0.20 -5.70 -3.80 rcurveto
+  1.50 0.50 3.50 0.00 3.50 -1.50 rcurveto
+  0.00 -1.00 -0.50 -2.00 -2.00 -2.00 rcurveto
+  -1.00 0.00 -2.00 0.90 -2.00 2.50 rcurveto
+  0.00 2.50 2.10 5.50 6.00 5.50 rcurveto
+  4.00 0.00 7.50 -2.50 7.50 -7.50 rcurveto
+  0.00 -5.50 -6.50 -11.00 -15.50 -13.70 rcurveto
+  8.30 4.00 12.80 9.00 12.80 13.00 rcurveto
+  0.00 4.50 -2.00 7.50 -4.30 7.30 rcurveto
+  -1.00 0.20 -4.20 0.20 -5.70 -3.80 rcurveto
+  1.50 0.50 3.50 0.00 3.50 -1.50 rcurveto
+  0.00 -1.00 -0.50 -2.00 -2.00 -2.00 rcurveto
+  -1.00 0.00 -2.00 0.90 -2.00 2.50 rcurveto
+  0.00 2.50 2.10 5.50 6.00 5.50 rcurveto
+  4.00 0.00 7.50 -2.50 7.50 -7.50 rcurveto
+  0.00 -5.50 -6.50 -11.00 -15.50 -13.70 rcurveto
+  16.90 18.20 rmoveto
+  0.00 1.50 2.00 1.50 2.00 0.00 rcurveto
+  0.00 -1.50 -2.00 -1.50 -2.00 0.00 rcurveto
+  0.00 -5.50 rmoveto
+  0.00 1.50 2.00 1.50 2.00 0.00 rcurveto
+  0.00 -1.50 -2.00 -1.50 -2.00 0.00 rcurveto
+fill
+} bind def
+
+/sbclef {
+  0.85 div gsave 0.85 0.85 scale 0 4 translate bclef grestore
+} bind def
+
+/cchalf {
+  0 moveto
+  0.00 12.00 rmoveto
+  1.20 2.75 rlineto
+  4.20 -0.50 6.00 2.25 6.00 5.00 rcurveto
+  0.00 2.00 -0.60 3.90 -3.30 4.00 rcurveto
+  -0.78 0.00 -2.70 0.00 -3.60 -2.00 rcurveto
+  0.90 0.25 2.10 0.00 2.10 -0.75 rcurveto
+  0.00 -0.50 -0.30 -1.00 -1.20 -1.00 rcurveto
+  -0.60 0.00 -1.20 0.45 -1.20 1.25 rcurveto
+  0.00 1.25 1.26 2.75 3.60 2.75 rcurveto
+  3.60 0.00 5.40 -1.25 5.40 -3.75 rcurveto
+  0.00 -3.25 -3.00 -6.00 -6.60 -5.75 rcurveto
+  -0.60 -2.50 rlineto
+fill
+} bind def
+
+/cclef {   % usage: x cclef
+   dup dup dup
+   cchalf gsave 0 24 translate 1 -1 scale cchalf
+   6.5 sub 0 moveto 0 24 rlineto 3 0 rlineto 0 -24 rlineto fill
+   1.8 sub 0 moveto 0 24 rlineto 0.8 setlinewidth stroke grestore 
+} bind def
+
+/scclef { cclef } bind def
+
+% Section 3 - Note Heads, Stems and Beams
+
+/hd {  % usage: x y hd  - full head
+  dup /y exch def exch dup /x exch def exch moveto
+  3.30 2.26 rmoveto
+  -2.26 3.30 -8.86 -1.22 -6.60 -4.52 rcurveto
+  2.26 -3.30 8.86 1.22 6.60 4.52 rcurveto
+   fill
+} bind def
+
+/Hd {  % usage: x y Hd  - open head for half
+  dup /y exch def exch dup /x exch def exch moveto
+  3.51 1.92 rmoveto
+  -2.04 3.73 -9.06 -0.10 -7.02 -3.83 rcurveto
+  2.04 -3.73 9.06 0.10 7.02 3.83 rcurveto
+  -0.44 -0.24 rmoveto
+  0.96 -1.76 -5.19 -5.11 -6.15 -3.35 rcurveto
+  -0.96 1.76 5.19 5.11 6.15 3.35 rcurveto
+   fill
+} bind def
+
+/HD { % usage: x y HD  - open head for whole
+  dup /y exch def exch dup /x exch def exch moveto
+  5.96 0.00 rmoveto
+  0.00 1.08 -2.71 3.52 -5.96 3.52 rcurveto
+  -3.25 0.00 -5.96 -2.44 -5.96 -3.52 rcurveto
+  0.00 -1.08 2.71 -3.52 5.96 -3.52 rcurveto
+  3.25 0.00 5.96 2.44 5.96 3.52 rcurveto
+  -8.13 1.62 rmoveto
+  1.62 2.17 5.96 -1.07 4.34 -3.24 rcurveto
+  -1.62 -2.17 -5.96 1.07 -4.34 3.24 rcurveto
+   fill
+} bind def
+
+/BHD { % usage x y BHD - breve
+  HD
+  x 6.0 sub y 3.5 sub moveto 0 7.0 rlineto stroke
+  x 8.0 sub y 3.5 sub moveto 0 7.0 rlineto stroke
+  x 6.0 add y 3.5 sub moveto 0 7.0 rlineto stroke
+  x 8.0 add y 3.5 sub moveto 0 7.0 rlineto stroke
+} bind def
+
+/setx { % usage: x setx - set x value
+  /x exch store
+} bind def
+
+/sety { % usage: y sety - set y value
+  /y exch store
+} bind def
+
+/su {  % usage: len su   - up stem
+  x y moveto 3.5 1.0 rmoveto 1.0 sub 0 exch rlineto stroke
+} bind def
+
+/sd {  % usage: len td   - down stem
+  x y moveto -3.5 -1.0 rmoveto neg 1.0 add 0 exch rlineto stroke
+} bind def
+
+/bm {  % usage: x1 y1 x2 y2 t bm  - beam, depth t
+  3 1 roll moveto dup 0 exch neg rlineto
+  dup 4 1 roll sub lineto 0 exch rlineto fill
+} bind def
+
+/bnum {  % usage: x y (str) bnum  - number on beam
+  3 1 roll moveto gsave /Times-Italic 12 selectfont
+  cshow grestore
+} bind def
+
+/hbr {  % usage: x1 y1 x2 y2 hbr  - half bracket
+  moveto lineto 0 -3 rlineto stroke
+} bind def
+
+/SL {  % usage: pp2x pp1x p1 pp1 pp2 p2 p1 sl
+  moveto curveto rlineto curveto fill
+} bind def
+
+% New slurs with simple interface 
+/slurdown { % Slur - usage x1 y1 x2 y2 slurdown
+  /ys2 exch def
+  /xs2 exch def
+  /ys1 exch def
+  /xs1 exch def
+  /ddy xs2 xs1 sub abs 2 div dup 12 gt {pop 12} if def
+  xs1 4 add ys1 4 sub moveto
+  xs1 2 mul xs2 add 3 div ys1 2 mul ys2 add 3 div ddy sub
+  xs1 xs2 2 mul add 3 div ys1 ys2 2 mul add 3 div ddy sub
+  xs2 4 sub ys2 4 sub
+  curveto
+  xs1 xs2 2 mul add 3 div ys1 ys2 2 mul add 3 div ddy sub 2 sub
+  xs1 2 mul xs2 add 3 div ys1 2 mul ys2 add 3 div ddy sub 2 sub
+  xs1 4 add ys1 4 sub
+  curveto fill
+} def
+/slurup { % Slur - usage x1 y1 x2 y2 slurup
+  /ys2 exch def
+  /xs2 exch def
+  /ys1 exch def
+  /xs1 exch def
+  /ddy xs2 xs1 sub abs 2 div dup 12 gt {pop 12} if def
+  xs1 4 add ys1 4 add moveto
+  xs1 2 mul xs2 add 3 div ys1 2 mul ys2 add 3 div ddy add
+  xs1 xs2 2 mul add 3 div ys1 ys2 2 mul add 3 div ddy add
+  xs2 4 sub ys2 4 add
+  curveto
+  xs1 xs2 2 mul add 3 div ys1 ys2 2 mul add 3 div ddy add 2 sub
+  xs1 2 mul xs2 add 3 div ys1 2 mul ys2 add 3 div ddy add 2 sub
+  xs1 4 add ys1 4 add
+  curveto fill
+} def
+
+% Section 4 - Note Ornaments (Staccato, Roll, Trill etc.)
+
+/dt {  % usage: dx dy dt  - dot shifted by dx,dy
+  y add exch x add exch 1.2 0 360 arc fill
+} bind def
+
+/grm {  % usage:  y grm  - gracing mark
+  x exch moveto
+  -5.00 -1.00 rmoveto
+  5.00 8.50 5.50 -4.50 10.00 2.00 rcurveto
+  -5.00 -8.50 -5.50 4.50 -10.00 -2.00 rcurveto
+   fill
+} bind def
+
+/stc {  % usage:  y stc  - staccato mark
+  x exch 1.2 0 360 arc fill } bind def
+
+/cpu {  % usage:  y cpu  - roll sign above head
+  x exch moveto
+  -5.85 0.00 rmoveto
+  0.45 7.29 11.25 7.29 11.70 0.00 rcurveto
+  -1.35 5.99 -10.35 5.99 -11.70 0.00 rcurveto
+   fill
+} bind def
+
+/cpd {  % usage:  y cpd  - roll sign below head
+  x exch moveto
+  -5.85 0.00 rmoveto
+  0.45 -7.29 11.25 -7.29 11.70 0.00 rcurveto
+  -1.35 -5.99 -10.35 -5.99 -11.70 0.00 rcurveto
+   fill
+} bind def
+
+/sld {  % usage:  y dx sld  - slide
+  x exch sub exch moveto
+  -7.20 -4.80 rmoveto
+  1.80 -0.70 4.50 0.20 7.20 4.80 rcurveto
+  -2.07 -5.00 -5.40 -6.80 -7.65 -6.00 rcurveto
+   fill
+} bind def
+
+/emb {  % usage:  y emb  - empahsis bar
+  gsave 1.2 setlinewidth 1 setlinecap x exch moveto 
+ -2.5 0 rmoveto 5 0 rlineto stroke grestore
+} bind def
+
+/trl {  % usage:  y trl  - trill sign
+  gsave /Times-BoldItalic 14 selectfont
+  x 4 sub exch moveto (tr) show grestore
+} bind def
+
+/hld {  % usage:  y hld  - hold sign
+  x exch 2 copy 1.5 add 1.3 0 360 arc moveto
+  -7.50 0.00 rmoveto
+  0.00 11.50 15.00 11.50 15.00 0.00 rcurveto
+  -0.25 0.00 rlineto
+  -1.25 9.00 -13.25 9.00 -14.50 0.00 rcurveto
+   fill
+} bind def
+
+/dnb {  % usage:  y dnb  - down bow
+  x exch moveto
+  -3.20 0.00 rmoveto
+  0.00 7.20 rlineto
+  6.40 0.00 rlineto
+  0.00 -7.20 rlineto
+   currentpoint stroke moveto
+  -6.40 4.80 rmoveto
+  0.00 2.40 rlineto
+  6.40 0.00 rlineto
+  0.00 -2.40 rlineto
+   fill
+} bind def
+
+/upb {  % usage:  y upb  - up bow
+  x exch moveto
+  -2.56 8.80 rmoveto
+  2.56 -8.80 rlineto
+  2.56 8.80 rlineto
+   stroke
+} bind def
+
+% Section 5 - helper lines
+
+/hl {  % usage: y hl  - helper line at height y
+   gsave 1 setlinewidth x exch moveto 
+   -5.5 0 rmoveto 11 0 rlineto stroke grestore
+} bind def
+
+/hl1 {  % usage: y hl1  - longer helper line
+   gsave 1 setlinewidth x exch moveto 
+   -7 0 rmoveto 14 0 rlineto stroke grestore
+} bind def
+
+% Section 6 - Note tails 
+
+/f1u {  % usage:  len f1u  - single flag up
+  y add x 3.5 add exch moveto
+  0.00 0.00 rmoveto
+  1.00 -2.00 0.67 -1.67 2.67 -4.00 rcurveto
+  3.33 -2.67 3.33 -6.67 2.67 -9.33 rcurveto
+  -0.67 -2.67 -2.67 -4.00 -1.00 -1.00 rcurveto
+  1.67 4.33 -1.67 8.33 -4.33 9.00 rcurveto
+   fill
+} bind def
+
+/f1d {  % usage:  len f1d  - single flag down
+  neg y add x 3.5 sub exch moveto
+  0.00 0.00 rmoveto
+  1.20 2.00 0.80 1.67 3.20 4.00 rcurveto
+  4.00 2.67 4.00 6.67 3.20 9.33 rcurveto
+  -0.80 2.67 -3.20 4.00 -1.20 1.00 rcurveto
+  2.00 -4.33 -2.00 -8.33 -5.20 -9.00 rcurveto
+   fill
+} bind def
+
+/f2u {  % usage:  len f2u  - double flag up
+  y add x 3.5 add exch moveto
+  0.00 0.00 rmoveto
+  1.33 -3.33 6.00 -4.00 5.00 -12.00 rcurveto
+  0.00 6.00 -4.00 7.67 -5.00 7.67 rcurveto
+  1.33 -5.00 6.00 -5.00 5.00 -13.00 rcurveto
+  0.00 6.00 -4.00 7.67 -5.00 8.00 rcurveto
+   fill
+} bind def
+
+/f2d {  % usage:  len f2d  - double flag down
+  neg y add x 3.5 sub exch moveto
+  0.00 0.00 rmoveto
+  1.60 3.33 7.20 4.00 6.00 12.00 rcurveto
+  0.00 -6.00 -4.80 -7.67 -6.00 -7.67 rcurveto
+  1.60 5.00 7.20 5.00 6.00 13.00 rcurveto
+  0.00 -6.00 -4.80 -7.67 -6.00 -8.00 rcurveto
+   fill
+} bind def
+
+/xfu {  % usage:  len xfu  - extra flag up
+  y add x 3.5 add exch moveto
+  0.00 0.00 rmoveto
+  1.33 -5.00 6.00 -5.00 5.00 -13.00 rcurveto
+  0.00 6.00 -4.00 7.67 -5.00 8.00 rcurveto
+   fill
+} bind def
+
+/xfd {  % usage:  len xfd  - extra flag down
+  neg y add x 3.5 sub exch moveto
+  0.00 0.00 rmoveto
+  1.60 5.00 7.20 5.00 6.00 13.00 rcurveto
+  0.00 -6.00 -4.80 -7.67 -6.00 -8.00 rcurveto
+   fill
+} bind def
+
+/f3d {dup f2d 9.5 sub xfd} bind def
+
+/f4d {dup dup f2d 9.5 sub xfd 14.7 sub xfd} bind def
+
+/f3u {dup f2u 9.5 sub xfu} bind def
+
+/f4u {dup dup f2u 9.5 sub xfu 14.7 sub xfu} bind def
+
+% Section 7 - Flats, Sharps and Naturals.
+
+/ft0 { % usage:  x y ft0  - flat sign
+  moveto
+  -1.60 2.67 rmoveto
+  6.40 3.11 6.40 -3.56 0.00 -6.67 rcurveto
+  4.80 4.00 4.80 7.56 0.00 5.78 rcurveto
+  currentpoint fill moveto
+  0.00 7.11 rmoveto
+  0.00 -12.44 rlineto
+  stroke
+ } bind def
+
+/ft { % usage: dx ft  - flat relative to head
+ neg x add y ft0 } bind def
+
+/ftx { % usage:  x y ftx  - narrow flat sign
+  moveto
+  -1.42 2.67 rmoveto
+  5.69 3.11 5.69 -3.56 0.00 -6.67 rcurveto
+  4.27 4.00 4.27 7.56 0.00 5.78 rcurveto
+  currentpoint fill moveto
+  0.00 7.11 rmoveto
+  0.00 -12.44 rlineto
+  stroke
+ } bind def
+
+/dft0 { % usage: x y dft0 ft  - double flat sign
+  2 copy exch 2.5 sub exch ftx exch 1.5 add exch ftx } bind def
+
+/dft { % usage: dx dft  - double flat relative to head
+  neg x add y dft0 } bind def
+
+/sh0 {  % usage:  x y sh0  - sharp sign
+  moveto
+  2.60 2.89 rmoveto
+  0.00 2.17 rlineto
+  -5.20 -1.44 rlineto
+  0.00 -2.17 rlineto
+  5.20 1.44 rlineto
+  0.00 -6.50 rmoveto
+  0.00 2.17 rlineto
+  -5.20 -1.44 rlineto
+  0.00 -2.17 rlineto
+  5.20 1.44 rlineto
+  currentpoint fill moveto
+  -1.30 -3.61 rmoveto
+  0.00 15.53 rlineto
+  currentpoint stroke moveto
+  -2.60 -16.61 rmoveto
+  0.00 15.53 rlineto
+  stroke
+ } bind def
+
+/sh { % usage: dx sh  - sharp relative to head
+ neg x add y sh0 } bind def
+
+/nt0 {  % usage:  x y nt0  - natural sign
+  moveto
+  -1.62 -4.33 rmoveto
+  3.25 0.72 rlineto
+  0.00 2.17 rlineto
+  -3.25 -0.72 rlineto
+  0.00 6.50 rlineto
+  0.00 -2.89 rmoveto
+  3.25 0.72 rlineto
+  0.00 2.17 rlineto
+  -3.25 -0.72 rlineto
+  0.00 -2.17 rlineto
+  currentpoint fill moveto
+  0.00 6.50 rmoveto
+  0.00 -11.92 rlineto
+  currentpoint stroke moveto
+  3.25 7.94 rmoveto
+  0.00 -11.92 rlineto
+  stroke
+ } bind def
+
+/nt { % usage: dx nt  - natural relative to head
+ neg x add y nt0 } bind def
+
+/dsh0 {  % usage:  x y dsh0  - double sharp 
+  moveto
+  0.39 0.00 rmoveto
+  1.78 1.67 rlineto
+  1.17 0.00 rlineto
+  0.11 1.78 rlineto
+  -1.78 -0.11 rlineto
+  0.00 -1.17 rlineto
+  -1.67 -1.78 rlineto
+  -1.67 1.78 rlineto
+  0.00 1.17 rlineto
+  -1.78 0.11 rlineto
+  0.11 -1.78 rlineto
+  1.17 0.00 rlineto
+  1.78 -1.67 rlineto
+  -1.78 -1.67 rlineto
+  -1.17 0.00 rlineto
+  -0.11 -1.78 rlineto
+  1.78 0.11 rlineto
+  0.00 1.17 rlineto
+  1.67 1.78 rlineto
+  1.67 -1.78 rlineto
+  0.00 -1.17 rlineto
+  1.78 -0.11 rlineto
+  -0.11 1.78 rlineto
+  -1.17 0.00 rlineto
+  -1.78 1.67 rlineto
+  fill
+ } bind def
+
+/dsh { % usage: dx dsh  - double sharp relative to head
+ neg x add y dsh0 } bind def
+
+% Section 8 - Guitar Chords
+
+/gc { % usage: x y (str) gc  -- draw guitar chord string
+  3 1 roll moveto show
+} bind def
+
+% Section 9 - Rests
+
+/r4 {  % usage:  x y r4  -  quarter rest
+   dup /y exch def exch dup /x exch def exch moveto
+  -0.52 8.87 rmoveto
+  8.35 -6.78 -2.61 -4.70 3.91 -11.48 rcurveto
+  -4.43 1.57 -6.00 -3.13 -2.87 -5.22 rcurveto
+  -5.22 2.09 -3.65 7.83 0.00 7.30 rcurveto
+  -5.22 4.17 3.13 3.13 -1.04 9.39 rcurveto
+  fill
+ } bind def
+
+/r8 {  % usage:  x y r8  -  eighth rest
+   dup /y exch def exch dup /x exch def exch moveto
+  3.11 5.44 rmoveto
+  -1.17 -1.94 -1.94 -3.50 -3.69 -3.89 rcurveto
+  2.14 2.72 -2.92 3.89 -2.92 1.17 rcurveto
+  0.00 -1.17 1.17 -1.94 2.33 -1.94 rcurveto
+  2.72 0.00 3.11 1.94 3.89 3.50 rcurveto
+  -3.42 -12.06 rlineto
+  0.51 0.00 rlineto
+  3.50 13.22 rlineto
+  fill
+ } bind def
+
+/r16 {  % usage:  x y r16  -  16th rest
+   dup /y exch def exch dup /x exch def exch moveto
+  3.11 5.44 rmoveto
+  -1.17 -1.94 -1.94 -3.50 -3.69 -3.89 rcurveto
+  2.14 2.72 -2.92 3.89 -2.92 1.17 rcurveto
+  0.00 -1.17 1.17 -1.94 2.33 -1.94 rcurveto
+  2.72 0.00 3.11 1.94 3.89 3.50 rcurveto
+  -1.24 -4.28 rlineto
+  -1.17 -1.94 -1.94 -3.50 -3.69 -3.89 rcurveto
+  2.14 2.72 -2.92 3.89 -2.92 1.17 rcurveto
+  0.00 -1.17 1.17 -1.94 2.33 -1.94 rcurveto
+  2.72 0.00 3.11 1.94 4.01 3.50 rcurveto
+  -1.91 -7.00 rlineto
+  0.51 0.00 rlineto
+  3.50 13.61 rlineto
+  fill
+ } bind def
+
+/r0 {  % usage:  x y r0  -  breve rest
+  dup /y exch def exch dup /x exch def exch moveto
+  -3 0 rmoveto 0 6 rlineto 6 0 rlineto 0 -6 rlineto fill
+} bind def
+
+/r1 {  % usage:  x y r1  -  whole rest
+  dup /y exch def exch dup /x exch def exch moveto
+  -3 0 rmoveto 0 -3 rlineto 6 0 rlineto 0 3 rlineto fill
+} bind def
+
+/r2 {  % usage:  x y r2  -  half rest
+  dup /y exch def exch dup /x exch def exch moveto
+  -3 0 rmoveto 0 3 rlineto 6 0 rlineto 0 -3 rlineto fill
+} bind def
+
+/r32 {
+  2 copy r16 5.5 add exch 1.6 add exch r8
+} bind def
+
+/r64 {
+  2 copy 5.5 add exch 1.6 add exch r16
+  5.5 sub exch 1.5 sub exch r16
+} bind def
+
+/mrest {  %usage: nb_measures x y mrest
+  gsave 1 setlinewidth
+  2 copy -6 add moveto 0 12 rlineto stroke
+  2 copy exch 40 add exch -6 add moveto 0 12 rlineto stroke
+  2 copy moveto 5 setlinewidth 40 0 rlineto stroke
+  /Times-Bold 15 selectfont exch 20 add exch 16 add moveto cshow
+  grestore
+} bind def
+
+% Section 10 - Bar signs
+
+/bar {  % usage: x bar  - single bar
+  0 moveto  0 24 rlineto stroke
+} bind def
+
+/dbar {  % usage: x dbar  - thin double bar
+   0 moveto 0 24 rlineto -3 -24 rmoveto
+   0 24 rlineto stroke
+} bind def
+
+/fbar1 {  % usage: x fbar1  - fat double bar at start
+  0 moveto  0 24 rlineto 3 0 rlineto 0 -24 rlineto 
+  currentpoint fill moveto
+  3 0 rmoveto 0 24 rlineto stroke
+} bind def
+
+/fbar2 {  % usage: x fbar2  - fat double bar at end
+  0 moveto  0 24 rlineto -3 0 rlineto 0 -24 rlineto 
+  currentpoint fill moveto
+  -3 0 rmoveto 0 24 rlineto stroke
+} bind def
+
+/rdots {  % usage: x rdots  - repeat dots 
+  0 moveto 0 9 rmoveto currentpoint 2 copy 1.2 0 360 arc 
+  moveto 0 6 rmoveto  currentpoint 1.2 0 360 arc fill
+} bind def
+
+/end1 {  % usage: x1 x2 (str) end1  - mark first ending
+  3 1 roll 44 moveto 0 6 rlineto dup 50 lineto 0 -6 rlineto stroke
+  4 add 40 moveto gsave /Times-Roman 13 selectfont 1.2 0.95 scale
+  show grestore
+} bind def
+
+/end2 {  % usage: x1 x2 (str) end2  - mark second ending
+  3 1 roll 50 moveto dup 50 lineto 0 -6 rlineto stroke
+  4 add 40 moveto gsave /Times-Roman 13 selectfont 1.2 0.95 scale
+  show grestore
+} bind def
+
+
+ % following 2 routines added by J. Allwright
+/endy1 {  % usage: y x1 x2 (str) endy1  - mark first ending
+  4 -1 roll /yval exch def
+  3 1 roll yval 4 add moveto 0 6 rlineto
+  dup yval 10 add lineto 0 -6 rlineto stroke
+  4 add yval moveto gsave /Times-Roman 13 selectfont 1.2 0.95 scale
+  show grestore
+} bind def
+
+/endy2 {  % usage: y x1 x2 (str) endy2  - mark second ending
+  4 -1 roll /yval exch def
+  3 1 roll yval 10 add moveto
+  dup yval 10 add lineto 0 -6 rlineto stroke
+  4 add yval moveto gsave /Times-Roman 13 selectfont 1.2 0.95 scale
+  show grestore
+} bind def
+
+% Section 11 - Grace Notes
+
+/gn {  % usage: x y gn  - grace note head only
+  moveto
+  -1.29 1.53 rmoveto
+  2.45 2.06 5.02 -1.00 2.58 -3.06 rcurveto
+  -2.45 -2.06 -5.02 1.00 -2.58 3.06 rcurveto
+  fill
+} bind def
+
+/gn1 {  % usage: x y l gnt  - grace note with tail
+  3 1 roll 2 copy moveto
+  -1.29 1.53 rmoveto
+  2.45 2.06 5.02 -1.00 2.58 -3.06 rcurveto
+  -2.45 -2.06 -5.02 1.00 -2.58 3.06 rcurveto
+  fill moveto 2.00 0 rmoveto 0 exch rlineto
+3 -4 4 -5 2 -8 rcurveto -5 2 rmoveto 7 4 rlineto   
+stroke
+} bind def
+
+/gnt {  % usage: x y l gnt  - grace note
+  3 1 roll 2 copy moveto
+  -1.29 1.53 rmoveto
+  2.45 2.06 5.02 -1.00 2.58 -3.06 rcurveto
+  -2.45 -2.06 -5.02 1.00 -2.58 3.06 rcurveto
+  fill moveto 2.00 0 rmoveto 0 exch rlineto stroke
+} bind def
+
+/gbm2 {  % usage: x1 y1 x2 y2 gbm2  - double note beam
+  gsave 1.4 setlinewidth
+  4 copy 0.5 sub moveto 0.5 sub lineto stroke
+  3.4 sub moveto 3.4 sub lineto stroke grestore
+} bind def
+
+/gbm3 {  % usage: x1 y1 x2 y2 gbm3  - triple gnote beam
+  gsave 1.2 setlinewidth
+  4 copy 0.3 sub moveto 0.3 sub lineto stroke
+  4 copy 2.5 sub moveto 2.5 sub lineto stroke
+  4.7 sub moveto 4.7 sub lineto stroke grestore
+} bind def
+
+/ghl {  % usage: x y ghl  - grace note helper line
+   gsave 0.7 setlinewidth moveto 
+   -3 0 rmoveto 6 0 rlineto stroke grestore
+} bind def
+
+/gsl {  % usage: x1 y2 x2 y2 x3 y3 x0 y0 gsl
+  moveto curveto stroke
+} bind def
+
+/gsh0 {  % usage: x y gsh0
+gsave translate 0.7 0.7 scale 0 0 sh0 grestore
+} bind def
+
+/gft0 {  % usage: x y gft0
+gsave translate 0.7 0.7 scale 0 0 ft0 grestore
+} bind def
+
+/gnt0 {  % usage: x y gnt0
+gsave translate 0.7 0.7 scale 0 0 nt0 grestore
+} bind def
+
+/gdf0 {  % usage: x y gdf0
+gsave translate 0.7 0.6 scale 0 0 dft0 grestore
+} bind def
+
+/gds0 {  % usage: x y gds0
+gsave translate 0.7 0.7 scale 0 0 dsh0 grestore
+} bind def
+
+% Section 12 - Time Signatures
+
+/csig {  % usage:  x csig  - C timesig 
+  0 moveto
+  1.00 17.25 rmoveto
+  1.00 0.00 2.75 -0.75 2.75 -3.00 rcurveto
+  0.00 1.50 -1.50 1.25 -1.50 0.00 rcurveto
+  0.00 -1.25 1.75 -1.25 1.75 0.25 rcurveto
+  0.00 2.50 -1.50 3.25 -3.00 3.25 rcurveto
+  -3.75 0.00 -6.25 -2.75 -6.25 -6.50 rcurveto
+  0.00 -3.00 3.75 -7.50 9.00 -2.50 rcurveto
+  -4.25 -3.00 -7.25 -0.75 -7.25 2.50 rcurveto
+  0.00 3.00 1.00 6.00 4.50 6.00 rcurveto
+   fill
+} bind def
+
+/ctsig {  % usage:  x ctsig  - C| timesig 
+  dup csig 4 moveto 0 16 rlineto stroke
+} bind def
+
+/sep0 { % usage: x1 x2 sep0  - hline separator 
+   0 moveto 0 lineto stroke
+} bind def
+
+/tsig { % usage: x (top) (bot) tsig -- draw time signature
+   3 -1 roll 0 moveto
+   gsave /Times-Bold 16 selectfont 1.2 1 scale
+   0 1.0 rmoveto currentpoint 3 -1 roll cshow
+   moveto 0 12 rmoveto cshow grestore
+} bind def
+
+% Section 13 - Staff And Other things
+
+/staff {  % usage: l staff  - draw staff
+  gsave   dup 0 rlineto dup neg 6 rmoveto
+  dup 0 rlineto dup neg 6 rmoveto
+  dup 0 rlineto dup neg 6 rmoveto
+  dup 0 rlineto dup neg 6 rmoveto
+  dup 0 rlineto dup neg 6 rmoveto
+  pop stroke grestore
+} bind def
+
+/segno { % segno symbol usage: x y segno
+  gsave translate
+  5.82 0.84 moveto
+  4.62 1.15   5.04 3.20   4.6 3.64 curveto
+  4.17 4.08   3.19 2.75   3.9 1.51 curveto
+  4.62 0.27   7.45 0.0    8.03 1.82 curveto
+  8.61 3.64   5.06 7.81   3.38 9.67 curveto
+  1.69 11.53  1.59 14.46  2.79 14.16 curveto
+  3.99 13.85  3.55 11.80  4.00 11.36 curveto
+  4.44 10.92  5.33 12.25  4.66 13.49 curveto
+  3.99 14.73  1.15 15.0   0.57 13.18 curveto
+  0.0  11.36  3.50 7.19   5.21 5.32  curveto
+  6.92 3.46   7.01 0.53   5.82 0.84 curveto
+  closepath fill
+  -0.43 2.93 moveto
+  8.79 12.25 lineto 9.32 11.72 lineto -0.09 2.40 lineto
+  closepath fill
+  0.71 7.50 1.0 0 360 arc
+  closepath fill
+  7.85 7.50 1.0 0 360 arc
+  closepath fill
+  grestore
+} bind def
+
+/coda { % coda : usage x y coda
+  gsave
+  translate
+  1.0 setlinewidth
+  0.0 7.5 moveto 15.0 7.5 lineto stroke
+  7.5 0.0 moveto 7.5 15.0 lineto stroke
+  7.5 7.5 5.0 0 360 arc stroke
+  grestore
+} bind def
+
+/WS {   %usage:  w nspaces str WS
+   dup stringwidth pop 4 -1 roll
+   sub neg 3 -1 roll div 0 8#040 4 -1 roll
+   widthshow
+} bind def
+
+/W1 { show pop pop } bind def
+
+/str 50 string def
+
+/W0 {
+   dup stringwidth pop str cvs exch show (  ) show show pop pop
+} bind def
+
+/WC { counttomark 1 sub dup 0 eq { 0 }
+  {  ( ) stringwidth pop neg 0 3 -1 roll
+  {  dup 3 add index stringwidth pop ( ) stringwidth pop add
+  dup 3 index add 4 index lt 2 index 1 lt or
+  {3 -1 roll add exch 1 add} {pop exit} ifelse
+  } repeat } ifelse
+} bind def
+
+/P1 {
+  {  WC dup 0 le {exit} if
+      exch pop gsave { exch show ( ) show } repeat grestore LF
+   } loop pop pop pop pop
+} bind def
+
+/P2 {
+   {  WC dup 0 le {exit} if
+      dup 1 sub dup 0 eq
+      { pop exch pop 0.0 }
+      { 3 2 roll 3 index exch sub exch div } ifelse
+      counttomark 3 sub 2 index eq { pop 0 } if exch gsave
+      {  3 2 roll show ( ) show dup 0 rmoveto } repeat
+      grestore LF pop
+   } loop pop pop pop pop
+} bind def
+
+0 setlinecap 0 setlinejoin 0.8 setlinewidth
+
+/T {translate} bind def
+/M {moveto} bind def
+/L {lineto stroke} bind def
+
+% End of abc2ps Postscript Library
+%%EndSetup
+
+%%Page: 1 1
+%%BeginPageSetup
+gsave
+40 796 T
+0.8 setlinewidth 0 setlinecap
+0.700 0.700 scale
+%%EndPageSetup
+
+0 -20.0 T
+20.0 F0
+(Coleraine) 367.1 0 M cshow
+12.0 F3
+10.0 0.0 hd 14.0 su 30.0 0.0 M (= 142) show
+0 -58.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+ 38.6 (6) (8) tsig
+48.3 fbar1 58.3 rdots
+66.6 0.0 hd
+ 20.0 su 20.0 f1u
+
+ 63.1 35.0 (E7) gc 83.4 bar
+91.7 0.0 hd 7.5 3.0 dt
+ 25.6 su
+
+ 88.2 35.0 (Am) gc 114.4 9.0 hd
+ 22.5 su
+
+126.2 9.0 hd
+ 25.6 su
+
+95.2 25.6 129.7 34.6 2.6 bm
+106.5 23.3 117.9 26.2 2.6 bm
+
+138.0 9.0 hd
+ 20.0 su
+
+161.6 12.0 hd
+ 21.0 su
+
+173.3 15.0 hd
+ 20.0 su
+
+141.5 29.0 176.8 35.0 2.6 bm
+
+182.4 bar
+190.7 12.0 hd 7.5 3.0 dt
+ 20.0 sd
+
+ 187.2 35.0 (E7) gc 210.2 21.0 hd
+ 23.4 sd
+
+221.9 21.0 hd
+ 20.0 sd
+
+187.2 -8.0 218.4 1.0 -2.6 bm
+196.9 0.1 206.7 2.9 -2.6 bm
+
+233.7 21.0 hd
+ 20.0 sd
+
+245.5 18.0 hd
+ 20.0 sd 20.0 f1d
+
+254.6 bar
+262.9 15.0 hd 7.5 3.0 dt
+ 20.0 su
+
+ 259.4 35.0 (Am) gc 285.6 9.0 hd
+ 22.0 su
+
+297.4 9.0 hd
+ 20.0 su
+
+266.4 35.0 300.9 29.0 2.6 bm
+277.8 27.7 289.1 25.7 2.6 bm
+
+309.2 9.0 hd
+ 20.0 su
+
+321.0 12.0 hd
+ 20.0 su
+
+332.8 15.0 hd
+ 20.0 su
+
+312.7 29.0 336.3 35.0 2.6 bm
+
+341.8 bar
+350.1 12.0 hd
+ 20.0 su
+
+ 346.6 35.0 (E7) gc 372.1 6.0 hd 9.6 sh
+ 18.2 su
+
+383.9 0.0 hd
+ 20.0 su
+
+353.6 32.0 387.4 20.0 2.6 bm
+
+395.6 0.0 hd
+ 20.0 su
+
+407.4 0.0 hd
+ 20.0 su 20.0 f1u
+
+421.5 bar
+427.1 bar
+435.4 0.0 hd 7.5 3.0 dt
+ 25.6 su
+
+ 431.9 35.0 (Am) gc 458.1 9.0 hd
+ 22.5 su
+
+469.9 9.0 hd
+ 25.6 su
+
+438.9 25.6 473.4 34.6 2.6 bm
+450.3 23.3 461.6 26.2 2.6 bm
+
+481.7 9.0 hd
+ 20.0 su
+
+493.5 12.0 hd
+ 20.0 su
+
+505.3 15.0 hd
+ 20.0 su
+
+485.2 29.0 508.8 35.0 2.6 bm
+
+514.3 bar
+522.6 12.0 hd 7.5 3.0 dt
+ 20.0 sd
+
+ 519.1 35.0 (E7) gc 542.1 21.0 hd
+ 23.4 sd
+
+553.9 21.0 hd
+ 20.0 sd
+
+519.1 -8.0 550.4 1.0 -2.6 bm
+528.9 0.1 538.6 2.9 -2.6 bm
+
+565.6 21.0 hd
+ 20.0 sd
+
+577.4 18.0 hd
+ 20.0 sd 20.0 f1d
+
+586.5 bar
+594.8 15.0 hd 7.5 3.0 dt
+ 20.0 su
+
+ 591.3 35.0 (Am) gc 617.6 12.0 hd
+ 19.0 su
+
+629.3 9.0 hd
+ 20.0 su
+
+598.3 35.0 632.8 29.0 2.6 bm
+609.7 27.7 621.1 25.7 2.6 bm
+
+641.1 12.0 hd
+ 20.0 su
+
+ 637.6 35.0 (E7) gc 663.1 6.0 hd 9.6 sh
+ 18.2 su
+
+674.9 0.0 hd
+ 20.0 su
+
+644.6 32.0 678.4 20.0 2.6 bm
+
+683.9 bar
+692.2 9.0 hd 7.5 3.0 dt
+ 20.0 su
+
+ 688.7 35.0 (Am) gc  692.2 9.0 715.0 9.0 slurdown
+715.0 9.0 hd
+ 20.0 su
+
+724.3 rdots 734.3 fbar2
+0 -51.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+ 38.6 (6) (8) tsig
+48.3 fbar1 58.3 rdots
+67.1 12 r8 
+83.4 bar
+91.7 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+114.4 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+126.2 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+95.2 -16.0 129.7 -16.0 2.6 bm
+106.5 -21.3 117.9 -21.3 2.6 bm
+
+138.0 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+149.8 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 23.0 su
+
+161.6 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+173.3 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+141.5 -13.0 176.8 -13.0 2.6 bm
+141.5 -18.3 153.3 -18.3 2.6 bm
+
+182.4 bar
+0 24 M 0 51.0 L
+0 -101.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+34.0 fbar1 44.0 rdots
+51.5 12.0 hd
+ 20.0 sd 20.0 f1d
+
+ 48.0 36.0 (G7) gc 68.8 bar
+76.3 15.0 hd
+ 20.0 sd
+
+ 72.8 36.0 (C) gc 110.9 15.0 hd
+ 20.0 sd 20.0 f1d
+
+121.9 15.0 hd
+ 20.0 sd
+
+143.9 18.0 hd
+ 23.0 sd
+
+159.7 15.0 hd
+ 20.0 sd
+
+118.4 -5.0 156.2 -5.0 -2.6 bm
+
+168.0 bar
+175.5 12.0 hd
+ 20.0 sd
+
+ 172.0 36.0 (G) gc 188.8 18.0 hd
+ 17.8 sd
+
+199.8 27.0 hd
+ 20.0 sd
+
+172.0 -8.0 196.3 7.0 -2.6 bm
+
+210.8 27.0 hd
+ 20.0 sd
+
+ 207.3 36.0 (\(E\)) gc 233.3 27.0 hd 9.6 sh
+ 20.0 sd 20.0 f1d
+
+241.6 bar
+249.1 30.0 hd 7.5 3.0 dt 30 hl
+ 20.0 sd
+
+ 245.6 36.0 (Am) gc 271.1 21.0 hd
+ 19.0 sd
+
+282.0 18.0 hd
+ 20.0 sd
+
+245.6 10.0 278.5 -2.0 -2.6 bm
+256.6 11.3 267.6 7.3 -2.6 bm
+
+293.0 15.0 hd
+ 20.0 su
+
+304.0 12.0 hd
+ 20.0 su
+
+315.0 9.0 hd
+ 20.0 su
+
+296.5 35.0 318.5 29.0 2.6 bm
+
+323.3 bar
+333.3 6.0 hd 9.6 sh
+ 20.0 su
+
+ 327.3 36.0 (E7) gc 349.5 12.0 hd
+ 14.0 su
+
+360.5 6.0 hd
+ 20.0 su
+
+336.8 26.0 364.0 26.0 2.6 bm
+
+371.5 0.0 hd
+ 20.0 su
+
+385.0 3.0 hd 9.6 sh
+ 20.3 su
+
+396.0 6.0 hd
+ 20.0 su
+
+375.0 20.0 399.5 26.0 2.6 bm
+
+404.2 bar
+409.0 bar
+416.5 9.0 hd
+ 20.0 su
+
+ 413.0 36.0 (Am) gc 441.0 6.0 hd 9.6 sh
+ 23.0 su
+
+452.0 9.0 hd
+ 20.0 su
+
+420.0 29.0 455.5 29.0 2.6 bm
+
+463.0 12.0 hd
+ 20.0 su
+
+ 459.5 36.0 (E7) gc 481.7 9.0 hd
+ 23.0 su
+
+492.7 12.0 hd
+ 20.0 su
+
+466.5 32.0 496.2 32.0 2.6 bm
+
+501.0 bar
+508.5 15.0 hd
+ 20.0 sd
+
+ 505.0 36.0 (Am) gc 530.5 18.0 hd
+ 19.0 sd
+
+541.4 21.0 hd
+ 20.0 sd
+
+505.0 -5.0 537.9 1.0 -2.6 bm
+
+552.4 24.0 hd
+ 20.0 sd
+
+ 548.9 36.0 (Dm) gc 575.1 21.0 hd
+ 21.0 sd
+
+586.1 18.0 hd
+ 20.0 sd
+
+548.9 4.0 582.6 -2.0 -2.6 bm
+
+594.4 bar
+601.9 15.0 hd 7.5 3.0 dt
+ 20.0 su
+
+ 598.4 36.0 (Am) gc 623.9 12.0 hd
+ 19.0 su
+
+634.9 9.0 hd
+ 20.0 su
+
+605.4 35.0 638.4 29.0 2.6 bm
+616.4 27.7 627.4 25.7 2.6 bm
+
+645.9 12.0 hd
+ 20.0 su
+
+ 642.4 36.0 (E7) gc 667.0 6.0 hd 9.6 sh
+ 18.1 su
+
+678.0 0.0 hd
+ 20.0 su
+
+649.4 32.0 681.5 20.0 2.6 bm
+
+686.3 bar
+693.8 9.0 hd 7.5 3.0 dt
+ 20.0 su
+
+ 690.3 36.0 (Am) gc  693.8 9.0 715.8 9.0 slurdown
+715.8 9.0 hd
+ 20.0 su
+
+724.3 rdots 734.3 fbar2
+0 -51.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+51.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+88.9 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+99.9 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+55.0 -16.0 103.4 -16.0 2.6 bm
+73.7 -21.3 92.4 -21.3 2.6 bm
+
+110.9 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+121.9 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 22.0 su
+
+132.9 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 18.0 su
+
+143.9 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+114.4 -13.0 147.4 -16.0 2.6 bm
+125.4 -19.3 136.4 -20.3 2.6 bm
+
+152.2 bar
+0 24 M 0 51.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+206.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 210.0 -16.0 2.6 bm
+137.5 -21.3 163.0 -21.3 2.6 bm
+
+253.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+300.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 23.0 su
+
+347.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+394.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+257.0 -13.0 398.0 -13.0 2.6 bm
+257.0 -18.3 304.0 -18.3 2.6 bm
+
+438.8 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+206.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 210.0 -16.0 2.6 bm
+137.5 -21.3 163.0 -21.3 2.6 bm
+
+253.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+300.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 22.0 su
+
+347.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 18.0 su
+
+394.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+257.0 -13.0 398.0 -16.0 2.6 bm
+304.0 -19.3 351.0 -20.3 2.6 bm
+
+438.8 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+206.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 210.0 -16.0 2.6 bm
+137.5 -21.3 163.0 -21.3 2.6 bm
+
+253.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+300.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 23.0 su
+
+347.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+394.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+257.0 -13.0 398.0 -13.0 2.6 bm
+257.0 -18.3 304.0 -18.3 2.6 bm
+
+438.8 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+206.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 210.0 -16.0 2.6 bm
+137.5 -21.3 163.0 -21.3 2.6 bm
+
+253.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+300.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 22.0 su
+
+347.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 18.0 su
+
+394.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+257.0 -13.0 398.0 -16.0 2.6 bm
+304.0 -19.3 351.0 -20.3 2.6 bm
+
+438.8 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+206.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 210.0 -16.0 2.6 bm
+137.5 -21.3 163.0 -21.3 2.6 bm
+
+253.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+300.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 23.0 su
+
+347.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+394.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+257.0 -13.0 398.0 -13.0 2.6 bm
+257.0 -18.3 304.0 -18.3 2.6 bm
+
+438.8 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+206.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 210.0 -16.0 2.6 bm
+137.5 -21.3 163.0 -21.3 2.6 bm
+
+253.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+300.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 23.0 su
+
+347.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+257.0 -13.0 351.0 -13.0 2.6 bm
+304.0 -18.3 351.0 -18.3 2.6 bm
+
+392.0 rdots 402.0 fbar2
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+106.0 fbar1 116.0 rdots
+160.0 12 r8 
+203.8 bar
+247.3 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+298.3 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+345.3 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+250.8 -16.0 348.8 -16.0 2.6 bm
+276.3 -21.3 301.8 -21.3 2.6 bm
+
+392.3 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+439.3 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 23.0 su
+
+486.3 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+533.3 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+395.8 -13.0 536.8 -13.0 2.6 bm
+395.8 -18.3 442.8 -18.3 2.6 bm
+
+577.6 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+206.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 210.0 -16.0 2.6 bm
+137.5 -21.3 163.0 -21.3 2.6 bm
+
+253.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+300.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 22.0 su
+
+347.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 18.0 su
+
+394.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+257.0 -13.0 398.0 -16.0 2.6 bm
+304.0 -19.3 351.0 -20.3 2.6 bm
+
+438.8 bar
+0 24 M 0 85.0 L
+%%PageTrailer
+grestore
+showpage
+
+%%Page: 2 2
+%%BeginPageSetup
+gsave
+40 796 T
+0.8 setlinewidth 0 setlinecap
+0.700 0.700 scale
+%%EndPageSetup
+
+0 -43.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+206.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 210.0 -16.0 2.6 bm
+137.5 -21.3 163.0 -21.3 2.6 bm
+
+253.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+300.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 23.0 su
+
+347.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+394.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+257.0 -13.0 398.0 -13.0 2.6 bm
+257.0 -18.3 304.0 -18.3 2.6 bm
+
+438.8 bar
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 17.0 su
+
+206.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 210.0 -16.0 2.6 bm
+137.5 -21.3 163.0 -21.3 2.6 bm
+
+253.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 20.0 su
+
+300.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 22.0 su
+
+347.5 -33.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl
+ 18.0 su
+
+394.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+257.0 -13.0 398.0 -16.0 2.6 bm
+304.0 -19.3 351.0 -20.3 2.6 bm
+
+438.8 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+155.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+202.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 206.0 -16.0 2.6 bm
+
+249.0 12 r4  7.5 3.0 dt
+297.8 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+155.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+202.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 206.0 -16.0 2.6 bm
+
+249.0 12 r4  7.5 3.0 dt
+297.8 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+155.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+202.5 -36.0 hd -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+112.0 -16.0 206.0 -16.0 2.6 bm
+
+249.0 12 r4  7.5 3.0 dt
+297.8 bar
+0 24 M 0 85.0 L
+0 -85.0 T
+734.3 staff
+0 0 M 0 24 L
+gsave 0 0.0 T
+15.0 tclef grestore
+
+108.5 -36.0 hd 7.5 3.0 dt -6 hl -12 hl -18 hl -24 hl -30 hl -36 hl
+ 20.0 su
+
+159.0 12 r4 
+204.0 rdots 214.0 fbar2
+0 24 M 0 85.0 L
+%%PageTrailer
+grestore
+showpage
+

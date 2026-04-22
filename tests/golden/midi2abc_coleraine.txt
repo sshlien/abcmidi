@@ -1,0 +1,148 @@
+calling midi2abc
+X: 1
+T: from midi2abc_coleraine.mid
+M: 6/8
+L: 1/8
+Q:1/4=142
+K:C % 0 sharps
+V:1
+%%MIDI program 26
+%%MIDI program 72
+EE>A AAB| \
+cB>e ee2| \
+dc>A AAB| \
+cB^G EE2|
+EE>A AAB| \
+cB>e ee2| \
+dc>B AB^G| \
+EA4-A|
+EE>A AAB| \
+cB>e ee2| \
+dc>A AAB| \
+cB^G EE2|
+EE>A AAB| \
+cB>e ee2| \
+dc>B AB^G| \
+EA4-A|
+Bc2 ccd| \
+cBd gg2| \
+^ga>e dcB| \
+A^GB GE^F|
+^GAG ABA| \
+Bcd efe| \
+dc>B AB^G| \
+EA4-A|
+Bc2 ccd| \
+cBd gg2| \
+^ga>e dcB| \
+A^GB GE^F|
+^GAG ABA| \
+Bcd efe| \
+dc>B AB^G| \
+EA4-A|
+V:2
+%%MIDI program 3
+%%MIDI program 3
+E,,A,,z [ECA,]A,,z| \
+[ECA,]E,,z [DB,^G,E,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]A,,z| \
+[ECA,]E,,z [DB,^G,E,]E,,z|
+[DB,^G,E,]A,,z [ECA,]A,,z| \
+[ECA,]E,,z [DB,^G,E,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]A,,z|
+[DB,^G,E,]A,,z [ECA,]A,,z| \
+[ECA,]E,,z [DB,^G,E,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]A,,z| \
+[ECA,]E,,z [DB,^G,E,]E,,z|
+[DB,^G,E,]A,,z [ECA,]A,,z| \
+[ECA,]E,,z [DB,^G,E,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]A,,z|
+[FDB,G,]C,,z [G,E,C,]C,,z| \
+[G,E,C,]G,,z [DB,G,]E,,z| \
+[B,^G,E,]A,,z [ECA,]A,,z| \
+[ECA,]E,,z [DB,^G,E,]E,,z|
+[DB,^G,E,]A,,z [ECA,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]D,,z| \
+[A,F,D,]A,,z [ECA,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]A,,z|
+[FDB,G,]C,,z [G,E,C,]C,,z| \
+[G,E,C,]G,,z [DB,G,]E,,z| \
+[B,^G,E,]A,,z [ECA,]A,,z| \
+[ECA,]E,,z [DB,^G,E,]E,,z|
+[DB,^G,E,]A,,z [ECA,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]D,,z| \
+[A,F,D,]A,,z [ECA,]E,,z| \
+[DB,^G,E,]A,,z [ECA,]A,,
+V:3
+%%MIDI channel 10
+%%clef bass
+FFz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F|
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F|
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F|
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F|
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F|
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F|
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F|
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F| \
+^F=Fz ^F/2F/2D,F|
+V:4
+%%MIDI channel 10
+zG,,3/2A,,/2 G,,A,,/2G,,/2A,,| \
+A,,G,,3/2A,,/2 G,,A,,G,,/2A,,/2| \
+G,,G,,3/2A,,/2 G,,A,,/2G,,/2A,,| \
+A,,G,,3/2A,,/2 G,,A,,G,,/2A,,/2|
+G,,G,,3/2A,,/2 G,,A,,/2G,,/2A,,| \
+A,,G,,3/2A,,/2 G,,A,,G,,/2A,,/2| \
+G,,G,,3/2A,,/2 G,,A,,/2G,,/2A,,| \
+A,,G,,3/2A,,/2 G,,A,,G,,/2A,,/2|
+zG,,3/2A,,/2 G,,A,,/2G,,/2A,,| \
+A,,G,,3/2A,,/2 G,,A,,G,,/2A,,/2| \
+G,,G,,3/2A,,/2 G,,A,,/2G,,/2A,,| \
+A,,G,,3/2A,,/2 G,,A,,G,,/2A,,/2|
+G,,G,,3/2A,,/2 G,,A,,/2G,,/2A,,| \
+A,,G,,3/2A,,/2 G,,A,,G,,/2A,,/2| \
+G,,G,,3/2A,,/2 G,,A,,/2G,,/2A,,| \
+A,,G,,3/2A,,/2 G,,A,,G,,/2A,,/2|
+z
+K:F# % 6 sharps
+=G,,3/2=A,,/2 G,,A,,/2G,,/2A,,| \
+=A,,=G,,3/2A,,/2 G,,A,,G,,/2A,,/2| \
+=G,,G,,3/2=A,,/2 G,,A,,/2G,,/2A,,| \
+=A,,=G,,3/2A,,/2 G,,A,,G,,/2A,,/2|
+=G,,G,,G,, G,,z2| \
+z=G,,G,, G,,z2| \
+z=G,,G,, G,,z2| \
+z=G,,3z2|
+z=G,,3/2=A,,/2 G,,A,,/2G,,/2A,,| \
+=A,,=G,,3/2A,,/2 G,,A,,G,,/2A,,/2| \
+=G,,G,,3/2=A,,/2 G,,A,,/2G,,/2A,,| \
+=A,,=G,,3/2A,,/2 G,,A,,G,,/2A,,/2|
+=G,,G,,G,, G,,z2| \
+z=G,,G,, G,,z2| \
+z=G,,G,, G,,z2| \
+z=G,,3
