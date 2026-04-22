@@ -296,6 +296,7 @@ int retuning = 0; /* [SS] 2012-04-01 */
 int bend = 8192; /* [SS] 2012-04-01 */
 int comma53 = 0; /* [SS] 2014-01-12 */
 int silent = 0; /* [SS] 2014-10-16 */
+int error_count = 0; /* number of errors reported by event_error() [RK] 2026-03-30 */
 int no_more_free_channels; /* [SS] 2015-03-23 */
 void init_p48toc53 (); /* [SS] 2014-01-12 */ 
 void convert_to_comma53 (char acc, int *midipitch, int* midibend);  
@@ -1536,6 +1537,7 @@ void event_fatal_error(char *s)
 void event_error(char *s)
 /* generic error handler */
 {
+  error_count++; /* [RK] 2026-03-30 */
 #ifdef NOFTELL
   extern int nullpass;
 
@@ -2683,7 +2685,8 @@ void event_field(char k, char *f)
       break;
     case 'R':
       {
-        char* p; 
+        char* p;
+        char buff[258];
         p = f;
         /* strncpy(rhythmdesignator,f,32);  [SS] 2011-08-19 */
 	snprintf(rhythmdesignator,sizeof(rhythmdesignator),"%s",f); /* [SEG] 2020-06-04 */
@@ -2695,6 +2698,11 @@ void event_field(char k, char *f)
           ratio_a = 2; /* [SS] 2016-01-02 */
           ratio_b = 4;
         };
+        /* Also store as text feature for MIDI output [RK] 2026-03-31 */
+        if (strlen(f) < 256) {
+          sprintf(buff, "R:%s", f);
+          textfeature(TEXT, buff);
+        }
       };
       break;
     default:
@@ -6230,6 +6238,12 @@ void event_refno(int n)
       /* sprintf(outname, "%s%d.mid", outbase, n); */
     };
     startfile();
+    /* Store reference number as text feature for MIDI output [RK] 2026-03-31 */
+    {
+      char xbuf[40];
+      sprintf(xbuf, "X:%d", n);
+      textfeature(TEXT, xbuf);
+    }
   };
 }
 
@@ -6278,6 +6292,6 @@ int main(int argc, char *argv[])
     parsefile(filename);
     free_abbreviations();
   };
-  return(0);
+  return(error_count > 0 ? 1 : 0); /* [RK] 2026-03-30 */
 }
 

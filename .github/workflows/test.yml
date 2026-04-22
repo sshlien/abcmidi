@@ -1,0 +1,78 @@
+# CI workflow for abcMIDI.
+#
+# Runs the CMake-based test suite (smoke + golden-file tests) on every push
+# and pull request against the long-lived branches, and can also be triggered
+# manually from the GitHub UI or via `gh workflow run test.yml`.
+#
+# Status badge: see the [![Tests]] link at the top of README.md.
+
+name: Tests
+
+on:
+  # Run on pushes to the main development branches.
+  push:
+    branches: [master, future]
+  # Run on PRs targeting those same branches.
+  pull_request:
+    branches: [master, future]
+  # Allow manual runs on any branch from the Actions tab or `gh workflow run`.
+  workflow_dispatch:
+
+# Minimal permissions: the workflow only needs to read the repository contents.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # One parallel job per tool.  GitHub Actions only exposes a single badge
+    # per workflow file, so this matrix produces one aggregate "Tests" badge
+    # but still gives per-tool visibility in the Actions UI and lets a single
+    # tool failure be diagnosed without scrolling through unrelated output.
+    strategy:
+      # Keep running the other tools even if one fails, so a single
+      # regression does not hide unrelated breakage.
+      fail-fast: false
+      matrix:
+        tool:
+          - abc2midi
+          - abc2abc
+          - midi2abc
+          - midistats
+          - mftext
+          - yaps
+          - midicopy
+          - abcmatch
+
+    # Job display name in the Actions UI (e.g. "Tests / abc2midi").
+    name: ${{ matrix.tool }}
+
+    steps:
+      # `persist-credentials: false` avoids leaving a GITHUB_TOKEN in the
+      # local git config — defence in depth against a later step that might
+      # inadvertently push or call the API on our behalf.
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      # Configure with the `default` preset (Release build, see CMakePresets.json).
+      - name: Configure
+        run: cmake --preset default
+
+      # Build every binary.  Each matrix job builds the full set rather than
+      # just `${{ matrix.tool }}` because several tools depend on others at
+      # test time: the golden tests for abc2midi / midistats / midicopy pipe
+      # their output through mftext, and midi2abc / midistats / midicopy are
+      # exercised on a MIDI file produced on-the-fly by abc2midi.  Building
+      # everything keeps the test dispatch logic in tests/run_test.cmake
+      # simple and matches what a developer runs locally.
+      - name: Build
+        run: cmake --build --preset default
+
+      # Run only the tests relevant to this matrix tool.  The regex matches:
+      #   - the smoke test          smoke_<tool>_ver
+      #   - every golden test       <tool>_<sample>
+      # (see tests/CMakeLists.txt for the naming convention).
+      - name: Test ${{ matrix.tool }}
+        run: ctest --preset default -R '^(smoke_${{ matrix.tool }}_ver|${{ matrix.tool }}_)'

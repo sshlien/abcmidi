@@ -3168,6 +3168,13 @@ long writetrack(int xtrack)
                           strlen(atext[pitch[j]]));
       };
       break;
+    case COMPOSER: /* [RK] 2026-03-31 */
+      if (texton) {
+        char cbuf[300];
+        snprintf(cbuf, sizeof(cbuf), "C:%s", atext[pitch[j]]);
+        mf_write_meta_event(0L, text_event, cbuf, strlen(cbuf));
+      }
+      break;
     case TITLE:
 /*  Write name of song as sequence name in track 0 and as track 1 name. */
 /*  karaokestarttrack routine handles this instead if tune is a Karaoke tune. */

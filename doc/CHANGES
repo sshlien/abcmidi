@@ -15686,6 +15686,24 @@ emitted as simple section markers (e.g. "Part A"). The existing code at
 genmidi.c:3187 that was meant to write markers was unreachable dead code;
 it has been restructured. Changes in genmidi.c (PART case in writetrack,
 partmarkers global) and store.c (event_part, event_init for -PMAR flag).
+
+abc2midi: now exits with status 1 if any errors occur. Previously
+abc2midi always exited 0 regardless of errors. An error_count global is
+incremented by event_error() and main() returns 1 when error_count > 0.
+Changes in store.c (error_count global, event_error, main return value).
+
+March 31 2026 [RK]
+
+abc2midi: output missing C: (composer), R: (rhythm) and X: (reference
+number) headers as MIDI text meta-events (0x01). Previously the C:
+field was stored as a COMPOSER feature but had no case handler in
+writetrack(), so composer information was lost. The R: field was only
+used internally for Hornpipe detection and never stored as a feature.
+The X: reference number was not stored at all. Changes: added case
+COMPOSER in genmidi.c writetrack; added textfeature(TEXT, "R:...")
+in event_field 'R' case in store.c; added textfeature(TEXT, "X:...")
+in event_refno() in store.c.
+
 Man page updated in doc/abc2midi.1.
 
 2026 April 01
