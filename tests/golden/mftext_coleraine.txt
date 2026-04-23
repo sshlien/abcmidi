@@ -14,6 +14,8 @@ Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <note track>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:8>
 Time=1  Program, chan=1 program=26
 Time=1  Meta Text, type=0x03 (Sequence/Track Name)  leng=9
      Text = <Coleraine>
@@ -21,6 +23,8 @@ Time=1  Meta Text, type=0x01 (Text Event)  leng=18
      Text = <B:Kerr's Violin IV>
 Time=1  Meta Text, type=0x01 (Text Event)  leng=66
      Text = <Z:John Chambers <jc@eddie.mit.edu> http://eddie.mit.edu/~jc/music/>
+Time=1  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = <R:jig>
 Time=1  Program, chan=1 program=72
 Time=1  Parameter, chan=1 c1=7 c2=115
 Time=1  Parameter, chan=1 c1=10 c2=67
@@ -361,12 +365,16 @@ Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=12
      Text = <gchord track>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:8>
 Time=1  Program, chan=3 program=3
 Time=1  Program, chan=2 program=3
 Time=1  Meta Text, type=0x01 (Text Event)  leng=18
      Text = <B:Kerr's Violin IV>
 Time=1  Meta Text, type=0x01 (Text Event)  leng=66
      Text = <Z:John Chambers <jc@eddie.mit.edu> http://eddie.mit.edu/~jc/music/>
+Time=1  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = <R:jig>
 Time=1  Parameter, chan=1 c1=7 c2=115
 Time=1  Parameter, chan=1 c1=10 c2=67
 Time=1  Note on, chan=2 pitch=40 vol=65
@@ -932,10 +940,14 @@ Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <drum track>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:8>
 Time=0  Meta Text, type=0x01 (Text Event)  leng=18
      Text = <B:Kerr's Violin IV>
 Time=0  Meta Text, type=0x01 (Text Event)  leng=66
      Text = <Z:John Chambers <jc@eddie.mit.edu> http://eddie.mit.edu/~jc/music/>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = <R:jig>
 Time=0  Parameter, chan=1 c1=7 c2=115
 Time=0  Parameter, chan=1 c1=10 c2=67
 Time=1  Note on, chan=10 pitch=65 vol=90

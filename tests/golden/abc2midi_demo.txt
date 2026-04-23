@@ -5,8 +5,12 @@ Time=0  Meta Text, type=0x01 (Text Event)  leng=10
 Time=0  Tempo, microseconds-per-MIDI-quarter-note=472440
 Time=0  Key signature, sharp/flats=1  minor=0
 Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:1>
 Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=13
      Text = <Horses Branle>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = <C:Trad>
 Time=1  Note on, chan=1 pitch=67 vol=105
 Time=360  Note off, chan=1 pitch=67 vol=0
 Time=361  Note on, chan=1 pitch=69 vol=80
