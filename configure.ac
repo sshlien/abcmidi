@@ -2,7 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-AC_INIT([abcmidi], [2011-08-03], [seymour.shlien@crc.ca])
+dnl Version is read from the VERSION file at the project root — single
+dnl source of truth, also consumed by CMakeLists.txt and installed as a
+dnl doc file.  m4_esyscmd_s strips the trailing newline.
+AC_INIT([abcmidi], m4_esyscmd_s([cat VERSION]), [seymour.shlien@crc.ca])
 AC_CONFIG_SRCDIR([abc.h])
 AC_CONFIG_HEADERS([config.h])
 

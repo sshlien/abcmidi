@@ -818,7 +818,8 @@ gsave translate 0.7 0.7 scale 0 0 dsh0 grestore
 % Section 13 - Staff And Other things
 
 /staff {  % usage: l staff  - draw staff
-  gsave   dup 0 rlineto dup neg 6 rmoveto
+  gsave 0.5 setlinewidth 0 0 moveto
+  dup 0 rlineto dup neg 6 rmoveto
   dup 0 rlineto dup neg 6 rmoveto
   dup 0 rlineto dup neg 6 rmoveto
   dup 0 rlineto dup neg 6 rmoveto

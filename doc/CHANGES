@@ -15724,3 +15724,19 @@ files (midifile.c, parseabc.c, music_utils.c, parser2.c) are compiled
 once via OBJECT libraries.  The build exports compile_commands.json
 for LSP/clangd support.  Note: the codebase requires -std=gnu89 until
 the K&R-to-ANSI prototype migration is completed.
+
+April 25 2026 [RK]
+
+abc2midi: bumped to version 5.03 (April 2026), reflecting the recent
+fixes (error exit status, missing C:/R:/X: headers emitted as MIDI
+text meta-events, %%MIDIdef macros allowed anywhere) and the build
+system additions on this branch.
+
+build: the package release date in the VERSION file is now the single
+source of truth.  CMakeLists.txt reads it into ABCMIDI_VERSION (no
+longer hard-coded as 2026.02.24 in project()), and configure.ac uses
+m4_esyscmd_s([cat VERSION]) so AC_INIT picks it up at autoreconf time
+(was hard-coded as the very stale 2011-08-03).  Maintainers must run
+"autoreconf -f" before tagging a release so the committed configure
+script reflects the new VERSION; see the Releasing section in
+README.md.

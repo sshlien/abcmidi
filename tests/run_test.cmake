@@ -130,8 +130,12 @@ endif()
 
 file(READ "${raw}" content)
 
-# Strip program version banners (e.g. "5.02 February 16 2025 abc2midi")
-string(REGEX REPLACE "[0-9]+\\.[0-9]+ +[A-Za-z]+ +[0-9]+ +[0-9]+ +[a-z2]+\n" "" content "${content}")
+# Strip program version banners.  Two date forms are emitted across the
+# binaries: "5.02 February 16 2025 abc2midi" (with day) and "5.03 April
+# 2026 abc2midi" (month + year only) — the day number is optional.
+# The month token must be capitalized to avoid matching PostScript lines
+# like "0.8 setlinewidth 0 setlinecap" in yaps output.
+string(REGEX REPLACE "[0-9]+\\.[0-9]+ +[A-Z][a-z]+ +([0-9]+ +)?[0-9]+ +[a-z2]+\n" "" content "${content}")
 
 # Strip yaps PostScript volatile headers
 string(REGEX REPLACE "%%Title:[^\n]*\n"        "%%Title: <stripped>\n"        content "${content}")
