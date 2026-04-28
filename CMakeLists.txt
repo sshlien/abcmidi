@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.14)
 
-# Read version from the VERSION file, matching the existing convention
-file(STRINGS VERSION ABCMIDI_VERSION_STRING LIMIT_COUNT 1)
+# The package release date lives in the VERSION file at the project root —
+# single source of truth, also read by configure.ac (via m4_esyscmd_s) and
+# installed as a doc file.  We do not pass it to project(VERSION ...) because
+# the date format ("April 25 2026") is not the MAJOR.MINOR.PATCH that CMake
+# expects there; PROJECT_VERSION is not used elsewhere in this build.
+file(STRINGS VERSION ABCMIDI_VERSION LIMIT_COUNT 1)
 
 project(abcmidi
-  VERSION 2026.02.24
   DESCRIPTION "ABC music notation tools: converters between ABC, MIDI, and PostScript"
   LANGUAGES C
 )

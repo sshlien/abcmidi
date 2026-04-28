@@ -88,3 +88,28 @@ cmake --build build/debug --target update-golden
 git diff tests/golden/
 ```
 
+### Maintainers / releasing
+
+The package release date in the `VERSION` file is the single source of
+truth for the package version. It is read by `CMakeLists.txt` (into
+`ABCMIDI_VERSION`) and spliced into `configure.ac`'s `AC_INIT` via
+`m4_esyscmd_s` at autoreconf time. Each individual program also keeps its
+own `#define VERSION "<n.nn> <date> <toolname>"` in its `.c` file
+(e.g. `store.c` for `abc2midi`); these are bumped per-tool when that
+tool's behaviour changes.
+
+To cut a release:
+
+1. Update the `VERSION` file (e.g. `April 25 2026`).
+2. For each tool whose behaviour changed since the last release, bump
+   its `#define VERSION` string in the corresponding source file.
+3. Run `autoreconf -f` so the committed `configure` picks up the new
+   `AC_INIT` arguments. The CMake build does not need this step — it
+   reads `VERSION` directly at configure time.
+4. Run `ctest --preset debug` and, if a golden-file test fails because
+   of an intentional output change, regenerate with
+   `cmake --build build/debug --target update-golden` and review the
+   diff.
+5. Append an entry to `doc/CHANGES` and update the per-tool version
+   listing at the top of `doc/readme.txt`.
+6. Commit and tag.
