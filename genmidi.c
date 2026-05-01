@@ -3132,9 +3132,17 @@ long writetrack(int xtrack)
             pitch[j] >= 'A' && pitch[j] <= 'Z') {
           char msg[8];
           snprintf(msg, sizeof(msg), "Part %c", (char) pitch[j]);
-          mf_write_meta_event(delta_time_track0, marker, msg, strlen(msg));
-          tracklen = tracklen + delta_time_track0;
-          delta_time_track0 = 0L;
+          if (ntracks != 1) {
+            mf_write_meta_event(delta_time_track0, marker, msg, strlen(msg));
+            tracklen = tracklen + delta_time_track0;
+            delta_time_track0 = 0L;
+            /* delta_time also accumulates on track 0; keep it in sync so
+               the end-of-track event is not pushed out beyond the music */
+            delta_time = 0L;
+          } else {
+            mf_write_meta_event(delta_time, marker, msg, strlen(msg));
+            delta_time = 0L;
+          }
         }
       } else {
         /* Parts active, navigate then emit "Part X-N" marker
@@ -3146,9 +3154,17 @@ long writetrack(int xtrack)
           char msg[20];
           snprintf(msg, sizeof(msg), "Part %c-%d",
                    (char)(partlabel + 'A'), part_count[partlabel]);
-          mf_write_meta_event(delta_time_track0, marker, msg, strlen(msg));
-          tracklen = tracklen + delta_time_track0;
-          delta_time_track0 = 0L;
+          if (ntracks != 1) {
+            mf_write_meta_event(delta_time_track0, marker, msg, strlen(msg));
+            tracklen = tracklen + delta_time_track0;
+            delta_time_track0 = 0L;
+            /* delta_time also accumulates on track 0; keep it in sync so
+               the end-of-track event is not pushed out beyond the music */
+            delta_time = 0L;
+          } else {
+            mf_write_meta_event(delta_time, marker, msg, strlen(msg));
+            delta_time = 0L;
+          }
         }
       }
       break;

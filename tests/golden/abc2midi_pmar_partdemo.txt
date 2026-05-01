@@ -1,0 +1,141 @@
+Header format=0 ntrks=1 division=480
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=1  minor=0
+Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:3>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=4
+     Text = <Test>
+Time=1  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part B-1>
+Time=1  Note on, chan=1 pitch=69 vol=105
+Time=240  Note off, chan=1 pitch=69 vol=0
+Time=241  Note on, chan=1 pitch=67 vol=80
+Time=480  Note off, chan=1 pitch=67 vol=0
+Time=481  Note on, chan=1 pitch=67 vol=80
+Time=720  Note off, chan=1 pitch=67 vol=0
+Time=721  Note on, chan=1 pitch=66 vol=80
+Time=960  Note off, chan=1 pitch=66 vol=0
+Time=961  Note on, chan=1 pitch=67 vol=95
+Time=1440  Note off, chan=1 pitch=67 vol=0
+Time=1441  Note on, chan=1 pitch=67 vol=80
+Time=1920  Note off, chan=1 pitch=67 vol=0
+Time=1921  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part A-1>
+Time=1921  Program, chan=5 program=55
+Time=1921  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part C-1>
+Time=1921  Note on, chan=5 pitch=74 vol=105
+Time=2160  Note off, chan=5 pitch=74 vol=0
+Time=2161  Note on, chan=5 pitch=72 vol=80
+Time=2280  Note off, chan=5 pitch=72 vol=0
+Time=2281  Note on, chan=5 pitch=71 vol=80
+Time=2400  Note off, chan=5 pitch=71 vol=0
+Time=2401  Note on, chan=5 pitch=69 vol=80
+Time=2640  Note off, chan=5 pitch=69 vol=0
+Time=2641  Note on, chan=5 pitch=71 vol=80
+Time=2880  Note off, chan=5 pitch=71 vol=0
+Time=2881  Note on, chan=5 pitch=72 vol=95
+Time=3120  Note off, chan=5 pitch=72 vol=0
+Time=3121  Note on, chan=5 pitch=71 vol=80
+Time=3240  Note off, chan=5 pitch=71 vol=0
+Time=3241  Note on, chan=5 pitch=69 vol=80
+Time=3360  Note off, chan=5 pitch=69 vol=0
+Time=3361  Note on, chan=5 pitch=67 vol=80
+Time=3600  Note off, chan=5 pitch=67 vol=0
+Time=3601  Note on, chan=5 pitch=71 vol=80
+Time=3840  Note off, chan=5 pitch=71 vol=0
+Time=3841  Note on, chan=5 pitch=69 vol=105
+Time=4080  Note off, chan=5 pitch=69 vol=0
+Time=4081  Note on, chan=5 pitch=67 vol=80
+Time=4320  Note off, chan=5 pitch=67 vol=0
+Time=4321  Note on, chan=5 pitch=67 vol=80
+Time=4560  Note off, chan=5 pitch=67 vol=0
+Time=4561  Note on, chan=5 pitch=66 vol=80
+Time=4800  Note off, chan=5 pitch=66 vol=0
+Time=4801  Note on, chan=5 pitch=67 vol=95
+Time=5280  Note off, chan=5 pitch=67 vol=0
+Time=5281  Note on, chan=5 pitch=67 vol=80
+Time=5760  Note off, chan=5 pitch=67 vol=0
+Time=5761  Note on, chan=5 pitch=69 vol=105
+Time=6000  Note off, chan=5 pitch=69 vol=0
+Time=6001  Note on, chan=5 pitch=67 vol=80
+Time=6240  Note off, chan=5 pitch=67 vol=0
+Time=6241  Note on, chan=5 pitch=67 vol=80
+Time=6480  Note off, chan=5 pitch=67 vol=0
+Time=6481  Note on, chan=5 pitch=66 vol=80
+Time=6720  Note off, chan=5 pitch=66 vol=0
+Time=6721  Note on, chan=5 pitch=67 vol=95
+Time=7200  Note off, chan=5 pitch=67 vol=0
+Time=7201  Note on, chan=5 pitch=67 vol=80
+Time=7680  Note off, chan=5 pitch=67 vol=0
+Time=7681  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part D-1>
+Time=7681  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part B-2>
+Time=7681  Note on, chan=5 pitch=76 vol=105
+Time=7920  Note off, chan=5 pitch=76 vol=0
+Time=7921  Note on, chan=5 pitch=74 vol=80
+Time=8160  Note off, chan=5 pitch=74 vol=0
+Time=8161  Note on, chan=5 pitch=74 vol=80
+Time=8400  Note off, chan=5 pitch=74 vol=0
+Time=8401  Note on, chan=5 pitch=73 vol=80
+Time=8640  Note off, chan=5 pitch=73 vol=0
+Time=8641  Note on, chan=5 pitch=74 vol=95
+Time=9120  Note off, chan=5 pitch=74 vol=0
+Time=9121  Note on, chan=5 pitch=74 vol=80
+Time=9600  Note off, chan=5 pitch=74 vol=0
+Time=9601  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part A-2>
+Time=9601  Program, chan=5 program=55
+Time=9601  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part C-2>
+Time=9601  Note on, chan=5 pitch=81 vol=105
+Time=9840  Note off, chan=5 pitch=81 vol=0
+Time=9841  Note on, chan=5 pitch=79 vol=80
+Time=9960  Note off, chan=5 pitch=79 vol=0
+Time=9961  Note on, chan=5 pitch=78 vol=80
+Time=10080  Note off, chan=5 pitch=78 vol=0
+Time=10081  Note on, chan=5 pitch=76 vol=80
+Time=10320  Note off, chan=5 pitch=76 vol=0
+Time=10321  Note on, chan=5 pitch=78 vol=80
+Time=10560  Note off, chan=5 pitch=78 vol=0
+Time=10561  Note on, chan=5 pitch=79 vol=95
+Time=10800  Note off, chan=5 pitch=79 vol=0
+Time=10801  Note on, chan=5 pitch=78 vol=80
+Time=10920  Note off, chan=5 pitch=78 vol=0
+Time=10921  Note on, chan=5 pitch=76 vol=80
+Time=11040  Note off, chan=5 pitch=76 vol=0
+Time=11041  Note on, chan=5 pitch=74 vol=80
+Time=11280  Note off, chan=5 pitch=74 vol=0
+Time=11281  Note on, chan=5 pitch=78 vol=80
+Time=11520  Note off, chan=5 pitch=78 vol=0
+Time=11521  Note on, chan=5 pitch=76 vol=105
+Time=11760  Note off, chan=5 pitch=76 vol=0
+Time=11761  Note on, chan=5 pitch=74 vol=80
+Time=12000  Note off, chan=5 pitch=74 vol=0
+Time=12001  Note on, chan=5 pitch=74 vol=80
+Time=12240  Note off, chan=5 pitch=74 vol=0
+Time=12241  Note on, chan=5 pitch=73 vol=80
+Time=12480  Note off, chan=5 pitch=73 vol=0
+Time=12481  Note on, chan=5 pitch=74 vol=95
+Time=12960  Note off, chan=5 pitch=74 vol=0
+Time=12961  Note on, chan=5 pitch=74 vol=80
+Time=13440  Note off, chan=5 pitch=74 vol=0
+Time=13441  Note on, chan=5 pitch=76 vol=105
+Time=13680  Note off, chan=5 pitch=76 vol=0
+Time=13681  Note on, chan=5 pitch=74 vol=80
+Time=13920  Note off, chan=5 pitch=74 vol=0
+Time=13921  Note on, chan=5 pitch=74 vol=80
+Time=14160  Note off, chan=5 pitch=74 vol=0
+Time=14161  Note on, chan=5 pitch=73 vol=80
+Time=14400  Note off, chan=5 pitch=73 vol=0
+Time=14401  Note on, chan=5 pitch=74 vol=95
+Time=14880  Note off, chan=5 pitch=74 vol=0
+Time=14881  Note on, chan=5 pitch=74 vol=80
+Time=15360  Note off, chan=5 pitch=74 vol=0
+Time=15386  Meta event, end of track
+Track end
