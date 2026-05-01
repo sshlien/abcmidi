@@ -38,12 +38,23 @@ foreach(bin IN LISTS ABCMIDI_BINARIES)
   list(APPEND BINARY_DEFS "-D${BIN_UPPER}=$<TARGET_FILE:${bin}>")
 endforeach()
 
-# Helper: register a golden test for one program against one sample
+# Helper: register a golden test for one program against one sample.
+#
+# Optional NAME overrides the default test name (${TYPE}_${stem}); use this
+# when registering multiple tests against the same TYPE+SAMPLE pair (e.g. a
+# plain abc2midi run and a -PMAR run on the same input).
+#
+# Optional ABC2MIDI_ARGS forwards extra arguments to the abc2midi invocation
+# (only meaningful for TYPEs that go ABC -> MIDI -> diff).
 function(add_golden_test)
-  cmake_parse_arguments(T "" "TYPE;SAMPLE" "" ${ARGN})
+  cmake_parse_arguments(T "" "TYPE;SAMPLE;NAME" "ABC2MIDI_ARGS" ${ARGN})
 
-  get_filename_component(stem "${T_SAMPLE}" NAME_WE)
-  set(test_name "${T_TYPE}_${stem}")
+  if(T_NAME)
+    set(test_name "${T_NAME}")
+  else()
+    get_filename_component(stem "${T_SAMPLE}" NAME_WE)
+    set(test_name "${T_TYPE}_${stem}")
+  endif()
 
   add_test(
     NAME "${test_name}"
@@ -52,6 +63,7 @@ function(add_golden_test)
       -DSAMPLE=${SAMPLES_DIR}/${T_SAMPLE}
       -DGOLDEN=${GOLDEN_DIR}/${test_name}.txt
       -DTMPDIR=${TEST_TMPDIR}
+      "-DABC2MIDI_ARGS=${T_ABC2MIDI_ARGS}"
       ${BINARY_DEFS}
       -P "${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake"
   )
@@ -66,6 +78,17 @@ endforeach()
 # A few extra coverage points on different samples
 add_golden_test(TYPE abc2midi SAMPLE demo.abc)
 add_golden_test(TYPE abc2abc  SAMPLE demo.abc)
+
+# Regression test for the -PMAR option (Part Marker meta-events).
+# Locks in marker emission and verifies the markers do not perturb note
+# timing or end-of-track time (bug fixed by carrying delta_time alongside
+# delta_time_track0 when emitting markers on the conductor track).
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        partdemo.abc
+  NAME          abc2midi_pmar_partdemo
+  ABC2MIDI_ARGS -PMAR
+)
 
 # --- Regenerate-golden convenience target ---
 #

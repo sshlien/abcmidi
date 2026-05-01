@@ -68,8 +68,11 @@ endfunction()
 # Convert ${SAMPLE} to MIDI, then run ${bin} on the resulting MIDI file and
 # capture its stdout.  Any extra arguments are inserted BEFORE the MIDI path
 # (needed e.g. for "midi2abc -f <file>").
+#
+# ABC2MIDI_ARGS (set by the caller, possibly empty) is forwarded as a CMake
+# list to the abc2midi invocation, so callers can opt into flags like -PMAR.
 function(run_via_mid outfile bin)
-  run_or_die("${ABC2MIDI}" "${SAMPLE}" -o "${midfile}" -quiet -silent)
+  run_or_die("${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_ARGS} -o "${midfile}" -quiet -silent)
   run_to_file("${outfile}" "${bin}" ${ARGN} "${midfile}")
 endfunction()
 
