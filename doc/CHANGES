@@ -15740,3 +15740,12 @@ m4_esyscmd_s([cat VERSION]) so AC_INIT picks it up at autoreconf time
 "autoreconf -f" before tagging a release so the committed configure
 script reflects the new VERSION; see the Releasing section in
 README.md.
+
+May 7 2026 [RK]
+
+build: lowered CMakePresets.json schema from v6 to v3 (and
+cmakeMinimumRequired from 3.25 to 3.21) so users on older CMake
+releases such as the 3.22.1 shipped by Ubuntu 22.04 LTS can use
+"cmake --preset" without hitting "Unrecognized 'version' field".  No
+v4/v5/v6 schema features were in use; v3 covers every field present
+in the file.
