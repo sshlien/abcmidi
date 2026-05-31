@@ -15,10 +15,23 @@ is used to  search for specific sequences of notes in an  abc file
 composed of many tunes. For example, if you know a few bars of a tune,
 you can use this program to find the tune having this sequence and perhaps
 identify the tune.
-At a minimum, abcmatch requires two files. A template file called
-match.abc which contains the bars that you are searching for and a large
-file consisting of a hundred or more abc tunes. The program automatically
-loads up the match.abc file and then scans every tune in the large file
+.P
+Abcmatch requires the path to the file containing the collection
+of abc tunes. In many cases, it may require a template file called
+match.abc which contains the bars that you are searching for.
+In such cases the program automatically loads up the match.abc file
+and then scans every tune in the large file.
+.P
+The order of reference numbers in the collection of tunes may
+not necessarily be sequential and may have numerous duplicates.
+For this reason abcmatch also returns the line number in the
+file where the reference number was enountered.
+If abcmatch succeeds in matching the contents of a tune to its
+template it will normally returns 3 numbers. The first number is the line
+number where the X: reference number was encountered. The second
+number is the actual X: reference value. The last number is the number
+of matches found for that tune.  
+
 .SH OPTIONS
 .TP
 .B -v and -c
@@ -82,6 +95,10 @@ Substitute any tune for the template match.abc. When using this
 feature, the entire tune is used as a template. Abcmatch does not match
 the template with itself, and only bars which match bars in other tunes
 are reported.
+.P
+Abcmatch returns a list of the bar numbers which matched
+the template.
+
 .TP
 .B -br threshold
 Runs the program in a brief mode designed to identify groups of tunes
@@ -117,4 +134,4 @@ future analysis.
 .SH AUTHOR
 This manual page was written by Ross Gammon based on abcmatch.txt by Seymour Shlien.
 .SH VERSION
-This man page describes abcmatch version 1.35 from January 15 2006.
+This man page describes abcmatch version 1.84 from May 20 2026.

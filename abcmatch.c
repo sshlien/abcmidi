@@ -49,7 +49,7 @@ Matching:
 
 
 
-#define VERSION "1.83 Feb 19 2024 abcmatch"
+#define VERSION "1.84 May 20 2026 abcmatch"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -703,7 +703,7 @@ match_notes (int mbar_number, int ibar_number, int delta_pitch)
           string1[notes] = 256*deltapitch + inotelength[i + ioffset];
           string2[notes] = 256*deltapitchtp + tpnotelength[i + moffset];
           if (notes < 32) notes++;
-          else printf("notes > 32\n");
+          else notes =0; /* [SS] 2026-05-20 */
 
          /* printf("%d %d\n",deltapitch,deltapitchtp);*/
           }
@@ -718,7 +718,7 @@ match_notes (int mbar_number, int ibar_number, int delta_pitch)
       string1[notes] = 256*imidipitch[i+ioffset] + inotelength[i + ioffset];
       string2[notes] = 256*(tpmidipitch[i+moffset] - delta_pitch) + tpnotelength[i + moffset];
       if (notes < 32) notes++;
-      else printf("notes > 32\n");
+      else notes =0; /* [SS] 2026-05-20 */
       }
   i++;
   }    
