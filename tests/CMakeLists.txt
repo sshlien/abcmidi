@@ -98,6 +98,7 @@ set(EXTRA_SAMPLES
   detune.abc
   drums.abc
   temperament.abc
+  words.abc
 )
 foreach(sample IN LISTS EXTRA_SAMPLES)
   add_golden_test(TYPE abc2midi SAMPLE ${sample})
@@ -131,6 +132,32 @@ add_golden_test(
   NAME          abc2midi_pmar_demo_5
   TUNE          5
   ABC2MIDI_ARGS -PMAR
+)
+
+# Karaoke tune 5 rendered with -lyrics: the w: words come out as standard MIDI
+# Lyric (0x05) meta-events with bare syllables, and the Soft-Karaoke decoration
+# (@KMIDI KARAOKE FILE / @I header lines and the / \ line/paragraph prefixes) is
+# suppressed.  Contrast with abc2midi_demo_5, which pins the default 0x01 Text
+# karaoke rendering of the same tune.
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        demo.abc
+  NAME          abc2midi_lyrics_demo_5
+  TUNE          5
+  ABC2MIDI_ARGS -lyrics
+)
+
+# words.abc rendered with -lyrics, the focused companion to the default 0x01
+# rendering pinned by abc2midi_words (registered above via EXTRA_SAMPLES).  The
+# diff between the two goldens is the -lyrics contract on a small controlled
+# input: 0x05 Lyric events with bare syllables, no @KMIDI/@I header, and no
+# / \ line/paragraph prefixes, while still exercising the w: control codes
+# (hyphen split, melisma _, hard space ~, blank *).
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        words.abc
+  NAME          abc2midi_lyrics_words
+  ABC2MIDI_ARGS -lyrics
 )
 
 # Regression test for the -PMAR option (Part Marker meta-events).
