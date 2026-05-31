@@ -46,8 +46,13 @@ endforeach()
 #
 # Optional ABC2MIDI_ARGS forwards extra arguments to the abc2midi invocation
 # (only meaningful for TYPEs that go ABC -> MIDI -> diff).
+#
+# Optional TUNE selects a single tune by its X: reference number from a
+# multi-tune sample file (abc2midi/mftext/midistats/midi2abc/midicopy paths).
+# Combine with NAME to give each tune-level test a distinct name, e.g.
+# NAME abc2midi_demo_5 TUNE 5.
 function(add_golden_test)
-  cmake_parse_arguments(T "" "TYPE;SAMPLE;NAME" "ABC2MIDI_ARGS" ${ARGN})
+  cmake_parse_arguments(T "" "TYPE;SAMPLE;NAME;TUNE" "ABC2MIDI_ARGS" ${ARGN})
 
   if(T_NAME)
     set(test_name "${T_NAME}")
@@ -64,20 +69,69 @@ function(add_golden_test)
       -DGOLDEN=${GOLDEN_DIR}/${test_name}.txt
       -DTMPDIR=${TEST_TMPDIR}
       "-DABC2MIDI_ARGS=${T_ABC2MIDI_ARGS}"
+      "-DABC2MIDI_TUNE=${T_TUNE}"
       ${BINARY_DEFS}
       -P "${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake"
   )
   set_tests_properties("${test_name}" PROPERTIES LABELS "golden")
 endfunction()
 
-# One golden test per program against coleraine.abc
+# Full per-program coverage against coleraine.abc: every binary is exercised
+# on this one representative sample.  (TYPE abc2midi and TYPE mftext run the
+# identical ABC->MIDI->mftext pipeline and so produce byte-identical goldens;
+# both are kept here to guard the dispatch wiring, but per-sample coverage
+# below only needs one of them.)
 foreach(type IN ITEMS abc2midi abc2abc midi2abc midistats mftext yaps midicopy abcmatch)
   add_golden_test(TYPE ${type} SAMPLE coleraine.abc)
 endforeach()
 
-# A few extra coverage points on different samples
-add_golden_test(TYPE abc2midi SAMPLE demo.abc)
-add_golden_test(TYPE abc2abc  SAMPLE demo.abc)
+# Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
+# for every other sample, so each sample file has at least its MIDI rendering
+# and its canonical-ABC form pinned.  coleraine is already covered above.
+set(EXTRA_SAMPLES
+  araber.abc
+  baym_rebin.abc
+  boys.abc
+  daramud.abc
+  demo.abc
+  dergasn.abc
+  detune.abc
+  drums.abc
+  temperament.abc
+)
+foreach(sample IN LISTS EXTRA_SAMPLES)
+  add_golden_test(TYPE abc2midi SAMPLE ${sample})
+  add_golden_test(TYPE abc2abc  SAMPLE ${sample})
+endforeach()
+
+# Tune-level coverage: select individual tunes from the multi-tune sample
+# files via their X: reference number.  These pin behaviour that the
+# whole-file abc2midi golden does not exercise on its own:
+#
+#   demo tune 5  - @KMIDI KARAOKE FILE header, Lyric meta-events on a dedicated
+#                  track, and P:(AB)3 header part spec (single voice, multi-track)
+#   demo tune 4  - multiple voices (V:1..V:4)
+#   demo tune 11 - multiple voices combined with a part spec
+#   demo tune 12 - multiple voices
+#   detune/temperament tune 2 - the second tune of each (whole-file golden
+#                  only renders/locks tune 1 of these as the lead tune)
+add_golden_test(TYPE abc2midi SAMPLE demo.abc NAME abc2midi_demo_4  TUNE 4)
+add_golden_test(TYPE abc2midi SAMPLE demo.abc NAME abc2midi_demo_5  TUNE 5)
+add_golden_test(TYPE abc2midi SAMPLE demo.abc NAME abc2midi_demo_11 TUNE 11)
+add_golden_test(TYPE abc2midi SAMPLE demo.abc NAME abc2midi_demo_12 TUNE 12)
+add_golden_test(TYPE abc2midi SAMPLE detune.abc      NAME abc2midi_detune_2      TUNE 2)
+add_golden_test(TYPE abc2midi SAMPLE temperament.abc NAME abc2midi_temperament_2 TUNE 2)
+
+# Karaoke tune 5 rendered with -PMAR: exercises Part Marker meta-event emission
+# on the conductor track for a single-voice, multi-track tune driven by a
+# header P:(AB)3 play-order spec (a path the partdemo -PMAR test does not cover).
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        demo.abc
+  NAME          abc2midi_pmar_demo_5
+  TUNE          5
+  ABC2MIDI_ARGS -PMAR
+)
 
 # Regression test for the -PMAR option (Part Marker meta-events).
 # Locks in marker emission and verifies the markers do not perturb note

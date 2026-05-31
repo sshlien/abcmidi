@@ -27,11 +27,16 @@ if(NOT TYPE OR NOT SAMPLE OR NOT GOLDEN OR NOT TMPDIR)
 endif()
 
 file(MAKE_DIRECTORY "${TMPDIR}")
-get_filename_component(stem "${SAMPLE}" NAME_WE)
 
-set(raw     "${TMPDIR}/${TYPE}_${stem}.raw")
-set(out     "${TMPDIR}/${TYPE}_${stem}.out")
-set(midfile "${TMPDIR}/${TYPE}_${stem}.mid")
+# Derive a unique per-test tag from the golden file name (which equals the
+# unique test name).  Several tests share the same TYPE+SAMPLE (e.g. different
+# tunes of demo.abc all run abc2midi on demo.abc), so basing the temporary
+# file names on TYPE+sample would collide under parallel ctest.
+get_filename_component(tag "${GOLDEN}" NAME_WE)
+
+set(raw     "${TMPDIR}/${tag}.raw")
+set(out     "${TMPDIR}/${tag}.out")
+set(midfile "${TMPDIR}/${tag}.mid")
 
 # --- Command helpers ---------------------------------------------------------
 
@@ -65,14 +70,37 @@ function(run_to_file outfile)
   endif()
 endfunction()
 
+# Convert ${SAMPLE} to MIDI (writing ${midfile}), aborting only if no MIDI is
+# produced.  abc2midi returns a non-zero exit code when the input ABC contains
+# errors, but it still emits a best-effort MIDI file; for golden testing we
+# want to capture that output, so a non-zero exit is tolerated as long as the
+# MIDI file is actually written.
+#
+# ABC2MIDI_TUNE (set by the caller, possibly empty) selects a single tune by
+# its X: reference number from a multi-tune file.  ABC2MIDI_ARGS (also possibly
+# empty) forwards extra flags such as -PMAR.  Both are forwarded as CMake
+# lists; when empty they expand to nothing.
+function(abc2midi_to_mid)
+  file(REMOVE "${midfile}")
+  execute_process(
+    COMMAND "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_TUNE} ${ABC2MIDI_ARGS}
+            -o "${midfile}" -quiet -silent
+    RESULT_VARIABLE abc_rc
+    OUTPUT_VARIABLE abc_out
+    ERROR_VARIABLE  abc_err
+  )
+  if(NOT EXISTS "${midfile}")
+    message(FATAL_ERROR
+      "abc2midi produced no MIDI for ${SAMPLE} (rc=${abc_rc}):\n"
+      "--- stdout ---\n${abc_out}\n--- stderr ---\n${abc_err}")
+  endif()
+endfunction()
+
 # Convert ${SAMPLE} to MIDI, then run ${bin} on the resulting MIDI file and
 # capture its stdout.  Any extra arguments are inserted BEFORE the MIDI path
 # (needed e.g. for "midi2abc -f <file>").
-#
-# ABC2MIDI_ARGS (set by the caller, possibly empty) is forwarded as a CMake
-# list to the abc2midi invocation, so callers can opt into flags like -PMAR.
 function(run_via_mid outfile bin)
-  run_or_die("${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_ARGS} -o "${midfile}" -quiet -silent)
+  abc2midi_to_mid()
   run_to_file("${outfile}" "${bin}" ${ARGN} "${midfile}")
 endfunction()
 
@@ -110,14 +138,14 @@ elseif(TYPE STREQUAL "abcmatch")
   run_on_sample("${raw}" "${bin}" -pitch_hist)
 
 elseif(TYPE STREQUAL "yaps")
-  set(psfile "${TMPDIR}/yaps_${stem}.ps")
+  set(psfile "${TMPDIR}/${tag}.ps")
   run_or_die("${bin}" "${SAMPLE}" -o "${psfile}")
   configure_file("${psfile}" "${raw}" COPYONLY)
 
 elseif(TYPE STREQUAL "midicopy")
   # ABC -> MIDI -> midicopy -> mftext
-  set(copied "${TMPDIR}/midicopy_${stem}_out.mid")
-  run_or_die("${ABC2MIDI}" "${SAMPLE}" -o "${midfile}" -quiet -silent)
+  set(copied "${TMPDIR}/${tag}_copy.mid")
+  abc2midi_to_mid()
   run_or_die("${bin}" "${midfile}" "${copied}")
   run_to_file("${raw}" "${MFTEXT}" "${copied}")
 

@@ -1,0 +1,214 @@
+Header format=0 ntrks=1 division=480
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=0  minor=0
+Time=0  Time signature=6/2  MIDI-clocks/click=-112  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:2>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=19
+     Text = <temperament command>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=84
+     Text = <from https://chiselapp.com/user/moinejf/repository/abc2svg/artifact/9b9730a7decefc8f>
+Time=1  Program, chan=1 program=16
+Time=1  Program, chan=2 program=16
+Time=1  Program, chan=3 program=16
+Time=1  Meta Text, type=0x01 (Text Event)  leng=21
+     Text = < pythagore (~500 B.C)>
+Time=1  Note on, chan=1 pitch=60 vol=105
+Time=11  Pitchbend, chan=2 lsb=66 msb=72
+Time=11  Note on, chan=2 pitch=64 vol=105
+Time=21  Pitchbend, chan=3 lsb=64 msb=82
+Time=21  Note on, chan=3 pitch=67 vol=105
+Time=1920  Note off, chan=3 pitch=67 vol=0
+Time=1920  Note off, chan=2 pitch=64 vol=0
+Time=1920  Note off, chan=1 pitch=60 vol=0
+Time=2881  Note on, chan=1 pitch=60 vol=95
+Time=2891  Pitchbend, chan=2 lsb=62 msb=11
+Time=2891  Note on, chan=2 pitch=63 vol=95
+Time=2901  Note on, chan=3 pitch=67 vol=95
+Time=4800  Note off, chan=3 pitch=67 vol=0
+Time=4800  Note off, chan=2 pitch=63 vol=0
+Time=4800  Note off, chan=1 pitch=60 vol=0
+Time=5761  Pitchbend, chan=1 lsb=67 msb=108
+Time=5761  Note on, chan=1 pitch=66 vol=105
+Time=5771  Pitchbend, chan=2 lsb=62 msb=93
+Time=5771  Note on, chan=2 pitch=70 vol=105
+Time=5781  Pitchbend, chan=3 lsb=68 msb=61
+Time=5781  Note on, chan=3 pitch=73 vol=105
+Time=7680  Note off, chan=3 pitch=73 vol=0
+Time=7680  Note off, chan=2 pitch=70 vol=0
+Time=7680  Note off, chan=1 pitch=66 vol=0
+Time=8641  Note on, chan=1 pitch=66 vol=95
+Time=8651  Pitchbend, chan=2 lsb=65 msb=118
+Time=8651  Note on, chan=2 pitch=69 vol=95
+Time=8661  Note on, chan=3 pitch=73 vol=95
+Time=10560  Note off, chan=3 pitch=73 vol=0
+Time=10560  Note off, chan=2 pitch=69 vol=0
+Time=10560  Note off, chan=1 pitch=66 vol=0
+Time=10560  Meta Text, type=0x01 (Text Event)  leng=16
+     Text = < just intonation>
+Time=11521  Pitchbend, chan=1 lsb=64 msb=0
+Time=11521  Note on, chan=1 pitch=60 vol=105
+Time=11531  Pitchbend, chan=2 lsb=59 msb=68
+Time=11531  Note on, chan=2 pitch=64 vol=105
+Time=11541  Pitchbend, chan=3 lsb=64 msb=82
+Time=11541  Note on, chan=3 pitch=67 vol=105
+Time=13440  Note off, chan=3 pitch=67 vol=0
+Time=13440  Note off, chan=2 pitch=64 vol=0
+Time=13440  Note off, chan=1 pitch=60 vol=0
+Time=14401  Note on, chan=1 pitch=60 vol=95
+Time=14411  Pitchbend, chan=2 lsb=62 msb=11
+Time=14411  Note on, chan=2 pitch=63 vol=95
+Time=14421  Note on, chan=3 pitch=67 vol=95
+Time=16320  Note off, chan=3 pitch=67 vol=0
+Time=16320  Note off, chan=2 pitch=63 vol=0
+Time=16320  Note off, chan=1 pitch=60 vol=0
+Time=17281  Pitchbend, chan=1 lsb=60 msb=103
+Time=17281  Note on, chan=1 pitch=66 vol=105
+Time=17291  Pitchbend, chan=2 lsb=62 msb=93
+Time=17291  Note on, chan=2 pitch=70 vol=105
+Time=17301  Pitchbend, chan=3 lsb=61 msb=57
+Time=17301  Note on, chan=3 pitch=73 vol=105
+Time=19200  Note off, chan=3 pitch=73 vol=0
+Time=19200  Note off, chan=2 pitch=70 vol=0
+Time=19200  Note off, chan=1 pitch=66 vol=0
+Time=20161  Note on, chan=1 pitch=66 vol=95
+Time=20171  Pitchbend, chan=2 lsb=58 msb=114
+Time=20171  Note on, chan=2 pitch=69 vol=95
+Time=20181  Note on, chan=3 pitch=73 vol=95
+Time=22080  Note off, chan=3 pitch=73 vol=0
+Time=22080  Note off, chan=2 pitch=69 vol=0
+Time=22080  Note off, chan=1 pitch=66 vol=0
+Time=22080  Meta Text, type=0x01 (Text Event)  leng=29
+     Text = < meantone (Pietro Aaron 1523)>
+Time=23041  Pitchbend, chan=1 lsb=64 msb=0
+Time=23041  Note on, chan=1 pitch=60 vol=105
+Time=23051  Pitchbend, chan=2 lsb=59 msb=68
+Time=23051  Note on, chan=2 pitch=64 vol=105
+Time=23061  Pitchbend, chan=3 lsb=63 msb=6
+Time=23061  Note on, chan=3 pitch=67 vol=105
+Time=24960  Note off, chan=3 pitch=67 vol=0
+Time=24960  Note off, chan=2 pitch=64 vol=0
+Time=24960  Note off, chan=1 pitch=60 vol=0
+Time=25921  Note on, chan=1 pitch=60 vol=95
+Time=25931  Pitchbend, chan=2 lsb=67 msb=26
+Time=25931  Note on, chan=2 pitch=63 vol=95
+Time=25941  Note on, chan=3 pitch=67 vol=95
+Time=27840  Note off, chan=3 pitch=67 vol=0
+Time=27840  Note off, chan=2 pitch=63 vol=0
+Time=27840  Note off, chan=1 pitch=60 vol=0
+Time=28801  Pitchbend, chan=1 lsb=57 msb=37
+Time=28801  Note on, chan=1 pitch=66 vol=105
+Time=28811  Pitchbend, chan=2 lsb=66 msb=31
+Time=28811  Note on, chan=2 pitch=70 vol=105
+Time=28821  Pitchbend, chan=3 lsb=56 msb=42
+Time=28821  Note on, chan=3 pitch=73 vol=105
+Time=30720  Note off, chan=3 pitch=73 vol=0
+Time=30720  Note off, chan=2 pitch=70 vol=0
+Time=30720  Note off, chan=1 pitch=66 vol=0
+Time=31681  Note on, chan=1 pitch=66 vol=95
+Time=31691  Pitchbend, chan=2 lsb=67 msb=26
+Time=31691  Note on, chan=2 pitch=69 vol=95
+Time=31701  Note on, chan=3 pitch=73 vol=95
+Time=33600  Note off, chan=3 pitch=73 vol=0
+Time=33600  Note off, chan=2 pitch=69 vol=0
+Time=33600  Note off, chan=1 pitch=66 vol=0
+Time=33600  Meta Text, type=0x01 (Text Event)  leng=32
+     Text = < Andreas Werckmeister III (1681)>
+Time=34561  Pitchbend, chan=1 lsb=64 msb=0
+Time=34561  Note on, chan=1 pitch=60 vol=105
+Time=34571  Pitchbend, chan=2 lsb=62 msb=93
+Time=34571  Note on, chan=2 pitch=64 vol=105
+Time=34581  Pitchbend, chan=3 lsb=64 msb=82
+Time=34581  Note on, chan=3 pitch=67 vol=105
+Time=36480  Note off, chan=3 pitch=67 vol=0
+Time=36480  Note off, chan=2 pitch=64 vol=0
+Time=36480  Note off, chan=1 pitch=60 vol=0
+Time=37441  Note on, chan=1 pitch=60 vol=95
+Time=37451  Pitchbend, chan=2 lsb=64 msb=0
+Time=37451  Note on, chan=2 pitch=63 vol=95
+Time=37461  Note on, chan=3 pitch=67 vol=95
+Time=39360  Note off, chan=3 pitch=67 vol=0
+Time=39360  Note off, chan=2 pitch=63 vol=0
+Time=39360  Note off, chan=1 pitch=60 vol=0
+Time=40321  Note on, chan=1 pitch=66 vol=105
+Time=40331  Pitchbend, chan=2 lsb=64 msb=82
+Time=40331  Note on, chan=2 pitch=70 vol=105
+Time=40341  Pitchbend, chan=3 lsb=62 msb=93
+Time=40341  Note on, chan=3 pitch=73 vol=105
+Time=42240  Note off, chan=3 pitch=73 vol=0
+Time=42240  Note off, chan=2 pitch=70 vol=0
+Time=42240  Note off, chan=1 pitch=66 vol=0
+Time=43201  Note on, chan=1 pitch=66 vol=95
+Time=43211  Pitchbend, chan=2 lsb=64 msb=0
+Time=43211  Note on, chan=2 pitch=69 vol=95
+Time=43221  Note on, chan=3 pitch=73 vol=95
+Time=45120  Note off, chan=3 pitch=73 vol=0
+Time=45120  Note off, chan=2 pitch=69 vol=0
+Time=45120  Note off, chan=1 pitch=66 vol=0
+Time=45120  Meta Text, type=0x01 (Text Event)  leng=38
+     Text = < well temperament (F.A. Vallotti 1754)>
+Time=46081  Note on, chan=1 pitch=60 vol=105
+Time=46091  Pitchbend, chan=2 lsb=61 msb=57
+Time=46091  Note on, chan=2 pitch=64 vol=105
+Time=46101  Pitchbend, chan=3 lsb=63 msb=47
+Time=46101  Note on, chan=3 pitch=67 vol=105
+Time=48000  Note off, chan=3 pitch=67 vol=0
+Time=48000  Note off, chan=2 pitch=64 vol=0
+Time=48000  Note off, chan=1 pitch=60 vol=0
+Time=48961  Note on, chan=1 pitch=60 vol=95
+Time=48971  Pitchbend, chan=2 lsb=63 msb=47
+Time=48971  Note on, chan=2 pitch=63 vol=95
+Time=48981  Note on, chan=3 pitch=67 vol=95
+Time=50880  Note off, chan=3 pitch=67 vol=0
+Time=50880  Note off, chan=2 pitch=63 vol=0
+Time=50880  Note off, chan=1 pitch=60 vol=0
+Time=51841  Pitchbend, chan=1 lsb=61 msb=57
+Time=51841  Note on, chan=1 pitch=66 vol=105
+Time=51851  Pitchbend, chan=2 lsb=64 msb=0
+Time=51851  Note on, chan=2 pitch=70 vol=105
+Time=51861  Pitchbend, chan=3 lsb=62 msb=11
+Time=51861  Note on, chan=3 pitch=73 vol=105
+Time=53760  Note off, chan=3 pitch=73 vol=0
+Time=53760  Note off, chan=2 pitch=70 vol=0
+Time=53760  Note off, chan=1 pitch=66 vol=0
+Time=54721  Note on, chan=1 pitch=66 vol=95
+Time=54731  Pitchbend, chan=2 lsb=62 msb=11
+Time=54731  Note on, chan=2 pitch=69 vol=95
+Time=54741  Note on, chan=3 pitch=73 vol=95
+Time=56640  Note off, chan=3 pitch=73 vol=0
+Time=56640  Note off, chan=2 pitch=69 vol=0
+Time=56640  Note off, chan=1 pitch=66 vol=0
+Time=56640  Meta Text, type=0x01 (Text Event)  leng=26
+     Text = < 12-tone equal temperament>
+Time=57601  Pitchbend, chan=1 lsb=64 msb=0
+Time=57601  Note on, chan=1 pitch=60 vol=105
+Time=57611  Pitchbend, chan=2 lsb=64 msb=0
+Time=57611  Note on, chan=2 pitch=64 vol=105
+Time=57621  Pitchbend, chan=3 lsb=64 msb=0
+Time=57621  Note on, chan=3 pitch=67 vol=105
+Time=59520  Note off, chan=3 pitch=67 vol=0
+Time=59520  Note off, chan=2 pitch=64 vol=0
+Time=59520  Note off, chan=1 pitch=60 vol=0
+Time=60481  Note on, chan=1 pitch=60 vol=95
+Time=60491  Note on, chan=2 pitch=63 vol=95
+Time=60501  Note on, chan=3 pitch=67 vol=95
+Time=62400  Note off, chan=3 pitch=67 vol=0
+Time=62400  Note off, chan=2 pitch=63 vol=0
+Time=62400  Note off, chan=1 pitch=60 vol=0
+Time=63361  Note on, chan=1 pitch=66 vol=105
+Time=63371  Note on, chan=2 pitch=70 vol=105
+Time=63381  Note on, chan=3 pitch=73 vol=105
+Time=65280  Note off, chan=3 pitch=73 vol=0
+Time=65280  Note off, chan=2 pitch=70 vol=0
+Time=65280  Note off, chan=1 pitch=66 vol=0
+Time=66241  Note on, chan=1 pitch=66 vol=95
+Time=66251  Note on, chan=2 pitch=69 vol=95
+Time=66261  Note on, chan=3 pitch=73 vol=95
+Time=68160  Note off, chan=3 pitch=73 vol=0
+Time=68160  Note off, chan=2 pitch=69 vol=0
+Time=68160  Note off, chan=1 pitch=66 vol=0
+Time=69146  Meta event, end of track
+Track end
