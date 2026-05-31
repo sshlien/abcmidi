@@ -164,6 +164,7 @@ int single_velocity;
 
 /* karaoke handling */
 extern int karaoke, wcount;
+extern int lyrics_meta; /* [RK] 2026-05-30 -lyrics: 0x05 Lyric meta-events */
 int kspace;
 char* wordlineptr;
 extern char** words;
@@ -693,8 +694,19 @@ static int findvoice(int initplace, int voice, int xtrack)
 
 static void text_data(char *s)
 /* write text event to MIDI file */
-{   
+{
   mf_write_meta_event(delta_time, text_event, s, strlen(s));
+  tracklen = tracklen + delta_time;
+  delta_time = 0L;
+}
+
+/* [RK] 2026-05-30 */
+static void word_data(char *s)
+/* Write one lyric syllable to the MIDI file.  With -lyrics it is emitted as a
+ * standard MIDI Lyric (0x05) meta-event; otherwise as a Text (0x01) event,
+ * which is the Soft-Karaoke convention. */
+{
+  mf_write_meta_event(delta_time, lyrics_meta ? lyric : text_event, s, strlen(s));
   tracklen = tracklen + delta_time;
   delta_time = 0L;
 }
@@ -710,7 +722,9 @@ static void karaokestarttrack (int track)
  *  Print Karaoke file headers in track 0.
  *  @KMIDI KARAOKE FILE - Karaoke midi file marker)
  */
-   if (track == 0)
+   /* [RK] 2026-05-30 the @KMIDI marker is Soft-Karaoke specific; -lyrics
+    * keeps only the standard sequence-name title written below. */
+   if ((track == 0) && (!lyrics_meta))
    {
       text_data("@KMIDI KARAOKE FILE");
    }
@@ -742,21 +756,23 @@ static void karaokestarttrack (int track)
      
   while ((j < notes) && (done > 0))
   {
+     /* [RK] 2026-05-30 the @I/@T info lines are Soft-Karaoke markers; with
+      * -lyrics only the standard sequence-name title (above) is kept. */
      if (feature[j] == TITLE) {
         if (track != 2)
            mf_write_meta_event(0L, sequence_name, atext[pitch[j]], strlen (atext[pitch[j]]));
         strncpy(atitle+2, atext[pitch[j]], 197); /* [KG] 2022-01-13 stack overflow bug */
-        text_data(atitle);
+        if (!lyrics_meta) text_data(atitle);
         done--;
      }
      if (feature[j] == COMPOSER) {
         strncpy(atitle+2, atext[pitch[j]], 197); /* [KG] 2022-01-13 stack overflow bug */
-        text_data(atitle);
+        if (!lyrics_meta) text_data(atitle);
         done--;
-     }     
+     }
      if (feature[j] == COPYRIGHT) {
         strcpy(atitle+2, atext[pitch[j]]); /* [KG] 2022-01-13 stack overflow bug */
-        text_data(atitle);
+        if (!lyrics_meta) text_data(atitle);
         done--;
      }
      j = j+1;
@@ -921,11 +937,13 @@ static int getword(int *place, int w)
     syllable[i] = '\0';
     return ('\0');
   };
-  if (*place == 0) {
+  /* [RK] 2026-05-30 the / and \ line/paragraph markers are a Soft-Karaoke
+   * convention; with -lyrics we emit just the bare words. */
+  if ((*place == 0) && (!lyrics_meta)) {
     if ((w % 2) == 0) {
-      syllable[i] = '/'; 
+      syllable[i] = '/';
     } else {
-      syllable[i] = '\\'; 
+      syllable[i] = '\\';
     };
     i = i + 1;
   };
@@ -1054,7 +1072,7 @@ static int getword(int *place, int w)
   } else {
     syllcount = 1;
     if (strlen(syllable) > 0) {
-      text_data(syllable);
+      word_data(syllable);
       /*printf("TEXT DATA %s\n",syllable);*/
     };
   };
