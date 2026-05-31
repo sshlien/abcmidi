@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
  
-#define VERSION "1.03 February 20 2026 midistats"
+#define VERSION "1.04 March 02 2026 midistats"
 
 /* midistrats.c is a descendent of midi2abc.c which was becoming to
    large. The object of the program is to extract statistical characterisitic 
@@ -320,7 +320,8 @@ int filegetc()
 }
 
 
-void fatal_error(char *s)
+void fatal_error(s)
+char* s;
 /* fatal error encounterd - abort program */
 {
   fprintf(stderr, "%s\n", s);
@@ -328,7 +329,8 @@ void fatal_error(char *s)
 }
 
 
-void event_error(char *s)
+void event_error(s)
+char *s;
 /* problem encountered but OK to continue */
 {
   char msg[256];
@@ -338,8 +340,9 @@ void event_error(char *s)
 }
 
 
-int* checkmalloc(int bytes)
+int* checkmalloc(bytes)
 /* malloc with error checking */
+int bytes;
 {
   int *p;
 
@@ -354,7 +357,9 @@ int* checkmalloc(int bytes)
 
 
 FILE *
-efopen(char *name, char *mode)
+efopen(name,mode)
+char *name;
+char *mode;
 {
     FILE *f;
 
@@ -366,14 +371,16 @@ efopen(char *name, char *mode)
     return(f);
 }
 
-void error(char *s)
+void error(s)
+char *s;
 {
     fprintf(stderr,"Error: %s\n",s);
 }
 
 
 /* [SS] 2017-11-19 */
-void stats_error(char *s)
+void stats_error(s)
+char *s;
 {
     fprintf(stderr,"Error: %s\n",s);
     fprintf(stderr,"activetrack %d\n",tracknum);
@@ -388,9 +395,7 @@ void stats_error(char *s)
  void no_op0() {}
  void no_op1(int dummy1) {}
  void no_op2(int dummy1, int dummy2) {}
- void no_op2_is(int dummy1, char *dummy2) {}
  void no_op3(int dummy1, int dummy2, int dummy3) { }
- void no_op3_iis(int dummy1, int dummy2, char *dummy3) { }
  void no_op4(int dummy1, int dummy2, int dummy3, int dummy4) { }
  void no_op5(int dummy1, int dummy2, int dummy3, int dummy4, int dummy5) { }
 
@@ -437,7 +442,8 @@ char* s = name;
 }
 
 
-void pitch2drum(int midipitch)
+void pitch2drum(midipitch)
+int midipitch;
 {
 static char *drumpatches[] = {
  "Acoustic Bass Drum", "Bass Drum 1", "Side Stick", "Acoustic Snare",
@@ -714,7 +720,9 @@ float histogram_entropy (int *histogram, int size)
 
 
 
-void output_count_trkdata(int data_array[], char *name)
+void output_count_trkdata(data_array,name)
+int data_array[];
+char *name;
 {
 int i,sum;
 sum = 0;
@@ -908,7 +916,8 @@ tracknm.eighthUnit = unit;
 
 
 
-void stats_noteon(int chan, int pitch, int vol)
+void stats_noteon(chan,pitch,vol)
+int chan, pitch, vol;
 {
  int delta;
  int barnum;
@@ -947,7 +956,7 @@ void stats_noteon(int chan, int pitch, int vol)
 	 }
     }
 	 
- if (labs(Mf_currtime - last_on_tick[chan+1]) < chordthreshold) trkdata.chordcount[chan+1]++;
+ if (abs(Mf_currtime - last_on_tick[chan+1]) < chordthreshold) trkdata.chordcount[chan+1]++;
  else trkdata.notecount[chan+1]++; /* [SS] 2019-08-02 */
  lastTick[chan*128 + pitch] = Mf_currtime;
  last_on_tick[chan+1] = Mf_currtime; /* [SS] 2019-08-02 */
@@ -1023,13 +1032,15 @@ void stats_noteoff(int chan,int pitch,int vol)
 }
 
 
-void stats_pitchbend(int chan, int lsb, int msb)
+void stats_pitchbend(chan,lsb,msb)
+int chan, lsb, msb;
 {
 trkdata.pitchbend[0]++;
 trkdata.pitchbend[chan+1]++;
 }
 
-void stats_pressure(int chan, int pitch, int press)
+void stats_pressure(chan,press)
+int chan, press;
 {
 trkdata.pressure[0]++;
 trkdata.pressure[chan+1]++; /* [SS] 2022.04.28 */
@@ -1037,7 +1048,8 @@ trkdata.pressure[chan+1]++; /* [SS] 2022.04.28 */
 
 
 
-void stats_program(int chan, int program)
+void stats_program(chan,program)
+int chan, program;
 {
 int beatnumber;
 if (program <0 || program > 127) return; /* [SS] 2018-03-06 */
@@ -1055,7 +1067,8 @@ if (trkdata.program[chan+1] != 0) {
 
 
 
-void stats_parameter(int chan, int control, int value)
+void stats_parameter(chan,control,value)
+int chan, control, value;
 {
 int chan1;
 chan1 = chan+1;
@@ -1071,7 +1084,9 @@ trkdata.cntlparam[chan1]++;
 
 
 
-void stats_metatext(int type, int leng, char *mess)
+void stats_metatext(type,leng,mess)
+int type, leng;
+char *mess;
 {
 int i; 
 if (type == 5) hasLyrics = 1; /* [SS] 2023-10-30 */
@@ -1085,7 +1100,8 @@ printf("\n");
 
 
 /* [SS] 2018-01-02 */
-void stats_keysig(int sf, int mi)
+void stats_keysig(sf,mi)
+int sf, mi;
 {
   float beatnumber;
   static char *major[] = {"Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F",
@@ -1096,19 +1112,19 @@ void stats_keysig(int sf, int mi)
   beatnumber = Mf_currtime/division;
   index = sf + 7;
   if (index < 0 || index >12) return;
-  if (noOutput == 0) { 
-    if (mi) {
+  if (mi)
+    if (noOutput == 0) 
        printf("keysig %s %d %d %6.2f\n",minor[index],sf,mi,beatnumber);
-    } else {
+  else
+    if (noOutput == 0) 
        printf("keysig %s %d %d %6.2f\n",major[index],sf,mi,beatnumber);
-    }
-  }
 }
 
 
 
 /* [SS] 2018-01-02 */
-void stats_tempo(long ltempo)
+void stats_tempo(ltempo)
+long ltempo;
 {
   float beatnumber;
   tempo = ltempo;
@@ -1120,7 +1136,8 @@ void stats_tempo(long ltempo)
 }
 
 
-void stats_timesig(int nn, int dd, int cc, int bb)
+void stats_timesig(nn,dd,cc,bb)
+int nn, dd, cc, bb;
 {
   float beatnumber;
   int denom = 1;
@@ -1186,56 +1203,56 @@ void load_header (int format, int ntrks, int ldivision)
 void initfunc_for_stats()
 {
     int i;
-    Mf_error = &stats_error; /* [SS] 2017-11-19 */
-    Mf_header = &stats_header;
-    Mf_trackstart = &stats_trackstart;
-    Mf_trackend = &stats_trackend;
-    Mf_noteon = &stats_noteon;
-    Mf_noteoff = &stats_noteoff;
-    Mf_pressure = &no_op3;
-    Mf_parameter = &stats_parameter;
-    Mf_pitchbend = &stats_pitchbend;
-    Mf_program = &stats_program;
-    Mf_chanpressure = &stats_pressure;
-    Mf_sysex = &no_op2_is;
-    Mf_metamisc = &no_op3_iis;
-    Mf_seqnum = &no_op1;
-    Mf_eot = &stats_eot;
-    Mf_timesig = &stats_timesig;
-    Mf_smpte = &no_op5;
-    Mf_tempo = &stats_tempo;
-    Mf_keysig = &stats_keysig;
-    Mf_seqspecific = &no_op3;
-    Mf_text = &stats_metatext;
-    Mf_arbitrary = &no_op2;
+    Mf_error = stats_error; /* [SS] 2017-11-19 */
+    Mf_header = stats_header;
+    Mf_trackstart = stats_trackstart;
+    Mf_trackend = stats_trackend;
+    Mf_noteon = stats_noteon;
+    Mf_noteoff = stats_noteoff;
+    Mf_pressure = no_op3;
+    Mf_parameter = stats_parameter;
+    Mf_pitchbend = stats_pitchbend;
+    Mf_program = stats_program;
+    Mf_chanpressure = stats_pressure;
+    Mf_sysex = no_op2;
+    Mf_metamisc = no_op3;
+    Mf_seqnum = no_op1;
+    Mf_eot = stats_eot;
+    Mf_timesig = stats_timesig;
+    Mf_smpte = no_op5;
+    Mf_tempo = stats_tempo;
+    Mf_keysig = stats_keysig;
+    Mf_seqspecific = no_op3;
+    Mf_text = stats_metatext;
+    Mf_arbitrary = no_op2;
     for (i = 0; i< 2047; i++) pulseCounter[i] = 0;
 }
 
 
 void initfunc_for_loadNoteEvents()
 {
-    Mf_error = &error;
-    Mf_header = &load_header;
-    Mf_trackstart = &no_op0;
-    Mf_trackend = &record_trackend;
-    Mf_noteon = &record_noteon;
-    Mf_noteoff = &record_noteoff;
-    Mf_pressure = &no_op3;
-    Mf_parameter = &no_op3;
-    Mf_pitchbend = &no_op3;
-    Mf_program = &no_op0;
-    Mf_chanpressure = &no_op3;
-    Mf_sysex = &no_op2_is;
-    Mf_metamisc = &no_op3_iis;
-    Mf_seqnum = &no_op1;
-    Mf_eot = &no_op0;
-    Mf_timesig = &no_op4;
-    Mf_smpte = &no_op5;
-    Mf_tempo = &record_tempo;
-    Mf_keysig = &no_op2;
-    Mf_seqspecific = &no_op3;
-    Mf_text = &no_op3;
-    Mf_arbitrary = &no_op2;
+    Mf_error = error;
+    Mf_header = load_header;
+    Mf_trackstart = no_op0;
+    Mf_trackend = record_trackend;
+    Mf_noteon = record_noteon;
+    Mf_noteoff = record_noteoff;
+    Mf_pressure = no_op3;
+    Mf_parameter = no_op3;
+    Mf_pitchbend = no_op3;
+    Mf_program = no_op0;
+    Mf_chanpressure = no_op3;
+    Mf_sysex = no_op2;
+    Mf_metamisc = no_op3;
+    Mf_seqnum = no_op1;
+    Mf_eot = no_op0;
+    Mf_timesig = no_op4;
+    Mf_smpte = no_op5;
+    Mf_tempo = record_tempo;
+    Mf_keysig = no_op2;
+    Mf_seqspecific = no_op3;
+    Mf_text = no_op3;
+    Mf_arbitrary = no_op2;
 }
 
 void dumpMidievents (int from , int to)
@@ -1485,9 +1502,20 @@ for (i = 0; i <lastEvent; i++) {
   }
 }
 
+int flipsf (int sf,int dir) {
+/* C# - 7 sharps Db 5 flats
+*  F# - 6 sharps Gb 6 flats
+*  B  - 5 sharps Cb 7 flats
+* are enharmonic key signatures for the major scale.
+* This function switches sf between them
+*/
+if (dir < 0) return (sf - 12);
+else return (sf + 12);
+}
 
 int localKeyMatch (); 
 void reset_local_pitchclass_activity (int barIndex);
+int lastsf = 0;
 
 void localPitchClassAnalysis () {
 int i;
@@ -1495,6 +1523,7 @@ int channel;
 int pitch;
 int bar4Index, lastbar4Index;
 int sf;
+extern int lastsf;
 printf("localkeysf ");
 lastbar4Index = 0;
 for (i=0;i<12;i++) local_pitchclass_activity[i] = 0;
@@ -1505,7 +1534,10 @@ for (i = 0; i < lastEvent; i++) {
   if (bar4Index != lastbar4Index) {
        sf = localKeyMatch();
        reset_local_pitchclass_activity(lastbar4Index);
+       if (sf > 4 && lastsf <0) sf = flipsf(sf,-1);
+       if (sf < -4 && lastsf >0) sf = flipsf(sf,1);  
        printf(" %d",sf);
+       lastsf = sf;
        lastbar4Index = bar4Index;
        }
   pitch = midievents[i].pitch;
@@ -1688,15 +1720,7 @@ printf("\nrmin ");
 for (r=0;r<12;r++) printf("%7.3f",rmin[r]);
 }
 
-/********
-int index2sf (int index, int bestMode) {
-int sf;
-if (bestMode == 0) sf = maj2sf[index];
-else sf = min2sf[index];
-printf("\t\t%s%s %d %d\t",keylist[index],majmin[bestMode],bestMode,sf);
-return sf;
-}
-********/
+
 
 int localKeyMatch () {
 int i;
@@ -1835,9 +1859,10 @@ printf("%d\t%d\t%d\t%d\t%d\t%d\n",lasttrack,nchannels, division,bpm,lastEvent,la
 
 
 
-int readnum(char *num) 
+int readnum(num) 
 /* read a number from a string */
 /* used for processing command line */
+char *num;
 {
   int t;
   char *p;
@@ -1859,9 +1884,10 @@ int readnum(char *num)
 }
 
 
-int readnump(char **p) 
+int readnump(p) 
 /* read a number from a string (subtly different) */
 /* used for processing command line */
+char **p;
 {
   int t;
   
@@ -1879,8 +1905,11 @@ int readnump(char **p)
 }
 
 
-int getarg(char *option, int argc, char *argv[])
+int getarg(option, argc, argv)
 /* extract arguments from command line */
+char *option;
+char *argv[];
+int argc;
 {
   int j, place;
 
@@ -1893,9 +1922,11 @@ int getarg(char *option, int argc, char *argv[])
   return (place);
 }
 
-int huntfilename(int argc, char *argv[])
+int huntfilename(argc, argv)
 /* look for filename argument if -f option is missing */
 /* assumes filename does not begin with '-'           */
+char *argv[];
+int argc;
 {
   int j, place;
 
@@ -1917,7 +1948,9 @@ int huntfilename(int argc, char *argv[])
   return(place);
 }
 
-int process_command_line_arguments(int argc, char *argv[])
+int process_command_line_arguments(argc,argv)
+char *argv[];
+int argc;
 {
   int val;
   int arg;
@@ -2059,7 +2092,9 @@ int process_command_line_arguments(int argc, char *argv[])
 
 
 
-void midistats(int argc,char *argv[])
+void midistats(argc,argv)
+char *argv[];
+int argc;
 {
 initfunc_for_stats();
 Mf_getc = filegetc;
@@ -2118,8 +2153,11 @@ if (keystabilityAnalysis) {
 
 
 
-int main(int argc, char *argv[])
+int main(argc,argv)
+char *argv[];
+int argc;
 {
+  FILE *efopen();
   int arg;
 
   // verify_arrays();
