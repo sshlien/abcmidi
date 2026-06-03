@@ -396,6 +396,8 @@ char *s;
  void no_op1(int dummy1) {}
  void no_op2(int dummy1, int dummy2) {}
  void no_op3(int dummy1, int dummy2, int dummy3) { }
+ void no_op_sysex(int dummy1, char *dummy2) {}
+ void no_op_metamisc(int dummy1, int dummy2, char *dummy3) { }
  void no_op4(int dummy1, int dummy2, int dummy3, int dummy4) { }
  void no_op5(int dummy1, int dummy2, int dummy3, int dummy4, int dummy5) { }
 
@@ -1214,8 +1216,8 @@ void initfunc_for_stats()
     Mf_pitchbend = stats_pitchbend;
     Mf_program = stats_program;
     Mf_chanpressure = stats_pressure;
-    Mf_sysex = no_op2;
-    Mf_metamisc = no_op3;
+    Mf_sysex = no_op_sysex;
+    Mf_metamisc = no_op_metamisc;
     Mf_seqnum = no_op1;
     Mf_eot = stats_eot;
     Mf_timesig = stats_timesig;
@@ -1242,8 +1244,8 @@ void initfunc_for_loadNoteEvents()
     Mf_pitchbend = no_op3;
     Mf_program = no_op0;
     Mf_chanpressure = no_op3;
-    Mf_sysex = no_op2;
-    Mf_metamisc = no_op3;
+    Mf_sysex = no_op_sysex;
+    Mf_metamisc = no_op_metamisc;
     Mf_seqnum = no_op1;
     Mf_eot = no_op0;
     Mf_timesig = no_op4;
