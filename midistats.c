@@ -397,7 +397,7 @@ char *s;
  void no_op2(int dummy1, int dummy2) {}
  void no_op3(int dummy1, int dummy2, int dummy3) { }
  void no_op_sysex(int dummy1, char *dummy2) {}
-void no_op_metamisc(int dummy1, int dummy2, char *dummy3) {}
+ void no_op_metamisc(int dummy1, int dummy2, char *dummy3) { }
  void no_op4(int dummy1, int dummy2, int dummy3, int dummy4) { }
  void no_op5(int dummy1, int dummy2, int dummy3, int dummy4, int dummy5) { }
 
