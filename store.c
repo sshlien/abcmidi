@@ -526,7 +526,7 @@ void dumpfeat (int from, int to); /* defined in genmidi.c */
 char * concatenatestring(char * s1,char * s2); /* defined in parseabc.c */
 void read_custom_stress_file (char *filename); /* defined in stresspat.c */
 
- 
+
 extern long Mf_numbyteswritten; /* linking with midifile.c [SS] 2019-03-23 */
 
 static struct voicecontext* newvoice(int n)
@@ -3595,7 +3595,7 @@ static int pitchof(char note, char accidental, int mult, int octave, int propaga
   static int scale[7] = {0, 2, 4, 5, 7, 9, 11};
   char *anoctave = "cdefgab";
 
-  p = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+  p = (int) (strchr(anoctave, note) -  anoctave);
   p = scale[p];
   acc = accidental;
   mul = mult;
@@ -3626,7 +3626,7 @@ int p,pitch;
 int accidental_size = 1;
 static const char *anoctave = "cdefgab";
 static int scale[7] = {0, 2, 4, 5, 7, 9, 11};
-p = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+p = (int) (strchr(anoctave, note) - anoctave);
 p = scale[p];
 if (accidental == '^') p = p + mult*accidental_size;
 if (accidental == '_') p = p - mult*accidental_size;
@@ -3711,7 +3711,7 @@ static int pitchof_b(char note, char accidental, int mult, int octave, int propa
 
 
 
-  p = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+  p = (int) (strchr(anoctave, note) -  anoctave);
   /* [HL] 2020-07-03 */
   if ((temperament==TEMPERLN) || (temperament==TEMPEREQ))  {
  
@@ -3839,7 +3839,7 @@ static void doroll(char note, int octave, int n, int m, int pitch)
 
   upoct = octave;
   downoct = octave;
-  t = (int) ((long) strchr(anoctave, note)  - (long) anoctave);
+  t = (int) (strchr(anoctave, note)  -  anoctave);
   up = *(anoctave + ((t+1) % 7));
   down = *(anoctave + ((t+6) % 7));
   if (up == 'c') upoct = upoct + 1;
@@ -3874,7 +3874,7 @@ static void doroll_setup(char note, int octave, int n, int m, int pitch)
 
   upoct = octave;
   downoct = octave;
-  t = (int) ((long) strchr(anoctave, note)  - (long) anoctave);
+  t = (int) ( strchr(anoctave, note)  - anoctave);
   up = *(anoctave + ((t+1) % 7));
   down = *(anoctave + ((t+6) % 7));
   if (up == 'c') upoct = upoct + 1;
@@ -3949,7 +3949,7 @@ static void dotrill(char note, int octave, int n, int m, int pitch)
   int bend;
 
   upoct = octave;
-  t = (int) ((long) strchr(anoctave, note)  - (long) anoctave);
+  t = (int) ( strchr(anoctave, note)  -  anoctave);
   up = *(anoctave + ((t+1) % 7));
   if (up == 'c') upoct = upoct + 1;
   pitchup = pitchof_b(up, v->basemap[(int)up - 'a'], 1, upoct, 0,&bend);
@@ -3989,7 +3989,7 @@ static void dotrill_setup(char note, int octave, int n, int m, int pitch)
   struct notestruct *s;
 
   upoct = octave;
-  t = (int) ((long) strchr(anoctave, note)  - (long) anoctave);
+  t = (int) ( strchr(anoctave, note)  -  anoctave);
   up = *(anoctave + ((t+1) % 7));
   if (up == 'c') upoct = upoct + 1;
   pitchup = pitchof_b(up, v->basemap[(int)up - 'a'], 1, upoct, 0,&bend);
@@ -4124,7 +4124,7 @@ static void doornament(char note, int octave, int n, int m, int pitch)
 
   upoct = octave;
   downoct = octave;
-  t = (int) ((long) strchr(anoctave, note)  - (long) anoctave);
+  t = (int) ( strchr(anoctave, note)  -  anoctave);
   up = *(anoctave + ((t+1) % 7));
   down = *(anoctave + ((t+6) % 7));
   if (up == 'c') upoct = upoct + 1;
@@ -6127,7 +6127,7 @@ static void finishfile()
     if (verbose > 5) dumpfeat(0,notes);
 
     if (check) {
-      Mf_putc = nullputc;
+      Mf_putc = &nullputc;
       header_time_num = time_num; /* [SS] 2010-05-21 */
       header_time_denom = time_denom; /* [SS] 2010-05-21 */
       Mf_numbyteswritten = 0; /* [SS] 2019-03-23 */

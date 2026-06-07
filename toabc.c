@@ -2232,7 +2232,7 @@ void transpose_note(char xaccidental, int xmult, char xnote, int xoctave, int tr
     char *anoctave = "cdefgab";
 
     *octave = xoctave;
-    val = (int) ((long) strchr(anoctave, xnote) - (long) anoctave);
+    val = (int) (strchr(anoctave, xnote) -  anoctave);
     newval = val + lines;
     *octave = *octave + (newval/7);
     newval = newval % 7;
@@ -2340,7 +2340,7 @@ void event_note1(int decorators[DECSIZE], cleftype_t *clef, char xaccidental, in
     char *anoctave = "cdefgab";
 
     octave = xoctave;
-    val = (int) ((long) strchr(anoctave, xnote) - (long) anoctave);
+    val = (int) (strchr(anoctave, xnote) - anoctave);
     newval = val + lines;
     octave = octave + (newval/7);
     newval = newval % 7;
@@ -2481,7 +2481,7 @@ void event_note2(int decorators[DECSIZE], cleftype_t *clef, char xaccidental, in
 
   acc = accidental_to_code(xaccidental);
   if (acc == -1 || acc == 1) acc = xmult*acc;
-  val = (int) ((long) strchr(anoctave, xnote) - (long) anoctave);
+  val = (int) (strchr(anoctave, xnote) - anoctave);
 
   /* if no accidental precedes, then get accidental from key signature */
   assumed_acc = oldtable[(int)anoctave[val] - (int)'a']; 
@@ -2604,7 +2604,7 @@ int pitchof(char note, int accidental, int mult, int octave)
   char *anoctave = "cdefgab";
   int middle_c = 60;
 
-  p = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+  p = (int) (strchr(anoctave, note) - anoctave);
   p = scale[p];
   mul = mult;
   noteno = (int)note - 'a';

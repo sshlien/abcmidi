@@ -2741,7 +2741,7 @@ static int pitch2midi(char note, char accidental, int mult, int octave)
   mul = mult;
   noteno = (int)note - 'a';
  
-  p = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+  p = (int) (strchr(anoctave, note) -  anoctave);
   if (p < 0 || p > 6) {    /* [SS] 2022-12-22 */
 	  printf("illegal note %c\n",note);
 	  return 72;

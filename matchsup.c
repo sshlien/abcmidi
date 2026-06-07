@@ -1254,7 +1254,7 @@ static int pitchof(char note, char accidental, int mult, int octave, int propoga
   static int scale[7] = {0, 2, 4, 5, 7, 9, 11};
   char *anoctave = "cdefgab";
 
-  p = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+  p = (int) (strchr(anoctave, note) -  anoctave);
   p = scale[p];
   acc = accidental;
   mul = mult;

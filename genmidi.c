@@ -2637,7 +2637,7 @@ void parse_drummap(char **s)
     };
   };
   /*printf("note = %d octave = %d accidental = %d\n",note,octave,accidental);*/
-  midipitch = (int) ((long) strchr(anoctave, note) - (long) anoctave);
+  midipitch = (int) (strchr(anoctave, note) - anoctave);
   if (midipitch <0 || midipitch > 6) {
     event_error("Malformed note in drummap : expecting a-g or A-G");
     return;

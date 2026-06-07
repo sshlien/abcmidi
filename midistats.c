@@ -391,16 +391,16 @@ char *s;
 
 
 /* Dummy functions for handling MIDI messages.
- *    */
+ */    
  void no_op0() {}
  void no_op1(int dummy1) {}
  void no_op2(int dummy1, int dummy2) {}
+ void no_op2_is(int dummy1, char *dummy2) {}
  void no_op3(int dummy1, int dummy2, int dummy3) { }
- void no_op_sysex(int dummy1, char *dummy2) {}
- void no_op_metamisc(int dummy1, int dummy2, char *dummy3) { }
+ void no_op3_iis(int dummy1, int dummy2, char * dummy3) { }
  void no_op4(int dummy1, int dummy2, int dummy3, int dummy4) { }
  void no_op5(int dummy1, int dummy2, int dummy3, int dummy4, int dummy5) { }
-
+ 
 
 
 /* In order to associate a channel note off message with its
@@ -1211,13 +1211,13 @@ void initfunc_for_stats()
     Mf_trackend = stats_trackend;
     Mf_noteon = stats_noteon;
     Mf_noteoff = stats_noteoff;
-    Mf_pressure = no_op3;
+    Mf_pressure = &no_op3;
     Mf_parameter = stats_parameter;
     Mf_pitchbend = stats_pitchbend;
     Mf_program = stats_program;
     Mf_chanpressure = stats_pressure;
-    Mf_sysex = no_op_sysex;
-    Mf_metamisc = no_op_metamisc;
+    Mf_sysex = no_op2_is;
+    Mf_metamisc = no_op3_iis;
     Mf_seqnum = no_op1;
     Mf_eot = stats_eot;
     Mf_timesig = stats_timesig;
@@ -1244,8 +1244,8 @@ void initfunc_for_loadNoteEvents()
     Mf_pitchbend = no_op3;
     Mf_program = no_op0;
     Mf_chanpressure = no_op3;
-    Mf_sysex = no_op_sysex;
-    Mf_metamisc = no_op_metamisc;
+    Mf_sysex = no_op2_is;
+    Mf_metamisc = no_op3_iis;
     Mf_seqnum = no_op1;
     Mf_eot = no_op0;
     Mf_timesig = no_op4;
