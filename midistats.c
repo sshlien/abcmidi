@@ -1224,9 +1224,9 @@ void initfunc_for_stats()
     Mf_smpte = no_op5;
     Mf_tempo = stats_tempo;
     Mf_keysig = stats_keysig;
-    Mf_seqspecific = no_op3;
+    Mf_seqspecific = no_op2_is;
     Mf_text = stats_metatext;
-    Mf_arbitrary = no_op2;
+    Mf_arbitrary = no_op2_is;
     for (i = 0; i< 2047; i++) pulseCounter[i] = 0;
 }
 
@@ -1242,7 +1242,7 @@ void initfunc_for_loadNoteEvents()
     Mf_pressure = no_op3;
     Mf_parameter = no_op3;
     Mf_pitchbend = no_op3;
-    Mf_program = no_op0;
+    Mf_program = no_op2;
     Mf_chanpressure = no_op3;
     Mf_sysex = no_op2_is;
     Mf_metamisc = no_op3_iis;
@@ -1252,9 +1252,9 @@ void initfunc_for_loadNoteEvents()
     Mf_smpte = no_op5;
     Mf_tempo = record_tempo;
     Mf_keysig = no_op2;
-    Mf_seqspecific = no_op3;
-    Mf_text = no_op3;
-    Mf_arbitrary = no_op2;
+    Mf_seqspecific = no_op2_is;
+    Mf_text = no_op3_iis;
+    Mf_arbitrary = no_op2_is;
 }
 
 void dumpMidievents (int from , int to)
