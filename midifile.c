@@ -63,12 +63,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef ANSILIBS
 #include <string.h>
-#include <stdlib.h>
-#else
-char *strcpy(), *strcat();
-#endif
 
 /* int exit(), free(); */ /* Line commmented out JRA 19/12/95 */
 
@@ -76,20 +71,20 @@ char *strcpy(), *strcat();
 
 /* Functions to be called while processing the MIDI file. */
 int (*Mf_getc)() = NULLFUNC;
-void (*Mf_error)() = NULLFUNC;
+void (*Mf_error)(char *) = NULLFUNC;
 void (*Mf_header)(int, int, int) = NULLFUNC;
 void (*Mf_trackstart)() = NULLFUNC;
 void (*Mf_trackend)() = NULLFUNC;
-void (*Mf_noteon)() = NULLFUNC;
-void (*Mf_noteoff)() = NULLFUNC;
-void (*Mf_pressure)() = NULLFUNC;
-void (*Mf_parameter)() = NULLFUNC;
-void (*Mf_pitchbend)() = NULLFUNC;
-void (*Mf_program)() = NULLFUNC;
-void (*Mf_chanpressure)() = NULLFUNC;
-void (*Mf_sysex)() = NULLFUNC;
+void (*Mf_noteon)(int, int, int) = NULLFUNC;
+void (*Mf_noteoff)(int, int, int) = NULLFUNC;
+void (*Mf_pressure)(int, int, int) = NULLFUNC;
+void (*Mf_parameter)(int, int, int) = NULLFUNC;
+void (*Mf_pitchbend)(int, int, int) = NULLFUNC;
+void (*Mf_program)(int, int) = NULLFUNC;
+void (*Mf_chanpressure)(int, int, int) = NULLFUNC;
+void (*Mf_sysex)(int, char *) = NULLFUNC;
 void (*Mf_arbitrary)(int, char *) = NULLFUNC;
-void (*Mf_metamisc)() = NULLFUNC;
+void (*Mf_metamisc)(int, int, char *) = NULLFUNC;
 void (*Mf_seqnum)(int) = NULLFUNC;
 void (*Mf_eot)() = NULLFUNC;
 void (*Mf_smpte)(int,int,int,int,int) = NULLFUNC;

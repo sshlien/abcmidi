@@ -1,7 +1,7 @@
 /* definitions for MIDI file parsing code */
 #include <stdio.h>
 extern int (*Mf_getc)();
-extern void (*Mf_header)();
+extern void (*Mf_header)(int, int, int);
 extern void (*Mf_trackstart)();
 extern void (*Mf_trackend)();
 extern void (*Mf_noteon)(int, int, int);
@@ -11,24 +11,24 @@ extern void (*Mf_parameter)(int, int, int);
 extern void (*Mf_pitchbend)(int, int, int);
 extern void (*Mf_program)(int, int);
 extern void (*Mf_chanpressure)(int, int, int);
-extern void (*Mf_sysex)(int leng, char *mess);
+extern void (*Mf_sysex)(int, char *);
 extern void (*Mf_metamisc)(int, int, char *);
-extern void (*Mf_seqspecific)();
-extern void (*Mf_seqnum)();
-extern void (*Mf_text)();
+extern void (*Mf_seqspecific)(int, char *);
+extern void (*Mf_seqnum)(int);
+extern void (*Mf_text)(int, int, char *);
 extern void (*Mf_eot)();
 extern void (*Mf_timesig)(int,int,int,int);
 extern void (*Mf_smpte)(int,int,int,int,int);
-extern void (*Mf_tempo)();
+extern void (*Mf_tempo)(long);
 extern void (*Mf_keysig)(int, int);
-extern void (*Mf_arbitrary)();
+extern void (*Mf_arbitrary)(int, char *);
 extern void (*Mf_error)(char *);
 extern long Mf_currtime;
 extern int Mf_nomerge;
 
 /* definitions for MIDI file writing code */
 extern int (*Mf_putc)(char c);
-extern long (*Mf_writetrack)();
+extern long (*Mf_writetrack)(int);
 extern int (*Mf_writetempotrack)();
 float mf_ticks2sec(long ticks, int division, long tempo);
 long mf_sec2ticks(float secs, int division, long tempo);

@@ -733,7 +733,7 @@ void txt_metamisc(int type, int leng, char *mess)
 {
 }
 
-void txt_metaspecial(int type, int leng, char *mess)
+void txt_metaspecial(int leng, char *mess)
 {
 }
 
@@ -901,6 +901,7 @@ void txt_arbitrary(int leng, char *mess)
  void no_op3_iis(int dummy1, int dummy2, char * dummy3) { }
  void no_op4(int dummy1, int dummy2, int dummy3, int dummy4) { }
  void no_op5(int dummy1, int dummy2, int dummy3, int dummy4, int dummy5) { }
+ void no_op_l(long dummy1) {}
 
 
 void print_txt_header(int xformat, int ntrks, int ldivision)
@@ -1429,11 +1430,11 @@ void initfunc_for_midinotes()
     Mf_eot = &no_op0;
     Mf_timesig = &no_op4;
     Mf_smpte = &no_op5;
-    Mf_tempo = &no_op1;
+    Mf_tempo = &no_op_l;
     Mf_keysig = &no_op2;
-    Mf_seqspecific = &no_op3;
-    Mf_text = &no_op3;
-    Mf_arbitrary = &no_op2;
+    Mf_seqspecific = &no_op2_is;
+    Mf_text = &no_op3_iis;
+    Mf_arbitrary = &no_op2_is;
 }
 
 void initfunc_for_midipitch()
@@ -1465,9 +1466,9 @@ void initfunc_for_mftext()
     Mf_smpte = &mftxt_smpte;
     Mf_tempo = &mftxt_tempo;
     Mf_keysig = &mftxt_keysig;
-    Mf_seqspecific = &no_op3;
+    Mf_seqspecific = &no_op2_is;
     Mf_text = &mftxt_metatext;
-    Mf_arbitrary = &no_op2;
+    Mf_arbitrary = &no_op2_is;
 }
 
 

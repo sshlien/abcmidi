@@ -153,10 +153,10 @@ void txt_metamisc(int type, int leng, char *mess)
   printf("Meta event, unrecognized, type=0x%02x leng=%d\n",type,leng);
 }
 
-void txt_metaspecial(int type, int leng, char *mess)
+void txt_metaspecial(int leng, char *mess)
 {
   prtime();
-  printf("Meta event, sequencer-specific, type=0x%02x leng=%d\n",type,leng);
+  printf("Meta event, sequencer-specific, leng=%d\n", leng);
 }
 
 void txt_metatext(int type, int leng, char *mess)
