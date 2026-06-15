@@ -1,0 +1,628 @@
+Header format=1 ntrks=2 division=480
+Track start
+Time=1  Meta Text, type=0x01 (Text Event)  leng=19
+     Text = <@KMIDI KARAOKE FILE>
+Time=1  Meta Text, type=0x03 (Sequence/Track Name)  leng=21
+     Text = <Oh You New York Girls>
+Time=1  Meta Text, type=0x01 (Text Event)  leng=23
+     Text = <@IOh You New York Girls>
+Time=1  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = <@ITrad>
+Time=1  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=1  Tempo, microseconds-per-MIDI-quarter-note=300000
+Time=1  Key signature, sharp/flats=0  minor=0
+Time=1  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=1  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part A-1>
+Time=14881  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part B-1>
+Time=30721  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part A-2>
+Time=45601  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part B-2>
+Time=61441  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part A-3>
+Time=76321  Meta Text, type=0x06 (Marker)  leng=8
+     Text = <Part B-3>
+Time=92186  Meta event, end of track
+Track end
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=17
+     Text = <notes/lyric track>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:5>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = <C:Trad>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=9
+     Text = < 0 sharps>
+Time=1  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = </As>
+Time=1  Note on, chan=1 pitch=79 vol=105
+Time=480  Note off, chan=1 pitch=79 vol=0
+Time=481  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = < I>
+Time=481  Note on, chan=1 pitch=76 vol=105
+Time=960  Note off, chan=1 pitch=76 vol=0
+Time=961  Meta Text, type=0x01 (Text Event)  leng=7
+     Text = < walked>
+Time=961  Note on, chan=1 pitch=79 vol=80
+Time=1440  Note off, chan=1 pitch=79 vol=0
+Time=1441  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < out>
+Time=1441  Note on, chan=1 pitch=79 vol=95
+Time=2160  Note off, chan=1 pitch=79 vol=0
+Time=2161  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < on>
+Time=2161  Note on, chan=1 pitch=79 vol=80
+Time=2400  Note off, chan=1 pitch=79 vol=0
+Time=2401  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < So>
+Time=2401  Note on, chan=1 pitch=77 vol=105
+Time=2880  Note off, chan=1 pitch=77 vol=0
+Time=2881  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <uth>
+Time=2881  Note on, chan=1 pitch=81 vol=80
+Time=3360  Note off, chan=1 pitch=81 vol=0
+Time=3361  Meta Text, type=0x01 (Text Event)  leng=8
+     Text = < Street,>
+Time=3361  Note on, chan=1 pitch=81 vol=95
+Time=4080  Note off, chan=1 pitch=81 vol=0
+Time=4081  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = < a>
+Time=4081  Note on, chan=1 pitch=81 vol=80
+Time=4320  Note off, chan=1 pitch=81 vol=0
+Time=4321  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < fair>
+Time=4321  Note on, chan=1 pitch=79 vol=105
+Time=4800  Note off, chan=1 pitch=79 vol=0
+Time=4801  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < maid>
+Time=4801  Note on, chan=1 pitch=79 vol=80
+Time=5280  Note off, chan=1 pitch=79 vol=0
+Time=5281  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = < I>
+Time=5281  Note on, chan=1 pitch=77 vol=95
+Time=5760  Note off, chan=1 pitch=77 vol=0
+Time=5761  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < did>
+Time=5761  Note on, chan=1 pitch=79 vol=80
+Time=6240  Note off, chan=1 pitch=79 vol=0
+Time=6241  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < meet>
+Time=6241  Note on, chan=1 pitch=76 vol=105
+Time=7680  Note off, chan=1 pitch=76 vol=0
+Time=7681  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = <\ Who>
+Time=7681  Note on, chan=1 pitch=79 vol=80
+Time=8160  Note off, chan=1 pitch=79 vol=0
+Time=8161  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < asked>
+Time=8161  Note on, chan=1 pitch=84 vol=105
+Time=8880  Note off, chan=1 pitch=84 vol=0
+Time=8881  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < me>
+Time=8881  Note on, chan=1 pitch=84 vol=80
+Time=9120  Note off, chan=1 pitch=84 vol=0
+Time=9121  Meta Text, type=0x01 (Text Event)  leng=7
+     Text = < please>
+Time=9121  Note on, chan=1 pitch=84 vol=95
+Time=9600  Note off, chan=1 pitch=84 vol=0
+Time=9601  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < to>
+Time=9601  Note on, chan=1 pitch=79 vol=80
+Time=10080  Note off, chan=1 pitch=79 vol=0
+Time=10081  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < see>
+Time=10081  Note on, chan=1 pitch=83 vol=105
+Time=10560  Note off, chan=1 pitch=83 vol=0
+Time=10561  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < her>
+Time=10561  Note on, chan=1 pitch=81 vol=80
+Time=11040  Note off, chan=1 pitch=81 vol=0
+Time=11041  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < home,>
+Time=11041  Note on, chan=1 pitch=81 vol=95
+Time=11760  Note off, chan=1 pitch=81 vol=0
+Time=11761  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < she>
+Time=11761  Note on, chan=1 pitch=81 vol=80
+Time=12000  Note off, chan=1 pitch=81 vol=0
+Time=12001  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < lived>
+Time=12001  Note on, chan=1 pitch=79 vol=105
+Time=12720  Note off, chan=1 pitch=79 vol=0
+Time=12721  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < on>
+Time=12721  Note on, chan=1 pitch=79 vol=80
+Time=12960  Note off, chan=1 pitch=79 vol=0
+Time=12961  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < Blee>
+Time=12961  Note on, chan=1 pitch=77 vol=95
+Time=13440  Note off, chan=1 pitch=77 vol=0
+Time=13441  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <cker>
+Time=13441  Note on, chan=1 pitch=74 vol=80
+Time=13920  Note off, chan=1 pitch=74 vol=0
+Time=13921  Meta Text, type=0x01 (Text Event)  leng=7
+     Text = < Street>
+Time=13921  Note on, chan=1 pitch=72 vol=105
+Time=14880  Note off, chan=1 pitch=72 vol=0
+Time=14881  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = </ And>
+Time=14881  Note on, chan=1 pitch=76 vol=95
+Time=15360  Note off, chan=1 pitch=76 vol=0
+Time=15361  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = < a>
+Time=15361  Note on, chan=1 pitch=77 vol=80
+Time=15840  Note off, chan=1 pitch=77 vol=0
+Time=15841  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <way,>
+Time=15841  Note on, chan=1 pitch=79 vol=105
+Time=17280  Note off, chan=1 pitch=79 vol=0
+Time=17281  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < you>
+Time=17281  Note on, chan=1 pitch=76 vol=80
+Time=17760  Note off, chan=1 pitch=76 vol=0
+Time=17761  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < John>
+Time=17761  Note on, chan=1 pitch=77 vol=105
+Time=18240  Note off, chan=1 pitch=77 vol=0
+Time=18241  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <ny,>
+Time=18241  Note on, chan=1 pitch=81 vol=80
+Time=19680  Note off, chan=1 pitch=81 vol=0
+Time=19681  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < my>
+Time=19681  Note on, chan=1 pitch=83 vol=105
+Time=20640  Note off, chan=1 pitch=83 vol=0
+Time=20641  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < dear>
+Time=20641  Note on, chan=1 pitch=81 vol=95
+Time=21600  Note off, chan=1 pitch=81 vol=0
+Time=21601  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < hon>
+Time=21601  Note on, chan=1 pitch=81 vol=105
+Time=22080  Note off, chan=1 pitch=81 vol=0
+Time=22081  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = <ey>
+Time=22081  Note on, chan=1 pitch=79 vol=80
+Time=23040  Note off, chan=1 pitch=79 vol=0
+Time=23521  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <\ Oh>
+Time=23521  Note on, chan=1 pitch=84 vol=105
+Time=24960  Note off, chan=1 pitch=84 vol=0
+Time=24961  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < you>
+Time=24961  Note on, chan=1 pitch=83 vol=80
+Time=25440  Note off, chan=1 pitch=83 vol=0
+Time=25441  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < New>
+Time=25441  Note on, chan=1 pitch=83 vol=105
+Time=25920  Note off, chan=1 pitch=83 vol=0
+Time=25921  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < York>
+Time=25921  Note on, chan=1 pitch=81 vol=80
+Time=26400  Note off, chan=1 pitch=81 vol=0
+Time=26401  Meta Text, type=0x01 (Text Event)  leng=7
+     Text = < girls,>
+Time=26401  Note on, chan=1 pitch=81 vol=95
+Time=27360  Note off, chan=1 pitch=81 vol=0
+Time=27361  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < can>
+Time=27361  Note on, chan=1 pitch=79 vol=105
+Time=28080  Note off, chan=1 pitch=79 vol=0
+Time=28081  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < you>
+Time=28081  Note on, chan=1 pitch=79 vol=80
+Time=28320  Note off, chan=1 pitch=79 vol=0
+Time=28321  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < dance>
+Time=28321  Note on, chan=1 pitch=77 vol=95
+Time=28800  Note off, chan=1 pitch=77 vol=0
+Time=28801  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < the>
+Time=28801  Note on, chan=1 pitch=71 vol=80
+Time=29280  Note off, chan=1 pitch=71 vol=0
+Time=29281  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < pol>
+Time=29281  Note on, chan=1 pitch=74 vol=105
+Time=29760  Note off, chan=1 pitch=74 vol=0
+Time=29761  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <ka?>
+Time=29761  Note on, chan=1 pitch=72 vol=80
+Time=30720  Note off, chan=1 pitch=72 vol=0
+Time=30721  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <\ I>
+Time=30721  Note on, chan=1 pitch=79 vol=80
+Time=31200  Note off, chan=1 pitch=79 vol=0
+Time=31201  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < said,>
+Time=31201  Note on, chan=1 pitch=76 vol=105
+Time=31680  Note off, chan=1 pitch=76 vol=0
+Time=31681  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < "My>
+Time=31681  Note on, chan=1 pitch=79 vol=80
+Time=32160  Note off, chan=1 pitch=79 vol=0
+Time=32161  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < dear>
+Time=32161  Note on, chan=1 pitch=79 vol=95
+Time=32880  Note off, chan=1 pitch=79 vol=0
+Time=32881  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < young>
+Time=32881  Note on, chan=1 pitch=79 vol=80
+Time=33120  Note off, chan=1 pitch=79 vol=0
+Time=33121  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < la>
+Time=33121  Note on, chan=1 pitch=77 vol=105
+Time=33600  Note off, chan=1 pitch=77 vol=0
+Time=33601  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <dy,>
+Time=33601  Note on, chan=1 pitch=81 vol=80
+Time=34080  Note off, chan=1 pitch=81 vol=0
+Time=34081  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < I'm>
+Time=34081  Note on, chan=1 pitch=81 vol=95
+Time=34800  Note off, chan=1 pitch=81 vol=0
+Time=34801  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = < a>
+Time=34801  Note on, chan=1 pitch=81 vol=80
+Time=35040  Note off, chan=1 pitch=81 vol=0
+Time=35041  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < stran>
+Time=35041  Note on, chan=1 pitch=79 vol=105
+Time=35520  Note off, chan=1 pitch=79 vol=0
+Time=35521  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <ger>
+Time=35521  Note on, chan=1 pitch=79 vol=80
+Time=36000  Note off, chan=1 pitch=79 vol=0
+Time=36001  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < here>
+Time=36001  Note on, chan=1 pitch=77 vol=95
+Time=36480  Note off, chan=1 pitch=77 vol=0
+Time=36481  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < in>
+Time=36481  Note on, chan=1 pitch=79 vol=80
+Time=36960  Note off, chan=1 pitch=79 vol=0
+Time=36961  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < town>
+Time=36961  Note on, chan=1 pitch=76 vol=105
+Time=38400  Note off, chan=1 pitch=76 vol=0
+Time=38401  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = </ I>
+Time=38401  Note on, chan=1 pitch=79 vol=80
+Time=38880  Note off, chan=1 pitch=79 vol=0
+Time=38881  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < left>
+Time=38881  Note on, chan=1 pitch=84 vol=105
+Time=39600  Note off, chan=1 pitch=84 vol=0
+Time=39601  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < my>
+Time=39601  Note on, chan=1 pitch=84 vol=80
+Time=39840  Note off, chan=1 pitch=84 vol=0
+Time=39841  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < ship>
+Time=39841  Note on, chan=1 pitch=84 vol=95
+Time=40320  Note off, chan=1 pitch=84 vol=0
+Time=40321  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < just>
+Time=40321  Note on, chan=1 pitch=79 vol=80
+Time=40800  Note off, chan=1 pitch=79 vol=0
+Time=40801  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < yes>
+Time=40801  Note on, chan=1 pitch=83 vol=105
+Time=41280  Note off, chan=1 pitch=83 vol=0
+Time=41281  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <ter>
+Time=41281  Note on, chan=1 pitch=81 vol=80
+Time=41760  Note off, chan=1 pitch=81 vol=0
+Time=41761  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <day,>
+Time=41761  Note on, chan=1 pitch=81 vol=95
+Time=42480  Note off, chan=1 pitch=81 vol=0
+Time=42481  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < from>
+Time=42481  Note on, chan=1 pitch=81 vol=80
+Time=42720  Note off, chan=1 pitch=81 vol=0
+Time=42721  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < Liver>
+Time=42721  Note on, chan=1 pitch=79 vol=105
+Time=43440  Note off, chan=1 pitch=79 vol=0
+Time=43441  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <pool>
+Time=43441  Note on, chan=1 pitch=79 vol=80
+Time=43680  Note off, chan=1 pitch=79 vol=0
+Time=43681  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = < I>
+Time=43681  Note on, chan=1 pitch=77 vol=95
+Time=44160  Note off, chan=1 pitch=77 vol=0
+Time=44161  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < was>
+Time=44161  Note on, chan=1 pitch=74 vol=80
+Time=44640  Note off, chan=1 pitch=74 vol=0
+Time=44641  Meta Text, type=0x01 (Text Event)  leng=8
+     Text = < bound.">
+Time=44641  Note on, chan=1 pitch=72 vol=105
+Time=45600  Note off, chan=1 pitch=72 vol=0
+Time=45601  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = </ And>
+Time=45601  Note on, chan=1 pitch=76 vol=95
+Time=46080  Note off, chan=1 pitch=76 vol=0
+Time=46081  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = < a>
+Time=46081  Note on, chan=1 pitch=77 vol=80
+Time=46560  Note off, chan=1 pitch=77 vol=0
+Time=46561  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <way,>
+Time=46561  Note on, chan=1 pitch=79 vol=105
+Time=48000  Note off, chan=1 pitch=79 vol=0
+Time=48001  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < you>
+Time=48001  Note on, chan=1 pitch=76 vol=80
+Time=48480  Note off, chan=1 pitch=76 vol=0
+Time=48481  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < John>
+Time=48481  Note on, chan=1 pitch=77 vol=105
+Time=48960  Note off, chan=1 pitch=77 vol=0
+Time=48961  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <ny,>
+Time=48961  Note on, chan=1 pitch=81 vol=80
+Time=50400  Note off, chan=1 pitch=81 vol=0
+Time=50401  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < my>
+Time=50401  Note on, chan=1 pitch=83 vol=105
+Time=51360  Note off, chan=1 pitch=83 vol=0
+Time=51361  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < dear>
+Time=51361  Note on, chan=1 pitch=81 vol=95
+Time=52320  Note off, chan=1 pitch=81 vol=0
+Time=52321  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < hon>
+Time=52321  Note on, chan=1 pitch=81 vol=105
+Time=52800  Note off, chan=1 pitch=81 vol=0
+Time=52801  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = <ey>
+Time=52801  Note on, chan=1 pitch=79 vol=80
+Time=53760  Note off, chan=1 pitch=79 vol=0
+Time=54241  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <\ Oh>
+Time=54241  Note on, chan=1 pitch=84 vol=105
+Time=55680  Note off, chan=1 pitch=84 vol=0
+Time=55681  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < you>
+Time=55681  Note on, chan=1 pitch=83 vol=80
+Time=56160  Note off, chan=1 pitch=83 vol=0
+Time=56161  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < New>
+Time=56161  Note on, chan=1 pitch=83 vol=105
+Time=56640  Note off, chan=1 pitch=83 vol=0
+Time=56641  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < York>
+Time=56641  Note on, chan=1 pitch=81 vol=80
+Time=57120  Note off, chan=1 pitch=81 vol=0
+Time=57121  Meta Text, type=0x01 (Text Event)  leng=7
+     Text = < girls,>
+Time=57121  Note on, chan=1 pitch=81 vol=95
+Time=58080  Note off, chan=1 pitch=81 vol=0
+Time=58081  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < can>
+Time=58081  Note on, chan=1 pitch=79 vol=105
+Time=58800  Note off, chan=1 pitch=79 vol=0
+Time=58801  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < you>
+Time=58801  Note on, chan=1 pitch=79 vol=80
+Time=59040  Note off, chan=1 pitch=79 vol=0
+Time=59041  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < dance>
+Time=59041  Note on, chan=1 pitch=77 vol=95
+Time=59520  Note off, chan=1 pitch=77 vol=0
+Time=59521  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < the>
+Time=59521  Note on, chan=1 pitch=71 vol=80
+Time=60000  Note off, chan=1 pitch=71 vol=0
+Time=60001  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < pol>
+Time=60001  Note on, chan=1 pitch=74 vol=105
+Time=60480  Note off, chan=1 pitch=74 vol=0
+Time=60481  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <ka?>
+Time=60481  Note on, chan=1 pitch=72 vol=80
+Time=61440  Note off, chan=1 pitch=72 vol=0
+Time=61441  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = </ I>
+Time=61441  Note on, chan=1 pitch=79 vol=80
+Time=61920  Note off, chan=1 pitch=79 vol=0
+Time=61921  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < took>
+Time=61921  Note on, chan=1 pitch=76 vol=105
+Time=62400  Note off, chan=1 pitch=76 vol=0
+Time=62401  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < her>
+Time=62401  Note on, chan=1 pitch=79 vol=80
+Time=62880  Note off, chan=1 pitch=79 vol=0
+Time=62881  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < out>
+Time=62881  Note on, chan=1 pitch=79 vol=95
+Time=63600  Note off, chan=1 pitch=79 vol=0
+Time=63601  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < to>
+Time=63601  Note on, chan=1 pitch=79 vol=80
+Time=63840  Note off, chan=1 pitch=79 vol=0
+Time=63841  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < Tiff>
+Time=63841  Note on, chan=1 pitch=77 vol=105
+Time=64320  Note off, chan=1 pitch=77 vol=0
+Time=64321  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = <an>
+Time=64321  Note on, chan=1 pitch=81 vol=80
+Time=64800  Note off, chan=1 pitch=81 vol=0
+Time=64801  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <y's,>
+Time=64801  Note on, chan=1 pitch=81 vol=95
+Time=65520  Note off, chan=1 pitch=81 vol=0
+Time=65521  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = < I>
+Time=65521  Note on, chan=1 pitch=81 vol=80
+Time=65760  Note off, chan=1 pitch=81 vol=0
+Time=65761  Meta Text, type=0x01 (Text Event)  leng=7
+     Text = < spared>
+Time=65761  Note on, chan=1 pitch=79 vol=105
+Time=66240  Note off, chan=1 pitch=79 vol=0
+Time=66241  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < her>
+Time=66241  Note on, chan=1 pitch=79 vol=80
+Time=66720  Note off, chan=1 pitch=79 vol=0
+Time=66721  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < no>
+Time=66721  Note on, chan=1 pitch=77 vol=95
+Time=67200  Note off, chan=1 pitch=77 vol=0
+Time=67201  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < ex>
+Time=67201  Note on, chan=1 pitch=79 vol=80
+Time=67680  Note off, chan=1 pitch=79 vol=0
+Time=67681  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = <pense>
+Time=67681  Note on, chan=1 pitch=76 vol=105
+Time=69120  Note off, chan=1 pitch=76 vol=0
+Time=69121  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <\ I>
+Time=69121  Note on, chan=1 pitch=79 vol=80
+Time=69600  Note off, chan=1 pitch=79 vol=0
+Time=69601  Meta Text, type=0x01 (Text Event)  leng=7
+     Text = < bought>
+Time=69601  Note on, chan=1 pitch=84 vol=105
+Time=70320  Note off, chan=1 pitch=84 vol=0
+Time=70321  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < her>
+Time=70321  Note on, chan=1 pitch=84 vol=80
+Time=70560  Note off, chan=1 pitch=84 vol=0
+Time=70561  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < two>
+Time=70561  Note on, chan=1 pitch=84 vol=95
+Time=71040  Note off, chan=1 pitch=84 vol=0
+Time=71041  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < gold>
+Time=71041  Note on, chan=1 pitch=79 vol=80
+Time=71520  Note off, chan=1 pitch=79 vol=0
+Time=71521  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < ea>
+Time=71521  Note on, chan=1 pitch=83 vol=105
+Time=72000  Note off, chan=1 pitch=83 vol=0
+Time=72001  Meta Text, type=0x01 (Text Event)  leng=1
+     Text = <r>
+Time=72001  Note on, chan=1 pitch=81 vol=80
+Time=72480  Note off, chan=1 pitch=81 vol=0
+Time=72481  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = <rings,>
+Time=72481  Note on, chan=1 pitch=81 vol=95
+Time=73200  Note off, chan=1 pitch=81 vol=0
+Time=73201  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < they>
+Time=73201  Note on, chan=1 pitch=81 vol=80
+Time=73440  Note off, chan=1 pitch=81 vol=0
+Time=73441  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < cost>
+Time=73441  Note on, chan=1 pitch=79 vol=105
+Time=74160  Note off, chan=1 pitch=79 vol=0
+Time=74161  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < me>
+Time=74161  Note on, chan=1 pitch=79 vol=80
+Time=74400  Note off, chan=1 pitch=79 vol=0
+Time=74401  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < fif>
+Time=74401  Note on, chan=1 pitch=77 vol=95
+Time=74880  Note off, chan=1 pitch=77 vol=0
+Time=74881  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <teen>
+Time=74881  Note on, chan=1 pitch=74 vol=80
+Time=75360  Note off, chan=1 pitch=74 vol=0
+Time=75361  Meta Text, type=0x01 (Text Event)  leng=7
+     Text = < cents.>
+Time=75361  Note on, chan=1 pitch=72 vol=105
+Time=76320  Note off, chan=1 pitch=72 vol=0
+Time=76321  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = </ And>
+Time=76321  Note on, chan=1 pitch=76 vol=95
+Time=76800  Note off, chan=1 pitch=76 vol=0
+Time=76801  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = < a>
+Time=76801  Note on, chan=1 pitch=77 vol=80
+Time=77280  Note off, chan=1 pitch=77 vol=0
+Time=77281  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <way,>
+Time=77281  Note on, chan=1 pitch=79 vol=105
+Time=78720  Note off, chan=1 pitch=79 vol=0
+Time=78721  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < you>
+Time=78721  Note on, chan=1 pitch=76 vol=80
+Time=79200  Note off, chan=1 pitch=76 vol=0
+Time=79201  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < John>
+Time=79201  Note on, chan=1 pitch=77 vol=105
+Time=79680  Note off, chan=1 pitch=77 vol=0
+Time=79681  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <ny,>
+Time=79681  Note on, chan=1 pitch=81 vol=80
+Time=81120  Note off, chan=1 pitch=81 vol=0
+Time=81121  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = < my>
+Time=81121  Note on, chan=1 pitch=83 vol=105
+Time=82080  Note off, chan=1 pitch=83 vol=0
+Time=82081  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < dear>
+Time=82081  Note on, chan=1 pitch=81 vol=95
+Time=83040  Note off, chan=1 pitch=81 vol=0
+Time=83041  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < hon>
+Time=83041  Note on, chan=1 pitch=81 vol=105
+Time=83520  Note off, chan=1 pitch=81 vol=0
+Time=83521  Meta Text, type=0x01 (Text Event)  leng=2
+     Text = <ey>
+Time=83521  Note on, chan=1 pitch=79 vol=80
+Time=84480  Note off, chan=1 pitch=79 vol=0
+Time=84961  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = <\ Oh>
+Time=84961  Note on, chan=1 pitch=84 vol=105
+Time=86400  Note off, chan=1 pitch=84 vol=0
+Time=86401  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < you>
+Time=86401  Note on, chan=1 pitch=83 vol=80
+Time=86880  Note off, chan=1 pitch=83 vol=0
+Time=86881  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < New>
+Time=86881  Note on, chan=1 pitch=83 vol=105
+Time=87360  Note off, chan=1 pitch=83 vol=0
+Time=87361  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = < York>
+Time=87361  Note on, chan=1 pitch=81 vol=80
+Time=87840  Note off, chan=1 pitch=81 vol=0
+Time=87841  Meta Text, type=0x01 (Text Event)  leng=7
+     Text = < girls,>
+Time=87841  Note on, chan=1 pitch=81 vol=95
+Time=88800  Note off, chan=1 pitch=81 vol=0
+Time=88801  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < can>
+Time=88801  Note on, chan=1 pitch=79 vol=105
+Time=89520  Note off, chan=1 pitch=79 vol=0
+Time=89521  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < you>
+Time=89521  Note on, chan=1 pitch=79 vol=80
+Time=89760  Note off, chan=1 pitch=79 vol=0
+Time=89761  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = < dance>
+Time=89761  Note on, chan=1 pitch=77 vol=95
+Time=90240  Note off, chan=1 pitch=77 vol=0
+Time=90241  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < the>
+Time=90241  Note on, chan=1 pitch=71 vol=80
+Time=90720  Note off, chan=1 pitch=71 vol=0
+Time=90721  Meta Text, type=0x01 (Text Event)  leng=4
+     Text = < pol>
+Time=90721  Note on, chan=1 pitch=74 vol=105
+Time=91200  Note off, chan=1 pitch=74 vol=0
+Time=91201  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <ka?>
+Time=91201  Note on, chan=1 pitch=72 vol=80
+Time=92160  Note off, chan=1 pitch=72 vol=0
+Time=92186  Meta event, end of track
+Track end
