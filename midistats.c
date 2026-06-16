@@ -320,8 +320,7 @@ int filegetc()
 }
 
 
-void fatal_error(s)
-char* s;
+void fatal_error(char *s)
 /* fatal error encounterd - abort program */
 {
   fprintf(stderr, "%s\n", s);
@@ -329,8 +328,7 @@ char* s;
 }
 
 
-void event_error(s)
-char *s;
+void event_error(char *s)
 /* problem encountered but OK to continue */
 {
   char msg[256];
@@ -340,9 +338,8 @@ char *s;
 }
 
 
-int* checkmalloc(bytes)
+int* checkmalloc(int bytes)
 /* malloc with error checking */
-int bytes;
 {
   int *p;
 
@@ -356,10 +353,7 @@ int bytes;
 
 
 
-FILE *
-efopen(name,mode)
-char *name;
-char *mode;
+FILE * efopen(char *name,char *mode)
 {
     FILE *f;
 
@@ -371,16 +365,14 @@ char *mode;
     return(f);
 }
 
-void error(s)
-char *s;
+void error(char *s)
 {
     fprintf(stderr,"Error: %s\n",s);
 }
 
 
 /* [SS] 2017-11-19 */
-void stats_error(s)
-char *s;
+void stats_error(char *s)
 {
     fprintf(stderr,"Error: %s\n",s);
     fprintf(stderr,"activetrack %d\n",tracknum);
@@ -444,8 +436,7 @@ char* s = name;
 }
 
 
-void pitch2drum(midipitch)
-int midipitch;
+void pitch2drum(int midipitch)
 {
 static char *drumpatches[] = {
  "Acoustic Bass Drum", "Bass Drum 1", "Side Stick", "Acoustic Snare",
@@ -722,9 +713,7 @@ float histogram_entropy (int *histogram, int size)
 
 
 
-void output_count_trkdata(data_array,name)
-int data_array[];
-char *name;
+void output_count_trkdata(int data_array[],char *name)
 {
 int i,sum;
 sum = 0;
@@ -918,8 +907,7 @@ tracknm.eighthUnit = unit;
 
 
 
-void stats_noteon(chan,pitch,vol)
-int chan, pitch, vol;
+void stats_noteon(int chan,int pitch,int vol)
 {
  int delta;
  int barnum;
@@ -1034,15 +1022,13 @@ void stats_noteoff(int chan,int pitch,int vol)
 }
 
 
-void stats_pitchbend(chan,lsb,msb)
-int chan, lsb, msb;
+void stats_pitchbend(int chan,int lsb,int msb)
 {
 trkdata.pitchbend[0]++;
 trkdata.pitchbend[chan+1]++;
 }
 
-void stats_pressure(chan,press)
-int chan, press;
+void stats_pressure(int chan,int pitch,int press)
 {
 trkdata.pressure[0]++;
 trkdata.pressure[chan+1]++; /* [SS] 2022.04.28 */
@@ -1050,8 +1036,7 @@ trkdata.pressure[chan+1]++; /* [SS] 2022.04.28 */
 
 
 
-void stats_program(chan,program)
-int chan, program;
+void stats_program(int chan,int program)
 {
 int beatnumber;
 if (program <0 || program > 127) return; /* [SS] 2018-03-06 */
@@ -1069,8 +1054,7 @@ if (trkdata.program[chan+1] != 0) {
 
 
 
-void stats_parameter(chan,control,value)
-int chan, control, value;
+void stats_parameter(int chan,int control,int value)
 {
 int chan1;
 chan1 = chan+1;
@@ -1086,9 +1070,7 @@ trkdata.cntlparam[chan1]++;
 
 
 
-void stats_metatext(type,leng,mess)
-int type, leng;
-char *mess;
+void stats_metatext(int type,int leng,char* mess)
 {
 int i; 
 if (type == 5) hasLyrics = 1; /* [SS] 2023-10-30 */
@@ -1102,8 +1084,7 @@ printf("\n");
 
 
 /* [SS] 2018-01-02 */
-void stats_keysig(sf,mi)
-int sf, mi;
+void stats_keysig(int sf,int mi)
 {
   float beatnumber;
   static char *major[] = {"Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F",
@@ -1125,8 +1106,7 @@ int sf, mi;
 
 
 /* [SS] 2018-01-02 */
-void stats_tempo(ltempo)
-long ltempo;
+void stats_tempo(long ltempo)
 {
   float beatnumber;
   tempo = ltempo;
@@ -1138,8 +1118,7 @@ long ltempo;
 }
 
 
-void stats_timesig(nn,dd,cc,bb)
-int nn, dd, cc, bb;
+void stats_timesig(int nn,int dd,int cc,int bb)
 {
   float beatnumber;
   int denom = 1;
@@ -1861,10 +1840,9 @@ printf("%d\t%d\t%d\t%d\t%d\t%d\n",lasttrack,nchannels, division,bpm,lastEvent,la
 
 
 
-int readnum(num) 
+int readnum(char *num) 
 /* read a number from a string */
 /* used for processing command line */
-char *num;
 {
   int t;
   char *p;
@@ -1886,10 +1864,9 @@ char *num;
 }
 
 
-int readnump(p) 
+int readnump(char **p) 
 /* read a number from a string (subtly different) */
 /* used for processing command line */
-char **p;
 {
   int t;
   
@@ -1907,11 +1884,8 @@ char **p;
 }
 
 
-int getarg(option, argc, argv)
+int getarg(char *option, int argc,char *argv[])
 /* extract arguments from command line */
-char *option;
-char *argv[];
-int argc;
 {
   int j, place;
 
@@ -1924,11 +1898,9 @@ int argc;
   return (place);
 }
 
-int huntfilename(argc, argv)
+int huntfilename(int argc, char *argv[])
 /* look for filename argument if -f option is missing */
 /* assumes filename does not begin with '-'           */
-char *argv[];
-int argc;
 {
   int j, place;
 
@@ -1950,9 +1922,7 @@ int argc;
   return(place);
 }
 
-int process_command_line_arguments(argc,argv)
-char *argv[];
-int argc;
+int process_command_line_arguments(int argc,char *argv[])
 {
   int val;
   int arg;
@@ -2094,9 +2064,7 @@ int argc;
 
 
 
-void midistats(argc,argv)
-char *argv[];
-int argc;
+void midistats(int argc, char *argv[])
 {
 initfunc_for_stats();
 Mf_getc = filegetc;
@@ -2155,13 +2123,9 @@ if (keystabilityAnalysis) {
 
 
 
-int main(argc,argv)
-char *argv[];
-int argc;
+int main(int argc, char *argv[])
 {
-  FILE *efopen();
   int arg;
-
   // verify_arrays();
   arg = process_command_line_arguments(argc,argv);
   if(stats == 1)  midistats(argc,argv);

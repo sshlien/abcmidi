@@ -64,6 +64,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* define USE_INDEX if your C libraries have index() instead of strchr() */
 #ifdef USE_INDEX
@@ -76,7 +77,7 @@ char *pvcon = NULL;
 
 char* crack(int argc, char *argv[], char *flags, int ign)
 {
-    char *pv, *flgp, *strchr();
+    char *pv, *flgp;
     while ((arg_index) < argc)
 	{
 	if (pvcon != NULL)
