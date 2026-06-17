@@ -15749,3 +15749,13 @@ releases such as the 3.22.1 shipped by Ubuntu 22.04 LTS can use
 "cmake --preset" without hitting "Unrecognized 'version' field".  No
 v4/v5/v6 schema features were in use; v3 covers every field present
 in the file.
+
+June 17 2026 [RK]
+
+mftext: fixed the Pitchbend text output, which printed its two data
+bytes under swapped "lsb="/"msb=" labels (sshlien/abcmidi#6).  The
+values now match their labels and are shown most-significant first
+("msb=%d lsb=%d") since the bend value is msb*128 + lsb.  This is a
+display-only change in the text dump; MIDI output is unaffected.  The
+golden test references that recorded the old mislabeled lines were
+regenerated to match.
