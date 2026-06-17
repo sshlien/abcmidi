@@ -1,0 +1,18 @@
+% Lyric/word handling coverage for the golden test suite.
+% Small, deliberately exercises w: control codes: a hyphen-split word
+% (hy-phen), a melisma hold (_), a hard space joining two words into one
+% syllable (a~b), a blank syllable (*), and a line break between two w:
+% lines.  Rendered both with the default Soft-Karaoke output (0x01 Text,
+% with the / and \ line/paragraph prefixes) and with -lyrics (bare 0x05
+% Lyric events) so the contrast between the two is pinned.
+X:1
+T:Word and lyric handling
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+C D E F |
+w:plain hy-phen end
+G A B c |
+w:hold _ a~b *

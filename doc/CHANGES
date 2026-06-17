@@ -15749,3 +15749,18 @@ releases such as the 3.22.1 shipped by Ubuntu 22.04 LTS can use
 "cmake --preset" without hitting "Unrecognized 'version' field".  No
 v4/v5/v6 schema features were in use; v3 covers every field present
 in the file.
+
+May 30 2026 [RK]
+
+abc2midi: new -lyrics option.  When a tune has w: word lines, abc2midi
+normally renders them in the Soft-Karaoke convention: 0x01 Text
+meta-events, an "@KMIDI KARAOKE FILE" / "@I" header on the conductor
+track, and a "/" or "\" line/paragraph prefix on the first syllable of
+each w: line.  With -lyrics the words are instead emitted as standard
+MIDI Lyric (0x05) meta-events carrying just the bare syllable text,
+still synchronized to their notes, with the karaoke-specific decoration
+suppressed (the standard sequence-name title is retained).  Default
+behaviour is unchanged.  Implemented in genmidi.c (new word_data()
+helper and lyrics_meta guards in getword() and karaokestarttrack()) and
+store.c (flag parsing); regression-pinned by the tests/golden
+abc2midi_lyrics_demo_5 golden.

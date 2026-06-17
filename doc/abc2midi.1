@@ -2,7 +2,7 @@
 .SH NAME
 \fBabc2midi\fP \- converts abc file to MIDI file(s)
 .SH SYNOPSIS
-abc2midi \fIinfile\fP [\fIrefnum\fP] [\-c] [\-v] [\-ver] [\-t] [\-n limit] [\-CS] [\-quiet] [\-silent] [\-Q tempo] [\-NFNP] [\-NFER] [\-NGRA] [\-NGUI] [\-STFW] [\-OCC] [\-NCOM] [\-PMAR] [\-HARP] [\-BF] [\-TT] [\-o outfile] \-CSM [filename]
+abc2midi \fIinfile\fP [\fIrefnum\fP] [\-c] [\-v] [\-ver] [\-t] [\-n limit] [\-CS] [\-quiet] [\-silent] [\-Q tempo] [\-NFNP] [\-NFER] [\-NGRA] [\-NGUI] [\-STFW] [\-lyrics] [\-OCC] [\-NCOM] [\-PMAR] [\-HARP] [\-BF] [\-TT] [\-o outfile] \-CSM [filename]
 .SH DESCRIPTION
  The default action is to write a MIDI file for each abc tune
  with the filename <stem>N.mid, where <stem> is the filestem
@@ -57,6 +57,12 @@ Ignore any guitar chords enclosed in double quotes.
 .TP
 .B -STFW
 Place lyric text in separate MIDI tracks.
+.TP
+.B -lyrics
+Emit the w: words as standard MIDI Lyric (0x05) meta-events carrying the
+bare syllable text, instead of the default Soft-Karaoke rendering (0x01
+Text events with the @KMIDI KARAOKE FILE / @I header lines and the / and \\
+line/paragraph prefixes). The syllables remain synchronized to their notes.
 .TP
 .B -NCOM
 Suppress some comments in the output MIDI file.

@@ -1,0 +1,50 @@
+Header format=1 ntrks=2 division=480
+Track start
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=23
+     Text = <Word and lyric handling>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=0  minor=0
+Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=3866  Meta event, end of track
+Track end
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=17
+     Text = <notes/lyric track>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:1>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=1  Meta Text, type=0x05 (Lyric)  leng=5
+     Text = <plain>
+Time=1  Note on, chan=1 pitch=60 vol=105
+Time=480  Note off, chan=1 pitch=60 vol=0
+Time=481  Meta Text, type=0x05 (Lyric)  leng=3
+     Text = < hy>
+Time=481  Note on, chan=1 pitch=62 vol=80
+Time=960  Note off, chan=1 pitch=62 vol=0
+Time=961  Meta Text, type=0x05 (Lyric)  leng=4
+     Text = <phen>
+Time=961  Note on, chan=1 pitch=64 vol=95
+Time=1440  Note off, chan=1 pitch=64 vol=0
+Time=1441  Meta Text, type=0x05 (Lyric)  leng=4
+     Text = < end>
+Time=1441  Note on, chan=1 pitch=65 vol=80
+Time=1920  Note off, chan=1 pitch=65 vol=0
+Time=1921  Meta Text, type=0x05 (Lyric)  leng=5
+     Text = < hold>
+Time=1921  Note on, chan=1 pitch=67 vol=105
+Time=2400  Note off, chan=1 pitch=67 vol=0
+Time=2401  Note on, chan=1 pitch=69 vol=80
+Time=2880  Note off, chan=1 pitch=69 vol=0
+Time=2881  Meta Text, type=0x05 (Lyric)  leng=4
+     Text = < a b>
+Time=2881  Note on, chan=1 pitch=71 vol=95
+Time=3360  Note off, chan=1 pitch=71 vol=0
+Time=3361  Meta Text, type=0x05 (Lyric)  leng=1
+     Text = < >
+Time=3361  Note on, chan=1 pitch=72 vol=80
+Time=3840  Note off, chan=1 pitch=72 vol=0
+Time=3866  Meta event, end of track
+Track end
