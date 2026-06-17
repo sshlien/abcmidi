@@ -22,37 +22,37 @@ Time=1  Program, chan=1 program=17
 Time=1  Program, chan=2 program=17
 Time=1  Program, chan=3 program=17
 Time=1  Program, chan=4 program=17
-Time=1  Pitchbend, chan=1 lsb=62 msb=10
+Time=1  Pitchbend, chan=1 msb=62 lsb=10
 Time=1  Note on, chan=1 pitch=60 vol=105
-Time=11  Pitchbend, chan=2 lsb=56 msb=79
+Time=11  Pitchbend, chan=2 msb=56 lsb=79
 Time=11  Note on, chan=2 pitch=64 vol=105
-Time=21  Pitchbend, chan=3 lsb=62 msb=92
+Time=21  Pitchbend, chan=3 msb=62 lsb=92
 Time=21  Note on, chan=3 pitch=67 vol=105
 Time=1920  Note off, chan=3 pitch=67 vol=0
 Time=1920  Note off, chan=2 pitch=64 vol=0
 Time=1920  Note off, chan=1 pitch=60 vol=0
 Time=1921  Note on, chan=1 pitch=60 vol=105
-Time=1931  Pitchbend, chan=2 lsb=64 msb=82
+Time=1931  Pitchbend, chan=2 msb=64 lsb=82
 Time=1931  Note on, chan=2 pitch=64 vol=105
 Time=1941  Note on, chan=3 pitch=67 vol=105
 Time=3840  Note off, chan=3 pitch=67 vol=0
 Time=3840  Note off, chan=2 pitch=64 vol=0
 Time=3840  Note off, chan=1 pitch=60 vol=0
 Time=3841  Note on, chan=1 pitch=60 vol=95
-Time=3851  Pitchbend, chan=2 lsb=56 msb=79
+Time=3851  Pitchbend, chan=2 msb=56 lsb=79
 Time=3851  Note on, chan=2 pitch=64 vol=95
 Time=3861  Note on, chan=3 pitch=67 vol=95
-Time=3871  Pitchbend, chan=4 lsb=77 msb=108
+Time=3871  Pitchbend, chan=4 msb=77 lsb=108
 Time=3871  Note on, chan=4 pitch=69 vol=95
 Time=5760  Note off, chan=4 pitch=69 vol=0
 Time=5760  Note off, chan=3 pitch=67 vol=0
 Time=5760  Note off, chan=2 pitch=64 vol=0
 Time=5760  Note off, chan=1 pitch=60 vol=0
 Time=5761  Note on, chan=1 pitch=60 vol=105
-Time=5771  Pitchbend, chan=2 lsb=64 msb=82
+Time=5771  Pitchbend, chan=2 msb=64 lsb=82
 Time=5771  Note on, chan=2 pitch=64 vol=105
 Time=5781  Note on, chan=3 pitch=67 vol=105
-Time=5791  Pitchbend, chan=4 lsb=60 msb=102
+Time=5791  Pitchbend, chan=4 msb=60 lsb=102
 Time=5791  Note on, chan=4 pitch=70 vol=105
 Time=7680  Note off, chan=4 pitch=70 vol=0
 Time=7680  Note off, chan=3 pitch=67 vol=0

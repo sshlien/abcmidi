@@ -29,16 +29,16 @@ Time=0  Meta Text, type=0x01 (Text Event)  leng=66
 Time=0  Meta Text, type=0x01 (Text Event)  leng=54
      Text = < %MIDI temperamentnormal                      % 12-EDO>
 Time=1  Program, chan=1 program=16
-Time=1  Pitchbend, chan=1 lsb=62 msb=16
+Time=1  Pitchbend, chan=1 msb=62 lsb=16
 Time=1  Note on, chan=1 pitch=72 vol=105
 Time=960  Note off, chan=1 pitch=72 vol=0
-Time=961  Pitchbend, chan=1 lsb=65 msb=32
+Time=961  Pitchbend, chan=1 msb=65 lsb=32
 Time=961  Note on, chan=1 pitch=71 vol=95
 Time=1920  Note off, chan=1 pitch=71 vol=0
-Time=1921  Pitchbend, chan=1 lsb=62 msb=16
+Time=1921  Pitchbend, chan=1 msb=62 lsb=16
 Time=1921  Note on, chan=1 pitch=72 vol=105
 Time=2640  Note off, chan=1 pitch=72 vol=0
-Time=2881  Pitchbend, chan=1 lsb=68 msb=49
+Time=2881  Pitchbend, chan=1 msb=68 lsb=49
 Time=2881  Note on, chan=1 pitch=70 vol=95
 Time=3840  Note off, chan=1 pitch=70 vol=0
 Time=3866  Meta event, end of track
@@ -47,7 +47,7 @@ Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <note track>
 Time=1  Program, chan=2 program=16
-Time=1  Pitchbend, chan=2 lsb=62 msb=96
+Time=1  Pitchbend, chan=2 msb=62 lsb=96
 Time=1  Note on, chan=2 pitch=67 vol=105
 Time=960  Note off, chan=2 pitch=67 vol=0
 Time=961  Note on, chan=2 pitch=67 vol=95
@@ -62,25 +62,25 @@ Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <note track>
 Time=1  Program, chan=3 program=16
-Time=1  Pitchbend, chan=3 lsb=64 msb=80
+Time=1  Pitchbend, chan=3 msb=64 lsb=80
 Time=1  Note on, chan=3 pitch=64 vol=105
 Time=320  Note off, chan=3 pitch=64 vol=0
-Time=321  Pitchbend, chan=3 lsb=60 msb=32
+Time=321  Pitchbend, chan=3 msb=60 lsb=32
 Time=321  Note on, chan=3 pitch=63 vol=80
 Time=640  Note off, chan=3 pitch=63 vol=0
-Time=641  Pitchbend, chan=3 lsb=67 msb=96
+Time=641  Pitchbend, chan=3 msb=67 lsb=96
 Time=641  Note on, chan=3 pitch=63 vol=80
 Time=960  Note off, chan=3 pitch=63 vol=0
-Time=961  Pitchbend, chan=3 lsb=63 msb=48
+Time=961  Pitchbend, chan=3 msb=63 lsb=48
 Time=961  Note on, chan=3 pitch=62 vol=95
 Time=1280  Note off, chan=3 pitch=62 vol=0
-Time=1281  Pitchbend, chan=3 lsb=61 msb=64
+Time=1281  Pitchbend, chan=3 msb=61 lsb=64
 Time=1281  Note on, chan=3 pitch=65 vol=80
 Time=1600  Note off, chan=3 pitch=65 vol=0
-Time=1601  Pitchbend, chan=3 lsb=57 msb=15
+Time=1601  Pitchbend, chan=3 msb=57 lsb=15
 Time=1601  Note on, chan=3 pitch=64 vol=80
 Time=1920  Note off, chan=3 pitch=64 vol=0
-Time=1921  Pitchbend, chan=3 lsb=64 msb=80
+Time=1921  Pitchbend, chan=3 msb=64 lsb=80
 Time=1921  Note on, chan=3 pitch=64 vol=105
 Time=2640  Note off, chan=3 pitch=64 vol=0
 Time=2881  Note on, chan=3 pitch=64 vol=95
@@ -91,13 +91,13 @@ Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <note track>
 Time=1  Program, chan=4 program=16
-Time=1  Pitchbend, chan=4 lsb=62 msb=16
+Time=1  Pitchbend, chan=4 msb=62 lsb=16
 Time=1  Note on, chan=4 pitch=60 vol=105
 Time=960  Note off, chan=4 pitch=60 vol=0
-Time=961  Pitchbend, chan=4 lsb=62 msb=96
+Time=961  Pitchbend, chan=4 msb=62 lsb=96
 Time=961  Note on, chan=4 pitch=55 vol=95
 Time=1920  Note off, chan=4 pitch=55 vol=0
-Time=1921  Pitchbend, chan=4 lsb=62 msb=16
+Time=1921  Pitchbend, chan=4 msb=62 lsb=16
 Time=1921  Note on, chan=4 pitch=60 vol=105
 Time=2640  Note off, chan=4 pitch=60 vol=0
 Time=2881  Note on, chan=4 pitch=60 vol=95
