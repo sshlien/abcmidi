@@ -37,3 +37,4 @@ struct trackstruct {enum {NOTES, WORDS, NOTEWORDS, GCHORDS, DRUMS, DRONE} trackt
 #define DIV 480
 #define MAXPARTS 100
 #define MAXCHORDNAMES 80
+#define MAXLAYERS 3 /* [SS] 2015-07-24 2015-10-03; shared with queues.c */

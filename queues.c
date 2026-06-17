@@ -61,8 +61,8 @@ extern int bendstate; /* from genmidi.c [SS] */
 /* [SS] 2014-09-10 */
 extern int benddata[256]; /* from genmidi.c [SS] 2015-09-10 2015-10-03 */
 extern int bendnvals;
-extern int controldata[3][256]; /* extended to 256 2015-10-03 */
-extern int controlnvals[2];
+extern int controldata[MAXLAYERS][256]; /* extended to 256 2015-10-03 */
+extern int controlnvals[MAXLAYERS];
 extern int controldefaults[128]; /* [SS] 2015-08-10 */
 extern int nlayers; /* [SS] 2015-08-20 */
 
