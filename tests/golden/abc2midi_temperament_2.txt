@@ -24,36 +24,36 @@ Time=1  Program, chan=3 program=44
 Time=1  Program, chan=4 program=44
 Time=1  Meta Text, type=0x01 (Text Event)  leng=0
      Text = <>
-Time=1  Pitchbend, chan=1 lsb=77 msb=91
+Time=1  Pitchbend, chan=1 msb=77 lsb=91
 Time=1  Note on, chan=1 pitch=72 vol=105
 Time=960  Note off, chan=1 pitch=72 vol=0
-Time=961  Pitchbend, chan=1 lsb=68 msb=73
+Time=961  Pitchbend, chan=1 msb=68 lsb=73
 Time=961  Note on, chan=1 pitch=74 vol=95
 Time=1920  Note off, chan=1 pitch=74 vol=0
-Time=1921  Pitchbend, chan=1 lsb=59 msb=55
+Time=1921  Pitchbend, chan=1 msb=59 lsb=55
 Time=1921  Note on, chan=1 pitch=76 vol=95
 Time=2880  Note off, chan=1 pitch=76 vol=0
-Time=2881  Pitchbend, chan=1 lsb=50 msb=37
+Time=2881  Pitchbend, chan=1 msb=50 lsb=37
 Time=2881  Note on, chan=1 pitch=78 vol=95
 Time=3840  Note off, chan=1 pitch=78 vol=0
-Time=3841  Pitchbend, chan=1 lsb=73 msb=18
+Time=3841  Pitchbend, chan=1 msb=73 lsb=18
 Time=3841  Note on, chan=1 pitch=79 vol=95
 Time=4800  Note off, chan=1 pitch=79 vol=0
-Time=4801  Pitchbend, chan=1 lsb=64 msb=0
+Time=4801  Pitchbend, chan=1 msb=64 lsb=0
 Time=4801  Note on, chan=1 pitch=81 vol=95
 Time=5760  Note off, chan=1 pitch=81 vol=0
-Time=5761  Pitchbend, chan=1 lsb=54 msb=110
+Time=5761  Pitchbend, chan=1 msb=54 lsb=110
 Time=5761  Note on, chan=1 pitch=83 vol=95
 Time=6720  Note off, chan=1 pitch=83 vol=0
-Time=6721  Pitchbend, chan=1 lsb=77 msb=91
+Time=6721  Pitchbend, chan=1 msb=77 lsb=91
 Time=6721  Note on, chan=1 pitch=84 vol=95
 Time=7680  Note off, chan=1 pitch=84 vol=0
 Time=7681  Note on, chan=1 pitch=60 vol=105
-Time=7691  Pitchbend, chan=2 lsb=59 msb=55
+Time=7691  Pitchbend, chan=2 msb=59 lsb=55
 Time=7691  Note on, chan=2 pitch=64 vol=105
-Time=7701  Pitchbend, chan=3 lsb=73 msb=18
+Time=7701  Pitchbend, chan=3 msb=73 lsb=18
 Time=7701  Note on, chan=3 pitch=67 vol=105
-Time=7711  Pitchbend, chan=4 lsb=77 msb=91
+Time=7711  Pitchbend, chan=4 msb=77 lsb=91
 Time=7711  Note on, chan=4 pitch=72 vol=105
 Time=9600  Note off, chan=4 pitch=72 vol=0
 Time=9600  Note off, chan=3 pitch=67 vol=0
@@ -61,33 +61,33 @@ Time=9600  Note off, chan=2 pitch=64 vol=0
 Time=9600  Note off, chan=1 pitch=60 vol=0
 Time=9600  Meta Text, type=0x01 (Text Event)  leng=0
      Text = <>
-Time=10561  Pitchbend, chan=1 lsb=58 msb=45
+Time=10561  Pitchbend, chan=1 msb=58 lsb=45
 Time=10561  Note on, chan=1 pitch=72 vol=105
 Time=11520  Note off, chan=1 pitch=72 vol=0
-Time=11521  Pitchbend, chan=1 lsb=48 msb=120
+Time=11521  Pitchbend, chan=1 msb=48 lsb=120
 Time=11521  Note on, chan=1 pitch=73 vol=95
 Time=12480  Note off, chan=1 pitch=73 vol=0
-Time=12481  Pitchbend, chan=1 lsb=71 msb=68
+Time=12481  Pitchbend, chan=1 msb=71 lsb=68
 Time=12481  Note on, chan=1 pitch=73 vol=95
 Time=13440  Note off, chan=1 pitch=73 vol=0
-Time=13441  Pitchbend, chan=1 lsb=62 msb=15
+Time=13441  Pitchbend, chan=1 msb=62 lsb=15
 Time=13441  Note on, chan=1 pitch=74 vol=95
 Time=14400  Note off, chan=1 pitch=74 vol=0
-Time=14401  Pitchbend, chan=1 lsb=71 msb=68
+Time=14401  Pitchbend, chan=1 msb=71 lsb=68
 Time=14401  Note on, chan=1 pitch=73 vol=95
 Time=15360  Note off, chan=1 pitch=73 vol=0
-Time=15361  Pitchbend, chan=1 lsb=48 msb=121
+Time=15361  Pitchbend, chan=1 msb=48 lsb=121
 Time=15361  Note on, chan=1 pitch=73 vol=95
 Time=16320  Note off, chan=1 pitch=73 vol=0
-Time=16321  Pitchbend, chan=1 lsb=58 msb=45
+Time=16321  Pitchbend, chan=1 msb=58 lsb=45
 Time=16321  Note on, chan=1 pitch=72 vol=95
 Time=17280  Note off, chan=1 pitch=72 vol=0
 Time=17281  Note on, chan=1 pitch=60 vol=105
-Time=17291  Pitchbend, chan=2 lsb=65 msb=113
+Time=17291  Pitchbend, chan=2 msb=65 lsb=113
 Time=17291  Note on, chan=2 pitch=64 vol=105
-Time=17301  Pitchbend, chan=3 lsb=60 msb=30
+Time=17301  Pitchbend, chan=3 msb=60 lsb=30
 Time=17301  Note on, chan=3 pitch=67 vol=105
-Time=17311  Pitchbend, chan=4 lsb=58 msb=45
+Time=17311  Pitchbend, chan=4 msb=58 lsb=45
 Time=17311  Note on, chan=4 pitch=72 vol=105
 Time=19200  Note off, chan=4 pitch=72 vol=0
 Time=19200  Note off, chan=3 pitch=67 vol=0
@@ -95,39 +95,39 @@ Time=19200  Note off, chan=2 pitch=64 vol=0
 Time=19200  Note off, chan=1 pitch=60 vol=0
 Time=19200  Meta Text, type=0x01 (Text Event)  leng=0
      Text = <>
-Time=20161  Pitchbend, chan=1 lsb=55 msb=35
+Time=20161  Pitchbend, chan=1 msb=55 lsb=35
 Time=20161  Note on, chan=1 pitch=72 vol=105
 Time=21120  Note off, chan=1 pitch=72 vol=0
-Time=21121  Pitchbend, chan=1 lsb=72 msb=93
+Time=21121  Pitchbend, chan=1 msb=72 lsb=93
 Time=21121  Note on, chan=1 pitch=72 vol=95
 Time=22080  Note off, chan=1 pitch=72 vol=0
-Time=22081  Pitchbend, chan=1 lsb=58 msb=23
+Time=22081  Pitchbend, chan=1 msb=58 lsb=23
 Time=22081  Note on, chan=1 pitch=73 vol=95
 Time=23040  Note off, chan=1 pitch=73 vol=0
-Time=23041  Pitchbend, chan=1 lsb=75 msb=81
+Time=23041  Pitchbend, chan=1 msb=75 lsb=81
 Time=23041  Note on, chan=1 pitch=73 vol=95
 Time=24000  Note off, chan=1 pitch=73 vol=0
-Time=24001  Pitchbend, chan=1 lsb=61 msb=12
+Time=24001  Pitchbend, chan=1 msb=61 lsb=12
 Time=24001  Note on, chan=1 pitch=74 vol=95
 Time=24960  Note off, chan=1 pitch=74 vol=0
-Time=24961  Pitchbend, chan=1 lsb=75 msb=81
+Time=24961  Pitchbend, chan=1 msb=75 lsb=81
 Time=24961  Note on, chan=1 pitch=73 vol=95
 Time=25920  Note off, chan=1 pitch=73 vol=0
-Time=25921  Pitchbend, chan=1 lsb=58 msb=23
+Time=25921  Pitchbend, chan=1 msb=58 lsb=23
 Time=25921  Note on, chan=1 pitch=73 vol=95
 Time=26880  Note off, chan=1 pitch=73 vol=0
-Time=26881  Pitchbend, chan=1 lsb=72 msb=93
+Time=26881  Pitchbend, chan=1 msb=72 lsb=93
 Time=26881  Note on, chan=1 pitch=72 vol=95
 Time=27840  Note off, chan=1 pitch=72 vol=0
-Time=27841  Pitchbend, chan=1 lsb=55 msb=35
+Time=27841  Pitchbend, chan=1 msb=55 lsb=35
 Time=27841  Note on, chan=1 pitch=72 vol=95
 Time=28800  Note off, chan=1 pitch=72 vol=0
 Time=28801  Note on, chan=1 pitch=60 vol=105
-Time=28811  Pitchbend, chan=2 lsb=49 msb=58
+Time=28811  Pitchbend, chan=2 msb=49 lsb=58
 Time=28811  Note on, chan=2 pitch=64 vol=105
-Time=28821  Pitchbend, chan=3 lsb=58 msb=23
+Time=28821  Pitchbend, chan=3 msb=58 lsb=23
 Time=28821  Note on, chan=3 pitch=67 vol=105
-Time=28831  Pitchbend, chan=4 lsb=55 msb=35
+Time=28831  Pitchbend, chan=4 msb=55 lsb=35
 Time=28831  Note on, chan=4 pitch=72 vol=105
 Time=30720  Note off, chan=4 pitch=72 vol=0
 Time=30720  Note off, chan=3 pitch=67 vol=0
@@ -135,45 +135,45 @@ Time=30720  Note off, chan=2 pitch=64 vol=0
 Time=30720  Note off, chan=1 pitch=60 vol=0
 Time=30720  Meta Text, type=0x01 (Text Event)  leng=0
      Text = <>
-Time=31681  Pitchbend, chan=1 lsb=67 msb=12
+Time=31681  Pitchbend, chan=1 msb=67 lsb=12
 Time=31681  Note on, chan=1 pitch=72 vol=105
 Time=32640  Note off, chan=1 pitch=72 vol=0
-Time=32641  Pitchbend, chan=1 lsb=79 msb=62
+Time=32641  Pitchbend, chan=1 msb=79 lsb=62
 Time=32641  Note on, chan=1 pitch=72 vol=95
 Time=33600  Note off, chan=1 pitch=72 vol=0
-Time=33601  Pitchbend, chan=1 lsb=59 msb=111
+Time=33601  Pitchbend, chan=1 msb=59 lsb=111
 Time=33601  Note on, chan=1 pitch=73 vol=95
 Time=34560  Note off, chan=1 pitch=73 vol=0
-Time=34561  Pitchbend, chan=1 lsb=72 msb=33
+Time=34561  Pitchbend, chan=1 msb=72 lsb=33
 Time=34561  Note on, chan=1 pitch=73 vol=95
 Time=35520  Note off, chan=1 pitch=73 vol=0
-Time=35521  Pitchbend, chan=1 lsb=52 msb=83
+Time=35521  Pitchbend, chan=1 msb=52 lsb=83
 Time=35521  Note on, chan=1 pitch=74 vol=95
 Time=36480  Note off, chan=1 pitch=74 vol=0
-Time=36481  Pitchbend, chan=1 lsb=65 msb=4
+Time=36481  Pitchbend, chan=1 msb=65 lsb=4
 Time=36481  Note on, chan=1 pitch=74 vol=95
 Time=37440  Note off, chan=1 pitch=74 vol=0
-Time=37441  Pitchbend, chan=1 lsb=52 msb=83
+Time=37441  Pitchbend, chan=1 msb=52 lsb=83
 Time=37441  Note on, chan=1 pitch=74 vol=95
 Time=38400  Note off, chan=1 pitch=74 vol=0
-Time=38401  Pitchbend, chan=1 lsb=72 msb=33
+Time=38401  Pitchbend, chan=1 msb=72 lsb=33
 Time=38401  Note on, chan=1 pitch=73 vol=95
 Time=39360  Note off, chan=1 pitch=73 vol=0
-Time=39361  Pitchbend, chan=1 lsb=59 msb=112
+Time=39361  Pitchbend, chan=1 msb=59 lsb=112
 Time=39361  Note on, chan=1 pitch=73 vol=95
 Time=40320  Note off, chan=1 pitch=73 vol=0
-Time=40321  Pitchbend, chan=1 lsb=79 msb=62
+Time=40321  Pitchbend, chan=1 msb=79 lsb=62
 Time=40321  Note on, chan=1 pitch=72 vol=95
 Time=41280  Note off, chan=1 pitch=72 vol=0
-Time=41281  Pitchbend, chan=1 lsb=67 msb=12
+Time=41281  Pitchbend, chan=1 msb=67 lsb=12
 Time=41281  Note on, chan=1 pitch=72 vol=95
 Time=43200  Note off, chan=1 pitch=72 vol=0
 Time=43201  Note on, chan=1 pitch=60 vol=105
-Time=43211  Pitchbend, chan=2 lsb=62 msb=124
+Time=43211  Pitchbend, chan=2 msb=62 lsb=124
 Time=43211  Note on, chan=2 pitch=64 vol=105
-Time=43221  Pitchbend, chan=3 lsb=66 msb=8
+Time=43221  Pitchbend, chan=3 msb=66 lsb=8
 Time=43221  Note on, chan=3 pitch=67 vol=105
-Time=43231  Pitchbend, chan=4 lsb=67 msb=12
+Time=43231  Pitchbend, chan=4 msb=67 lsb=12
 Time=43231  Note on, chan=4 pitch=72 vol=105
 Time=45120  Note off, chan=4 pitch=72 vol=0
 Time=45120  Note off, chan=3 pitch=67 vol=0
@@ -181,33 +181,33 @@ Time=45120  Note off, chan=2 pitch=64 vol=0
 Time=45120  Note off, chan=1 pitch=60 vol=0
 Time=45120  Meta Text, type=0x01 (Text Event)  leng=0
      Text = <>
-Time=46081  Pitchbend, chan=1 lsb=69 msb=7
+Time=46081  Pitchbend, chan=1 msb=69 lsb=7
 Time=46081  Note on, chan=1 pitch=72 vol=105
 Time=47040  Note off, chan=1 pitch=72 vol=0
-Time=47041  Pitchbend, chan=1 lsb=57 msb=34
+Time=47041  Pitchbend, chan=1 msb=57 lsb=34
 Time=47041  Note on, chan=1 pitch=73 vol=95
 Time=48000  Note off, chan=1 pitch=73 vol=0
-Time=48001  Pitchbend, chan=1 lsb=77 msb=61
+Time=48001  Pitchbend, chan=1 msb=77 lsb=61
 Time=48001  Note on, chan=1 pitch=73 vol=95
 Time=48960  Note off, chan=1 pitch=73 vol=0
-Time=48961  Pitchbend, chan=1 lsb=65 msb=88
+Time=48961  Pitchbend, chan=1 msb=65 lsb=88
 Time=48961  Note on, chan=1 pitch=74 vol=95
 Time=49920  Note off, chan=1 pitch=74 vol=0
-Time=49921  Pitchbend, chan=1 lsb=77 msb=61
+Time=49921  Pitchbend, chan=1 msb=77 lsb=61
 Time=49921  Note on, chan=1 pitch=73 vol=95
 Time=50880  Note off, chan=1 pitch=73 vol=0
-Time=50881  Pitchbend, chan=1 lsb=57 msb=34
+Time=50881  Pitchbend, chan=1 msb=57 lsb=34
 Time=50881  Note on, chan=1 pitch=73 vol=95
 Time=51840  Note off, chan=1 pitch=73 vol=0
-Time=51841  Pitchbend, chan=1 lsb=69 msb=7
+Time=51841  Pitchbend, chan=1 msb=69 lsb=7
 Time=51841  Note on, chan=1 pitch=72 vol=95
 Time=52800  Note off, chan=1 pitch=72 vol=0
 Time=52801  Note on, chan=1 pitch=60 vol=105
-Time=52811  Pitchbend, chan=2 lsb=62 msb=40
+Time=52811  Pitchbend, chan=2 msb=62 lsb=40
 Time=52811  Note on, chan=2 pitch=64 vol=105
-Time=52821  Pitchbend, chan=3 lsb=67 msb=47
+Time=52821  Pitchbend, chan=3 msb=67 lsb=47
 Time=52821  Note on, chan=3 pitch=67 vol=105
-Time=52831  Pitchbend, chan=4 lsb=69 msb=7
+Time=52831  Pitchbend, chan=4 msb=69 lsb=7
 Time=52831  Note on, chan=4 pitch=72 vol=105
 Time=54720  Note off, chan=4 pitch=72 vol=0
 Time=54720  Note off, chan=3 pitch=67 vol=0
@@ -215,34 +215,34 @@ Time=54720  Note off, chan=2 pitch=64 vol=0
 Time=54720  Note off, chan=1 pitch=60 vol=0
 Time=54720  Meta Text, type=0x01 (Text Event)  leng=0
      Text = <>
-Time=55681  Pitchbend, chan=1 lsb=69 msb=61
+Time=55681  Pitchbend, chan=1 msb=69 lsb=61
 Time=55681  Note on, chan=1 pitch=72 vol=105
 Time=56640  Note off, chan=1 pitch=72 vol=0
-Time=56641  Pitchbend, chan=1 lsb=57 msb=98
+Time=56641  Pitchbend, chan=1 msb=57 lsb=98
 Time=56641  Note on, chan=1 pitch=73 vol=95
 Time=57600  Note off, chan=1 pitch=73 vol=0
-Time=57601  Pitchbend, chan=1 lsb=78 msb=8
+Time=57601  Pitchbend, chan=1 msb=78 lsb=8
 Time=57601  Note on, chan=1 pitch=73 vol=95
 Time=58560  Note off, chan=1 pitch=73 vol=0
-Time=58561  Pitchbend, chan=1 lsb=66 msb=46
+Time=58561  Pitchbend, chan=1 msb=66 lsb=46
 Time=58561  Note on, chan=1 pitch=74 vol=95
 Time=59520  Note off, chan=1 pitch=74 vol=0
-Time=59521  Pitchbend, chan=1 lsb=78 msb=8
+Time=59521  Pitchbend, chan=1 msb=78 lsb=8
 Time=59521  Note on, chan=1 pitch=73 vol=95
 Time=60480  Note off, chan=1 pitch=73 vol=0
-Time=60481  Pitchbend, chan=1 lsb=57 msb=98
+Time=60481  Pitchbend, chan=1 msb=57 lsb=98
 Time=60481  Note on, chan=1 pitch=73 vol=95
 Time=61440  Note off, chan=1 pitch=73 vol=0
-Time=61441  Pitchbend, chan=1 lsb=69 msb=61
+Time=61441  Pitchbend, chan=1 msb=69 lsb=61
 Time=61441  Note on, chan=1 pitch=72 vol=95
 Time=62400  Note off, chan=1 pitch=72 vol=0
-Time=62401  Pitchbend, chan=1 lsb=67 msb=112
+Time=62401  Pitchbend, chan=1 msb=67 lsb=112
 Time=62401  Note on, chan=1 pitch=60 vol=105
-Time=62411  Pitchbend, chan=2 lsb=61 msb=82
+Time=62411  Pitchbend, chan=2 msb=61 lsb=82
 Time=62411  Note on, chan=2 pitch=64 vol=105
-Time=62421  Pitchbend, chan=3 lsb=67 msb=15
+Time=62421  Pitchbend, chan=3 msb=67 lsb=15
 Time=62421  Note on, chan=3 pitch=67 vol=105
-Time=62431  Pitchbend, chan=4 lsb=69 msb=61
+Time=62431  Pitchbend, chan=4 msb=69 lsb=61
 Time=62431  Note on, chan=4 pitch=72 vol=105
 Time=64320  Note off, chan=4 pitch=72 vol=0
 Time=64320  Note off, chan=3 pitch=67 vol=0
@@ -250,45 +250,45 @@ Time=64320  Note off, chan=2 pitch=64 vol=0
 Time=64320  Note off, chan=1 pitch=60 vol=0
 Time=64320  Meta Text, type=0x01 (Text Event)  leng=0
      Text = <>
-Time=65281  Pitchbend, chan=1 lsb=66 msb=116
+Time=65281  Pitchbend, chan=1 msb=66 lsb=116
 Time=65281  Note on, chan=1 pitch=70 vol=105
 Time=66240  Note off, chan=1 pitch=70 vol=0
-Time=66241  Pitchbend, chan=1 lsb=69 msb=105
+Time=66241  Pitchbend, chan=1 msb=69 lsb=105
 Time=66241  Note on, chan=1 pitch=71 vol=95
 Time=67200  Note off, chan=1 pitch=71 vol=0
-Time=67201  Pitchbend, chan=1 lsb=72 msb=93
+Time=67201  Pitchbend, chan=1 msb=72 lsb=93
 Time=67201  Note on, chan=1 pitch=72 vol=95
 Time=68160  Note off, chan=1 pitch=72 vol=0
-Time=68161  Pitchbend, chan=1 lsb=75 msb=81
+Time=68161  Pitchbend, chan=1 msb=75 lsb=81
 Time=68161  Note on, chan=1 pitch=73 vol=95
 Time=69120  Note off, chan=1 pitch=73 vol=0
-Time=69121  Pitchbend, chan=1 lsb=78 msb=70
+Time=69121  Pitchbend, chan=1 msb=78 lsb=70
 Time=69121  Note on, chan=1 pitch=74 vol=95
 Time=70080  Note off, chan=1 pitch=74 vol=0
-Time=70081  Pitchbend, chan=1 lsb=49 msb=58
+Time=70081  Pitchbend, chan=1 msb=49 lsb=58
 Time=70081  Note on, chan=1 pitch=76 vol=95
 Time=71040  Note off, chan=1 pitch=76 vol=0
-Time=71041  Pitchbend, chan=1 lsb=52 msb=47
+Time=71041  Pitchbend, chan=1 msb=52 lsb=47
 Time=71041  Note on, chan=1 pitch=77 vol=95
 Time=72000  Note off, chan=1 pitch=77 vol=0
-Time=72001  Pitchbend, chan=1 lsb=55 msb=35
+Time=72001  Pitchbend, chan=1 msb=55 lsb=35
 Time=72001  Note on, chan=1 pitch=78 vol=95
 Time=72960  Note off, chan=1 pitch=78 vol=0
-Time=72961  Pitchbend, chan=1 lsb=58 msb=23
+Time=72961  Pitchbend, chan=1 msb=58 lsb=23
 Time=72961  Note on, chan=1 pitch=79 vol=95
 Time=73920  Note off, chan=1 pitch=79 vol=0
-Time=73921  Pitchbend, chan=1 lsb=61 msb=12
+Time=73921  Pitchbend, chan=1 msb=61 lsb=12
 Time=73921  Note on, chan=1 pitch=80 vol=95
 Time=74880  Note off, chan=1 pitch=80 vol=0
-Time=74881  Pitchbend, chan=1 lsb=64 msb=0
+Time=74881  Pitchbend, chan=1 msb=64 lsb=0
 Time=74881  Note on, chan=1 pitch=81 vol=95
 Time=75840  Note off, chan=1 pitch=81 vol=0
-Time=75841  Pitchbend, chan=1 lsb=66 msb=116
+Time=75841  Pitchbend, chan=1 msb=66 lsb=116
 Time=75841  Note on, chan=1 pitch=82 vol=95
 Time=76800  Note off, chan=1 pitch=82 vol=0
 Time=76800  Meta Text, type=0x01 (Text Event)  leng=0
      Text = <>
-Time=76801  Pitchbend, chan=1 lsb=64 msb=0
+Time=76801  Pitchbend, chan=1 msb=64 lsb=0
 Time=76801  Note on, chan=1 pitch=72 vol=105
 Time=77760  Note off, chan=1 pitch=72 vol=0
 Time=77761  Note on, chan=1 pitch=73 vol=95
@@ -320,28 +320,28 @@ Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <note track>
-Time=1  Pitchbend, chan=5 lsb=77 msb=91
+Time=1  Pitchbend, chan=5 msb=77 lsb=91
 Time=1  Note on, chan=5 pitch=60 vol=105
 Time=7680  Note off, chan=5 pitch=60 vol=0
-Time=10561  Pitchbend, chan=5 lsb=58 msb=45
+Time=10561  Pitchbend, chan=5 msb=58 lsb=45
 Time=10561  Note on, chan=5 pitch=60 vol=105
 Time=17280  Note off, chan=5 pitch=60 vol=0
-Time=20161  Pitchbend, chan=5 lsb=55 msb=35
+Time=20161  Pitchbend, chan=5 msb=55 lsb=35
 Time=20161  Note on, chan=5 pitch=60 vol=105
 Time=28800  Note off, chan=5 pitch=60 vol=0
-Time=31681  Pitchbend, chan=5 lsb=67 msb=12
+Time=31681  Pitchbend, chan=5 msb=67 lsb=12
 Time=31681  Note on, chan=5 pitch=60 vol=105
 Time=43200  Note off, chan=5 pitch=60 vol=0
-Time=46081  Pitchbend, chan=5 lsb=69 msb=7
+Time=46081  Pitchbend, chan=5 msb=69 lsb=7
 Time=46081  Note on, chan=5 pitch=60 vol=105
 Time=52800  Note off, chan=5 pitch=60 vol=0
-Time=55681  Pitchbend, chan=5 lsb=67 msb=112
+Time=55681  Pitchbend, chan=5 msb=67 lsb=112
 Time=55681  Note on, chan=5 pitch=60 vol=105
 Time=62400  Note off, chan=5 pitch=60 vol=0
-Time=65281  Pitchbend, chan=5 lsb=66 msb=116
+Time=65281  Pitchbend, chan=5 msb=66 lsb=116
 Time=65281  Note on, chan=5 pitch=58 vol=105
 Time=76800  Note off, chan=5 pitch=58 vol=0
-Time=76801  Pitchbend, chan=5 lsb=64 msb=0
+Time=76801  Pitchbend, chan=5 msb=64 lsb=0
 Time=76801  Note on, chan=5 pitch=60 vol=105
 Time=90240  Note off, chan=5 pitch=60 vol=0
 Time=90266  Meta event, end of track
