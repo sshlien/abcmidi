@@ -126,7 +126,7 @@ void txt_parameter(int chan, int control, int value)
 void txt_pitchbend(int chan, int lsb, int msb)
 {
   prtime();
-  printf("Pitchbend, chan=%d lsb=%d msb=%d\n",chan+1,msb,lsb);
+  printf("Pitchbend, chan=%d msb=%d lsb=%d\n",chan+1,msb,lsb);
 }
 
 void txt_program(int chan, int program)
