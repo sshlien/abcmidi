@@ -15749,3 +15749,21 @@ releases such as the 3.22.1 shipped by Ubuntu 22.04 LTS can use
 "cmake --preset" without hitting "Unrecognized 'version' field".  No
 v4/v5/v6 schema features were in use; v3 covers every field present
 in the file.
+
+June 17 2026 [RK]
+
+parseabc, yaps: fix four -Wformat-truncation warnings from gcc 13+
+(reported by Seymour Shlien on Linux Mint 22.3, gcc 13.3.0).  All
+four were stale snprintf size arguments that no longer matched the
+underlying buffer:
+
+  - parseabc.c check_bar_repeats(): error_message was declared as
+    char[140] but snprintf was still passing 80 as the size limit,
+    leaving the compiler unsure the formatted output would fit.
+  - yapstree.c event_init(): outputname is char[MAX_OUTPUTNAME + 1]
+    (271 bytes) but snprintf was passing MAX_OUTPUTROOT (250) as the
+    size limit, which both triggered the warning and would have
+    silently truncated a maximally-long argv.
+
+Fixed by using sizeof(buffer) at each call site so the snprintf size
+argument tracks the actual destination capacity.

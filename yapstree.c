@@ -1218,7 +1218,7 @@ void event_init(int argc, char *argv[], char **filename)
 #ifdef NO_SNPRINTF
     sprintf(outputname, "%s",argv[filearg]); /* [SS] 2020-11-01 */
 #else
-    snprintf(outputname, MAX_OUTPUTROOT,"%s",argv[filearg]);
+    snprintf(outputname, sizeof(outputname), "%s", argv[filearg]);
 #endif
   } else {
     if (strlen(argv[1]) > MAX_OUTPUTROOT)
@@ -1229,7 +1229,7 @@ void event_init(int argc, char *argv[], char **filename)
 #ifdef NO_SNPRINTF
     sprintf(outputname,"%s", argv[1]);  /* [SS] 2020-11-01 */
 #else
-    snprintf(outputname,MAX_OUTPUTROOT,"%s", argv[1]);
+    snprintf(outputname, sizeof(outputname), "%s", argv[1]);
 #endif
     place = strchr(outputname, '.');
     if (place == NULL) {
