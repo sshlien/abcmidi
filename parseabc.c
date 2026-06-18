@@ -2652,7 +2652,7 @@ static void check_bar_repeats (int bar_type, char *replist)
 #ifdef NO_SNPRINT 
           sprintf(error_message, "Missing repeat at start ? Unexpected :|%s found", replist);
 #else
-          snprintf(error_message, 80, "Missing repeat at start ? Unexpected :|%s found", replist);
+          snprintf(error_message, sizeof(error_message), "Missing repeat at start ? Unexpected :|%s found", replist);
 #endif
           event_warning (error_message);
         }
@@ -2661,7 +2661,7 @@ static void check_bar_repeats (int bar_type, char *replist)
 #ifdef NO_SNPRINT 
           sprintf(error_message,  "Unexpected :|%s found", replist);
 #else
-          snprintf(error_message, 80, "Unexpected :|%s found", replist);
+          snprintf(error_message, sizeof(error_message), "Unexpected :|%s found", replist);
 #endif
 
           event_warning (error_message);
