@@ -1095,12 +1095,9 @@ void stats_keysig(int sf,int mi)
   beatnumber = Mf_currtime/division;
   index = sf + 7;
   if (index < 0 || index >12) return;
-  if (mi)
-    if (noOutput == 0) 
-       printf("keysig %s %d %d %6.2f\n",minor[index],sf,mi,beatnumber);
-  else
-    if (noOutput == 0) 
-       printf("keysig %s %d %d %6.2f\n",major[index],sf,mi,beatnumber);
+  if (noOutput == 0) {
+     printf("keysig %s %d %d %6.2f\n",mi ? minor[index] : major[index],sf,mi,beatnumber);
+  }
 }
 
 
@@ -1623,7 +1620,7 @@ static int min2sf[] = {-3, 4, -1, -6, 1, -4, 3, -2, -7, 0, -5, 2};
 
 void verify_arrays () {
 int i;
-for (i == 0; i <11; i++) {
+for (i = 0; i <11; i++) {
   printf("%d %s %d %d\n",i, keylist[i], maj2sf[i], min2sf[i]);
   }
 }
