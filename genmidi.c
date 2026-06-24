@@ -258,8 +258,7 @@ int benddata[256];
 int bendnvals;
 int bendtype = 1;
 
-/* [SS] 2015-07-24 2015-10-03 */
-#define MAXLAYERS 3
+/* [SS] 2015-07-24 2015-10-03; MAXLAYERS now defined in genmidi.h */
 int controldata[MAXLAYERS][256];
 int controlnvals[MAXLAYERS];
 int controldefaults[128]; /* [SS] 2015-08-10 */
