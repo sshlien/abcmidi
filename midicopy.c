@@ -948,7 +948,7 @@ void
 metaevent (int type)
 {
   int leng;
-  unsigned char *m;
+  char *m;
   long qnote;			/* [SS] 2013-09-06 */
 
   leng = msgleng ();
