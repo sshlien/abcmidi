@@ -100,3 +100,36 @@ jobs:
       # (see tests/CMakeLists.txt for the naming convention).
       - name: Test ${{ matrix.tool }}
         run: ctest --preset default -R '^(smoke_${{ matrix.tool }}_ver|${{ matrix.tool }}_)'
+
+  # Memory-safety gate: build with the `sanitize` preset (AddressSanitizer +
+  # UndefinedBehaviorSanitizer, see CMakePresets.json) and run the golden
+  # suite instrumented, so heap-buffer-overflows, use-after-free, and UB abort
+  # the run instead of silently producing plausible output.  This is the job
+  # that would have caught the %%MIDI beatstring heap-buffer-overflow: the
+  # Release build above renders that input without complaint, only ASan turns
+  # the one-byte over-read into a hard failure.
+  #
+  # KNOWN-FAILING TESTS ARE EXCLUDED so the gate is green and any *new*
+  # sanitizer regression stands out.  These four fail on pre-existing bugs
+  # unrelated to the beatstring fix and should be fixed so the exclusion can
+  # be dropped:
+  #   abc2midi_detune    - global-buffer-overflow in pitchof_b (store.c)
+  #   abc2abc_demo       - memory leak via initvstring/extendvstring (parseabc.c)
+  #   abc2abc_words      - memory leak via initvstring (parseabc.c)
+  #   abcmatch_coleraine - memory leak via initvstring (parseabc.c)
+  # The -E regex is anchored so e.g. abc2midi_detune_2 is still exercised.
+  test-sanitize:
+    runs-on: ubuntu-latest
+    name: sanitize (ASan+UBSan)
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Configure
+        run: cmake --preset sanitize
+      - name: Build
+        run: cmake --build --preset sanitize
+      - name: Test (sanitizers, known-failing tests excluded)
+        run: >-
+          ctest --preset sanitize
+          -E '^(abc2midi_detune|abc2abc_demo|abc2abc_words|abcmatch_coleraine)$'

@@ -15805,3 +15805,14 @@ terminating NUL, so at the end of the directive the loop copied the
 string's '\0' and advanced one byte past the buffer, reading off the
 end (found by AddressSanitizer).  Added a (*p != 0) guard to the loop
 condition, mirroring the existing NUL check in the gchord parser.
+
+Added a golden regression test (samples/beatstring.abc,
+tests/golden/abc2midi_beatstring.txt) pinning the beatstring per-beat
+velocity pattern; it also reproduces the overflow above, so it fails
+under the sanitizer build without the fix.  Added a "sanitize
+(ASan+UBSan)" CI job (.github/workflows/test.yml) running the suite
+instrumented -- the check that would have caught this class of bug,
+which the Release build does not.  Four pre-existing sanitizer
+failures (abc2midi_detune global-buffer-overflow; abc2abc_demo,
+abc2abc_words, abcmatch_coleraine leaks) are excluded from that job
+for now so it stays green.

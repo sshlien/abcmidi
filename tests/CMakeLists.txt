@@ -160,6 +160,13 @@ add_golden_test(
   ABC2MIDI_ARGS -lyrics
 )
 
+# Regression test for the "%%MIDI beatstring" directive.  Pins the per-beat
+# velocity pattern (f/m/p -> loud/medium/soft) that beatstring assigns to each
+# metrical position, and guards against the heap-buffer-overflow the parser
+# used to hit at the end of the directive string (see samples/beatstring.abc).
+# Most valuable under the sanitizer build, where that overflow aborts abc2midi.
+add_golden_test(TYPE abc2midi SAMPLE beatstring.abc)
+
 # Regression test for the -PMAR option (Part Marker meta-events).
 # Locks in marker emission and verifies the markers do not perturb note
 # timing or end-of-track time (bug fixed by carrying delta_time alongside
