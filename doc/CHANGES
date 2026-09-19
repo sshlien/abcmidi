@@ -15827,3 +15827,25 @@ was enough to trigger it (write overflow, silent in the Release build).
 Corrected the bound to "j > 6"; the letter is now rejected as an invalid
 microtone.  Added a golden regression test (samples/microtone.abc,
 tests/golden/abc2midi_microtone.txt).
+
+Fixed the four pre-existing sanitizer failures so the "sanitize (ASan+UBSan)"
+CI job runs the whole suite with no exclusions:
+
+  store.c: fixed a global-buffer-overflow in pitchof_b() (the abc2midi_detune
+  test).  Under detune temperament the semitone offset p (0..11) is adjusted
+  by an accidental and can land outside the range (^b -> 12, _c -> -1), then
+  indexed the twelve-element temperament_dt[].  Reduce it to a pitch class
+  (p mod 12) for that lookup; the returned pitch still uses the raw p, so the
+  MIDI output is unchanged.
+
+  toabc.c: fixed a memory leak in event_words() (abc2abc_demo, abc2abc_words).
+  The local vstring built for each w: field was passed to event_field (which
+  copies it) but never freed; added the missing freevstring.
+
+  matchsup.c: fixed a memory leak in startfile() (abcmatch_coleraine).
+  analyze_abc_file() calls startfile() once per loop iteration and event_refno
+  calls it again on the X: line, so initvstring(&part) orphaned the earlier
+  allocation.  Free part before re-initialising it.
+
+  parseabc.c: abcversion was a char* to a string literal but parse_precomment
+  sscanf-writes into it; made it a writable char array.

@@ -109,15 +109,12 @@ jobs:
   # Release build above renders that input without complaint, only ASan turns
   # the one-byte over-read into a hard failure.
   #
-  # KNOWN-FAILING TESTS ARE EXCLUDED so the gate is green and any *new*
-  # sanitizer regression stands out.  These four fail on pre-existing bugs
-  # unrelated to the beatstring fix and should be fixed so the exclusion can
-  # be dropped:
-  #   abc2midi_detune    - global-buffer-overflow in pitchof_b (store.c)
-  #   abc2abc_demo       - memory leak via initvstring/extendvstring (parseabc.c)
-  #   abc2abc_words      - memory leak via initvstring (parseabc.c)
-  #   abcmatch_coleraine - memory leak via initvstring (parseabc.c)
-  # The -E regex is anchored so e.g. abc2midi_detune_2 is still exercised.
+  # The whole suite runs clean under the sanitizers now.  If a fix is not yet
+  # ready and a test has to be quarantined to keep the gate green, exclude it
+  # by name with an anchored regex, e.g.
+  #   ctest --preset sanitize -E '^(some_test|other_test)$'
+  # (anchoring keeps e.g. abc2midi_detune_2 running when abc2midi_detune is
+  # excluded), and list the reason here so it is not forgotten.
   test-sanitize:
     runs-on: ubuntu-latest
     name: sanitize (ASan+UBSan)
@@ -129,7 +126,5 @@ jobs:
         run: cmake --preset sanitize
       - name: Build
         run: cmake --build --preset sanitize
-      - name: Test (sanitizers, known-failing tests excluded)
-        run: >-
-          ctest --preset sanitize
-          -E '^(abc2midi_detune|abc2abc_demo|abc2abc_words|abcmatch_coleraine)$'
+      - name: Test (sanitizers)
+        run: ctest --preset sanitize

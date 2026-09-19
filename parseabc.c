@@ -128,7 +128,9 @@ int temperament = 0;            /* [SS] 2020-06-25 */
 
 extern programname fileprogram;
 int oldchordconvention = 0;
-char * abcversion = "2.0"; /* [SS] 2014-08-11 */
+char abcversion[8] = "2.0"; /* [SS] 2014-08-11 */ /* [RK] 2026-09-19 was char*
+  to a string literal, but parse_precomment() sscanf-writes into it (%3s); a
+  writable array avoids the undefined write to read-only storage */
 char lastfieldcmd = ' '; /* [SS] 2014-08-15 */
 
 /* tables mode and modeshift moved to music_utils.c */

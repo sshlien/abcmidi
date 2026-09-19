@@ -1740,6 +1740,12 @@ void startfile()
   };
   headerpartlabel = 0;
   additive = 1;
+  /* [RK] 2026-09-19 free any vstring left by a previous startfile before
+     re-initialising: analyze_abc_file() calls startfile() once per loop
+     iteration and event_refno() calls it again on the X: line, so without
+     this the first allocation is orphaned and leaked.  part.st is NULL on
+     the first call (zero-initialised global) and freevstring handles that. */
+  freevstring(&part);
   initvstring(&part);
  }
 
