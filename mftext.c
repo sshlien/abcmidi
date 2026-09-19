@@ -123,10 +123,13 @@ void txt_parameter(int chan, int control, int value)
 
 
 /* [SS] 2017-11-16 submitted by Jonathan Hough (msb,lsb interchanged) */
+/* [RK] 2026-06-17 the lsb/msb values were printed under swapped labels;
+   fixed and reordered to msb-first since the bend is msb*128 + lsb
+   (sshlien/abcmidi#6) */
 void txt_pitchbend(int chan, int lsb, int msb)
 {
   prtime();
-  printf("Pitchbend, chan=%d lsb=%d msb=%d\n",chan+1,msb,lsb);
+  printf("Pitchbend, chan=%d msb=%d lsb=%d\n",chan+1,msb,lsb);
 }
 
 void txt_program(int chan, int program)
