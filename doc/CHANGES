@@ -15849,3 +15849,9 @@ CI job runs the whole suite with no exclusions:
 
   parseabc.c: abcversion was a char* to a string literal but parse_precomment
   sscanf-writes into it; made it a writable char array.
+
+Added a golden regression test for the pitchof_b() detune overflow
+(samples/detune_accidentals.abc, tests/golden/abc2midi_detune_accidentals.txt):
+under a detune temperament, notes whose accidental pushes the semitone offset
+out of 0..11 (^b, _c) now take the pitch-class detune (B# -> C, Cb -> B).  Built
+with the sanitize preset against the pre-fix code it aborts in pitchof_b.
