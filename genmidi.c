@@ -2147,7 +2147,11 @@ static void dodeferred(char *s, int noteson)
 
     skipspace(&p);
     count = 0;
-    while ((count < 99) && (strchr("fFmMpP", *p) != NULL)) {
+    /* [RK] 2026-09-19 guard against *p == 0: strchr(set, '\0') returns a
+       non-NULL pointer to the set's own terminator, so without the (*p != 0)
+       test the loop copied the string's NUL and read one byte past the end
+       of the deferred-command buffer (heap-buffer-overflow) */
+    while ((count < 99) && (*p != 0) && (strchr("fFmMpP", *p) != NULL)) {
       beatstring[count] = *p;
       count = count + 1;
       p = p + 1;

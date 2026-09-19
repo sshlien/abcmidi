@@ -15796,3 +15796,12 @@ easyABC ticket #81 Unrecognized Rhythm/ Time signature. (Corresponding
 stress patterns for C and 4/4 were added for certain rhythms.)
 
 
+September 19 2026 [RK]
+
+abc2midi: fixed a heap-buffer-overflow read when parsing a
+"%%MIDI beatstring" directive.  The parsing loop tested each character
+with strchr("fFmMpP", *p), but strchr matches the search set's own
+terminating NUL, so at the end of the directive the loop copied the
+string's '\0' and advanced one byte past the buffer, reading off the
+end (found by AddressSanitizer).  Added a (*p != 0) guard to the loop
+condition, mirroring the existing NUL check in the gchord parser.
