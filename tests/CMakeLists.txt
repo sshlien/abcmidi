@@ -167,6 +167,14 @@ add_golden_test(
 # Most valuable under the sanitizer build, where that overflow aborts abc2midi.
 add_golden_test(TYPE abc2midi SAMPLE beatstring.abc)
 
+# Regression test for the process_microtones() stack-buffer-overflow: a K:
+# field microtone modifier with an out-of-range note letter (^1/4H -> index 7
+# into seven-element arrays) used to write past modmap[]/modmicrotone[].  Now
+# rejected as an invalid microtone (see samples/microtone.abc).  Like the
+# beatstring guard above, its value is under the sanitizer build, where the
+# pre-fix overflow aborts abc2midi.
+add_golden_test(TYPE abc2midi SAMPLE microtone.abc)
+
 # Regression test for the -PMAR option (Part Marker meta-events).
 # Locks in marker emission and verifies the markers do not perturb note
 # timing or end-of-track time (bug fixed by carrying delta_time alongside
