@@ -15750,45 +15750,16 @@ releases such as the 3.22.1 shipped by Ubuntu 22.04 LTS can use
 v4/v5/v6 schema features were in use; v3 covers every field present
 in the file.
 
-May 30 2026 [RK]
+June 21 2026 [RK] [SS]
 
-abc2midi: new -lyrics option.  When a tune has w: word lines, abc2midi
-normally renders them in the Soft-Karaoke convention: 0x01 Text
-meta-events, an "@KMIDI KARAOKE FILE" / "@I" header on the conductor
-track, and a "/" or "\" line/paragraph prefix on the first syllable of
-each w: line.  With -lyrics the words are instead emitted as standard
-MIDI Lyric (0x05) meta-events carrying just the bare syllable text,
-still synchronized to their notes, with the karaoke-specific decoration
-suppressed (the standard sequence-name title is retained).  Default
-behaviour is unchanged.  Implemented in genmidi.c (new word_data()
-helper and lyrics_meta guards in getword() and karaokestarttrack()) and
-store.c (flag parsing); regression-pinned by the tests/golden
-abc2midi_lyrics_demo_5 golden.
+Updated all the c code so that it can be compiled by msys2/ucrt64 on
+the Windows 11 operating system.
 
-June 17 2026 [RK]
 
-parseabc, yaps: fix four -Wformat-truncation warnings from gcc 13+
-(reported by Seymour Shlien on Linux Mint 22.3, gcc 13.3.0).  All
-four were stale snprintf size arguments that no longer matched the
-underlying buffer:
+September 20 2026 [SS]
 
-  - parseabc.c check_bar_repeats(): error_message was declared as
-    char[140] but snprintf was still passing 80 as the size limit,
-    leaving the compiler unsure the formatted output would fit.
-  - yapstree.c event_init(): outputname is char[MAX_OUTPUTNAME + 1]
-    (271 bytes) but snprintf was passing MAX_OUTPUTROOT (250) as the
-    size limit, which both triggered the warning and would have
-    silently truncated a maximally-long argv.
+Added some missing stress patterns to stresspat.c as requested by
+easyABC ticket #81 Unrecognized Rhythm/ Time signature. (Corresponding
+stress patterns for C and 4/4 were added for certain rhythms.)
 
-Fixed by using sizeof(buffer) at each call site so the snprintf size
-argument tracks the actual destination capacity.
 
-June 17 2026 [RK]
-
-mftext: fixed the Pitchbend text output, which printed its two data
-bytes under swapped "lsb="/"msb=" labels (sshlien/abcmidi#6).  The
-values now match their labels and are shown most-significant first
-("msb=%d lsb=%d") since the bend value is msb*128 + lsb.  This is a
-display-only change in the text dump; MIDI output is unaffected.  The
-golden test references that recorded the old mislabeled lines were
-regenerated to match.

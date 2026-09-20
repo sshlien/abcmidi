@@ -11,7 +11,7 @@
 #define casecmp strcasecmp
 #endif
 
-int nmodels = 32;
+int nmodels = 39;
 
 struct stressdef
 {
@@ -37,6 +37,17 @@ extern int *checkmalloc(int size);
 
 void reduce (int *, int *);
 
+
+/* [SS] 2026-09-20 added missing C stresspats for Hornpipe 4/4
+Reel 4/4 Polka 4/4 Set Dance 4/4 and missing 4/4 versions for
+Strathspey C Fling C Slow March C March C
+per easyabc ticket #81 Unrecognized Rhythm/ Time signature
+
+I do not know the stress patterns for Air, Waltz, Barndance
+and Mazurka
+
+*/
+
 void
 init_stresspat ()
 {
@@ -54,7 +65,7 @@ init_stresspat ()
   stresspat[0].expcoef[1] = (float) 0.6;
 
   stresspat[1].name = "Hornpipe";
-  stresspat[1].meter = "C|";
+  stresspat[1].meter = "C";
   stresspat[1].nseg = 8;
   stresspat[1].nval = 2;
   stresspat[1].vel[0] = 110;
@@ -63,7 +74,7 @@ init_stresspat ()
   stresspat[1].expcoef[1] = (float) 0.6;
 
   stresspat[2].name = "Hornpipe";
-  stresspat[2].meter = "2/4";
+  stresspat[2].meter = "C|";
   stresspat[2].nseg = 8;
   stresspat[2].nval = 2;
   stresspat[2].vel[0] = 110;
@@ -72,85 +83,73 @@ init_stresspat ()
   stresspat[2].expcoef[1] = (float) 0.6;
 
   stresspat[3].name = "Hornpipe";
-  stresspat[3].meter = "9/4";
-  stresspat[3].nseg = 9;
-  stresspat[3].nval = 3;
+  stresspat[3].meter = "2/4";
+  stresspat[3].nseg = 8;
+  stresspat[3].nval = 2;
   stresspat[3].vel[0] = 110;
-  stresspat[3].vel[1] = 80;
-  stresspat[3].vel[2] = 100;
+  stresspat[3].vel[1] = 90;
   stresspat[3].expcoef[0] = (float) 1.4;
   stresspat[3].expcoef[1] = (float) 0.6;
-  stresspat[3].expcoef[2] = (float) 1.0;
 
   stresspat[4].name = "Hornpipe";
-  stresspat[4].meter = "3/2";
-  stresspat[4].nseg = 12;
-  stresspat[4].nval = 2;
+  stresspat[4].meter = "9/4";
+  stresspat[4].nseg = 9;
+  stresspat[4].nval = 3;
   stresspat[4].vel[0] = 110;
-  stresspat[4].vel[1] = 90;
+  stresspat[4].vel[1] = 80;
+  stresspat[4].vel[2] = 100;
   stresspat[4].expcoef[0] = (float) 1.4;
   stresspat[4].expcoef[1] = (float) 0.6;
+  stresspat[4].expcoef[2] = (float) 1.0;
 
   stresspat[5].name = "Hornpipe";
-  stresspat[5].meter = "12/8";
+  stresspat[5].meter = "3/2";
   stresspat[5].nseg = 12;
-  stresspat[5].nval = 3;
+  stresspat[5].nval = 2;
   stresspat[5].vel[0] = 110;
-  stresspat[5].vel[1] = 80;
-  stresspat[5].vel[2] = 100;
+  stresspat[5].vel[1] = 90;
   stresspat[5].expcoef[0] = (float) 1.4;
   stresspat[5].expcoef[1] = (float) 0.6;
-  stresspat[5].expcoef[2] = (float) 1.0;
 
-  stresspat[6].name = "Double hornpipe";
-  stresspat[6].meter = "6/2";
+  stresspat[6].name = "Hornpipe";
+  stresspat[6].meter = "12/8";
   stresspat[6].nseg = 12;
-  stresspat[6].nval = 6;
+  stresspat[6].nval = 3;
   stresspat[6].vel[0] = 110;
   stresspat[6].vel[1] = 80;
-  stresspat[6].vel[2] = 80;
-  stresspat[6].vel[3] = 105;
-  stresspat[6].vel[4] = 80;
-  stresspat[6].vel[5] = 80;
-  stresspat[6].expcoef[0] = (float) 1.2;
-  stresspat[6].expcoef[1] = (float) 0.9;
-  stresspat[6].expcoef[2] = (float) 0.9;
-  stresspat[6].expcoef[3] = (float) 1.2;
-  stresspat[6].expcoef[4] = (float) 0.9;
-  stresspat[6].expcoef[5] = (float) 0.9;
+  stresspat[6].vel[2] = 100;
+  stresspat[6].expcoef[0] = (float) 1.4;
+  stresspat[6].expcoef[1] = (float) 0.6;
+  stresspat[6].expcoef[2] = (float) 1.0;
 
-  stresspat[7].name = "Reel";
-  stresspat[7].meter = "4/4";
-  stresspat[7].nseg = 8;
-  stresspat[7].nval = 2;
-  stresspat[7].vel[0] = 120;
-  stresspat[7].vel[1] = 60;
-  stresspat[7].expcoef[0] = (float) 1.1;
+  stresspat[7].name = "Double hornpipe";
+  stresspat[7].meter = "6/2";
+  stresspat[7].nseg = 12;
+  stresspat[7].nval = 6;
+  stresspat[7].vel[0] = 110;
+  stresspat[7].vel[1] = 80;
+  stresspat[7].vel[2] = 80;
+  stresspat[7].vel[3] = 105;
+  stresspat[7].vel[4] = 80;
+  stresspat[7].vel[5] = 80;
+  stresspat[7].expcoef[0] = (float) 1.2;
   stresspat[7].expcoef[1] = (float) 0.9;
+  stresspat[7].expcoef[2] = (float) 0.9;
+  stresspat[7].expcoef[3] = (float) 1.2;
+  stresspat[7].expcoef[4] = (float) 0.9;
+  stresspat[7].expcoef[5] = (float) 0.9;
 
   stresspat[8].name = "Reel";
-  stresspat[8].meter = "C|";
+  stresspat[8].meter = "4/4";
   stresspat[8].nseg = 8;
-  stresspat[8].nval = 8;
-  stresspat[8].vel[0] = 80;
+  stresspat[8].nval = 2;
+  stresspat[8].vel[0] = 120;
   stresspat[8].vel[1] = 60;
-  stresspat[8].vel[2] = 120;
-  stresspat[8].vel[3] = 60;
-  stresspat[8].vel[4] = 80;
-  stresspat[8].vel[5] = 60;
-  stresspat[8].vel[6] = 120;
-  stresspat[8].vel[7] = 60;
   stresspat[8].expcoef[0] = (float) 1.1;
   stresspat[8].expcoef[1] = (float) 0.9;
-  stresspat[8].expcoef[2] = (float) 1.1;
-  stresspat[8].expcoef[3] = (float) 0.9;
-  stresspat[8].expcoef[4] = (float) 1.1;
-  stresspat[8].expcoef[5] = (float) 0.9;
-  stresspat[8].expcoef[6] = (float) 1.1;
-  stresspat[8].expcoef[7] = (float) 0.9;
 
   stresspat[9].name = "Reel";
-  stresspat[9].meter = "2/4";
+  stresspat[9].meter = "C";
   stresspat[9].nseg = 8;
   stresspat[9].nval = 2;
   stresspat[9].vel[0] = 120;
@@ -158,51 +157,59 @@ init_stresspat ()
   stresspat[9].expcoef[0] = (float) 1.1;
   stresspat[9].expcoef[1] = (float) 0.9;
 
-  stresspat[10].name = "Slip Jig";
-  stresspat[10].meter = "9/8";
-  stresspat[10].nseg = 9;
-  stresspat[10].nval = 3;
-  stresspat[10].vel[0] = 110;
-  stresspat[10].vel[1] = 70;
-  stresspat[10].vel[2] = 80;
-  stresspat[10].expcoef[0] = (float) 1.4;
-  stresspat[10].expcoef[1] = (float) 0.5;
+  stresspat[10].name = "Reel";
+  stresspat[10].meter = "C|";
+  stresspat[10].nseg = 8;
+  stresspat[10].nval = 8;
+  stresspat[10].vel[0] = 80;
+  stresspat[10].vel[1] = 60;
+  stresspat[10].vel[2] = 120;
+  stresspat[10].vel[3] = 60;
+  stresspat[10].vel[4] = 80;
+  stresspat[10].vel[5] = 60;
+  stresspat[10].vel[6] = 120;
+  stresspat[10].vel[7] = 60;
+  stresspat[10].expcoef[0] = (float) 1.1;
+  stresspat[10].expcoef[1] = (float) 0.9;
   stresspat[10].expcoef[2] = (float) 1.1;
+  stresspat[10].expcoef[3] = (float) 0.9;
+  stresspat[10].expcoef[4] = (float) 1.1;
+  stresspat[10].expcoef[5] = (float) 0.9;
+  stresspat[10].expcoef[6] = (float) 1.1;
+  stresspat[10].expcoef[7] = (float) 0.9;
 
-  stresspat[11].name = "Double Jig";
-  stresspat[11].meter = "6/8";
-  stresspat[11].nseg = 6;
-  stresspat[11].nval = 3;
-  stresspat[11].vel[0] = 110;
-  stresspat[11].vel[1] = 70;
-  stresspat[11].vel[2] = 80;
-  stresspat[11].expcoef[0] = (float) 1.2;
-  stresspat[11].expcoef[1] = (float) 0.7;
-  stresspat[11].expcoef[2] = (float) 1.1;
+  stresspat[11].name = "Reel";
+  stresspat[11].meter = "2/4";
+  stresspat[11].nseg = 8;
+  stresspat[11].nval = 2;
+  stresspat[11].vel[0] = 120;
+  stresspat[11].vel[1] = 60;
+  stresspat[11].expcoef[0] = (float) 1.1;
+  stresspat[11].expcoef[1] = (float) 0.9;
 
-  stresspat[12].name = "Single Jig";
-  stresspat[12].meter = "6/8";
-  stresspat[12].nseg = 6;
+  stresspat[12].name = "Slip Jig";
+  stresspat[12].meter = "9/8";
+  stresspat[12].nseg = 9;
   stresspat[12].nval = 3;
   stresspat[12].vel[0] = 110;
-  stresspat[12].vel[1] = 80;
-  stresspat[12].vel[2] = 90;
-  stresspat[12].expcoef[0] = (float) 1.2;
-  stresspat[12].expcoef[1] = (float) 0.7;
+  stresspat[12].vel[1] = 70;
+  stresspat[12].vel[2] = 80;
+  stresspat[12].expcoef[0] = (float) 1.4;
+  stresspat[12].expcoef[1] = (float) 0.5;
   stresspat[12].expcoef[2] = (float) 1.1;
 
-  stresspat[13].name = "Slide";
+  stresspat[13].name = "Double Jig";
   stresspat[13].meter = "6/8";
   stresspat[13].nseg = 6;
   stresspat[13].nval = 3;
   stresspat[13].vel[0] = 110;
-  stresspat[13].vel[1] = 80;
-  stresspat[13].vel[2] = 90;
-  stresspat[13].expcoef[0] = (float) 1.3;
-  stresspat[13].expcoef[1] = (float) 0.8;
-  stresspat[13].expcoef[2] = (float) 0.9;
+  stresspat[13].vel[1] = 70;
+  stresspat[13].vel[2] = 80;
+  stresspat[13].expcoef[0] = (float) 1.2;
+  stresspat[13].expcoef[1] = (float) 0.7;
+  stresspat[13].expcoef[2] = (float) 1.1;
 
-  stresspat[14].name = "Jig";
+  stresspat[14].name = "Single Jig";
   stresspat[14].meter = "6/8";
   stresspat[14].nseg = 6;
   stresspat[14].nval = 3;
@@ -213,192 +220,276 @@ init_stresspat ()
   stresspat[14].expcoef[1] = (float) 0.7;
   stresspat[14].expcoef[2] = (float) 1.1;
 
-  stresspat[15].name = "Ragtime";
-  stresspat[15].meter = "12/8";
-  stresspat[15].nseg = 12;
+  stresspat[15].name = "Slide";
+  stresspat[15].meter = "6/8";
+  stresspat[15].nseg = 6;
   stresspat[15].nval = 3;
   stresspat[15].vel[0] = 110;
-  stresspat[15].vel[1] = 70;
+  stresspat[15].vel[1] = 80;
   stresspat[15].vel[2] = 90;
-  stresspat[15].expcoef[0] = (float) 1.4;
-  stresspat[15].expcoef[1] = (float) 0.6;
-  stresspat[15].expcoef[2] = (float) 1.0;
+  stresspat[15].expcoef[0] = (float) 1.3;
+  stresspat[15].expcoef[1] = (float) 0.8;
+  stresspat[15].expcoef[2] = (float) 0.9;
 
-  stresspat[16].name = "Strathspey";
-  stresspat[16].meter = "C";
-  stresspat[16].nseg = 8;
-  stresspat[16].nval = 2;
-  stresspat[16].vel[0] = 120;
+  stresspat[16].name = "Jig";
+  stresspat[16].meter = "6/8";
+  stresspat[16].nseg = 6;
+  stresspat[16].nval = 3;
+  stresspat[16].vel[0] = 110;
   stresspat[16].vel[1] = 80;
-  stresspat[16].expcoef[0] = (float) 1.0;
-  stresspat[16].expcoef[1] = (float) 1.0;
+  stresspat[16].vel[2] = 90;
+  stresspat[16].expcoef[0] = (float) 1.2;
+  stresspat[16].expcoef[1] = (float) 0.7;
+  stresspat[16].expcoef[2] = (float) 1.1;
 
-  stresspat[17].name = "Fling";
-  stresspat[17].meter = "C";
-  stresspat[17].nseg = 8;
-  stresspat[17].nval = 2;
+  stresspat[17].name = "Ragtime";
+  stresspat[17].meter = "12/8";
+  stresspat[17].nseg = 12;
+  stresspat[17].nval = 3;
   stresspat[17].vel[0] = 110;
-  stresspat[17].vel[1] = 90;
+  stresspat[17].vel[1] = 70;
+  stresspat[17].vel[2] = 90;
   stresspat[17].expcoef[0] = (float) 1.4;
   stresspat[17].expcoef[1] = (float) 0.6;
+  stresspat[17].expcoef[2] = (float) 1.0;
 
-  stresspat[18].name = "Set Dance";
-  stresspat[18].meter = "4/4";
+  stresspat[18].name = "Strathspey";
+  stresspat[18].meter = "C";
   stresspat[18].nseg = 8;
   stresspat[18].nval = 2;
-  stresspat[18].vel[0] = 110;
-  stresspat[18].vel[1] = 90;
-  stresspat[18].expcoef[0] = (float) 1.4;
-  stresspat[18].expcoef[1] = (float) 0.6;
+  stresspat[18].vel[0] = 120;
+  stresspat[18].vel[1] = 80;
+  stresspat[18].expcoef[0] = (float) 1.0;
+  stresspat[18].expcoef[1] = (float) 1.0;
 
-  stresspat[19].name = "Set Dance";
-  stresspat[19].meter = "C|";
+  stresspat[19].name = "Strathspey";
+  stresspat[19].meter = "4/4";
   stresspat[19].nseg = 8;
   stresspat[19].nval = 2;
-  stresspat[19].vel[0] = 110;
-  stresspat[19].vel[1] = 90;
-  stresspat[19].expcoef[0] = (float) 1.4;
-  stresspat[19].expcoef[1] = (float) 0.6;
+  stresspat[19].vel[0] = 120;
+  stresspat[19].vel[1] = 80;
+  stresspat[19].expcoef[0] = (float) 1.0;
+  stresspat[19].expcoef[1] = (float) 1.0;
 
-  stresspat[20].name = "Waltz";
-  stresspat[20].meter = "3/4";
-  stresspat[20].nseg = 3;
-  stresspat[20].nval = 3;
+  stresspat[20].name = "Fling";
+  stresspat[20].meter = "C";
+  stresspat[20].nseg = 8;
+  stresspat[20].nval = 2;
   stresspat[20].vel[0] = 110;
-  stresspat[20].vel[1] = 70;
-  stresspat[20].vel[2] = 70;
-  stresspat[20].expcoef[0] = (float) 1.04;
-  stresspat[20].expcoef[1] = (float) 0.98;
-  stresspat[20].expcoef[2] = (float) 0.98;
+  stresspat[20].vel[1] = 90;
+  stresspat[20].expcoef[0] = (float) 1.4;
+  stresspat[20].expcoef[1] = (float) 0.6;
 
-  stresspat[21].name = "Slow March";
-  stresspat[21].meter = "C|";
+  stresspat[21].name = "Fling";
+  stresspat[21].meter = "4/4";
   stresspat[21].nseg = 8;
-  stresspat[21].nval = 3;
-  stresspat[21].vel[0] = 115;
-  stresspat[21].vel[1] = 85;
-  stresspat[21].vel[2] = 100;
-  stresspat[21].vel[3] = 85;
-  stresspat[21].expcoef[0] = (float) 1.1;
-  stresspat[21].expcoef[1] = (float) 0.9;
-  stresspat[21].expcoef[2] = (float) 1.1;
-  stresspat[21].expcoef[3] = (float) 0.9;
+  stresspat[21].nval = 2;
+  stresspat[21].vel[0] = 110;
+  stresspat[21].vel[1] = 90;
+  stresspat[21].expcoef[0] = (float) 1.4;
+  stresspat[21].expcoef[1] = (float) 0.6;
 
-  stresspat[22].name = "Slow March";
-  stresspat[22].meter = "C";
+  stresspat[22].name = "Set Dance";
+  stresspat[22].meter = "4/4";
   stresspat[22].nseg = 8;
-  stresspat[22].nval = 3;
-  stresspat[22].vel[0] = 115;
-  stresspat[22].vel[1] = 85;
-  stresspat[22].vel[2] = 100;
-  stresspat[22].vel[3] = 85;
-  stresspat[22].expcoef[0] = (float) 1.1;
-  stresspat[22].expcoef[1] = (float) 0.9;
-  stresspat[22].expcoef[2] = (float) 1.1;
-  stresspat[22].expcoef[3] = (float) 0.9;
+  stresspat[22].nval = 2;
+  stresspat[22].vel[0] = 110;
+  stresspat[22].vel[1] = 90;
+  stresspat[22].expcoef[0] = (float) 1.4;
+  stresspat[22].expcoef[1] = (float) 0.6;
 
-  stresspat[23].name = "March";
-  stresspat[23].meter = "C|";
+  stresspat[23].name = "Set Dance";
+  stresspat[23].meter = "C";
   stresspat[23].nseg = 8;
   stresspat[23].nval = 2;
-  stresspat[23].vel[0] = 115;
-  stresspat[23].vel[1] = 85;
-  stresspat[23].expcoef[0] = (float) 1.1;
-  stresspat[23].expcoef[1] = (float) 0.9;
+  stresspat[23].vel[0] = 110;
+  stresspat[23].vel[1] = 90;
+  stresspat[23].expcoef[0] = (float) 1.4;
+  stresspat[23].expcoef[1] = (float) 0.6;
 
-  stresspat[24].name = "March";
-  stresspat[24].meter = "C";
+  stresspat[24].name = "Set Dance";
+  stresspat[24].meter = "C|";
   stresspat[24].nseg = 8;
-  stresspat[24].nval = 4;
-  stresspat[24].vel[0] = 115;
-  stresspat[24].vel[1] = 85;
-  stresspat[24].vel[2] = 100;
-  stresspat[24].vel[3] = 85;
-  stresspat[24].expcoef[0] = (float) 1.1;
-  stresspat[24].expcoef[1] = (float) 0.9;
-  stresspat[24].expcoef[2] = (float) 1.1;
-  stresspat[24].expcoef[3] = (float) 0.9;
+  stresspat[24].nval = 2;
+  stresspat[24].vel[0] = 110;
+  stresspat[24].vel[1] = 90;
+  stresspat[24].expcoef[0] = (float) 1.4;
+  stresspat[24].expcoef[1] = (float) 0.6;
 
-  stresspat[25].name = "March";
-  stresspat[25].meter = "6/8";
-  stresspat[25].nseg = 8;
+  stresspat[25].name = "Waltz";
+  stresspat[25].meter = "3/4";
+  stresspat[25].nseg = 3;
   stresspat[25].nval = 3;
   stresspat[25].vel[0] = 110;
   stresspat[25].vel[1] = 70;
-  stresspat[25].vel[2] = 80;
-  stresspat[25].expcoef[0] = (float) 1.1;
-  stresspat[25].expcoef[1] = (float) 0.95;
-  stresspat[25].expcoef[2] = (float) 0.95;
+  stresspat[25].vel[2] = 70;
+  stresspat[25].expcoef[0] = (float) 1.04;
+  stresspat[25].expcoef[1] = (float) 0.98;
+  stresspat[25].expcoef[2] = (float) 0.98;
 
-  stresspat[26].name = "March";
-  stresspat[26].meter = "2/4";
+  stresspat[26].name = "Slow March";
+  stresspat[26].meter = "C|";
   stresspat[26].nseg = 8;
-  stresspat[26].nval = 2;
+  stresspat[26].nval = 3;
   stresspat[26].vel[0] = 115;
   stresspat[26].vel[1] = 85;
+  stresspat[26].vel[2] = 100;
+  stresspat[26].vel[3] = 85;
   stresspat[26].expcoef[0] = (float) 1.1;
   stresspat[26].expcoef[1] = (float) 0.9;
+  stresspat[26].expcoef[2] = (float) 1.1;
+  stresspat[26].expcoef[3] = (float) 0.9;
 
-  stresspat[27].name = "Polka k1";
-  stresspat[27].meter = "3/4";
-  stresspat[27].nseg = 3;
+  stresspat[27].name = "Slow March";
+  stresspat[27].meter = "C";
+  stresspat[27].nseg = 8;
   stresspat[27].nval = 3;
-  stresspat[27].vel[0] = 90;
-  stresspat[27].vel[1] = 110;
+  stresspat[27].vel[0] = 115;
+  stresspat[27].vel[1] = 85;
   stresspat[27].vel[2] = 100;
-  stresspat[27].expcoef[0] = (float) 0.75;
-  stresspat[27].expcoef[1] = (float) 1.25;
-  stresspat[27].expcoef[2] = (float) 1.00;
+  stresspat[27].vel[3] = 85;
+  stresspat[27].expcoef[0] = (float) 1.1;
+  stresspat[27].expcoef[1] = (float) 0.9;
+  stresspat[27].expcoef[2] = (float) 1.1;
+  stresspat[27].expcoef[3] = (float) 0.9;
 
-  stresspat[28].name = "Polka";
+  stresspat[28].name = "Slow March";
   stresspat[28].meter = "4/4";
   stresspat[28].nseg = 8;
-  stresspat[28].nval = 2;
-  stresspat[28].vel[0] = 110;
-  stresspat[28].vel[1] = 90;
-  stresspat[28].expcoef[0] = (float) 1.4;
-  stresspat[28].expcoef[1] = (float) 0.6;
+  stresspat[28].nval = 3;
+  stresspat[28].vel[0] = 115;
+  stresspat[28].vel[1] = 85;
+  stresspat[28].vel[2] = 100;
+  stresspat[28].vel[3] = 85;
+  stresspat[28].expcoef[0] = (float) 1.1;
+  stresspat[28].expcoef[1] = (float) 0.9;
+  stresspat[28].expcoef[2] = (float) 1.1;
+  stresspat[28].expcoef[3] = (float) 0.9;
 
-  stresspat[29].name = "saucy";
-  stresspat[29].meter = "3/4";
-  stresspat[29].nseg = 6;
-  stresspat[29].nval = 6;
+  stresspat[29].name = "March";
+  stresspat[29].meter = "C|";
+  stresspat[29].nseg = 8;
+  stresspat[29].nval = 2;
   stresspat[29].vel[0] = 115;
   stresspat[29].vel[1] = 85;
-  stresspat[29].vel[2] = 120;
-  stresspat[29].vel[3] = 85;
-  stresspat[29].vel[4] = 115;
-  stresspat[29].vel[5] = 85;
-  stresspat[29].expcoef[0] = (float) 1.2;
-  stresspat[29].expcoef[1] = (float) 0.8;
-  stresspat[29].expcoef[2] = (float) 1.3;
-  stresspat[29].expcoef[3] = (float) 0.7;
-  stresspat[29].expcoef[4] = (float) 1.1;
-  stresspat[29].expcoef[5] = (float) 0.9;
+  stresspat[29].expcoef[0] = (float) 1.1;
+  stresspat[29].expcoef[1] = (float) 0.9;
 
-  stresspat[30].name = "Slip jig";
-  stresspat[30].meter = "3/4";
-  stresspat[30].nseg = 9;
-  stresspat[30].nval = 3;
-  stresspat[30].vel[0] = 110;
-  stresspat[30].vel[1] = 80;
+  stresspat[30].name = "March";
+  stresspat[30].meter = "C";
+  stresspat[30].nseg = 8;
+  stresspat[30].nval = 4;
+  stresspat[30].vel[0] = 115;
+  stresspat[30].vel[1] = 85;
   stresspat[30].vel[2] = 100;
-  stresspat[30].expcoef[0] = (float) 1.3;
-  stresspat[30].expcoef[1] = (float) 0.7;
-  stresspat[30].expcoef[2] = (float) 1.0;
+  stresspat[30].vel[3] = 85;
+  stresspat[30].expcoef[0] = (float) 1.1;
+  stresspat[30].expcoef[1] = (float) 0.9;
+  stresspat[30].expcoef[2] = (float) 1.1;
+  stresspat[30].expcoef[3] = (float) 0.9;
 
-  stresspat[31].name = "Tango";
-  stresspat[31].meter = "2/4";
+  stresspat[31].name = "March";
+  stresspat[31].meter = "4/4";
   stresspat[31].nseg = 8;
   stresspat[31].nval = 4;
-  stresspat[31].vel[0] = 110;
-  stresspat[31].vel[1] = 90;
-  stresspat[31].vel[2] = 90;
-  stresspat[31].vel[3] = 100;
-  stresspat[31].expcoef[0] = (float) 1.6;
-  stresspat[31].expcoef[1] = (float) 0.8;
-  stresspat[31].expcoef[2] = (float) 0.8;
-  stresspat[31].expcoef[3] = (float) 0.8;
+  stresspat[31].vel[0] = 115;
+  stresspat[31].vel[1] = 85;
+  stresspat[31].vel[2] = 100;
+  stresspat[31].vel[3] = 85;
+  stresspat[31].expcoef[0] = (float) 1.1;
+  stresspat[31].expcoef[1] = (float) 0.9;
+  stresspat[31].expcoef[2] = (float) 1.1;
+  stresspat[31].expcoef[3] = (float) 0.9;
+
+  stresspat[32].name = "March";
+  stresspat[32].meter = "6/8";
+  stresspat[32].nseg = 8;
+  stresspat[32].nval = 3;
+  stresspat[32].vel[0] = 110;
+  stresspat[32].vel[1] = 70;
+  stresspat[32].vel[2] = 80;
+  stresspat[32].expcoef[0] = (float) 1.1;
+  stresspat[32].expcoef[1] = (float) 0.95;
+  stresspat[32].expcoef[2] = (float) 0.95;
+
+  stresspat[33].name = "March";
+  stresspat[33].meter = "2/4";
+  stresspat[33].nseg = 8;
+  stresspat[33].nval = 2;
+  stresspat[33].vel[0] = 115;
+  stresspat[33].vel[1] = 85;
+  stresspat[33].expcoef[0] = (float) 1.1;
+  stresspat[33].expcoef[1] = (float) 0.9;
+
+  stresspat[34].name = "Polka k1";
+  stresspat[34].meter = "3/4";
+  stresspat[34].nseg = 3;
+  stresspat[34].nval = 3;
+  stresspat[34].vel[0] = 90;
+  stresspat[34].vel[1] = 110;
+  stresspat[34].vel[2] = 100;
+  stresspat[34].expcoef[0] = (float) 0.75;
+  stresspat[34].expcoef[1] = (float) 1.25;
+  stresspat[34].expcoef[2] = (float) 1.00;
+
+  stresspat[35].name = "Polka";
+  stresspat[35].meter = "4/4";
+  stresspat[35].nseg = 8;
+  stresspat[35].nval = 2;
+  stresspat[35].vel[0] = 110;
+  stresspat[35].vel[1] = 90;
+  stresspat[35].expcoef[0] = (float) 1.4;
+  stresspat[35].expcoef[1] = (float) 0.6;
+
+  stresspat[36].name = "Polka";
+  stresspat[36].meter = "C";
+  stresspat[36].nseg = 8;
+  stresspat[36].nval = 2;
+  stresspat[36].vel[0] = 110;
+  stresspat[36].vel[1] = 90;
+  stresspat[36].expcoef[0] = (float) 1.4;
+  stresspat[36].expcoef[1] = (float) 0.6;
+
+  stresspat[37].name = "saucy";
+  stresspat[37].meter = "3/4";
+  stresspat[37].nseg = 6;
+  stresspat[37].nval = 6;
+  stresspat[37].vel[0] = 115;
+  stresspat[37].vel[1] = 85;
+  stresspat[37].vel[2] = 120;
+  stresspat[37].vel[3] = 85;
+  stresspat[37].vel[4] = 115;
+  stresspat[37].vel[5] = 85;
+  stresspat[37].expcoef[0] = (float) 1.2;
+  stresspat[37].expcoef[1] = (float) 0.8;
+  stresspat[37].expcoef[2] = (float) 1.3;
+  stresspat[37].expcoef[3] = (float) 0.7;
+  stresspat[37].expcoef[4] = (float) 1.1;
+  stresspat[37].expcoef[5] = (float) 0.9;
+
+  stresspat[38].name = "Slip jig";
+  stresspat[38].meter = "3/4";
+  stresspat[38].nseg = 9;
+  stresspat[38].nval = 3;
+  stresspat[38].vel[0] = 110;
+  stresspat[38].vel[1] = 80;
+  stresspat[38].vel[2] = 100;
+  stresspat[38].expcoef[0] = (float) 1.3;
+  stresspat[38].expcoef[1] = (float) 0.7;
+  stresspat[38].expcoef[2] = (float) 1.0;
+
+  stresspat[39].name = "Tango";
+  stresspat[39].meter = "2/4";
+  stresspat[39].nseg = 8;
+  stresspat[39].nval = 4;
+  stresspat[39].vel[0] = 110;
+  stresspat[39].vel[1] = 90;
+  stresspat[39].vel[2] = 90;
+  stresspat[39].vel[3] = 100;
+  stresspat[39].expcoef[0] = (float) 1.6;
+  stresspat[39].expcoef[1] = (float) 0.8;
+  stresspat[39].expcoef[2] = (float) 0.8;
+  stresspat[39].expcoef[3] = (float) 0.8;
 
 }
 
