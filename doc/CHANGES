@@ -15525,7 +15525,7 @@ note, pitchbend, microtone, setmicrotone. event_microtone
 is called before event_note. It is hard to determine what is
 going on. Many people have worked on this code.
 
- 
+
 January 07 2025
 
 abc2midi: works correctly with microtone shortcuts but does not
@@ -15671,9 +15671,11 @@ February 13 2026
 
 midistats: added new option -keystability.
 
+
 February 24 2026
 
 midistats: the summary includes ntimesig, triplets, unquantized when appropriate.
+
 
 March 30 2026 [RK]
 
@@ -15692,6 +15694,7 @@ abc2midi always exited 0 regardless of errors. An error_count global is
 incremented by event_error() and main() returns 1 when error_count > 0.
 Changes in store.c (error_count global, event_error, main return value).
 
+
 March 31 2026 [RK]
 
 abc2midi: output missing C: (composer), R: (rhythm) and X: (reference
@@ -15706,6 +15709,7 @@ in event_refno() in store.c.
 
 Man page updated in doc/abc2midi.1.
 
+
 March 31 2026 [RK]
 
 abc2midi: allow %%MIDIdef macros to be defined anywhere, including
@@ -15716,7 +15720,9 @@ so macros defined in the file header were silently ignored. The
 event_specific() in store.c since macro definitions are
 context-independent.
 
+
 2026 April 01
+
 build: added CMake build system (CMakeLists.txt, CMakePresets.json)
 alongside the existing autoconf build.  Three presets are provided:
 default (Release), debug, and sanitize (ASan+UBSan).  Shared source
@@ -15724,6 +15730,7 @@ files (midifile.c, parseabc.c, music_utils.c, parser2.c) are compiled
 once via OBJECT libraries.  The build exports compile_commands.json
 for LSP/clangd support.  Note: the codebase requires -std=gnu89 until
 the K&R-to-ANSI prototype migration is completed.
+
 
 April 25 2026 [RK]
 
@@ -15741,6 +15748,7 @@ m4_esyscmd_s([cat VERSION]) so AC_INIT picks it up at autoreconf time
 script reflects the new VERSION; see the Releasing section in
 README.md.
 
+
 May 7 2026 [RK]
 
 build: lowered CMakePresets.json schema from v6 to v3 (and
@@ -15749,6 +15757,7 @@ releases such as the 3.22.1 shipped by Ubuntu 22.04 LTS can use
 "cmake --preset" without hitting "Unrecognized 'version' field".  No
 v4/v5/v6 schema features were in use; v3 covers every field present
 in the file.
+
 
 May 30 2026 [RK]
 
@@ -15764,6 +15773,7 @@ behaviour is unchanged.  Implemented in genmidi.c (new word_data()
 helper and lyrics_meta guards in getword() and karaokestarttrack()) and
 store.c (flag parsing); regression-pinned by the tests/golden
 abc2midi_lyrics_demo_5 golden.
+
 
 June 17 2026 [RK]
 
@@ -15783,6 +15793,7 @@ underlying buffer:
 Fixed by using sizeof(buffer) at each call site so the snprintf size
 argument tracks the actual destination capacity.
 
+
 June 17 2026 [RK]
 
 mftext: fixed the Pitchbend text output, which printed its two data
@@ -15793,17 +15804,11 @@ display-only change in the text dump; MIDI output is unaffected.  The
 golden test references that recorded the old mislabeled lines were
 regenerated to match.
 
+
 June 21 2026 [RK] [SS]
 
 Updated all the c code so that it can be compiled by msys2/ucrt64 on
 the Windows 11 operating system.
-
-
-September 20 2026 [SS]
-
-Added some missing stress patterns to stresspat.c as requested by
-easyABC ticket #81 Unrecognized Rhythm/ Time signature. (Corresponding
-stress patterns for C and 4/4 were added for certain rhythms.)
 
 
 September 19 2026 [RK]
@@ -15865,3 +15870,23 @@ Added a golden regression test for the pitchof_b() detune overflow
 under a detune temperament, notes whose accidental pushes the semitone offset
 out of 0..11 (^b, _c) now take the pitch-class detune (B# -> C, Cb -> B).  Built
 with the sanitize preset against the pre-fix code it aborts in pitchof_b.
+
+
+September 20 2026 [SS]
+
+Added some missing stress patterns to stresspat.c as requested by
+easyABC ticket #81 Unrecognized Rhythm/ Time signature. (Corresponding
+stress patterns for C and 4/4 were added for certain rhythms.)
+
+
+September 21 2026 [RK]
+
+doc: added exitcodes.md, a synthesis of every exit status each of the
+eight programs can return and the condition behind it, compiled from
+every exit() call and main() return in the sources.  It also records
+the known inconsistencies (errors that exit 0, the exit(-1) in
+stresspat.c, midicopy -h exiting 1, only abc2midi propagating parse
+errors to its status) so that scripts relying on the current behaviour
+are not surprised and so that anyone changing an exit path knows to
+update the file.  Both build systems now install doc/*.md alongside
+the doc/*.txt files.

@@ -155,6 +155,7 @@ install: abc2midi midi2abc abc2abc mftext midicopy yaps abcmatch midistats
 	# install documentation
 	$(INSTALL) -d $(DESTDIR)${docdir}
 	$(INSTALL)  -m 644 doc/*.txt $(DESTDIR)$(docdir)
+	$(INSTALL)  -m 644 doc/*.md $(DESTDIR)$(docdir)
 	$(INSTALL)  -m 644 doc/AUTHORS $(DESTDIR)$(docdir)
 	$(INSTALL)  -m 644 doc/CHANGES $(DESTDIR)$(docdir)
 	$(INSTALL)  -m 644 VERSION $(DESTDIR)$(docdir)
@@ -176,6 +177,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/abcmatch
 	rm -f $(DESTDIR)$(bindir)/midicopy
 	rm -f $(DESTDIR)$(docdir)/*.txt
+	rm -f $(DESTDIR)$(docdir)/*.md
 	rm -f $(DESTDIR)$(docdir)/AUTHORS
 	rm -f $(DESTDIR)$(docdir)/CHANGES
 	rm -f $(DESTDIR)$(docdir)/VERSION
