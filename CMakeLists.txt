@@ -118,6 +118,7 @@ install(TARGETS ${ABCMIDI_BINARIES}
 install(FILES
   doc/abcguide.txt
   doc/abcmatch.txt
+  doc/exitcodes.md
   doc/gpl.txt
   doc/history.txt
   doc/hudsonshift.txt
