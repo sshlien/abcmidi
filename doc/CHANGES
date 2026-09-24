@@ -15783,6 +15783,16 @@ underlying buffer:
 Fixed by using sizeof(buffer) at each call site so the snprintf size
 argument tracks the actual destination capacity.
 
+June 17 2026 [RK]
+
+mftext: fixed the Pitchbend text output, which printed its two data
+bytes under swapped "lsb="/"msb=" labels (sshlien/abcmidi#6).  The
+values now match their labels and are shown most-significant first
+("msb=%d lsb=%d") since the bend value is msb*128 + lsb.  This is a
+display-only change in the text dump; MIDI output is unaffected.  The
+golden test references that recorded the old mislabeled lines were
+regenerated to match.
+
 June 21 2026 [RK] [SS]
 
 Updated all the c code so that it can be compiled by msys2/ucrt64 on
@@ -15796,3 +15806,62 @@ easyABC ticket #81 Unrecognized Rhythm/ Time signature. (Corresponding
 stress patterns for C and 4/4 were added for certain rhythms.)
 
 
+September 19 2026 [RK]
+
+abc2midi: fixed a heap-buffer-overflow read when parsing a
+"%%MIDI beatstring" directive.  The parsing loop tested each character
+with strchr("fFmMpP", *p), but strchr matches the search set's own
+terminating NUL, so at the end of the directive the loop copied the
+string's '\0' and advanced one byte past the buffer, reading off the
+end (found by AddressSanitizer).  Added a (*p != 0) guard to the loop
+condition, mirroring the existing NUL check in the gchord parser.
+
+Added a golden regression test (samples/beatstring.abc,
+tests/golden/abc2midi_beatstring.txt) pinning the beatstring per-beat
+velocity pattern; it also reproduces the overflow above, so it fails
+under the sanitizer build without the fix.  Added a "sanitize
+(ASan+UBSan)" CI job (.github/workflows/test.yml) running the suite
+instrumented -- the check that would have caught this class of bug,
+which the Release build does not.  Four pre-existing sanitizer
+failures (abc2midi_detune global-buffer-overflow; abc2abc_demo,
+abc2abc_words, abcmatch_coleraine leaks) are excluded from that job
+for now so it stays green.
+
+parseabc.c: fixed a stack-buffer-overflow in process_microtones() found
+while auditing the parser for bugs of the same class as the beatstring
+overflow above.  A K: field microtone modifier maps its note letter to
+an index j into the seven-element modmap[]/modmicrotone[] arrays (a-g ->
+0..6), but the range check was "j > 7", so an out-of-range letter such
+as H/h (j == 7) wrote one element past both arrays.  A K:C ^1/4H field
+was enough to trigger it (write overflow, silent in the Release build).
+Corrected the bound to "j > 6"; the letter is now rejected as an invalid
+microtone.  Added a golden regression test (samples/microtone.abc,
+tests/golden/abc2midi_microtone.txt).
+
+Fixed the four pre-existing sanitizer failures so the "sanitize (ASan+UBSan)"
+CI job runs the whole suite with no exclusions:
+
+  store.c: fixed a global-buffer-overflow in pitchof_b() (the abc2midi_detune
+  test).  Under detune temperament the semitone offset p (0..11) is adjusted
+  by an accidental and can land outside the range (^b -> 12, _c -> -1), then
+  indexed the twelve-element temperament_dt[].  Reduce it to a pitch class
+  (p mod 12) for that lookup; the returned pitch still uses the raw p, so the
+  MIDI output is unchanged.
+
+  toabc.c: fixed a memory leak in event_words() (abc2abc_demo, abc2abc_words).
+  The local vstring built for each w: field was passed to event_field (which
+  copies it) but never freed; added the missing freevstring.
+
+  matchsup.c: fixed a memory leak in startfile() (abcmatch_coleraine).
+  analyze_abc_file() calls startfile() once per loop iteration and event_refno
+  calls it again on the X: line, so initvstring(&part) orphaned the earlier
+  allocation.  Free part before re-initialising it.
+
+  parseabc.c: abcversion was a char* to a string literal but parse_precomment
+  sscanf-writes into it; made it a writable char array.
+
+Added a golden regression test for the pitchof_b() detune overflow
+(samples/detune_accidentals.abc, tests/golden/abc2midi_detune_accidentals.txt):
+under a detune temperament, notes whose accidental pushes the semitone offset
+out of 0..11 (^b, _c) now take the pitch-class detune (B# -> C, Cb -> B).  Built
+with the sanitize preset against the pre-fix code it aborts in pitchof_b.

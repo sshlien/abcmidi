@@ -1,0 +1,21 @@
+% Coverage for the "%%MIDI beatstring" directive in the golden test suite.
+% beatstring assigns a per-beat dynamic (f/m/p -> loud/medium/soft note
+% velocity) to each metrical position in the bar; note_beat() then indexes
+% beatstring[] by beat position to set each NoteOn velocity.  With L:1/8 in
+% 4/4 the bar holds eight eighth notes, one per beatstring character, so the
+% "fmfmfffp" pattern maps onto the eight notes and pins eight distinct
+% velocities in the rendered MIDI.
+%
+% This is also the regression guard for the heap-buffer-overflow that the
+% beatstring parser used to hit at end-of-string (strchr matched its search
+% set's terminating NUL, so the loop ran one byte past the directive text).
+% Under the sanitizer build the overflow aborts abc2midi, failing this test.
+X:1
+T:Beatstring velocity control
+C:abc2midi test
+M:4/4
+L:1/8
+Q:1/4=120
+K:C
+%%MIDI beatstring fmfmfffp
+C D E F G A B c |

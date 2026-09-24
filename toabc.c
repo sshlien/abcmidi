@@ -1143,6 +1143,7 @@ void event_words(char *p, int append, int continuation)
     } else {
       event_field('w', afield.st);
     }
+    freevstring(&afield); /* [RK] 2026-09-19 event_field copies the text; free the local vstring */
   };
 }
 

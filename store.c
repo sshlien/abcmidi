@@ -3766,7 +3766,11 @@ static int pitchof_b(char note, char accidental, int mult, int octave, int propa
     pitch = p + 12*octave + middle_c;
     bend = 8192; /* corresponds to zero bend */
     if (temperament == TEMPERDT) {  /* [HL] 2020-07-03 */
-      bend += (int) (0.5 + 40.96 * temperament_dt[p]);
+      /* [RK] 2026-09-19 an accidental can push p outside 0..11 (e.g. ^b -> 12,
+         _c -> -1), so reduce it to a pitch class before indexing the twelve-
+         element temperament_dt[]; the pitch computed above keeps the raw p. */
+      int dt = ((p % 12) + 12) % 12;
+      bend += (int) (0.5 + 40.96 * temperament_dt[dt]);
 	bend = bend<0?0:(bend>16383?16383:bend);
     }
    }

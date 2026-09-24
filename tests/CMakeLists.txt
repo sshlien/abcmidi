@@ -160,6 +160,29 @@ add_golden_test(
   ABC2MIDI_ARGS -lyrics
 )
 
+# Regression test for the "%%MIDI beatstring" directive.  Pins the per-beat
+# velocity pattern (f/m/p -> loud/medium/soft) that beatstring assigns to each
+# metrical position, and guards against the heap-buffer-overflow the parser
+# used to hit at the end of the directive string (see samples/beatstring.abc).
+# Most valuable under the sanitizer build, where that overflow aborts abc2midi.
+add_golden_test(TYPE abc2midi SAMPLE beatstring.abc)
+
+# Regression test for the process_microtones() stack-buffer-overflow: a K:
+# field microtone modifier with an out-of-range note letter (^1/4H -> index 7
+# into seven-element arrays) used to write past modmap[]/modmicrotone[].  Now
+# rejected as an invalid microtone (see samples/microtone.abc).  Like the
+# beatstring guard above, its value is under the sanitizer build, where the
+# pre-fix overflow aborts abc2midi.
+add_golden_test(TYPE abc2midi SAMPLE microtone.abc)
+
+# Regression test for the pitchof_b() global-buffer-overflow: under a detune
+# temperament an accidental can push a note's semitone offset outside 0..11
+# (^b -> 12, _c -> -1), which used to index temperament_dt[] out of bounds.
+# The lookup now folds to a pitch class (see samples/detune_accidentals.abc).
+# Like the guards above, its value is under the sanitizer build, where the
+# pre-fix overflow aborts abc2midi.
+add_golden_test(TYPE abc2midi SAMPLE detune_accidentals.abc)
+
 # Regression test for the -PMAR option (Part Marker meta-events).
 # Locks in marker emission and verifies the markers do not perturb note
 # timing or end-of-track time (bug fixed by carrying delta_time alongside

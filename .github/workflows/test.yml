@@ -100,3 +100,31 @@ jobs:
       # (see tests/CMakeLists.txt for the naming convention).
       - name: Test ${{ matrix.tool }}
         run: ctest --preset default -R '^(smoke_${{ matrix.tool }}_ver|${{ matrix.tool }}_)'
+
+  # Memory-safety gate: build with the `sanitize` preset (AddressSanitizer +
+  # UndefinedBehaviorSanitizer, see CMakePresets.json) and run the golden
+  # suite instrumented, so heap-buffer-overflows, use-after-free, and UB abort
+  # the run instead of silently producing plausible output.  This is the job
+  # that would have caught the %%MIDI beatstring heap-buffer-overflow: the
+  # Release build above renders that input without complaint, only ASan turns
+  # the one-byte over-read into a hard failure.
+  #
+  # The whole suite runs clean under the sanitizers now.  If a fix is not yet
+  # ready and a test has to be quarantined to keep the gate green, exclude it
+  # by name with an anchored regex, e.g.
+  #   ctest --preset sanitize -E '^(some_test|other_test)$'
+  # (anchoring keeps e.g. abc2midi_detune_2 running when abc2midi_detune is
+  # excluded), and list the reason here so it is not forgotten.
+  test-sanitize:
+    runs-on: ubuntu-latest
+    name: sanitize (ASan+UBSan)
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Configure
+        run: cmake --preset sanitize
+      - name: Build
+        run: cmake --build --preset sanitize
+      - name: Test (sanitizers)
+        run: ctest --preset sanitize

@@ -1,0 +1,17 @@
+% Regression guard for the pitchof_b() global-buffer-overflow (store.c).
+% Under a detune temperament (%%temperament, TEMPERDT), a note's semitone
+% offset p -- scale[note] plus the accidental -- can leave the range 0..11:
+% ^b gives 11 + 1 = 12 and _c gives 0 - 1 = -1.  That value used to index the
+% twelve-element temperament_dt[] array directly, reading out of bounds.  The
+% lookup now folds p to a pitch class (p mod 12), so B# takes C's detune and
+% Cb takes B's, while the emitted pitch still uses the raw p.  Built with the
+% sanitize preset against the pre-fix code this input aborts in pitchof_b, so
+% it is a real regression guard and not just an output pin.
+X:1
+T:Detune accidental bounds
+C:abc2midi test
+M:4/4
+L:1/4
+K:C
+%%temperament +00 -06 -04 -02 -08 +02 -08 -02 -04 -06 +00 -10
+^b _c ^b _c |

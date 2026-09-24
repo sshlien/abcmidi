@@ -1,0 +1,16 @@
+% Regression guard for the process_microtones() stack-buffer-overflow.
+% A K: key-signature microtone modifier such as "^1/4H" gave note index
+% j = 'H' - 'A' = 7, but modmap[]/modmicrotone[] hold only seven entries
+% (note letters a-g -> 0..6).  The bound check was "j > 7", which let j == 7
+% through and wrote one element past both arrays.  It is now "j > 6", so the
+% out-of-range letter is rejected with "Not a valid microtone" and the tune
+% still renders.  Built with the sanitize preset against the pre-fix parser
+% this input aborts in process_microtones (parseabc.c), so it is a real
+% regression guard rather than an output pin.
+X:1
+T:Microtone index bound
+C:abc2midi test
+M:4/4
+L:1/4
+K:C ^1/4H
+C D E F |

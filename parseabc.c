@@ -128,7 +128,9 @@ int temperament = 0;            /* [SS] 2020-06-25 */
 
 extern programname fileprogram;
 int oldchordconvention = 0;
-char * abcversion = "2.0"; /* [SS] 2014-08-11 */
+char abcversion[8] = "2.0"; /* [SS] 2014-08-11 */ /* [RK] 2026-09-19 was char*
+  to a string literal, but parse_precomment() sscanf-writes into it (%3s); a
+  writable array avoids the undefined write to read-only storage */
 char lastfieldcmd = ' '; /* [SS] 2014-08-15 */
 
 /* tables mode and modeshift moved to music_utils.c */
@@ -1286,6 +1288,10 @@ static void process_microtones (int *parsed,  char word[],
   int j;
   int success;
 
+  /* [RK] 2026-09-19 j indexes modmap[7]/modmicrotone[7] (note c-g -> 0..6),
+     so a valid index is 0..6.  The bound below was "j > 7", which let a
+     microtone note letter of 'H'/'h' (j == 7) through and wrote one element
+     past both arrays -- a stack-buffer-overflow on inputs like K:C ^1/4H. */
   /* shortcuts such as ^/4G instead of ^1/4G not allowed here */
 
 	  success = sscanf (&word[1], "%d/%d%c", &a, &b, &c);
@@ -1293,11 +1299,11 @@ static void process_microtones (int *parsed,  char word[],
 	    {
 	      *parsed = 1;
 	      j = (int) c - 'A';
-        if (j > 7) {
+        if (j > 6) {
           j = (int) c - 'a';
         }
         if (word[0] == '_') a = -a; /* [SS] 2025-01-07 */
-        if (j > 7 || j < 0) {
+        if (j > 6 || j < 0) {
           event_error ("Not a valid microtone");
           return;
         }
@@ -1318,10 +1324,10 @@ static void process_microtones (int *parsed,  char word[],
 	  /* if (parsed ==1)  [SS] 2020-09-30 */
     if (success > 0) {
       j = (int) c - 'A';
-      if (j > 7) {
+      if (j > 6) {
         j = (int) c - 'a';
       }
-      if (j > 7 || j < 0) {
+      if (j > 6 || j < 0) {
         event_error ("Not a valid microtone");
         return;
       }
