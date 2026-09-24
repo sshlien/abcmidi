@@ -15783,6 +15783,16 @@ underlying buffer:
 Fixed by using sizeof(buffer) at each call site so the snprintf size
 argument tracks the actual destination capacity.
 
+June 17 2026 [RK]
+
+mftext: fixed the Pitchbend text output, which printed its two data
+bytes under swapped "lsb="/"msb=" labels (sshlien/abcmidi#6).  The
+values now match their labels and are shown most-significant first
+("msb=%d lsb=%d") since the bend value is msb*128 + lsb.  This is a
+display-only change in the text dump; MIDI output is unaffected.  The
+golden test references that recorded the old mislabeled lines were
+regenerated to match.
+
 June 21 2026 [RK] [SS]
 
 Updated all the c code so that it can be compiled by msys2/ucrt64 on
