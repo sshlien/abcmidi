@@ -473,6 +473,9 @@ int programbase = 0; /* [SS] 2017-06-02 */
 
 /* karaoke handling */
 int karaoke, wcount;
+/* [RK] 2026-05-30 -lyrics: emit words as standard MIDI Lyric (0x05)
+ * meta-events instead of the Soft-Karaoke Text (0x01) convention. */
+int lyrics_meta;
 char** words;
 int maxwords = INITWORDS;
 
@@ -940,7 +943,7 @@ void event_init(int argc, char *argv[], char **filename)
   } else {
      ignore_guitarchords = 0;
     }
-  
+
   if (getarg("-NCOM", argc, argv) != -1) {
     nocom = 1;
   } else {
@@ -952,6 +955,13 @@ void event_init(int argc, char *argv[], char **filename)
     partmarkers = 1;
   } else {
     partmarkers = 0;
+  }
+
+  /* [RK] 2026-05-30 */
+  if (getarg("-lyrics", argc, argv) != -1) {
+    lyrics_meta = 1;
+  } else {
+    lyrics_meta = 0;
   }
 
   if (getarg("-STFW",argc,argv) != -1) {
@@ -1053,6 +1063,7 @@ void event_init(int argc, char *argv[], char **filename)
     printf("        -NGRA ignore grace notes\n");
     printf("        -NGUI ignore guitar chord indications\n");
     printf("        -STFW separate tracks for words (lyrics)\n");
+    printf("        -lyrics emit lyrics as standard MIDI Lyric (0x05) meta-events\n"); /* [RK] 2026-05-30 */
     printf("        -HARP ornaments=roll for harpist (same pitch)\n"); /* [JS] 2011-04-29 */
     printf("        -BF Barfly mode: invokes a stress model if possible\n");
     printf("        -OCC old chord convention (eg. +CE+)\n");
