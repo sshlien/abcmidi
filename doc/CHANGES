@@ -15890,3 +15890,32 @@ errors to its status) so that scripts relying on the current behaviour
 are not surprised and so that anyone changing an exit path knows to
 update the file.  Both build systems now install doc/*.md alongside
 the doc/*.txt files.
+
+October 2 2026 [SS]
+
+When compiler abc2midi using gcc with the -fsanitize=address option,
+the Barfly model (-BF 2) causes a memory error in the function
+beat_modifier (store.c). Here is a sample test file.
+
+X:1
+T: Causes memory error when executing with -BF 2 option.
+M:6/8
+L:1/8
+R:jig
+K:ADor
+EAA A2B|
+
+Even though this file is correct, the loop
+while (feature[i] != SINGLE_BAR) {
+  ...
+  i++;
+  }
+never ends because it does not catch the end of the
+feature array. It was necessary to break the loop with
+the line
+if (feature[i] == MUSICSTOP) break; /* [SS] 2026.10.02 */
+(It may also be necessary to check that i does not
+exceed maxnotes which specifies the amount of memory that
+was allocated to feature, stressvelocity, bentpitch,  pitch,
+num, denom, charloc, and pitchline.)
+

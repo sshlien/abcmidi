@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "5.04 September 19 2026 abc2midi"
+#define VERSION "5.05 October 02 2026 abc2midi"
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -5561,6 +5561,7 @@ void beat_modifier (int i)
   end_denom = start_denom;
   i++;
   while (feature[i] != SINGLE_BAR) {
+    if (feature[i] == MUSICSTOP) break; /* [SS] 2026.10.02 */
     if (feature[i] == DOUBLE_BAR ||
         feature[i] == BAR_REP ||
         feature[i] == DOUBLE_REP ||

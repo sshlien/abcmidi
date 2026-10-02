@@ -1,0 +1,78 @@
+Barfly is an operation in abc2midi which applies applies a stress model
+to an abc file while creating a midi file. To use this option include
+-BF as one of the flags in the command line. The option can be followed
+by either 1 or 2, designating the type of model. In order for this to work,
+abc2midi must recognize the key signature and rhythm designation
+of the tune. At the moment (October 2 2026), 39 stress patterns have
+been defined in the source code stresspat.c in the abcmidi package.
+
+As mentioned above, you have a choice of two methods for applying
+the stress model. This is described in the documentation
+https://abcmidi.sourceforge.io/ .Go to Stress Model in the table of
+contents in the left frame. By default method 2 is assumed.
+
+The code for applying the Barfly stress model is spread out in
+3 files; stresspat.c, store.c and genmidi.c. It may be difficult
+to figure it out without using a debugger. Here is an outline
+of how it works.
+
+stresspat.c defines the 39 built in models in init_stresspat().
+Note there should be a distinction between M: 4/4 and M: C. 
+I wrote a little Python script to go through the 728 tunes in my Paul Hardy's Session Tunebook, and the unique combinations are:
+
+Air in 2/2 Air in 2/4 Air in 3/4 Air in 4/4 Air in 6/8
+An Dro in 4/4 Barndance in 4/4 Bourrée in 2/2 Bourrée in 2/4
+Bourrée in 3/4 Branle in 4/4 Fling in 4/4 Hornpipe in 2/2
+Hornpipe in 4/4 Jig in 6/4 Jig in 6/8 Klezmer in 4/4
+Lament in 6/8 March in 2/2 March in 2/4 March in 4/4
+March in 6/8 Mazurka in 3/4 Minuet in 3/2 Minuet in 3/4
+Morris Dance in 4/4 Polka in 2/2 Polka in 2/4 Polka in 4/4
+Quickstep in 2/2 Quintuple in 5/2 Reel in 2/2 Reel in 2/4
+Reel in 4/4 Reijländer in 2/2 Rigaudon in 2/2 Schottische in 4/4
+Scottische in 4/4 Set Dance in 4/4 Shanty in 4/4 Slide in 12/8
+Slide in 4/4 Slide in 6/8 Slipjig in 9/8 Slow Air in 4/4
+Slow March in 2/2 Smooth Hornpipe in 2/2 Smooth Hornpipe in 4/4
+Strathspey in 4/4 Triple Hornpipe in 3/2 Triple Hornpipe in 6/4
+Waltz in 3/4
+
+I would need help in creating the models for many of these stress
+patterns. Presently, if abc2midi does not recognize a pattern
+it ignores the request. The user still has the option of defining
+their own pattern as discussed in the above documentation.
+stresspat.c also contains the code for loading the stress model
+(load_stress_parameters).
+
+The remaining code is found in the files store.c and genmidi.c.
+apply_bf_stress_factors() starts the entire process. It ensures
+that the stress parameters are loaded. If model 2 is specified,
+it applies the model one bar at a time using the function beat_modifier
+defined in store.c. For both models, the stress model is applied
+in the second pass by articulated_stress_factors() defined in
+genmidi.c.
+
+The parser converts the abc file into an internal representation
+stored in a feature[] structure. If model 2 is selected, then 
+apply_bf_stress_factors() modifies this structure using the
+function beat_modifier. This changes the start and stop times
+of each note in a measure in the internal representation using
+the function fdursum_at_segment() which is defined in genmidi.c
+The bar is divided in nseg segments as specified in the model.
+The fdur values are set in the stress model for each segment.
+apply_bf_stress_factors() determines which segment applies
+to the note and adjusts the start and stop times.
+
+stress_factors is called by noteon provided that one of the
+stress models is active. stress_factors returns the new
+note velocity for the note. If model 2 was selected, stress_factors
+gets the velocity from the stressvelocity array; otherwise,
+the velocity is obtained from the function
+articulated_stress_factors().
+
+It is apparent that the implementation of both of these models
+is rather complicated and I do not understand all the details.
+
+Seymour
+
+
+
+
