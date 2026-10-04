@@ -1449,10 +1449,10 @@ Time=45960  Note off, chan=2 pitch=38 vol=0
 Time=45961  Note on, chan=3 pitch=50 vol=64
 Time=45961  Note on, chan=3 pitch=53 vol=64
 Time=45961  Note on, chan=3 pitch=57 vol=64
-Time=46200  Note off, chan=3 pitch=50 vol=0
-Time=46200  Note off, chan=3 pitch=53 vol=0
-Time=46200  Note off, chan=3 pitch=57 vol=0
-Time=46227  Meta event, end of track
+Time=46081  Note off, chan=3 pitch=50 vol=0
+Time=46081  Note off, chan=3 pitch=53 vol=0
+Time=46081  Note off, chan=3 pitch=57 vol=0
+Time=46106  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
