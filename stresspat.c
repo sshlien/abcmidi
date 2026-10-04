@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
 
 
@@ -11,7 +12,7 @@
 #define casecmp strcasecmp
 #endif
 
-int nmodels = 39;
+int nmodels = 0; /* set by init_stresspat() [RK] 2026-10-04 */
 
 struct stressdef
 {
@@ -491,9 +492,49 @@ init_stresspat ()
   stresspat[39].expcoef[2] = (float) 0.8;
   stresspat[39].expcoef[3] = (float) 0.8;
 
+  /* count the models rather than keeping a constant in sync with the
+   * table: nmodels = 39 left Tango 2/4 unreachable and let a -CSM model
+   * overwrite it [RK] 2026-10-04 */
+  for (nmodels = 0;
+       nmodels < (int) (sizeof (stresspat) / sizeof (stresspat[0]))
+       && stresspat[nmodels].name != NULL; nmodels++)
+    ;
 }
 
 
+
+/* [RK] 2026-10-04 */
+static int
+same_word (char *a, char *b)
+/* compares ignoring case, spaces and hyphens, so that Slipjig,
+ * Slip-jig and Slip Jig are the same rhythm */
+{
+  for (;;)
+    {
+      while (*a == ' ' || *a == '-')
+        a++;
+      while (*b == ' ' || *b == '-')
+        b++;
+      if (tolower ((unsigned char) *a) != tolower ((unsigned char) *b))
+        return 0;
+      if (*a == '\0')
+        return 1;
+      a++;
+      b++;
+    }
+}
+
+/* [RK] 2026-10-04 */
+static char *
+meter_alias (char *meter)
+/* M:C is 4/4 and M:C| is 2/2 */
+{
+  if (same_word (meter, "C"))
+    return "4/4";
+  if (same_word (meter, "C|"))
+    return "2/2";
+  return meter;
+}
 
 int
 stress_locator (char *rhythmdesignator, char *timesigstring)
@@ -506,6 +547,18 @@ stress_locator (char *rhythmdesignator, char *timesigstring)
 	{
 	  return i;
 	}
+    }
+  /* no exact match: retry with the spelling variations above, so that
+   * e.g. R:Slipjig M:9/8 finds Slip Jig 9/8 and R:Reel M:2/2 finds
+   * Reel C| [RK] 2026-10-04 */
+  for (i = 0; i < nmodels; i++)
+    {
+      if (same_word (rhythmdesignator, stresspat[i].name) &&
+          same_word (meter_alias (timesigstring),
+                     meter_alias (stresspat[i].meter)))
+        {
+          return i;
+        }
     }
   return -1;
 }
