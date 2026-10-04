@@ -16029,3 +16029,13 @@ between the two are never written.  A new golden test,
 abc2midi_barfly_split_bar (samples/barfly_split_bar.abc), covers both
 the overflow after the final bar line, under the sanitize build, and
 the stress of the split bar.
+
+abc2midi: -BF and -v take an optional number (stress model, verbosity
+level), but their defaults (model 2, level 1) were only used when the
+option was the last argument.  Followed by another option, e.g.
+"-BF -TT 440", sscanf failed and Barfly mode stayed off ("stressmodel is
+ignored without -BF runtime option"), and "-v -BF" did not turn verbose
+mode on.  The default now applies unless a number follows (GitHub issue
+#8).  New golden test abc2midi_barfly_option (samples/barfly_option.abc)
+with a plain -BF followed by other options; its output is the same as
+with -BF 2.

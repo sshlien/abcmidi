@@ -187,6 +187,15 @@ add_golden_test(
 # Most valuable under the sanitizer build, where that overflow aborts abc2midi.
 add_golden_test(TYPE abc2midi SAMPLE beatstring.abc)
 
+# Regression test for -BF without a model number (issue #8): the runner puts
+# other options after ABC2MIDI_ARGS, which used to turn Barfly mode off
+# instead of selecting the default model 2 (see samples/barfly_option.abc).
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        barfly_option.abc
+  ABC2MIDI_ARGS -BF
+)
+
 # Regression test for the process_microtones() stack-buffer-overflow: a K:
 # field microtone modifier with an out-of-range note letter (^1/4H -> index 7
 # into seven-element arrays) used to write past modmap[]/modmicrotone[].  Now

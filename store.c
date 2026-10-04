@@ -915,10 +915,13 @@ void event_init(int argc, char *argv[], char **filename)
   /* look for verbose option */
   arg = getarg("-v", argc, argv);
   if (arg != -1) {  /* [SS] 2011-08-26 */
+    /* the level is optional: 1 unless -v is followed by a number, also
+     * when another option follows, not only at the end [RK] 2026-10-04 */
+    verbose = 1;
     if (argc > arg) {
       n = sscanf(argv[arg],"%d",&m);
-      if (n > 0) verbose = m; }
-      else verbose = 1; /* arg != -1 but arg == argc */
+      if (n > 0) verbose = m;
+      };
     } else {  /* arg =  -1 */
     verbose = 0;
   };
@@ -992,11 +995,15 @@ void event_init(int argc, char *argv[], char **filename)
 
   arg = getarg("-BF",argc,argv);
   if (arg != -1)  {  /* [SS] 2011-08-26 */
+    /* the model is optional: 2 unless -BF is followed by a number, also
+     * when another option follows, not only at the end (issue #8)
+     * [RK] 2026-10-04 */
+    stressmodel = 2;
     if (argc > arg) {
       n = sscanf(argv[arg],"%d",&m);
       if (n > 0) stressmodel = m;
-      } else stressmodel = 2;
-      barflymode = stressmodel; /* [SS] 2018-04-15 */
+      };
+    barflymode = stressmodel; /* [SS] 2018-04-15 */
     } else {
     barflymode = 0;
     stressmodel = 0;
