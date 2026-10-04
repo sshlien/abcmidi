@@ -203,6 +203,17 @@ add_golden_test(TYPE abc2midi SAMPLE microtone.abc EXPECT_ERRORS)
 # pre-fix overflow aborts abc2midi.
 add_golden_test(TYPE abc2midi SAMPLE detune_accidentals.abc)
 
+# Regression test for beat_modifier(), which applies the -BF 2 stress model
+# bar by bar: it used to scan past the end of feature[] after the final bar
+# line (an overflow the sanitizer build turns into a failure), and must still
+# stress all the notes of a bar split across two lines (see
+# samples/barfly_split_bar.abc).
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        barfly_split_bar.abc
+  ABC2MIDI_ARGS -BF 2
+)
+
 # Regression test for the -PMAR option (Part Marker meta-events).
 # Locks in marker emission and verifies the markers do not perturb note
 # timing or end-of-track time (bug fixed by carrying delta_time alongside
