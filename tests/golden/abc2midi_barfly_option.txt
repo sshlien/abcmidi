@@ -1,0 +1,61 @@
+Header format=0 ntrks=1 division=480
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=1  minor=0
+Time=0  Time signature=6/8  MIDI-clocks/click=36  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:1>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=19
+     Text = <Barfly option order>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=5
+     Text = <R:jig>
+Time=1  Note on, chan=1 pitch=71 vol=110
+Time=288  Note off, chan=1 pitch=71 vol=0
+Time=289  Note on, chan=1 pitch=69 vol=80
+Time=456  Note off, chan=1 pitch=69 vol=0
+Time=457  Note on, chan=1 pitch=67 vol=90
+Time=720  Note off, chan=1 pitch=67 vol=0
+Time=721  Note on, chan=1 pitch=67 vol=110
+Time=1008  Note off, chan=1 pitch=67 vol=0
+Time=1009  Note on, chan=1 pitch=69 vol=80
+Time=1176  Note off, chan=1 pitch=69 vol=0
+Time=1177  Note on, chan=1 pitch=71 vol=90
+Time=1440  Note off, chan=1 pitch=71 vol=0
+Time=1441  Note on, chan=1 pitch=71 vol=110
+Time=1728  Note off, chan=1 pitch=71 vol=0
+Time=1729  Note on, chan=1 pitch=69 vol=80
+Time=1896  Note off, chan=1 pitch=69 vol=0
+Time=1897  Note on, chan=1 pitch=67 vol=90
+Time=2160  Note off, chan=1 pitch=67 vol=0
+Time=2161  Note on, chan=1 pitch=67 vol=110
+Time=2448  Note off, chan=1 pitch=67 vol=0
+Time=2449  Note on, chan=1 pitch=69 vol=80
+Time=2616  Note off, chan=1 pitch=69 vol=0
+Time=2617  Note on, chan=1 pitch=71 vol=90
+Time=2880  Note off, chan=1 pitch=71 vol=0
+Time=2881  Note on, chan=1 pitch=74 vol=110
+Time=3168  Note off, chan=1 pitch=74 vol=0
+Time=3169  Note on, chan=1 pitch=71 vol=80
+Time=3336  Note off, chan=1 pitch=71 vol=0
+Time=3337  Note on, chan=1 pitch=67 vol=90
+Time=3600  Note off, chan=1 pitch=67 vol=0
+Time=3601  Note on, chan=1 pitch=69 vol=110
+Time=3888  Note off, chan=1 pitch=69 vol=0
+Time=3889  Note on, chan=1 pitch=66 vol=80
+Time=4056  Note off, chan=1 pitch=66 vol=0
+Time=4057  Note on, chan=1 pitch=62 vol=90
+Time=4320  Note off, chan=1 pitch=62 vol=0
+Time=4321  Note on, chan=1 pitch=67 vol=110
+Time=4608  Note off, chan=1 pitch=67 vol=0
+Time=4609  Note on, chan=1 pitch=71 vol=80
+Time=4776  Note off, chan=1 pitch=71 vol=0
+Time=4777  Note on, chan=1 pitch=74 vol=90
+Time=5040  Note off, chan=1 pitch=74 vol=0
+Time=5041  Note on, chan=1 pitch=79 vol=110
+Time=5760  Note off, chan=1 pitch=79 vol=0
+Time=5786  Meta event, end of track
+Track end

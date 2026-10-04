@@ -1,0 +1,14 @@
+% Regression guard for the -BF option without a model number (issue #8).
+% -BF alone selects stress model 2, but the default used to apply only when
+% -BF was the last argument: followed by another option, Barfly mode was
+% silently turned off.  The golden test passes a plain -BF, which the test
+% runner follows with other options, so the golden must be the stressed
+% rendering, the same as with -BF 2.
+X:1
+T:Barfly option order
+C:abc2midi test
+M:6/8
+L:1/8
+R:jig
+K:G
+BAG GAB|BAG GAB|dBG AFD|GBd g3|
