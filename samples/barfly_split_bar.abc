@@ -1,0 +1,18 @@
+% Regression guard for beat_modifier() in store.c, which applies the -BF 2
+% (Barfly) stress model one bar at a time by scanning the features of the
+% bar up to its closing bar line.
+% - The tune ends with a bar line, after which there is none: the scan used
+%   to run past the end of feature[] (heap-buffer-overflow under the
+%   sanitize build).
+% - Bar 2 is split across two lines.  Stopping the scan at the end of a
+%   line of music (MUSICSTOP) left B A G, after the line break, unstressed;
+%   the golden pins the stressed durations and velocities of all six notes.
+X:1
+T:Barfly bar split across lines
+C:abc2midi test
+M:6/8
+L:1/8
+R:jig
+K:ADor
+EAA A2B|cBA
+BAG|EAA A2B|

@@ -16016,3 +16016,16 @@ Those notes are now cut off at the end of the music, without a message.
 Melody tracks are unchanged.  samples/dergasn.abc, whose gchord pattern
 overran its final 3/16 bar, is now rendered without errors and is no
 longer listed in ABC2MIDI_ERROR_SAMPLES in tests/CMakeLists.txt.
+
+October 4 2026 [RK]
+
+abc2midi -BF 2: the October 2 fix of beat_modifier() (store.c) stopped
+its scan at MUSICSTOP, but MUSICSTOP ends every line of music, not only
+the last one, so a bar split across two lines (e.g. "|cBA" then "BAG|")
+no longer got the stress model on the notes after the line break.  The
+scan is now bounded by notes, the number of features stored, instead.
+notes rather than maxnotes, which is the allocated size: the features
+between the two are never written.  A new golden test,
+abc2midi_barfly_split_bar (samples/barfly_split_bar.abc), covers both
+the overflow after the final bar line, under the sanitize build, and
+the stress of the split bar.

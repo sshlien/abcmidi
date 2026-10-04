@@ -5586,8 +5586,12 @@ void beat_modifier (int i)
   end_num=start_num;
   end_denom = start_denom;
   i++;
-  while (feature[i] != SINGLE_BAR) {
-    if (feature[i] == MUSICSTOP) break; /* [SS] 2026.10.02 */
+  /* after the final bar line of a tune there is no further bar line, so
+   * stop at the end of feature[] instead of reading past it [SS] 2026.10.02.
+   * This is a bound on notes rather than a stop at MUSICSTOP, which ends
+   * every line of music: a bar split across two lines would lose the
+   * stress of its second part [RK] 2026-10-04 */
+  while (i < notes && feature[i] != SINGLE_BAR) {
     if (feature[i] == DOUBLE_BAR ||
         feature[i] == BAR_REP ||
         feature[i] == DOUBLE_REP ||
