@@ -16,7 +16,7 @@ status values are ever produced:
 | Status | Meaning in practice |
 |-------:|---------------------|
 | 0 | Normal completion, `-h`/usage, `-ver` — and, in several programs, genuine errors as well (see [Known inconsistencies](#known-inconsistencies)) |
-| 1 | Every fatal error in the shared MIDI reader/writer (`midifile.c`), failure to open the input file in the shared abc parser (`parseabc.c`), most internal consistency errors; for `abc2midi` also any non-fatal parse error reported by `event_error()` |
+| 1 | Every fatal error in the shared MIDI reader/writer (`midifile.c`), failure to open the input file in the shared abc parser (`parseabc.c`), most internal consistency errors; for `abc2midi` also any non-fatal parse error reported by `event_error()`, and any warning under `-Werror` |
 | 2 | `midicopy` only: the output file cannot be opened |
 | 255 | `abc2midi` only: a malformed custom stress-model file (`-CSM`); the code calls `exit(-1)`, which POSIX reports as 255 |
 
@@ -72,14 +72,28 @@ modules.
 
 `main()` returns `error_count > 0 ? 1 : 0`, where `error_count` is
 incremented by every call to `event_error()`. `event_fatal_error()` prints
-its message (counting it as an error) and exits 1.
+its message (counting it as an error) and exits 1. Warnings
+(`event_warning()`) do not affect the status, unless `-Werror` is given:
+`event_warning()` then reports its message through `event_error()`
+(printed as `Error in line-char ...`), so any warning makes the status 1.
+Warnings that `-quiet` suppresses are not issued at all, so they do not
+count under `-Werror` either, and neither do the three `**warning** ...`
+messages that `stresspat.c` and `genmidi.c` print directly instead of
+calling `event_warning()`.
+
+With `-BF`, a tune whose `R:` field and meter match no stress model, or
+that has no `R:` field, is a warning (`invalid R: designator`, `No R: in
+header, ...`): the tune is rendered without stress and the status stays 0
+unless `-Werror` is given. In versions 5.03 to 5.05 these were errors
+and made the status 1, which stopped EasyABC from playing such tunes
+whenever its Barfly option was enabled.
 
 | Status | Where | Condition |
 |-------:|-------|-----------|
 | 0 | `main()` | Success and no error reported during parsing. |
 | 0 | `event_init()` | `-h`, or no argument at all: prints usage. |
 | 0 | `event_init()` | `-ver`: prints the version string. |
-| 1 | `main()` | At least one `event_error()` was reported while parsing. A best-effort MIDI file is still written in that case, which is why `tests/run_test.cmake` tolerates a non-zero status as long as the `.mid` file exists. |
+| 1 | `main()` | At least one `event_error()` was reported while parsing, or at least one `event_warning()` with `-Werror`. A best-effort MIDI file is still written in that case, which is why `tests/run_test.cmake` tolerates a non-zero status as long as the `.mid` file exists. |
 | 1 | `event_init()` via `event_fatal_error()` | `-n` stem-length limit outside 3..252. |
 | 1 | `event_init()` via `event_fatal_error()` | `-Q` default tempo below 3 (`Enter -Q 240 not -Q 1/4=240`). |
 | 1 | `setup_trackstructure()` via `event_fatal_error()` | More than 39 tracks would be needed. |

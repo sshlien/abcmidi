@@ -194,6 +194,71 @@ add_golden_test(
   ABC2MIDI_ARGS -PMAR
 )
 
+# --- Exit-status tests ---
+#
+# The golden tests above tolerate any abc2midi exit status, so the status
+# itself is pinned here.  Test names start with "abc2midi_" so that the CI
+# per-tool job (ctest -R '^(...|abc2midi_)') runs them too.
+#
+# Optional REGEX is a regular expression that abc2midi's stdout must match.
+function(add_exit_status_test)
+  cmake_parse_arguments(T "" "NAME;SAMPLE;RC;REGEX" "ABC2MIDI_ARGS" ${ARGN})
+  add_test(
+    NAME "${T_NAME}"
+    COMMAND "${CMAKE_COMMAND}"
+      -DABC2MIDI=$<TARGET_FILE:abc2midi>
+      -DSAMPLE=${SAMPLES_DIR}/${T_SAMPLE}
+      -DTMPDIR=${TEST_TMPDIR}
+      -DNAME=${T_NAME}
+      -DEXPECTED_RC=${T_RC}
+      "-DEXPECTED_REGEX=${T_REGEX}"
+      "-DABC2MIDI_ARGS=${T_ABC2MIDI_ARGS}"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/run_exit_status.cmake"
+  )
+  set_tests_properties("${T_NAME}" PROPERTIES LABELS "exit-status")
+endfunction()
+
+# -BF on a tune with no stress model for its rhythm (tune 1: R:Polka in 2/2,
+# from EasyABC ticket #81) or with no R: at all (tune 2) is a warning: the
+# tune is rendered without stress and abc2midi exits 0.  -Werror turns the
+# warning into an error and the exit status into 1.
+add_exit_status_test(
+  NAME          abc2midi_bf_unknown_rhythm
+  SAMPLE        barfly_rhythm.abc
+  ABC2MIDI_ARGS 1 -BF 2
+  RC            0
+  REGEX         "Warning in line-char [0-9]+-[0-9]+ : invalid R: designator"
+)
+add_exit_status_test(
+  NAME          abc2midi_bf_unknown_rhythm_werror
+  SAMPLE        barfly_rhythm.abc
+  ABC2MIDI_ARGS 1 -BF 2 -Werror
+  RC            1
+  REGEX         "Error in line-char [0-9]+-[0-9]+ : invalid R: designator"
+)
+add_exit_status_test(
+  NAME          abc2midi_bf_no_rhythm
+  SAMPLE        barfly_rhythm.abc
+  ABC2MIDI_ARGS 2 -BF 2
+  RC            0
+  REGEX         "Warning in line-char [0-9]+-[0-9]+ : No R: in header"
+)
+add_exit_status_test(
+  NAME          abc2midi_bf_no_rhythm_werror
+  SAMPLE        barfly_rhythm.abc
+  ABC2MIDI_ARGS 2 -BF 2 -Werror
+  RC            1
+  REGEX         "Error in line-char [0-9]+-[0-9]+ : No R: in header"
+)
+
+# -Werror alone must not fail a tune that raises no warning.
+add_exit_status_test(
+  NAME          abc2midi_werror_clean
+  SAMPLE        coleraine.abc
+  ABC2MIDI_ARGS -Werror
+  RC            0
+)
+
 # --- Regenerate-golden convenience target ---
 #
 # Usage:  cmake --build build/debug --target update-golden

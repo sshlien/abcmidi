@@ -15919,3 +15919,24 @@ exceed maxnotes which specifies the amount of memory that
 was allocated to feature, stressvelocity, bentpitch,  pitch,
 num, denom, charloc, and pitchline.)
 
+
+October 3 2026 [RK]
+
+abc2midi -BF: a tune whose R: field and meter match none of the stress
+models, or that has no R: field, is now a warning instead of an error
+("invalid R: designator", "No R: in header, cannot apply Barfly model
+without %%MIDI ptstress").  -BF only applies a stress model if possible
+and such a tune is valid abc, which is still rendered, just without
+stress.  Since abc2midi returns exit status 1 on errors (April 2026),
+these errors made EasyABC refuse to play any such tune when its Barfly
+option was enabled (EasyABC ticket #81, e.g. R:Polka with M:2/2).  The
+change is in apply_bf_stress_factors() in store.c.
+
+New -Werror option: every warning is reported as an error, so that the
+exit status is 1 as for errors.  This restores the strict behaviour for
+scripts and continuous integration that want to reject abc files which
+are otherwise only warned about.  Warnings suppressed by -quiet are not
+affected.  Both behaviours are pinned by new exit-status tests
+(tests/run_exit_status.cmake, samples/barfly_rhythm.abc), since the
+golden tests ignore the exit status of abc2midi.  doc/exitcodes.md and
+the man page are updated accordingly.

@@ -2,7 +2,7 @@
 .SH NAME
 \fBabc2midi\fP \- converts abc file to MIDI file(s)
 .SH SYNOPSIS
-abc2midi \fIinfile\fP [\fIrefnum\fP] [\-c] [\-v] [\-ver] [\-t] [\-n limit] [\-CS] [\-quiet] [\-silent] [\-Q tempo] [\-NFNP] [\-NFER] [\-NGRA] [\-NGUI] [\-STFW] [\-lyrics] [\-OCC] [\-NCOM] [\-PMAR] [\-HARP] [\-BF] [\-TT] [\-o outfile] \-CSM [filename]
+abc2midi \fIinfile\fP [\fIrefnum\fP] [\-c] [\-v] [\-ver] [\-t] [\-n limit] [\-CS] [\-quiet] [\-silent] [\-Werror] [\-Q tempo] [\-NFNP] [\-NFER] [\-NGRA] [\-NGUI] [\-STFW] [\-lyrics] [\-OCC] [\-NCOM] [\-PMAR] [\-HARP] [\-BF] [\-TT] [\-o outfile] \-CSM [filename]
 .SH DESCRIPTION
  The default action is to write a MIDI file for each abc tune
  with the filename <stem>N.mid, where <stem> is the filestem
@@ -35,6 +35,12 @@ Suppresses some common warnings.
 .TP
 .B -silent
 Suppresses other messages.
+.TP
+.B -Werror
+Reports every warning as an error, so that abc2midi exits with status 1
+when a warning is issued, as it does for errors. Useful in scripts and
+continuous integration to reject abc files that are otherwise only
+warned about. Warnings suppressed by \-quiet are not affected.
 .TP
 .B -n \fI X\fP
 limits the length of the file name stem to X characters
@@ -79,7 +85,9 @@ emitted as simple section markers (e.g. "Part A", "Part B").
 Accept old chord convention (eg +D2G2+ instead of [DG]2).
 .TP
 .B -BF
-BarFly mode: invokes a stress model if possible.
+BarFly mode: invokes a stress model if possible. When no stress model
+matches the R: field and the meter of a tune, or the tune has no R:
+field, a warning is issued and the tune is rendered without stress.
 .TP
 .B -HARP
 Roll ornaments=roll are generated for the harpist (same pitch)
