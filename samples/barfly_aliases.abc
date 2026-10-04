@@ -1,0 +1,33 @@
+% Stress model lookup for abc2midi -BF when the R: field or the meter is
+% spelled differently from the built-in table in stresspat.c.  Each tune
+% must find a model, so that abc2midi -BF 2 -Werror exits 0.
+% Tune 1: M:2/2 is the same meter as M:C|, and the table has Reel C|.
+% Tune 2: R:Slipjig is spelled Slip Jig in the table.
+% Tune 3: Tango 2/4 is the last table entry, which the lookup used to miss
+% because the number of models was off by one.
+X:1
+T:Reel in 2/2
+C:abc2midi test
+R:Reel
+M:2/2
+L:1/8
+K:D
+FAAB AFED|FAAB A2de|fedB AFEF|D2FD E2DE|
+
+X:2
+T:Slipjig spelled as one word
+C:abc2midi test
+R:Slipjig
+M:9/8
+L:1/8
+K:G
+GBd gdB c2A|GBd gdB A2B|
+
+X:3
+T:Tango
+C:abc2midi test
+R:Tango
+M:2/4
+L:1/8
+K:Am
+A>A EA|c>B AE|

@@ -15940,3 +15940,25 @@ affected.  Both behaviours are pinned by new exit-status tests
 (tests/run_exit_status.cmake, samples/barfly_rhythm.abc), since the
 golden tests ignore the exit status of abc2midi.  doc/exitcodes.md and
 the man page are updated accordingly.
+
+October 4 2026 [RK]
+
+abc2midi -BF: the stress model lookup (stress_locator() in stresspat.c)
+now falls back, when there is no exact match, to ignoring spaces and
+hyphens in the R: field and to taking M:C as 4/4 and M:C| as 2/2, as
+the abc standard defines them.  For example R:Slipjig with M:9/8 now
+finds Slip Jig 9/8, and R:Reel with M:2/2 finds Reel C|.  Exact matches
+are tried first, and the C and 4/4 entries of the table are identical
+anyway, so tunes that already found a model are unaffected.  This
+covers 5 more of the rhythm/meter combinations of Paul Hardy's Session
+Tunebook (doc/programming/barfly.txt).
+
+nmodels was 39 while init_stresspat() defines 40 models, so Tango 2/4,
+the last one, could never be found, and a model added by -CSM
+overwrote it.  init_stresspat() now counts the models instead.
+
+New exit-status tests (samples/barfly_aliases.abc) check that these
+three tunes find a model.  doc/programming/barfly.txt: corrected the
+lookup description (it uses the time signature, not the key
+signature), the model count, the attribution of the tunebook survey to
+Paul Hardy, and what happens when no model matches.

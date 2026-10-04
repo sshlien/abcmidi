@@ -251,6 +251,19 @@ add_exit_status_test(
   REGEX         "Error in line-char [0-9]+-[0-9]+ : No R: in header"
 )
 
+# -BF must find a stress model despite spelling differences with the table
+# in stresspat.c (M:2/2 for C|, Slipjig for Slip Jig) and for its last
+# entry (Tango 2/4), which an off-by-one model count used to hide.  With
+# -Werror a missed lookup would exit 1.
+foreach(tune IN ITEMS 1 2 3)
+  add_exit_status_test(
+    NAME          abc2midi_bf_aliases_${tune}
+    SAMPLE        barfly_aliases.abc
+    ABC2MIDI_ARGS ${tune} -BF 2 -Werror
+    RC            0
+  )
+endforeach()
+
 # -Werror alone must not fail a tune that raises no warning.
 add_exit_status_test(
   NAME          abc2midi_werror_clean
