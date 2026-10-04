@@ -10,6 +10,11 @@
 #   ABC2MIDI, ABC2ABC, MIDI2ABC, MIDISTATS, MFTEXT, YAPS, MIDICOPY, ABCMATCH
 #            - absolute paths to the binaries (only those needed for TYPE)
 #
+# Optional variables:
+#   ABC2MIDI_TUNE, ABC2MIDI_ARGS - see abc2midi_to_mid() below
+#   ABC2MIDI_EXPECT_ERRORS       - true if abc2midi must exit 1 on SAMPLE
+#                                  instead of 0
+#
 # Behaviour:
 #   - Runs the requested binary (and any pipeline steps required to make the
 #     output diffable, e.g. mftext for binary MIDI output).
@@ -70,11 +75,14 @@ function(run_to_file outfile)
   endif()
 endfunction()
 
-# Convert ${SAMPLE} to MIDI (writing ${midfile}), aborting only if no MIDI is
-# produced.  abc2midi returns a non-zero exit code when the input ABC contains
-# errors, but it still emits a best-effort MIDI file; for golden testing we
-# want to capture that output, so a non-zero exit is tolerated as long as the
-# MIDI file is actually written.
+# Convert ${SAMPLE} to MIDI (writing ${midfile}).  abc2midi runs with
+# -Werror, and without -quiet or -silent, which would hide some messages, so
+# that any warning or error it reports on a sample fails the test: the
+# samples are kept clean.  A sample that triggers an error on purpose is
+# registered with EXPECT_ERRORS (ABC2MIDI_EXPECT_ERRORS here) and must then
+# exit 1 instead, so that the flag has to be removed once the error is gone.
+# abc2midi still writes a best-effort MIDI file in that case, which is
+# compared with the golden as usual.
 #
 # ABC2MIDI_TUNE (set by the caller, possibly empty) selects a single tune by
 # its X: reference number from a multi-tune file.  ABC2MIDI_ARGS (also possibly
@@ -84,11 +92,22 @@ function(abc2midi_to_mid)
   file(REMOVE "${midfile}")
   execute_process(
     COMMAND "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_TUNE} ${ABC2MIDI_ARGS}
-            -o "${midfile}" -quiet -silent
+            -o "${midfile}" -Werror
     RESULT_VARIABLE abc_rc
     OUTPUT_VARIABLE abc_out
     ERROR_VARIABLE  abc_err
   )
+  if(ABC2MIDI_EXPECT_ERRORS)
+    set(expected_rc 1)
+  else()
+    set(expected_rc 0)
+  endif()
+  if(NOT abc_rc STREQUAL "${expected_rc}")
+    message(FATAL_ERROR
+      "abc2midi exited with status ${abc_rc}, expected ${expected_rc}, "
+      "on ${SAMPLE} ${ABC2MIDI_TUNE} ${ABC2MIDI_ARGS}:\n"
+      "--- stdout ---\n${abc_out}\n--- stderr ---\n${abc_err}")
+  endif()
   if(NOT EXISTS "${midfile}")
     message(FATAL_ERROR
       "abc2midi produced no MIDI for ${SAMPLE} (rc=${abc_rc}):\n"

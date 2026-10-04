@@ -15994,3 +15994,12 @@ way, and [I:MIDI=program 44] became [I:MIDI program 44], so the overlay
 voice now gets its intended program.  dergasn.abc is unchanged: its
 "Sustained notes beyond end of track" error comes from the gchord
 accompaniment overrunning the short final bar, not from the abc.
+
+tests: the golden tests now run abc2midi with -Werror, and without
+-quiet and -silent, and require exit status 0, so that a new warning or
+error on a sample fails the test suite.  Since the golden tests only
+render one tune per file, a new abc2midi_clean_<sample> test renders
+every tune of every sample with -Werror.  The samples on which abc2midi
+reports an error, microtone.abc on purpose and dergasn.abc for now, are
+listed in ABC2MIDI_ERROR_SAMPLES in tests/CMakeLists.txt and must exit
+1 instead.

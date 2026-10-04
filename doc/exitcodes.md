@@ -93,7 +93,7 @@ whenever its Barfly option was enabled.
 | 0 | `main()` | Success and no error reported during parsing. |
 | 0 | `event_init()` | `-h`, or no argument at all: prints usage. |
 | 0 | `event_init()` | `-ver`: prints the version string. |
-| 1 | `main()` | At least one `event_error()` was reported while parsing, or at least one `event_warning()` with `-Werror`. A best-effort MIDI file is still written in that case, which is why `tests/run_test.cmake` tolerates a non-zero status as long as the `.mid` file exists. |
+| 1 | `main()` | At least one `event_error()` was reported while parsing, or at least one `event_warning()` with `-Werror`. A best-effort MIDI file is still written in that case. The test suite runs abc2midi with `-Werror` on its samples and requires status 0, except for the samples listed in `ABC2MIDI_ERROR_SAMPLES` in `tests/CMakeLists.txt`, which must exit 1. |
 | 1 | `event_init()` via `event_fatal_error()` | `-n` stem-length limit outside 3..252. |
 | 1 | `event_init()` via `event_fatal_error()` | `-Q` default tempo below 3 (`Enter -Q 240 not -Q 1/4=240`). |
 | 1 | `setup_trackstructure()` via `event_fatal_error()` | More than 39 tracks would be needed. |

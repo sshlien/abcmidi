@@ -1,8 +1,9 @@
 # Exit-status test runner for abc2midi.
 #
-# The golden tests deliberately ignore abc2midi's exit status (they only need
-# the best-effort MIDI file), so this runner covers what they cannot: whether
-# a run exits 0 or 1, and whether a given message was reported.
+# The golden tests check abc2midi's exit status only for the plain runs that
+# render their goldens; this runner pins it for given inputs and options,
+# can check that a given message was reported, and can render every tune of
+# a file rather than one.
 #
 # Required variables (passed via -D on the cmake command line):
 #   ABC2MIDI     - absolute path to the abc2midi binary
@@ -14,6 +15,8 @@
 # Optional variables:
 #   ABC2MIDI_ARGS   - extra arguments (CMake list), e.g. "1;-BF;2;-Werror"
 #   EXPECTED_REGEX  - regular expression that stdout must match
+#   ALL_TUNES       - true to render every tune of SAMPLE instead of only the
+#                     first (or selected) one
 
 cmake_minimum_required(VERSION 3.14)
 
@@ -24,17 +27,33 @@ if(NOT ABC2MIDI OR NOT SAMPLE OR NOT TMPDIR OR NOT NAME
 endif()
 
 file(MAKE_DIRECTORY "${TMPDIR}")
-set(midfile "${TMPDIR}/${NAME}.mid")
+
+if(ALL_TUNES)
+  # Without -o abc2midi writes one <stem>N.mid per tune next to its input,
+  # so it runs on a copy of the sample in a directory of its own.
+  set(workdir "${TMPDIR}/${NAME}")
+  file(REMOVE_RECURSE "${workdir}")
+  file(MAKE_DIRECTORY "${workdir}")
+  file(COPY "${SAMPLE}" DESTINATION "${workdir}")
+  get_filename_component(input "${SAMPLE}" NAME)
+  set(command "${ABC2MIDI}" "${input}" ${ABC2MIDI_ARGS})
+else()
+  set(workdir "${TMPDIR}")
+  set(midfile "${TMPDIR}/${NAME}.mid")
+  set(command "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_ARGS} -o "${midfile}")
+endif()
 
 execute_process(
-  COMMAND "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_ARGS} -o "${midfile}"
+  COMMAND ${command}
+  WORKING_DIRECTORY "${workdir}"
   RESULT_VARIABLE rc
   OUTPUT_VARIABLE out
   ERROR_VARIABLE  err
 )
 
+string(REPLACE ";" " " command_line "${command}")
 set(details
-  "  ${ABC2MIDI} ${SAMPLE} ${ABC2MIDI_ARGS} -o ${midfile}\n"
+  "  (in ${workdir}) ${command_line}\n"
   "--- stdout ---\n${out}\n--- stderr ---\n${err}")
 
 if(NOT rc STREQUAL "${EXPECTED_RC}")
@@ -45,7 +64,12 @@ if(EXPECTED_REGEX AND NOT out MATCHES "${EXPECTED_REGEX}")
   message(FATAL_ERROR "stdout does not match '${EXPECTED_REGEX}':\n" ${details})
 endif()
 
-# Whatever the status, abc2midi must still write its best-effort MIDI file.
-if(NOT EXISTS "${midfile}")
+# Whatever the status, abc2midi must still write its best-effort MIDI output.
+if(ALL_TUNES)
+  file(GLOB midfiles "${workdir}/*.mid")
+  if(NOT midfiles)
+    message(FATAL_ERROR "abc2midi produced no MIDI file:\n" ${details})
+  endif()
+elseif(NOT EXISTS "${midfile}")
   message(FATAL_ERROR "abc2midi produced no MIDI file:\n" ${details})
 endif()
