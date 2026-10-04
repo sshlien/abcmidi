@@ -1,6 +1,6 @@
 # abcmidi test suite
 #
-# Two layers of tests:
+# Three layers of tests:
 #
 #   1. Smoke tests   - every binary runs with -ver and exits cleanly.
 #                      Catches link errors, missing libraries, trivial crashes.
@@ -9,7 +9,13 @@
 #                      is compared with a checked-in reference file.  Binary
 #                      MIDI outputs are first piped through mftext to produce
 #                      diffable text.  Volatile lines (version banners, dates,
-#                      tmpdir paths) are stripped before comparison.
+#                      tmpdir paths) are stripped before comparison.  abc2midi
+#                      runs with -Werror and must exit 0, so the samples stay
+#                      free of warnings and errors.
+#
+#   3. Exit-status tests - abc2midi's exit status and messages on specific
+#                      inputs and options, and every tune of every sample
+#                      rendered with -Werror.
 #
 # To regenerate golden files after an intentional change:
 #
@@ -51,8 +57,11 @@ endforeach()
 # multi-tune sample file (abc2midi/mftext/midistats/midi2abc/midicopy paths).
 # Combine with NAME to give each tune-level test a distinct name, e.g.
 # NAME abc2midi_demo_5 TUNE 5.
+#
+# Option EXPECT_ERRORS is for a sample on which abc2midi reports errors: it
+# must then exit 1 instead of 0 (see ABC2MIDI_ERROR_SAMPLES below).
 function(add_golden_test)
-  cmake_parse_arguments(T "" "TYPE;SAMPLE;NAME;TUNE" "ABC2MIDI_ARGS" ${ARGN})
+  cmake_parse_arguments(T "EXPECT_ERRORS" "TYPE;SAMPLE;NAME;TUNE" "ABC2MIDI_ARGS" ${ARGN})
 
   if(T_NAME)
     set(test_name "${T_NAME}")
@@ -70,6 +79,7 @@ function(add_golden_test)
       -DTMPDIR=${TEST_TMPDIR}
       "-DABC2MIDI_ARGS=${T_ABC2MIDI_ARGS}"
       "-DABC2MIDI_TUNE=${T_TUNE}"
+      -DABC2MIDI_EXPECT_ERRORS=${T_EXPECT_ERRORS}
       ${BINARY_DEFS}
       -P "${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake"
   )
@@ -84,6 +94,14 @@ endfunction()
 foreach(type IN ITEMS abc2midi abc2abc midi2abc midistats mftext yaps midicopy abcmatch)
   add_golden_test(TYPE ${type} SAMPLE coleraine.abc)
 endforeach()
+
+# Samples on which abc2midi reports errors, so that their abc2midi runs must
+# exit 1 rather than 0.  Remove a sample from this list once its error is
+# fixed (the test then fails, as a reminder).
+#   microtone.abc - an invalid K: microtone, on purpose (regression guard)
+#   dergasn.abc   - the gchord accompaniment overruns the short final bar:
+#                   "Sustained notes beyond end of track"
+set(ABC2MIDI_ERROR_SAMPLES microtone.abc dergasn.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering
@@ -101,7 +119,11 @@ set(EXTRA_SAMPLES
   words.abc
 )
 foreach(sample IN LISTS EXTRA_SAMPLES)
-  add_golden_test(TYPE abc2midi SAMPLE ${sample})
+  if(sample IN_LIST ABC2MIDI_ERROR_SAMPLES)
+    add_golden_test(TYPE abc2midi SAMPLE ${sample} EXPECT_ERRORS)
+  else()
+    add_golden_test(TYPE abc2midi SAMPLE ${sample})
+  endif()
   add_golden_test(TYPE abc2abc  SAMPLE ${sample})
 endforeach()
 
@@ -173,7 +195,7 @@ add_golden_test(TYPE abc2midi SAMPLE beatstring.abc)
 # rejected as an invalid microtone (see samples/microtone.abc).  Like the
 # beatstring guard above, its value is under the sanitizer build, where the
 # pre-fix overflow aborts abc2midi.
-add_golden_test(TYPE abc2midi SAMPLE microtone.abc)
+add_golden_test(TYPE abc2midi SAMPLE microtone.abc EXPECT_ERRORS)
 
 # Regression test for the pitchof_b() global-buffer-overflow: under a detune
 # temperament an accidental can push a note's semitone offset outside 0..11
@@ -196,13 +218,14 @@ add_golden_test(
 
 # --- Exit-status tests ---
 #
-# The golden tests above tolerate any abc2midi exit status, so the status
-# itself is pinned here.  Test names start with "abc2midi_" so that the CI
+# These pin abc2midi's exit status, and optionally its messages, for given
+# inputs and options.  Test names start with "abc2midi_" so that the CI
 # per-tool job (ctest -R '^(...|abc2midi_)') runs them too.
 #
 # Optional REGEX is a regular expression that abc2midi's stdout must match.
+# Option ALL_TUNES renders every tune of the sample (no -o) instead of one.
 function(add_exit_status_test)
-  cmake_parse_arguments(T "" "NAME;SAMPLE;RC;REGEX" "ABC2MIDI_ARGS" ${ARGN})
+  cmake_parse_arguments(T "ALL_TUNES" "NAME;SAMPLE;RC;REGEX" "ABC2MIDI_ARGS" ${ARGN})
   add_test(
     NAME "${T_NAME}"
     COMMAND "${CMAKE_COMMAND}"
@@ -211,6 +234,7 @@ function(add_exit_status_test)
       -DTMPDIR=${TEST_TMPDIR}
       -DNAME=${T_NAME}
       -DEXPECTED_RC=${T_RC}
+      -DALL_TUNES=${T_ALL_TUNES}
       "-DEXPECTED_REGEX=${T_REGEX}"
       "-DABC2MIDI_ARGS=${T_ABC2MIDI_ARGS}"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/run_exit_status.cmake"
@@ -271,6 +295,27 @@ add_exit_status_test(
   ABC2MIDI_ARGS -Werror
   RC            0
 )
+
+# Every tune of every sample must be free of warnings and errors: the golden
+# tests only render the tune they select (with -o, the first one by default),
+# so this renders whole files.  New samples are picked up when CMake is
+# re-run.
+file(GLOB all_samples RELATIVE "${SAMPLES_DIR}" "${SAMPLES_DIR}/*.abc")
+foreach(sample IN LISTS all_samples)
+  get_filename_component(stem "${sample}" NAME_WE)
+  if(sample IN_LIST ABC2MIDI_ERROR_SAMPLES)
+    set(rc 1)
+  else()
+    set(rc 0)
+  endif()
+  add_exit_status_test(
+    NAME          abc2midi_clean_${stem}
+    SAMPLE        ${sample}
+    ABC2MIDI_ARGS -Werror
+    RC            ${rc}
+    ALL_TUNES
+  )
+endforeach()
 
 # --- Regenerate-golden convenience target ---
 #
