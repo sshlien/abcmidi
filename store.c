@@ -1832,6 +1832,19 @@ static void textfeature(int type, char *s)
   };
 }
 
+static void free_texts()
+/* frees the strings stored by textfeature().  %%MIDI lines in tunes
+ * that are not selected also store strings, so this is called wherever
+ * ntexts is reset, instead of only after a tune is written [RK] 2026-10-04 */
+{
+  int i;
+
+  for (i=0; i<ntexts; i++) {
+    free(atext[i]);
+  };
+  ntexts = 0;
+}
+
 void event_comment(char *s)
 /* comment found in abc */
 {
@@ -5748,7 +5761,7 @@ static void startfile()
   global.default_length = -1;
   event_tempo(default_tempo, 1, 4, 0, NULL, NULL);
   notes = 0;
-  ntexts = 0;
+  free_texts(); /* [RK] 2026-10-04 */
   gfact_num = 1;
   gfact_denom = 4;
   hornpipe = 0;
@@ -6202,9 +6215,7 @@ static void finishfile()
 #endif /* __MACINTOSH__ */
 
     };
-    for (i=0; i<ntexts; i++) {
-      free(atext[i]);
-    };
+    free_texts(); /* [RK] 2026-10-04 */
     for (i=0; i<wcount; i++) {
       free(words[i]);
     };
@@ -6299,6 +6310,8 @@ void event_eof()
   free(num);
   free(denom);
   free(feature);
+  free_texts(); /* left by tunes after the selected one [RK] 2026-10-04 */
+  free(atext);
   free(words);
   free(outname);
   free(outbase);

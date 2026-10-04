@@ -15962,3 +15962,14 @@ three tunes find a model.  doc/programming/barfly.txt: corrected the
 lookup description (it uses the time signature, not the key
 signature), the model count, the attribution of the tunebook survey to
 Paul Hardy, and what happens when no model matches.
+
+October 4 2026 [RK]
+
+abc2midi: when one tune is rendered (selected by its reference number,
+or the first one with -o), the %%MIDI lines of the other tunes still
+store their text.  For the tunes before it, the pointers were lost when
+the selected tune started, leaking the strings; those after it were
+never freed.  The texts are now freed wherever their count is reset
+(free_texts() in store.c) and at the end of the file.  The sanitize CI
+job did not catch it: LeakSanitizer reports at exit, after the MIDI
+file is written, and the golden tests ignored abc2midi's exit status.
