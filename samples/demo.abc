@@ -194,7 +194,7 @@ L:1/8
 % adapted from http://anamnese.online.fr/iran/persianm.abc
 % see http://anamnese.online.fr/iran/persian_music.html for more info
 Q:1/4=135
-M:4/4
+M:none
 K:C
 %%MIDI program 111
 d _/e g f _/e d c _B  A G A d2 {c}_B2 {A}G2 |
@@ -222,7 +222,7 @@ P:A
 "G"(d/2=c/2B/2A/2) =Ge/2d/2|
 "A"cA AE|"A"A/2B/2c/2d/2 e2|"A"(f/2e/2d/2c/2) "E7"(e/2f/2e/2d/2)|"A"cA A:|
 P:B
-c/2d/2|"A"ea ca|"A"e/2f/2e/2c/2 AB/2=c/2|"G"d=g Bg|"G"d/2e/2d/2B/2 =Gc/2d/2|
+|:c/2d/2|"A"ea ca|"A"e/2f/2e/2c/2 AB/2=c/2|"G"d=g Bg|"G"d/2e/2d/2B/2 =Gc/2d/2|
 "A"ea ca|"A"e/2f/2e/2c/2 AB/2c/2|"E7"(d/2c/2B/2A/2) (G/2B/2e/2d/2)|"A"cA A:|
 
 
@@ -273,7 +273,7 @@ V:2
 [^F,,E,,]/[^F,,E,,]/[D,,^F,,]/[D,,^F,,]/ ^F,,F,, z4|^F,,E,,E,,^F,,z4|\
 [^F,,E,,]/[^F,,E,,]/[D,,^F,,]/[D,,^F,,]/ ^F,,F,, z4|D,,D,,D,,^F,,z4|
 [^F,,E,,]/[^F,,E,,]/[D,,^F,,]/[D,,^F,,]/ ^F,,F,, z4|^F,,D,,D,,^F,,z4|\
-[^F,,E,,]/[^F,,E,,]/[D,,^F,,]/[D,,^F,,]/ ^F,,E,, z4|E,,^F,,B,,,4|
+[^F,,E,,]/[^F,,E,,]/[D,,^F,,]/[D,,^F,,]/ ^F,,E,, z4|E,,^F,,B,,,4||
 
 
 

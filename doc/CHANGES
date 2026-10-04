@@ -15973,3 +15973,24 @@ never freed.  The texts are now freed wherever their count is reset
 (free_texts() in store.c) and at the end of the file.  The sanitize CI
 job did not catch it: LeakSanitizer reports at exit, after the MIDI
 file is written, and the golden tests ignored abc2midi's exit status.
+
+samples: fixed the abc errors that abc2midi reported in the sample files,
+so that they run cleanly with -Werror.  baym_rebin.abc: the key
+signature modifiers were glued to the tonic (K: C^f^c^a, parsed as an
+unknown mode and ignored), so the tune played F, C and A natural instead
+of the intended E Ukrainian Dorian; they are now separate words
+(K: C ^f ^c ^a), and the drum voice, which stopped after two of the
+three repeated sections, has its third section.  daramud.abc and the
+same tune in demo.abc (X:9): the Persian daramad is unmetered, so
+M:4/4 became M:none instead of reporting every bar as too long.
+demo.abc X:10: explicit |: at the start of part B instead of letting
+abc2midi guess the repeat (same MIDI).  demo.abc X:12: the drum voice
+ends with || like the melody, so its short last bar is accepted (same
+MIDI).  temperament.abc: the ;-separated annotations such as
+"^Pure;major;chord" were split by abc2midi into an annotation followed
+by the chord symbols "major" and "chord"; they are now consecutive
+annotations ("^Pure""^major""^chord"), which abc 2.1 stacks the same
+way, and [I:MIDI=program 44] became [I:MIDI program 44], so the overlay
+voice now gets its intended program.  dergasn.abc is unchanged: its
+"Sustained notes beyond end of track" error comes from the gchord
+accompaniment overrunning the short final bar, not from the abc.

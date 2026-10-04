@@ -4,7 +4,7 @@ T: At the Rabbi's Table
 Z: John Chambers <jc:trillian.mit.edu>
 M: 2/4
 L: 1/16
-K: C^f^c^a 
+K: C ^f ^c ^a
 Q:1/4=80
 V:1
 %%MIDI program 65 %alto sax
@@ -24,6 +24,23 @@ FE \
 V: drum
 %%MIDI channel 10
 zz |: D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,D,,D,, D,D,,D,, ^G,,^G,, |
+ D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,D,,D,, D,D,,D,, ^G,,^G,, |
+ D,D,,D,, D,D,,D,, D,^G,,  |
+ |D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,D,,D,, D,D,,D,, ^G,,^G,, |
+ D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,^G,,^G,, D,D,,D,, ^G,,D,, |
+ D,D,,D,, D,D,,D,, ^G,,^G,, |
+ D,D,,D,, D,D,,D,, D,^G,,  :|
+%
+|: D,^G,,^G,, D,D,,D,, ^G,,D,, |
  D,^G,,^G,, D,D,,D,, ^G,,D,, |
  D,^G,,^G,, D,D,,D,, ^G,,D,, |
  D,D,,D,, D,D,,D,, ^G,,^G,, |

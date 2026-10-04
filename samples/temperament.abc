@@ -30,13 +30,13 @@ V:1
 %%MIDI program 17
 %%MIDI temperamentlinear 1200 702 %% Pythagorian tunings
 %%MIDI makechordchannels 3
-"^Pure;major;chord"\
+"^Pure""^major""^chord"\
 [C_22/100EG]8 y |\
-"^Pythagorian;major;chord"\
+"^Pythagorian""^major""^chord"\
 [CEG]8 y ||\
-"^Pure;4:5:6:7;chord"\
+"^Pure""^4:5:6:7""^chord"\
 [C_22/100EG_141/100B]8 y |\
-"^Pythagorean;7-chord"\
+"^Pythagorean""^7-chord"\
 [CEG_B]8 y ||
 
 %%newpage
@@ -98,7 +98,7 @@ V:1
 %%text \%\%MIDI temperamentequal 7 1200 4 \% N.B.: fifth = 4 steps
 %%MIDI temperamentequal 7 1200 4 % N.B.: fifth = 4 steps
 "^Octave divided in 7 equal parts"\
-c d e f g a b c' & [I:MIDI=program 44] C8 | [CEGc]2 z |
+c d e f g a b c' & [I:MIDI program 44] C8 | [CEGc]2 z |
 %
 %%text \%\%MIDI temperamentequal 17
 %%MIDI temperamentequal 17
