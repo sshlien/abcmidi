@@ -1,0 +1,24 @@
+% Exit status of abc2midi -BF (Barfly stress model) when no stress model
+% applies.  Tune 1 is a rhythm/meter pair with no built-in model ("Polka" in
+% 2/2, as reported in EasyABC ticket #81); tune 2 has no R: field at all.
+% Both are valid abc: abc2midi renders them without stress and reports a
+% warning, so the exit status is 0.  It used to report an error, and since
+% abc2midi started returning 1 on errors, EasyABC refused to play such tunes
+% whenever its Barfly option was enabled.  With -Werror the warning becomes
+% an error again and the exit status is 1.
+X:1
+T:Polka in 2/2
+C:abc2midi test
+R:Polka
+M:2/2
+L:1/8
+K:G
+GABc d2B2|c2A2 B2G2|
+
+X:2
+T:No rhythm
+C:abc2midi test
+M:6/8
+L:1/8
+K:ADor
+EAA A2B|cBA BAG|

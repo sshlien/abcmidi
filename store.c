@@ -297,6 +297,7 @@ int bend = 8192; /* [SS] 2012-04-01 */
 int comma53 = 0; /* [SS] 2014-01-12 */
 int silent = 0; /* [SS] 2014-10-16 */
 int error_count = 0; /* number of errors reported by event_error() [RK] 2026-03-30 */
+int warnings_as_errors = 0; /* -Werror: report event_warning() as event_error() [RK] 2026-10-03 */
 int no_more_free_channels; /* [SS] 2015-03-23 */
 void init_p48toc53 (); /* [SS] 2014-01-12 */ 
 void convert_to_comma53 (char acc, int *midipitch, int* midibend);  
@@ -893,6 +894,13 @@ void event_init(int argc, char *argv[], char **filename)
   } else {
     check = 0;
   };
+  /* parsed first so that warnings issued while parsing the options are
+   * also turned into errors [RK] 2026-10-03 */
+  if (getarg("-Werror", argc, argv) != -1) {
+    warnings_as_errors = 1;
+  } else {
+    warnings_as_errors = 0;
+  };
   /* disable repeat checking because abc2midi does its own workaround
    * attempting to fix various repeat errors.
    */
@@ -1044,7 +1052,7 @@ void event_init(int argc, char *argv[], char **filename)
     printf("abc2midi version %s\n",VERSION);
     printf("Usage : abc2midi <abc file> [reference number] [-c] [-v] ");
     printf("[-o filename]\n");
-    printf("        [-t] [-n <value>] [-CS] [-NFNP] [-NCOM] [-NFER] [-NGRA] [-NGUI] [-HARP] [-PMAR]\n");
+    printf("        [-t] [-n <value>] [-CS] [-NFNP] [-NCOM] [-NFER] [-NGRA] [-NGUI] [-HARP] [-PMAR] [-Werror]\n");
     printf("        [reference number] selects a tune\n");
     printf("        -c  selects checking only\n");
     printf("        -v  selects verbose option\n");
@@ -1055,6 +1063,7 @@ void event_init(int argc, char *argv[], char **filename)
     printf("        -CS use 2:1 instead of 3:1 for broken rhythms\n"); /* [SS] 2016-01-02 */
     printf("        -quiet suppress some common warnings\n");
     printf("        -silent suppresses most messages\n");
+    printf("        -Werror report warnings as errors (exit status 1)\n"); /* [RK] 2026-10-03 */
     printf("        -Q default tempo (quarter notes/minute)\n");
     printf("        -NFNP don't process !p! or !f!-like fields\n");
     printf("        -NCOM suppress comments in output MIDI file\n");
@@ -1563,6 +1572,10 @@ void event_error(char *s)
 void event_warning(char *s)
 /* generic warning handler - for flagging possible errors */
 {
+  if (warnings_as_errors) { /* [RK] 2026-10-03 */
+    event_error(s);
+    return;
+  };
 #ifdef NOFTELL
   extern int nullpass;
 
@@ -5643,15 +5656,19 @@ static void apply_bf_stress_factors () {
   if (verbose) 
       printf("rhythmdesignator = %s\n",rhythmdesignator);
 
+  /* -BF only applies a stress model "if possible": a tune without a
+   * known R: is valid abc and is still rendered, just without stress,
+   * so these are warnings, not errors affecting the exit status
+   * [RK] 2026-10-03 */
   if (stress_pattern_loaded == 0) {
     if (rhythmdesignator[0] == '\0') {
-      event_error("No R: in header, cannot apply Barfly model without %%MIDI ptstress");
+      event_warning("No R: in header, cannot apply Barfly model without %%MIDI ptstress");
       return;
       }
     j = load_stress_parameters(rhythmdesignator);
     /* [SS] 2015-12-31 */
     if (j < 0 && beatmodel == 0) { /* [SS] 2018-04-16 */
-       event_error("invalid R: designator");
+       event_warning("invalid R: designator");
        return;
        }
     }
