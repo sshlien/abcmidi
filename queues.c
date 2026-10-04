@@ -65,6 +65,7 @@ extern int controldata[MAXLAYERS][256]; /* extended to 256 2015-10-03 */
 extern int controlnvals[MAXLAYERS];
 extern int controldefaults[128]; /* [SS] 2015-08-10 */
 extern int nlayers; /* [SS] 2015-08-20 */
+extern int noteson; /* from genmidi.c, 0 on accompaniment tracks [RK] 2026-10-04 */
 
 void set_control_defaults() {
     int i;
@@ -153,6 +154,24 @@ void clearQ()
 {
   int time;
   int i;
+
+  /* [RK] 2026-10-04 an accompaniment (gchord, drum or drone) track ends
+   * with the music.  When a tune ends on a short bar, its pattern may
+   * still be sounding: cut those notes off now instead of extending the
+   * track beyond the music ("Sustained notes beyond end of track"). */
+  if (!noteson) {
+    while (Qhead != -1) {
+      if (Q[Qhead].pitch != -1) {
+        midi_noteoff(delta_time, Q[Qhead].pitch, Q[Qhead].chan);
+        tracklen = tracklen + delta_time;
+        delta_time = 0L;
+      };
+      i = Qhead;
+      Qhead = Q[i].next;
+      Q[i].next = freehead;
+      freehead = i;
+    };
+  };
 
   /* remove gchord requests */
   time = 0;

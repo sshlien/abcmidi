@@ -99,9 +99,7 @@ endforeach()
 # exit 1 rather than 0.  Remove a sample from this list once its error is
 # fixed (the test then fails, as a reminder).
 #   microtone.abc - an invalid K: microtone, on purpose (regression guard)
-#   dergasn.abc   - the gchord accompaniment overruns the short final bar:
-#                   "Sustained notes beyond end of track"
-set(ABC2MIDI_ERROR_SAMPLES microtone.abc dergasn.abc)
+set(ABC2MIDI_ERROR_SAMPLES microtone.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering

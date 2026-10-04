@@ -16003,3 +16003,16 @@ every tune of every sample with -Werror.  The samples on which abc2midi
 reports an error, microtone.abc on purpose and dergasn.abc for now, are
 listed in ABC2MIDI_ERROR_SAMPLES in tests/CMakeLists.txt and must exit
 1 instead.
+
+October 4 2026 [RK]
+
+abc2midi: an accompaniment track (gchord, drum or drone) now ends with
+the music.  When a tune ends on a short bar, e.g. one that completes an
+anacrusis, the accompaniment pattern could still be sounding at the end
+of the track; clearQ() in queues.c then reported "Sustained notes beyond
+end of track" as an error and let the notes run on, making the track
+longer than the others ("Track N is ... quarter notes long not ...").
+Those notes are now cut off at the end of the music, without a message.
+Melody tracks are unchanged.  samples/dergasn.abc, whose gchord pattern
+overran its final 3/16 bar, is now rendered without errors and is no
+longer listed in ABC2MIDI_ERROR_SAMPLES in tests/CMakeLists.txt.
