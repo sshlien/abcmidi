@@ -320,6 +320,7 @@ Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <note track>
+Time=1  Program, chan=5 program=44
 Time=1  Pitchbend, chan=5 msb=77 lsb=91
 Time=1  Note on, chan=5 pitch=60 vol=105
 Time=7680  Note off, chan=5 pitch=60 vol=0

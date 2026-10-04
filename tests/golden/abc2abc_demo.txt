@@ -203,16 +203,12 @@ L:1/8
 % adapted from http://anamnese.online.fr/iran/persianm.abc
 % see http://anamnese.online.fr/iran/persian_music.html for more info
 Q:1/4=135
-M:4/4
+M:none
 K:C
 %%MIDI program 111
 d e g f e d c _B A G A d2 {c}_B2 {A}G2 |
-G A c _B A G F E D E F G A c {_B} A2 {G} F4 
-%Error : Bar 1 is 5/2 not 4/4
-|
-FFF A2 G2 {F} EEE G2 F2 {E} DDDF2 E2
-%Error : Bar 2 is 21/8 not 4/4
-| 
+G A c _B A G F E D E F G A c {_B} A2 {G} F4 |
+FFF A2 G2 {F} EEE G2 F2 {E} DDDF2 E2| 
 
 %using the %%MIDI trim command to distinguish slurs
 X:10
@@ -236,10 +232,8 @@ P:A
 %Warning : Missing repeat at start ? Unexpected :| found
 "A"cA A:|
 P:B
-c/2d/2|"A"ea ca|"A"e/2f/2e/2c/2 AB/2=c/2|"G"d=g Bg|"G"d/2e/2d/2B/2 =Gc/2d/2|
-"A"ea ca|"A"e/2f/2e/2c/2 AB/2c/2|"E7"(d/2c/2B/2A/2) (G/2B/2e/2d/2)|
-%Warning : Unexpected :| found
-"A"cA A:|
+|:c/2d/2|"A"ea ca|"A"e/2f/2e/2c/2 AB/2=c/2|"G"d=g Bg|"G"d/2e/2d/2B/2 =Gc/2d/2|
+"A"ea ca|"A"e/2f/2e/2c/2 AB/2c/2|"E7"(d/2c/2B/2A/2) (G/2B/2e/2d/2)|"A"cA A:|
 
 X:11
 T:Linear Temperament
@@ -279,16 +273,12 @@ Q:1/4=144
 K:Dm
 V:1
 "Dm"D2DE DCA,C|"Dm"DCDE F2"C7"FA|"F"c2cd A2GF|"C"ECCC C2"A7"FE|
-"Dm"D2DE DCA,C|"Dm"DCDE F2"C7"FG|"F"ABcA "A7"GFEF|"Dm"E2"Gm"D2 "Dm"D2
-%Error : Bar 7 is 3/4 not 4/4
-||
+"Dm"D2DE DCA,C|"Dm"DCDE F2"C7"FG|"F"ABcA "A7"GFEF|"Dm"E2"Gm"D2 "Dm"D2||
 V:2
 %%MIDI channel 10
 %%MIDI chordattack 50
 [^F,,E,,]/2[^F,,E,,]/2[D,,^F,,]/2[D,,^F,,]/2 ^F,,F,, z4|^F,,E,,E,,^F,,z4|\
 [^F,,E,,]/2[^F,,E,,]/2[D,,^F,,]/2[D,,^F,,]/2 ^F,,F,, z4|D,,D,,D,,^F,,z4|
 [^F,,E,,]/2[^F,,E,,]/2[D,,^F,,]/2[D,,^F,,]/2 ^F,,F,, z4|^F,,D,,D,,^F,,z4|\
-[^F,,E,,]/2[^F,,E,,]/2[D,,^F,,]/2[D,,^F,,]/2 ^F,,E,, z4|E,,^F,,B,,,4
-%Error : Bar 15 is 3/4 not 4/4
-|
+[^F,,E,,]/2[^F,,E,,]/2[D,,^F,,]/2[D,,^F,,]/2 ^F,,E,, z4|E,,^F,,B,,,4||
 
