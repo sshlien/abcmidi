@@ -516,7 +516,7 @@ void set_drums(char *s)
 static void checkbar(int pass)
 /* check to see we have the right number of notes in the bar */
 {
-  char msg[80];
+  char msg[256]; /* was 80: overflowed when bar_num/bar_denom are large, e.g. with -BF */
   
   if (barno >= 0 && barno < 1024 && pass == 1) barloc[barno] = bar_num; /*[SS] 2021-04-26 */
   if (barchecking) {
@@ -526,13 +526,13 @@ static void checkbar(int pass)
       if ((bar_num-barsize*(bar_denom) != 0) &&
           (bar_num != 0) && ((pass == 2) || (barno != 0))) {
         /* [SS] 2014-11-17 added tracknumber */
-        sprintf(msg, "Track %d Bar %d has %d",tracknumber, barno, bar_num);
+        snprintf(msg, sizeof(msg), "Track %d Bar %d has %d",tracknumber, barno, bar_num);
         if (bar_denom != 1) {
-          sprintf(msg+strlen(msg), "/%d", bar_denom);
+          snprintf(msg+strlen(msg), sizeof(msg)-strlen(msg), "/%d", bar_denom);
         };
-        sprintf(msg+strlen(msg), " time units while the time signature has %d", barsize);
+        snprintf(msg+strlen(msg), sizeof(msg)-strlen(msg), " time units while the time signature has %d", barsize);
         if (pass == 2) {
-          strcat(msg, " in repeat");
+          strncat(msg, " in repeat", sizeof(msg)-strlen(msg)-1);
         };
         if (quiet == -1) event_warning(msg);
       };
