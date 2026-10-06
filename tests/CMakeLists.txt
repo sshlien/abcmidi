@@ -99,9 +99,11 @@ endforeach()
 # exit 1 rather than 0.  Remove a sample from this list once its error is
 # fixed (the test then fails, as a reminder).
 #   microtone.abc - an invalid K: microtone, on purpose (regression guard)
-#   barcheck_long_warning.abc - a bar of the wrong length, on purpose
-#                   (regression guard): its warning is an error with -Werror
-set(ABC2MIDI_ERROR_SAMPLES microtone.abc barcheck_long_warning.abc)
+#   barcheck_long_warning.abc, barfly_barcheck.abc - a bar of the wrong
+#                   length, on purpose (regression guards): its warning is an
+#                   error with -Werror
+set(ABC2MIDI_ERROR_SAMPLES microtone.abc barcheck_long_warning.abc
+  barfly_barcheck.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering
@@ -327,6 +329,17 @@ foreach(tune IN ITEMS 1 2 3)
     RC            0
   )
 endforeach()
+
+# With -BF 2, beat_modifier() changes the note lengths before checkbar()
+# counts them, so the bar check warning must say that its count is after the
+# stress model (see samples/barfly_barcheck.abc).
+add_exit_status_test(
+  NAME          abc2midi_bf_barcheck
+  SAMPLE        barfly_barcheck.abc
+  ABC2MIDI_ARGS -BF 2
+  RC            0
+  REGEX         "Warning in line-char [0-9]+-[0-9]+ : Track 0 Bar 3 has 4499/500 time units \\(after the -BF stress model\\) while the time signature has 6"
+)
 
 # -Werror alone must not fail a tune that raises no warning.
 add_exit_status_test(

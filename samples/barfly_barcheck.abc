@@ -1,0 +1,14 @@
+% Bar check warning with the -BF 2 (Barfly) stress model.  beat_modifier()
+% (store.c) changes the note lengths before checkbar() (genmidi.c) counts
+% them, so the last bar, 9 units long as written, is reported as 4499/500
+% units.  The warning now says that this count is after the stress model:
+% Track 0 Bar 3 has 4499/500 time units (after the -BF stress model) while
+% the time signature has 6
+X:1
+T:Barfly bar check
+C:abc2midi test
+M:6/8
+L:1/8
+R:jig
+K:D
+FAA dAA|BAB dAG|FAA dfe|dBA c3 c3|
