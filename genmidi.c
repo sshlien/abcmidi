@@ -246,6 +246,7 @@ extern struct trackstruct trackdescriptor[40]; /* trackstruct defined in genmidi
 
 /* [SS] 2011-07-04 */
 int beatmodel = 0; /* flag selecting standard or Phil's model */
+int stressed_durations = 0; /* beat_modifier() changed num[]/denom[] [RK] 2026-10-05 */
 
 /* [SS] 2012-12-12 */
 int bendvelocity = 100;
@@ -518,7 +519,7 @@ static void checkbar(int pass)
 {
   /* 80 bytes overflowed when bar_num/bar_denom are large, e.g. 4499/500
    * with -BF 2.  With 5 ints of up to 11 characters, the longest message
-   * takes 124 bytes [GR] 2026-10-05 */
+   * takes 153 bytes [GR] 2026-10-05 */
   char msg[256];
   
   if (barno >= 0 && barno < 1024 && pass == 1) barloc[barno] = bar_num; /*[SS] 2021-04-26 */
@@ -533,7 +534,10 @@ static void checkbar(int pass)
         if (bar_denom != 1) {
           snprintf(msg+strlen(msg), sizeof(msg)-strlen(msg), "/%d", bar_denom);
         };
-        snprintf(msg+strlen(msg), sizeof(msg)-strlen(msg), " time units while the time signature has %d", barsize);
+        /* with -BF 2, beat_modifier() has changed the note lengths, so the
+         * count is not the length written in the bar [RK] 2026-10-05 */
+        snprintf(msg+strlen(msg), sizeof(msg)-strlen(msg), " time units%s while the time signature has %d",
+                 stressed_durations ? " (after the -BF stress model)" : "", barsize);
         if (pass == 2) {
           strncat(msg, " in repeat", sizeof(msg)-strlen(msg)-1);
         };

@@ -5565,6 +5565,7 @@ static void fixreps()
 extern int segnum,segden,nseg; /* from genmidi.c */
 extern int ngain[32];
 extern int beatmodel;
+extern int stressed_durations; /* [RK] 2026-10-05 */
 /* [SS] 2011-08-17 */
 void fdursum_at_segment(int segposnum, int segposden, int *val_num, int *val_den);
 
@@ -5586,6 +5587,7 @@ void beat_modifier (int i)
  * its value would be 3/2 (assuming we are counting from 0).
  */
   int inchord,notecount;
+  stressed_durations = 1; /* checkbar() tells the lengths are changed [RK] 2026-10-05 */
   notecount=0;
   inchord = 0;
   start_num=0;
@@ -6170,6 +6172,7 @@ static void finishfile()
       printf("handling grace notes\n");
     };
     dograce();
+    stressed_durations = 0; /* set by beat_modifier() [RK] 2026-10-05 */
     if (barflymode) apply_bf_stress_factors (); /* [SS] 2011-08-24 */ 
     tiefix(); /* [SS] 2014-04-03 */
     if ((parts == -1) && (voicecount == 1)) {

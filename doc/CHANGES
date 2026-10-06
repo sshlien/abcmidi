@@ -16075,3 +16075,17 @@ as before.  A new golden test, abc2midi_barfly_missing_bar_lines
 (samples/barfly_missing_bar_lines.abc), renders such a reel, now the
 same as with its bar lines written.
 
+October 5 2026 [RK]
+
+abc2midi -BF 2: beat_modifier() (store.c) changes the note lengths
+before checkbar() (genmidi.c) counts them, so the bar check warning
+gave a count that is not the length written in the bar: a 9-unit bar
+in 6/8 was reported as having 4499/500 time units.  Reporting the
+written length would need a copy of the original lengths kept in step
+with every later pass that inserts, removes or changes notes, so the
+warning now says that its count is after the stress model instead:
+"Track 0 Bar 3 has 4499/500 time units (after the -BF stress model)
+while the time signature has 6".  The longest message is now 153
+bytes, still within the 256-byte buffer.  A new exit-status test,
+abc2midi_bf_barcheck (samples/barfly_barcheck.abc), checks this message.
+
