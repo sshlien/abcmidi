@@ -1,0 +1,95 @@
+Header format=0 ntrks=1 division=480
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=2  minor=0
+Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:1>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=39
+     Text = <Barfly reel with the bar lines left out>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=6
+     Text = <R:reel>
+Time=1  Note on, chan=1 pitch=66 vol=120
+Time=264  Note off, chan=1 pitch=66 vol=0
+Time=265  Note on, chan=1 pitch=69 vol=60
+Time=480  Note off, chan=1 pitch=69 vol=0
+Time=481  Note on, chan=1 pitch=69 vol=120
+Time=744  Note off, chan=1 pitch=69 vol=0
+Time=745  Note on, chan=1 pitch=71 vol=60
+Time=960  Note off, chan=1 pitch=71 vol=0
+Time=961  Note on, chan=1 pitch=69 vol=120
+Time=1224  Note off, chan=1 pitch=69 vol=0
+Time=1225  Note on, chan=1 pitch=66 vol=60
+Time=1440  Note off, chan=1 pitch=66 vol=0
+Time=1441  Note on, chan=1 pitch=64 vol=120
+Time=1704  Note off, chan=1 pitch=64 vol=0
+Time=1705  Note on, chan=1 pitch=62 vol=60
+Time=1920  Note off, chan=1 pitch=62 vol=0
+Time=1921  Note on, chan=1 pitch=66 vol=120
+Time=2184  Note off, chan=1 pitch=66 vol=0
+Time=2185  Note on, chan=1 pitch=69 vol=60
+Time=2400  Note off, chan=1 pitch=69 vol=0
+Time=2401  Note on, chan=1 pitch=69 vol=120
+Time=2664  Note off, chan=1 pitch=69 vol=0
+Time=2665  Note on, chan=1 pitch=71 vol=60
+Time=2880  Note off, chan=1 pitch=71 vol=0
+Time=2881  Note on, chan=1 pitch=74 vol=120
+Time=3360  Note off, chan=1 pitch=74 vol=0
+Time=3361  Note on, chan=1 pitch=78 vol=120
+Time=3624  Note off, chan=1 pitch=78 vol=0
+Time=3625  Note on, chan=1 pitch=76 vol=60
+Time=3840  Note off, chan=1 pitch=76 vol=0
+Time=3841  Note on, chan=1 pitch=74 vol=120
+Time=4104  Note off, chan=1 pitch=74 vol=0
+Time=4105  Note on, chan=1 pitch=71 vol=60
+Time=4320  Note off, chan=1 pitch=71 vol=0
+Time=4321  Note on, chan=1 pitch=69 vol=120
+Time=4584  Note off, chan=1 pitch=69 vol=0
+Time=4585  Note on, chan=1 pitch=66 vol=60
+Time=4800  Note off, chan=1 pitch=66 vol=0
+Time=4801  Note on, chan=1 pitch=69 vol=120
+Time=5064  Note off, chan=1 pitch=69 vol=0
+Time=5065  Note on, chan=1 pitch=71 vol=60
+Time=5280  Note off, chan=1 pitch=71 vol=0
+Time=5281  Note on, chan=1 pitch=74 vol=120
+Time=5544  Note off, chan=1 pitch=74 vol=0
+Time=5545  Note on, chan=1 pitch=76 vol=60
+Time=5760  Note off, chan=1 pitch=76 vol=0
+Time=5761  Note on, chan=1 pitch=78 vol=120
+Time=6024  Note off, chan=1 pitch=78 vol=0
+Time=6025  Note on, chan=1 pitch=74 vol=60
+Time=6240  Note off, chan=1 pitch=74 vol=0
+Time=6241  Note on, chan=1 pitch=76 vol=120
+Time=6504  Note off, chan=1 pitch=76 vol=0
+Time=6505  Note on, chan=1 pitch=73 vol=60
+Time=6720  Note off, chan=1 pitch=73 vol=0
+Time=6721  Note on, chan=1 pitch=74 vol=120
+Time=6984  Note off, chan=1 pitch=74 vol=0
+Time=6985  Note on, chan=1 pitch=71 vol=60
+Time=7200  Note off, chan=1 pitch=71 vol=0
+Time=7201  Note on, chan=1 pitch=69 vol=120
+Time=7464  Note off, chan=1 pitch=69 vol=0
+Time=7465  Note on, chan=1 pitch=66 vol=60
+Time=7680  Note off, chan=1 pitch=66 vol=0
+Time=7681  Note on, chan=1 pitch=69 vol=120
+Time=7944  Note off, chan=1 pitch=69 vol=0
+Time=7945  Note on, chan=1 pitch=71 vol=60
+Time=8160  Note off, chan=1 pitch=71 vol=0
+Time=8161  Note on, chan=1 pitch=74 vol=120
+Time=8424  Note off, chan=1 pitch=74 vol=0
+Time=8425  Note on, chan=1 pitch=76 vol=60
+Time=8640  Note off, chan=1 pitch=76 vol=0
+Time=8641  Note on, chan=1 pitch=78 vol=120
+Time=8904  Note off, chan=1 pitch=78 vol=0
+Time=8905  Note on, chan=1 pitch=74 vol=60
+Time=9120  Note off, chan=1 pitch=74 vol=0
+Time=9121  Note on, chan=1 pitch=76 vol=120
+Time=9384  Note off, chan=1 pitch=76 vol=0
+Time=9385  Note on, chan=1 pitch=74 vol=60
+Time=9600  Note off, chan=1 pitch=74 vol=0
+Time=9626  Meta event, end of track
+Track end

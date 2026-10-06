@@ -232,6 +232,19 @@ add_golden_test(
 # under the sanitizer build, where the pre-fix overflow aborts abc2midi.
 add_golden_test(TYPE abc2midi SAMPLE barcheck_long_warning.abc EXPECT_ERRORS)
 
+# Regression test for the -BF 2 stress model on a bar longer than its time
+# signature (a reel with the bar lines left out, see
+# samples/barfly_missing_bar_lines.abc): beat_modifier() read the velocities
+# past the end of ngain[] (an overflow the sanitizer build turns into a
+# failure) and fdursum_at_segment() gave negative durations from the third
+# bar on, shifting the notes that follow.  The golden equals the rendering of
+# the same reel with its bar lines.
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        barfly_missing_bar_lines.abc
+  ABC2MIDI_ARGS -BF 2
+)
+
 # Regression test for the -PMAR option (Part Marker meta-events).
 # Locks in marker emission and verifies the markers do not perturb note
 # timing or end-of-track time (bug fixed by carrying delta_time alongside

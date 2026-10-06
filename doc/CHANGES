@@ -16056,3 +16056,22 @@ As this bar is wrong on purpose, the sample is listed in
 ABC2MIDI_ERROR_SAMPLES (tests/CMakeLists.txt): with -Werror its warning
 is an error.
 
+October 5 2026 [RK]
+
+abc2midi -BF 2: the stress model went wrong on a bar longer than its
+time signature, e.g. a reel with the bar lines left out.
+beat_modifier() (store.c) took each note velocity from ngain[32] at the
+segment number of the note, 8 segments per bar of a reel: from the
+fifth bar on it read past the end of ngain[] (global-buffer-overflow
+under the sanitize build), and from the second bar on the gain read was
+0, so the notes lost the stress pattern.  The segment number now wraps
+into the following bars when it goes past nseg, as it already did in
+fdursum_at_segment() (genmidi.c).  fdursum_at_segment() itself added
+the length of only one bar to the positions past the first bar, so from
+the third bar on positions went back, some durations became negative
+and the notes that follow were shifted; it now adds one bar length for
+every whole bar.  Tunes whose bars have the right length are rendered
+as before.  A new golden test, abc2midi_barfly_missing_bar_lines
+(samples/barfly_missing_bar_lines.abc), renders such a reel, now the
+same as with its bar lines written.
+

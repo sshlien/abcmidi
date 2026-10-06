@@ -1843,7 +1843,10 @@ float val,a0,a1;
 *val_num = 0;
 inx0 = segposnum/segposden;
 if (inx0 > nseg) {
-   *val_num = *val_num + (int) ((float) 1000.0*fdursum[nseg]); /* [SS] 2015-10-08 extra parentheses */
+   /* one bar length for every whole bar before the position, not only for
+      the first one: from 2 bars on, positions went back and the durations
+      became negative [RK] 2026-10-05 */
+   *val_num = (inx0/nseg) * (int) ((float) 1000.0*fdursum[nseg]); /* [SS] 2015-10-08 extra parentheses */
     /*inx0 = inx0 - nseg;  [SS] 2013-06-07*/
     inx0 = inx0 % nseg;  /* [SS] 2013-06-07 */
    }
