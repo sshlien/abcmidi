@@ -16039,3 +16039,20 @@ mode on.  The default now applies unless a number follows (GitHub issue
 #8).  New golden test abc2midi_barfly_option (samples/barfly_option.abc)
 with a plain -BF followed by other options; its output is the same as
 with -BF 2.
+
+October 5 2026 [GR] [RK]
+
+abc2midi: stack-buffer-overflow in checkbar() (genmidi.c).  The warning
+"Track %d Bar %d has %d/%d time units while the time signature has %d
+in repeat" was built in an 80-byte buffer, too small when the length of
+a wrong bar is a fraction with large terms, as the -BF 2 stress model
+produces (e.g. 4499/500).  Gérald Ryckeboer enlarged the buffer to 256
+bytes, the longest message taking 124, and builds it with snprintf.
+A new golden test, abc2midi_barcheck_long_warning
+(samples/barcheck_long_warning.abc), reaches an 82-character message
+with incomplete tuplets rather than with -BF, so that it does not depend
+on the stress model; it fails under the sanitize build without the fix.
+As this bar is wrong on purpose, the sample is listed in
+ABC2MIDI_ERROR_SAMPLES (tests/CMakeLists.txt): with -Werror its warning
+is an error.
+

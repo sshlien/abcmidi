@@ -99,7 +99,9 @@ endforeach()
 # exit 1 rather than 0.  Remove a sample from this list once its error is
 # fixed (the test then fails, as a reminder).
 #   microtone.abc - an invalid K: microtone, on purpose (regression guard)
-set(ABC2MIDI_ERROR_SAMPLES microtone.abc)
+#   barcheck_long_warning.abc - a bar of the wrong length, on purpose
+#                   (regression guard): its warning is an error with -Werror
+set(ABC2MIDI_ERROR_SAMPLES microtone.abc barcheck_long_warning.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering
@@ -222,6 +224,13 @@ add_golden_test(
   SAMPLE        barfly_split_bar.abc
   ABC2MIDI_ARGS -BF 2
 )
+
+# Regression test for the checkbar() stack-buffer-overflow: the warning for a
+# bar of the wrong length was built in an 80-byte buffer, too small when the
+# bar length is a fraction with large terms (see
+# samples/barcheck_long_warning.abc).  Like the guards above, its value is
+# under the sanitizer build, where the pre-fix overflow aborts abc2midi.
+add_golden_test(TYPE abc2midi SAMPLE barcheck_long_warning.abc EXPECT_ERRORS)
 
 # Regression test for the -PMAR option (Part Marker meta-events).
 # Locks in marker emission and verifies the markers do not perturb note
