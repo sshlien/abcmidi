@@ -1,0 +1,21 @@
+% Regression guard for checkbar() in genmidi.c, which builds the warning
+% "Track %d Bar %d has %d/%d time units while the time signature has %d in
+% repeat" for a bar of the wrong length.  The message used to be built in an
+% 80-byte buffer, too small once the bar length is a fraction with large
+% terms.  The -BF 2 stress model produces such fractions (e.g. 4499/500), but
+% this sample gets there without it, so that the guard does not depend on
+% the stress model: the incomplete tuplets (only 2, 3, 3 and 3 of their 3,
+% 5, 7 and 11 notes) make the last bar, bar 10 counting from 0, 19207/1155
+% units long, and its warning on the second time through the repeat takes
+% 82 characters.
+% Under the sanitize build the overflow aborts abc2midi, failing this test.
+X:1
+T:Bar check warning longer than 80 characters
+C:abc2midi test
+M:12/8
+L:1/8
+K:D
+FAA dAA BAB dAG|FAA dfe dBA BAG|FAA dAA BAB dAG|FAA dfe dBA d3|
+|:dfe dfa gfe fdB|AFA dfe dBA BAG|dfe dfa gfe fdB|AFA dfe dBA d3|
+dfe dfa gfe fdB|AFA dfe dBA BAG|
+(3:2:2AB (5:4:3cde (7:4:3fga (11:8:3ABc d3 A3 A3:|

@@ -516,7 +516,10 @@ void set_drums(char *s)
 static void checkbar(int pass)
 /* check to see we have the right number of notes in the bar */
 {
-  char msg[256]; /* was 80: overflowed when bar_num/bar_denom are large, e.g. with -BF */
+  /* 80 bytes overflowed when bar_num/bar_denom are large, e.g. 4499/500
+   * with -BF 2.  With 5 ints of up to 11 characters, the longest message
+   * takes 124 bytes [GR] 2026-10-05 */
+  char msg[256];
   
   if (barno >= 0 && barno < 1024 && pass == 1) barloc[barno] = bar_num; /*[SS] 2021-04-26 */
   if (barchecking) {
