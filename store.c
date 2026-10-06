@@ -5562,7 +5562,7 @@ static void fixreps()
 
 /* Barfly stress model support functions */
 
-extern int segnum,segden; /* from genmidi.c */
+extern int segnum,segden,nseg; /* from genmidi.c */
 extern int ngain[32];
 extern int beatmodel;
 /* [SS] 2011-08-17 */
@@ -5660,6 +5660,11 @@ endseg_num,endseg_denom,mstart_num,mstart_denom,mend_num,mend_denom);
        num[i] = delta_num; 
        denom[i] = delta_denom;
        segnumber = startseg_num/startseg_denom; /* [SS] 2011-08-17 */
+       /* in a bar longer than its time signature, e.g. with bar lines left
+        * out, segnumber runs past the nseg+1 entries set in ngain[32]:
+        * wrap it into the following bars as fdursum_at_segment() does
+        * [RK] 2026-10-05 */
+       if (segnumber > nseg) segnumber = segnumber % nseg;
        stressvelocity[i] = ngain[segnumber];
          
        if (notecount == 0) {start_num = end_num;

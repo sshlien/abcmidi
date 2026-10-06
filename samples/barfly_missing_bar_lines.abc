@@ -1,0 +1,22 @@
+% Regression guard for the -BF 2 (Barfly) stress model on a bar longer than
+% its time signature, here five bars of a reel with the bar lines left out.
+% beat_modifier() (store.c) maps each note onto the segments of the stress
+% pattern, 8 per bar of a reel:
+% - the note velocities were read from ngain[32] at the segment number, so
+%   from the fifth bar on past its end (global-buffer-overflow under the
+%   sanitize build); before that, from the second bar on, the gain read was
+%   0, so the notes lost the stress pattern for the plain beat velocities;
+% - fdursum_at_segment() (genmidi.c) added the length of only one bar to
+%   the positions after the first bar, so from the third bar on, positions
+%   went back and some durations became negative, shifting all the notes
+%   that follow.
+% The stressed rendering is now the same as with the bar lines written:
+% FAAB AFED|FAAB d2fe|dBAF ABde|fdec dBAF|ABde fd ed|
+X:1
+T:Barfly reel with the bar lines left out
+C:abc2midi test
+M:4/4
+L:1/8
+R:reel
+K:D
+FAAB AFED FAAB d2fe dBAF ABde fdec dBAF ABde fd ed|
