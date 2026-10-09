@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "5.05 October 02 2026 abc2midi"
+#define VERSION "5.06 October 04 2026 abc2midi"
 
 /* enables reading V: indication in header */
 #define XTEN1 1
