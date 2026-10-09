@@ -16089,3 +16089,20 @@ while the time signature has 6".  The longest message is now 153
 bytes, still within the 256-byte buffer.  A new exit-status test,
 abc2midi_bf_barcheck (samples/barfly_barcheck.abc), checks this message.
 
+October 9 2026 [RK]
+
+abc2midi: global-buffer-overflow in dump_barloc() (genmidi.c).  With -c,
+for a tune of several tracks, abc2midi writes in barloc.txt the size of
+each bar of each track, from barloc[], which keeps the first 1024 bars
+(see Mar 18 2019 and April 26 2021).  dump_barloc() read barloc[] up to
+the number of bars of the track, past its end for a longer tune: the
+sanitize build aborts and the others dump garbage.  It now stops at 1024
+values, while its header line still gives the number of bars; the limit
+is the new constant kMaxBarLoc.  Its writer, checkbar(), had the same
+problem until 4.47 (January 24 2021), whose "&&" replaced an always true
+bound ("barno >= 0 || barno < 1024"): in 4.41 a tune of more than 1024
+bars overwrote the variables after barloc[] and crashed (GitHub
+issue #3).  A new golden test, abc2midi_barloc_long
+(samples/barloc_long.abc, two voices of 1040 bars), pins barloc.txt
+through a new barloc TYPE of tests/run_test.cmake; it fails without the
+fix in every build.

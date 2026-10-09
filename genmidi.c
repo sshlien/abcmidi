@@ -124,7 +124,8 @@ int division = DIV;
 long delta_time; /* time since last MIDI event */
 long delta_time_track0; /* [SS] 2010-06-27 */
 long tracklen, tracklen1;
-long barloc[1024]; /* [SS] 2019-03-20 */
+enum {kMaxBarLoc = 1024}; /* number of entries in barloc[] [RK] 2026-10-09 */
+long barloc[kMaxBarLoc]; /* [SS] 2019-03-20 */
 
 /* output file generation */
 extern int ntracks;
@@ -522,7 +523,7 @@ static void checkbar(int pass)
    * takes 153 bytes [GR] 2026-10-05 */
   char msg[256];
   
-  if (barno >= 0 && barno < 1024 && pass == 1) barloc[barno] = bar_num; /*[SS] 2021-04-26 */
+  if (barno >= 0 && barno < kMaxBarLoc && pass == 1) barloc[barno] = bar_num; /*[SS] 2021-04-26 */
   if (barchecking) {
     /* only generate these errors once */
     if (noteson && (partrepno == 0)) {
@@ -3580,7 +3581,10 @@ void dump_barloc (FILE *diaghandle, int trkno)
 {
 int i;
 fprintf(diaghandle,"track = %d voice = %d type = %d number of bars = %d\n",trkno,trackdescriptor[trkno].voicenum,trackdescriptor[trkno].tracktype,barno);
-for (i=0;i<barno;i++) {
+/* barloc[] keeps the first kMaxBarLoc bars only: stop there rather than
+ * read past its end, while the header above gives all the bars of the
+ * track [RK] 2026-10-09 */
+for (i=0;i<barno && i<kMaxBarLoc;i++) {
   fprintf(diaghandle,"%6.2f\t",(double) barloc[i]); /* [SS] 2021-04-26 */
   if (i%8 == 7) fprintf(diaghandle,"\n");
   }
