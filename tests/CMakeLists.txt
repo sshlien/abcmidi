@@ -8,10 +8,11 @@
 #   2. Golden tests  - each program is run on a sample input and its output
 #                      is compared with a checked-in reference file.  Binary
 #                      MIDI outputs are first piped through mftext to produce
-#                      diffable text.  Volatile lines (version banners, dates,
-#                      tmpdir paths) are stripped before comparison.  abc2midi
-#                      runs with -Werror and must exit 0, so the samples stay
-#                      free of warnings and errors.
+#                      diffable text, and abc2midi -c gives its barloc.txt
+#                      file of bar sizes.  Volatile lines (version banners,
+#                      dates, tmpdir paths) are stripped before comparison.
+#                      abc2midi runs with -Werror and must exit 0, so the
+#                      samples stay free of warnings and errors.
 #
 #   3. Exit-status tests - abc2midi's exit status and messages on specific
 #                      inputs and options, and every tune of every sample
@@ -246,6 +247,14 @@ add_golden_test(
   SAMPLE        barfly_missing_bar_lines.abc
   ABC2MIDI_ARGS -BF 2
 )
+
+# Regression test for the dump_barloc() global-buffer-overflow: with -c,
+# barloc.txt gives the bar sizes of each track from barloc[], which keeps
+# 1024 bars, but dump_barloc() used to read it up to the number of bars of
+# the track (see samples/barloc_long.abc, two voices of 1040 bars).  The
+# golden pins barloc.txt, so that the test fails without the fix in every
+# build: the sanitizer build aborts, the others dump 1040 values per track.
+add_golden_test(TYPE barloc SAMPLE barloc_long.abc NAME abc2midi_barloc_long)
 
 # Regression test for the -PMAR option (Part Marker meta-events).
 # Locks in marker emission and verifies the markers do not perturb note

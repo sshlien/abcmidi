@@ -2,7 +2,8 @@
 #
 # Required variables (passed via -D on the cmake command line):
 #   TYPE     - one of: abc2midi, abc2abc, midi2abc, midistats, mftext,
-#              yaps, midicopy, abcmatch
+#              yaps, midicopy, abcmatch, barloc (the barloc.txt that
+#              abc2midi -c writes)
 #   SAMPLE   - path to the input ABC sample file
 #   GOLDEN   - path to the golden reference file
 #   TMPDIR   - working directory for temporary outputs
@@ -167,6 +168,28 @@ elseif(TYPE STREQUAL "midicopy")
   abc2midi_to_mid()
   run_or_die("${bin}" "${midfile}" "${copied}")
   run_to_file("${raw}" "${MFTEXT}" "${copied}")
+
+elseif(TYPE STREQUAL "barloc")
+  # abc2midi -c only checks the tune and writes no MIDI file, but for a tune
+  # of several tracks it writes the size of each bar of each track in
+  # barloc.txt, in its working directory: it runs in a directory of its own.
+  set(workdir "${TMPDIR}/${tag}")
+  file(REMOVE_RECURSE "${workdir}")
+  file(MAKE_DIRECTORY "${workdir}")
+  execute_process(
+    COMMAND "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_ARGS} -c -Werror
+    WORKING_DIRECTORY "${workdir}"
+    RESULT_VARIABLE abc_rc
+    OUTPUT_VARIABLE abc_out
+    ERROR_VARIABLE  abc_err
+  )
+  if(NOT abc_rc EQUAL 0 OR NOT EXISTS "${workdir}/barloc.txt")
+    message(FATAL_ERROR
+      "abc2midi -c exited with status ${abc_rc} on ${SAMPLE}, expected 0 "
+      "and a barloc.txt:\n"
+      "--- stdout ---\n${abc_out}\n--- stderr ---\n${abc_err}")
+  endif()
+  configure_file("${workdir}/barloc.txt" "${raw}" COPYONLY)
 
 else()
   message(FATAL_ERROR "Unknown TYPE: ${TYPE}")
