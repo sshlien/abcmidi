@@ -16117,3 +16117,22 @@ dropped without a warning: K:G _/B _3/4e _3/4A said nothing about _/B
 abc2midi_key_unknown_word (samples/key_unknown_word.abc), checks the
 warning for a word followed by a clef.
 
+October 10 2026 [RK]
+
+abc2midi, abc2abc, yaps: a microtone in the key signature can now be
+written with the shortcuts of the note syntax, such as _/B for _1/2B or
+^/4F for ^1/4F.  process_microtones() (parseabc.c) read the K: modifiers
+with sscanf as n/m or n only, so in K:G _/B _3/4e _3/4A, from GitHub
+issue #10, every B played natural.  It now reads them with
+read_microtone_value(), as for a note.  A word with no note letter after
+the microtone, such as the =1 of stafflines=1, is no longer reported as
+"Not a valid microtone" from an uninitialized letter, but ignored with a
+warning, and so is =1/2B, which is not a microtone on a note either.  A
+new golden test, abc2midi_key_microtone (samples/key_microtone.abc),
+plays bars under such key signatures next to the same bars with the
+microtones written on the notes.  abcguide.txt now documents microtones
+in the key signature.  abc2abc, which cannot rewrite a microtone
+modifier, now reports "expecting A-G or a-g after accidental in key
+modifier" for the shortcuts too, as it already did for _3/4e; the K:
+line it writes is unchanged.
+
