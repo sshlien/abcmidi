@@ -3,8 +3,10 @@
 % stands for _1/2B.  process_microtones() (parseabc.c) read only the n/m
 % and n forms, so _/B was ignored and B played natural.  Each bar played
 % with the key signature is followed by the same bar with the microtones
-% written on the notes, which must play the same pitches (by rounding, a
-% flat from the key signature gets a pitch bend one unit higher).
+% and accidentals written on the notes, which must play the same pitches
+% (by rounding, a flat from the key signature gets a pitch bend one unit
+% higher).  A later K: field without a microtone for a note cancels it:
+% setmap() (store.c) used to leave the microtone in force.
 X:1
 T:Microtones in the key signature
 C:abc2midi test
@@ -13,4 +15,6 @@ L:1/4
 K:G _/B _3/4e _3/4A
 B e A G|_/B _3/4e _3/4A G|
 K:C ^/4F _//d
-F d c z|^/4F _//d c z|
+F d B e|^/4F _//d =B =e|
+K:G
+F d B A|^F =d =B =A|

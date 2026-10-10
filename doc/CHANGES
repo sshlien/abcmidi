@@ -16136,3 +16136,14 @@ modifier, now reports "expecting A-G or a-g after accidental in key
 modifier" for the shortcuts too, as it already did for _3/4e; the K:
 line it writes is unchanged.
 
+October 10 2026 [RK]
+
+abc2midi: a microtone given by a key signature modifier stayed in force
+under a later K: field without it.  After K:C _1/2B, a K:C still played
+every B half a semitone flat, whereas after K:C _B it played B natural,
+and the next tune of the same file inherited the microtone too.
+setmap() (store.c), which sets the accidentals of a key signature for
+event_key() and startfile(), did not reset the microtones; it now does.
+The golden test abc2midi_key_microtone (samples/key_microtone.abc) now
+also plays bars after K: fields that drop the microtones.
+

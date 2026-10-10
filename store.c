@@ -4737,14 +4737,19 @@ static void setmap(
 /* work out accidentals to be applied to each note */
         int sf, /* number of sharps in key signature -7 to +7 */
         char map[7],
-        int mult[7]
+        int mult[7],
+        struct fraction mic[7] /* microtones [RK] 2026-10-10 */
         )
 {
   int j;
 
+  /* [RK] 2026-10-10 the microtones are reset too: otherwise one from a K:
+     modifier stayed in force under a later K: field without it. */
   for (j=0; j<7; j++) {
     map[j] = '=';
     mult[j] = 1;
+    mic[j].num = 0;
+    mic[j].denom = 1;
   };
   if (sf >= 1) map['f'-'a'] = '^';
   if (sf >= 2) map['c'-'a'] = '^';
@@ -5761,7 +5766,7 @@ static void startfile()
   /* set up defaults */
   sf = 0;
   mi = 0;
-  setmap(0, global.basemap, global.basemul);
+  setmap(0, global.basemap, global.basemul, global.basemic);
   copymap(&global);
   global.octaveshift = 0;
   global.keyset = 0;
@@ -5933,7 +5938,7 @@ void event_key(
   if (modeindex >0 && modeindex <4) minor = 1;
   if ((dotune) && gotkey) {
     if (pastheader) {
-      if (!explict) setmap(sharps, v->basemap, v->basemul); /* [SS] 2010-05-08*/
+      if (!explict) setmap(sharps, v->basemap, v->basemul, v->basemic); /* [SS] 2010-05-08*/
       altermap(v, modmap, modmul,modmicrotone);
       copymap(v);
       addfeature(KEY, sharps, 0, minor);
@@ -5944,7 +5949,7 @@ void event_key(
       if (gottranspose) {
         addfeature(GTRANSPOSE, transpose, 0, 0);
       };
-      if (!explict) setmap(sharps, global.basemap, global.basemul); /* [SS] 2010-05-08 */
+      if (!explict) setmap(sharps, global.basemap, global.basemul, global.basemic); /* [SS] 2010-05-08 */
       altermap(&global, modmap, modmul,modmicrotone);
       global.keyset=1;
       copymap(&global);
