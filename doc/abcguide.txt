@@ -155,6 +155,14 @@ will remove the f,c and g sharps and put a b-flat instead. You may use
 both upper and lower case letters as key modifiers since they are
 distinguished by abcm2ps.
 
+A key modifier may also be a microtone, written as on a note (see
+below). For example
+
+K: G _/B _3/4e
+
+plays every B half a semitone flat and every E three quarters of a
+semitone flat, unless otherwise marked in the music.
+
 
 Another extension of the K: field is that it can include a clef specifier
 an octave specifier and a transpose specifier e.g.
