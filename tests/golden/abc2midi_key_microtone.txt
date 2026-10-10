@@ -41,8 +41,10 @@ Time=4321  Pitchbend, chan=1 msb=56 lsb=1
 Time=4321  Note on, chan=1 pitch=74 vol=80
 Time=4800  Note off, chan=1 pitch=74 vol=0
 Time=4801  Pitchbend, chan=1 msb=64 lsb=0
-Time=4801  Note on, chan=1 pitch=72 vol=95
-Time=5280  Note off, chan=1 pitch=72 vol=0
+Time=4801  Note on, chan=1 pitch=71 vol=95
+Time=5280  Note off, chan=1 pitch=71 vol=0
+Time=5281  Note on, chan=1 pitch=76 vol=80
+Time=5760  Note off, chan=1 pitch=76 vol=0
 Time=5761  Pitchbend, chan=1 msb=72 lsb=0
 Time=5761  Note on, chan=1 pitch=65 vol=105
 Time=6240  Note off, chan=1 pitch=65 vol=0
@@ -50,7 +52,26 @@ Time=6241  Pitchbend, chan=1 msb=56 lsb=0
 Time=6241  Note on, chan=1 pitch=74 vol=80
 Time=6720  Note off, chan=1 pitch=74 vol=0
 Time=6721  Pitchbend, chan=1 msb=64 lsb=0
-Time=6721  Note on, chan=1 pitch=72 vol=95
-Time=7200  Note off, chan=1 pitch=72 vol=0
-Time=7706  Meta event, end of track
+Time=6721  Note on, chan=1 pitch=71 vol=95
+Time=7200  Note off, chan=1 pitch=71 vol=0
+Time=7201  Note on, chan=1 pitch=76 vol=80
+Time=7680  Note off, chan=1 pitch=76 vol=0
+Time=7680  Key signature, sharp/flats=1  minor=0
+Time=7681  Note on, chan=1 pitch=66 vol=105
+Time=8160  Note off, chan=1 pitch=66 vol=0
+Time=8161  Note on, chan=1 pitch=74 vol=80
+Time=8640  Note off, chan=1 pitch=74 vol=0
+Time=8641  Note on, chan=1 pitch=71 vol=95
+Time=9120  Note off, chan=1 pitch=71 vol=0
+Time=9121  Note on, chan=1 pitch=69 vol=80
+Time=9600  Note off, chan=1 pitch=69 vol=0
+Time=9601  Note on, chan=1 pitch=66 vol=105
+Time=10080  Note off, chan=1 pitch=66 vol=0
+Time=10081  Note on, chan=1 pitch=74 vol=80
+Time=10560  Note off, chan=1 pitch=74 vol=0
+Time=10561  Note on, chan=1 pitch=71 vol=95
+Time=11040  Note off, chan=1 pitch=71 vol=0
+Time=11041  Note on, chan=1 pitch=69 vol=80
+Time=11520  Note off, chan=1 pitch=69 vol=0
+Time=11546  Meta event, end of track
 Track end
