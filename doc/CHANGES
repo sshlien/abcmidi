@@ -16089,3 +16089,74 @@ while the time signature has 6".  The longest message is now 153
 bytes, still within the 256-byte buffer.  A new exit-status test,
 abc2midi_bf_barcheck (samples/barfly_barcheck.abc), checks this message.
 
+October 9 2026 [RK]
+
+abc2midi: global-buffer-overflow in dump_barloc() (genmidi.c).  With -c,
+for a tune of several tracks, abc2midi writes in barloc.txt the size of
+each bar of each track, from barloc[], which keeps the first 1024 bars
+(see Mar 18 2019 and April 26 2021).  dump_barloc() read barloc[] up to
+the number of bars of the track, past its end for a longer tune: the
+sanitize build aborts and the others dump garbage.  It now stops at 1024
+values, while its header line still gives the number of bars; the limit
+is the new constant kMaxBarLoc.  Its writer, checkbar(), had the same
+problem until 4.47 (January 24 2021), whose "&&" replaced an always true
+bound ("barno >= 0 || barno < 1024"): in 4.41 a tune of more than 1024
+bars overwrote the variables after barloc[] and crashed (GitHub
+issue #3).  A new golden test, abc2midi_barloc_long
+(samples/barloc_long.abc, two voices of 1040 bars), pins barloc.txt
+through a new barloc TYPE of tests/run_test.cmake; it fails without the
+fix in every build.
+
+October 10 2026 [RK]
+
+abc2midi, abc2abc, yaps: parsekey() (parseabc.c) warned "Ignoring string
+'%s' in K: field" only for the last word of the field, as the check came
+after its loop over the words, so any other word it could not parse was
+dropped without a warning: K:G _/B _3/4e _3/4A said nothing about _/B
+(GitHub issue #10).  Every word is now checked.  A new exit-status test,
+abc2midi_key_unknown_word (samples/key_unknown_word.abc), checks the
+warning for a word followed by a clef.
+
+October 10 2026 [RK]
+
+abc2midi, abc2abc, yaps: a microtone in the key signature can now be
+written with the shortcuts of the note syntax, such as _/B for _1/2B or
+^/4F for ^1/4F.  process_microtones() (parseabc.c) read the K: modifiers
+with sscanf as n/m or n only, so in K:G _/B _3/4e _3/4A, from GitHub
+issue #10, every B played natural.  It now reads them with
+read_microtone_value(), as for a note.  A word with no note letter after
+the microtone, such as the =1 of stafflines=1, is no longer reported as
+"Not a valid microtone" from an uninitialized letter, but ignored with a
+warning, and so is =1/2B, which is not a microtone on a note either.  A
+new golden test, abc2midi_key_microtone (samples/key_microtone.abc),
+plays bars under such key signatures next to the same bars with the
+microtones written on the notes.  abcguide.txt now documents microtones
+in the key signature.  abc2abc, which cannot rewrite a microtone
+modifier, now reports "expecting A-G or a-g after accidental in key
+modifier" for the shortcuts too, as it already did for _3/4e; the K:
+line it writes is unchanged.
+
+October 10 2026 [RK]
+
+abc2midi: a microtone given by a key signature modifier stayed in force
+under a later K: field without it.  After K:C _1/2B, a K:C still played
+every B half a semitone flat, whereas after K:C _B it played B natural,
+and the next tune of the same file inherited the microtone too.
+setmap() (store.c), which sets the accidentals of a key signature for
+event_key() and startfile(), did not reset the microtones; it now does.
+The golden test abc2midi_key_microtone (samples/key_microtone.abc) now
+also plays bars after K: fields that drop the microtones.
+
+October 10 2026 [RK]
+
+abc2midi: the pitch bend of a flat microtone from the key signature, or
+carried to a later note of the bar, was one unit (about 0.024 cent)
+higher than for the same microtone written on the note: _/B gave 6145
+instead of 6144.  pitchof_b() (store.c) passed the sign of the microtone
+in its numerator to event_microtone(), whose (int) cast of 4096*a/b+0.5
+truncates toward zero, so it rounds a negative bend up.  It now passes
+the sign as the direction, as the parser does for a note.  In the golden
+test abc2midi_key_microtone, the bars played with the key signature now
+have the same pitch bends as the bars with the microtones written on
+the notes.
+

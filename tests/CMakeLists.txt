@@ -8,10 +8,11 @@
 #   2. Golden tests  - each program is run on a sample input and its output
 #                      is compared with a checked-in reference file.  Binary
 #                      MIDI outputs are first piped through mftext to produce
-#                      diffable text.  Volatile lines (version banners, dates,
-#                      tmpdir paths) are stripped before comparison.  abc2midi
-#                      runs with -Werror and must exit 0, so the samples stay
-#                      free of warnings and errors.
+#                      diffable text, and abc2midi -c gives its barloc.txt
+#                      file of bar sizes.  Volatile lines (version banners,
+#                      dates, tmpdir paths) are stripped before comparison.
+#                      abc2midi runs with -Werror and must exit 0, so the
+#                      samples stay free of warnings and errors.
 #
 #   3. Exit-status tests - abc2midi's exit status and messages on specific
 #                      inputs and options, and every tune of every sample
@@ -102,8 +103,10 @@ endforeach()
 #   barcheck_long_warning.abc, barfly_barcheck.abc - a bar of the wrong
 #                   length, on purpose (regression guards): its warning is an
 #                   error with -Werror
+#   key_unknown_word.abc - an unknown word in K:, on purpose (regression
+#                   guard): its warning is an error with -Werror
 set(ABC2MIDI_ERROR_SAMPLES microtone.abc barcheck_long_warning.abc
-  barfly_barcheck.abc)
+  barfly_barcheck.abc key_unknown_word.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering
@@ -208,6 +211,13 @@ add_golden_test(
 # pre-fix overflow aborts abc2midi.
 add_golden_test(TYPE abc2midi SAMPLE microtone.abc EXPECT_ERRORS)
 
+# Regression test for microtones in the key signature written with the
+# shortcuts of the note syntax, such as K:G _/B for _1/2B (GitHub issue
+# #10): process_microtones() used to ignore them.  Each bar played with the
+# key signature is followed by the same bar with the microtones written on
+# the notes (see samples/key_microtone.abc).
+add_golden_test(TYPE abc2midi SAMPLE key_microtone.abc)
+
 # Regression test for the pitchof_b() global-buffer-overflow: under a detune
 # temperament an accidental can push a note's semitone offset outside 0..11
 # (^b -> 12, _c -> -1), which used to index temperament_dt[] out of bounds.
@@ -246,6 +256,14 @@ add_golden_test(
   SAMPLE        barfly_missing_bar_lines.abc
   ABC2MIDI_ARGS -BF 2
 )
+
+# Regression test for the dump_barloc() global-buffer-overflow: with -c,
+# barloc.txt gives the bar sizes of each track from barloc[], which keeps
+# 1024 bars, but dump_barloc() used to read it up to the number of bars of
+# the track (see samples/barloc_long.abc, two voices of 1040 bars).  The
+# golden pins barloc.txt, so that the test fails without the fix in every
+# build: the sanitizer build aborts, the others dump 1040 values per track.
+add_golden_test(TYPE barloc SAMPLE barloc_long.abc NAME abc2midi_barloc_long)
 
 # Regression test for the -PMAR option (Part Marker meta-events).
 # Locks in marker emission and verifies the markers do not perturb note
@@ -339,6 +357,15 @@ add_exit_status_test(
   ABC2MIDI_ARGS -BF 2
   RC            0
   REGEX         "Warning in line-char [0-9]+-[0-9]+ : Track 0 Bar 3 has 4499/500 time units \\(after the -BF stress model\\) while the time signature has 6"
+)
+
+# An unknown word in K: must be reported wherever it is in the field, not
+# only as its last word (see samples/key_unknown_word.abc).
+add_exit_status_test(
+  NAME          abc2midi_key_unknown_word
+  SAMPLE        key_unknown_word.abc
+  RC            0
+  REGEX         "Warning in line-char [0-9]+-[0-9]+ : Ignoring string 'xyz' in K: field"
 )
 
 # -Werror alone must not fail a tune that raises no warning.
