@@ -211,6 +211,13 @@ add_golden_test(
 # pre-fix overflow aborts abc2midi.
 add_golden_test(TYPE abc2midi SAMPLE microtone.abc EXPECT_ERRORS)
 
+# Regression test for microtones in the key signature written with the
+# shortcuts of the note syntax, such as K:G _/B for _1/2B (GitHub issue
+# #10): process_microtones() used to ignore them.  Each bar played with the
+# key signature is followed by the same bar with the microtones written on
+# the notes (see samples/key_microtone.abc).
+add_golden_test(TYPE abc2midi SAMPLE key_microtone.abc)
+
 # Regression test for the pitchof_b() global-buffer-overflow: under a detune
 # temperament an accidental can push a note's semitone offset outside 0..11
 # (^b -> 12, _c -> -1), which used to index temperament_dt[] out of bounds.

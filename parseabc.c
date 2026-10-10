@@ -1284,60 +1284,39 @@ static void process_microtones (int *parsed,  char word[],
   char modmap[], int modmul[], struct fraction modmicrotone[])
 {
   int a, b;                     /* for microtones [SS] 2014-01-06 */
-  char c;
+  char *p;
   int j;
-  int success;
 
-  /* [RK] 2026-09-19 j indexes modmap[7]/modmicrotone[7] (note c-g -> 0..6),
-     so a valid index is 0..6.  The bound below was "j > 7", which let a
-     microtone note letter of 'H'/'h' (j == 7) through and wrote one element
-     past both arrays -- a stack-buffer-overflow on inputs like K:C ^1/4H. */
-  /* shortcuts such as ^/4G instead of ^1/4G not allowed here */
-
-	  success = sscanf (&word[1], "%d/%d%c", &a, &b, &c);
-	  if (success == 3) /* [SS] 2016-04-10 */
-	    {
-	      *parsed = 1;
-	      j = (int) c - 'A';
-        if (j > 6) {
-          j = (int) c - 'a';
-        }
-        if (word[0] == '_') a = -a; /* [SS] 2025-01-07 */
-        if (j > 6 || j < 0) {
-          event_error ("Not a valid microtone");
-          return;
-        }
-	      if (word[0] == '_') a = -a;
-	      /* printf("%s fraction microtone  %d/%d for %c\n",word,a,b,c); */
-	   } else {
-	    success = sscanf (&word[1], "%d%c", &a, &c); /* [SS] 2020-06-25 */
-            if (success == 2)
-	    {
-            b = 0;
-            /* printf("%s integer microtone %d%c\n",word,a,c); */
-	    if (temperament != 1) { /* [SS] 2020-06-25 2020-07-05 */
-		    event_warning("do not use integer microtone without calling %%MIDI temperamentequal");
-	            }
-	    *parsed = 1;
-	    }
-          }
-	  /* if (parsed ==1)  [SS] 2020-09-30 */
-    if (success > 0) {
-      j = (int) c - 'A';
-      if (j > 6) {
-        j = (int) c - 'a';
-      }
-      if (j > 6 || j < 0) {
-        event_error ("Not a valid microtone");
-        return;
-      }
-      if (word[0] == '_') a = -a;
-      modmap[j] = word[0];
-	    modmicrotone[j].num = a;
-	    modmicrotone[j].denom = b;
-	    /* printf("%c microtone = %d/%d\n",modmap[j],modmicrotone[j].num,modmicrotone[j].denom); */
-	  }
-} /* finished ^ = _ */
+  /* [RK] 2026-10-10 the microtone is read by read_microtone_value(), as in
+     a note, so that the shortcuts such as _/B (for _1/2B) and ^/4G (for
+     ^1/4G) are accepted too.  b == 0 signals an integer microtone, such as
+     _2B for %%MIDI temperamentequal.  The note letter must end the word,
+     and a word without a microtone is left to the caller. */
+  if ((word[0] != '^') && (word[0] != '_'))
+    return;
+  p = &word[1];
+  read_microtone_value (&a, &b, &p);
+  if (p == &word[1])
+    return;
+  *parsed = 1;
+  if ((b == 0) && (temperament != 1)) { /* [SS] 2020-06-25 2020-07-05 */
+    event_warning("do not use integer microtone without calling %%MIDI temperamentequal");
+  }
+  /* j indexes modmap[7]/modmicrotone[7] (note letter a-g or A-G -> 0..6) */
+  j = -1;
+  if ((*p >= 'A') && (*p <= 'G'))
+    j = (int) *p - 'A';
+  if ((*p >= 'a') && (*p <= 'g'))
+    j = (int) *p - 'a';
+  if ((j < 0) || (p[1] != '\0')) {
+    event_error ("Not a valid microtone");
+    return;
+  }
+  if (word[0] == '_') a = -a;
+  modmap[j] = word[0];
+  modmicrotone[j].num = a;
+  modmicrotone[j].denom = b;
+} /* finished ^ _ */
 
 static void set_voice_from_master(int voice_num)
 {
@@ -1610,7 +1589,6 @@ parsekey (char *str)
 	    };
    }
 	  /* microtone? */
-	  /* shortcuts such as ^/4G instead of ^1/4G not allowed here */
 	  /* parsed =0; [SS] 2020-09-30 */
    process_microtones (&parsed,  word,
         modmap, modmul, modmicrotone);
