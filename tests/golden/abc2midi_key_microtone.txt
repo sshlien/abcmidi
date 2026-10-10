@@ -11,10 +11,10 @@ Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=31
      Text = <Microtones in the key signature>
 Time=0  Meta Text, type=0x01 (Text Event)  leng=15
      Text = <C:abc2midi test>
-Time=1  Pitchbend, chan=1 msb=48 lsb=1
+Time=1  Pitchbend, chan=1 msb=48 lsb=0
 Time=1  Note on, chan=1 pitch=71 vol=105
 Time=480  Note off, chan=1 pitch=71 vol=0
-Time=481  Pitchbend, chan=1 msb=40 lsb=1
+Time=481  Pitchbend, chan=1 msb=40 lsb=0
 Time=481  Note on, chan=1 pitch=76 vol=80
 Time=960  Note off, chan=1 pitch=76 vol=0
 Time=961  Note on, chan=1 pitch=69 vol=95
@@ -37,7 +37,7 @@ Time=3840  Key signature, sharp/flats=0  minor=0
 Time=3841  Pitchbend, chan=1 msb=72 lsb=0
 Time=3841  Note on, chan=1 pitch=65 vol=105
 Time=4320  Note off, chan=1 pitch=65 vol=0
-Time=4321  Pitchbend, chan=1 msb=56 lsb=1
+Time=4321  Pitchbend, chan=1 msb=56 lsb=0
 Time=4321  Note on, chan=1 pitch=74 vol=80
 Time=4800  Note off, chan=1 pitch=74 vol=0
 Time=4801  Pitchbend, chan=1 msb=64 lsb=0

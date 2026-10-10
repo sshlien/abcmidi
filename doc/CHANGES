@@ -16147,3 +16147,16 @@ event_key() and startfile(), did not reset the microtones; it now does.
 The golden test abc2midi_key_microtone (samples/key_microtone.abc) now
 also plays bars after K: fields that drop the microtones.
 
+October 10 2026 [RK]
+
+abc2midi: the pitch bend of a flat microtone from the key signature, or
+carried to a later note of the bar, was one unit (about 0.024 cent)
+higher than for the same microtone written on the note: _/B gave 6145
+instead of 6144.  pitchof_b() (store.c) passed the sign of the microtone
+in its numerator to event_microtone(), whose (int) cast of 4096*a/b+0.5
+truncates toward zero, so it rounds a negative bend up.  It now passes
+the sign as the direction, as the parser does for a note.  In the golden
+test abc2midi_key_microtone, the bars played with the key signature now
+have the same pitch bends as the bars with the microtones written on
+the notes.
+

@@ -4,8 +4,9 @@
 % and n forms, so _/B was ignored and B played natural.  Each bar played
 % with the key signature is followed by the same bar with the microtones
 % and accidentals written on the notes, which must play the same pitches
-% (by rounding, a flat from the key signature gets a pitch bend one unit
-% higher).  A later K: field without a microtone for a note cancels it:
+% with the same pitch bends: pitchof_b() (store.c) used to round the bend
+% of a flat from the key signature one unit up.  A later K: field without
+% a microtone for a note cancels it:
 % setmap() (store.c) used to leave the microtone in force.
 X:1
 T:Microtones in the key signature

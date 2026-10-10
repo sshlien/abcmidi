@@ -3731,7 +3731,12 @@ static int pitchof_b(char note, char accidental, int mult, int octave, int propa
    they are applied to the note.
 */
     
-    if(a != 0) {
+    /* [RK] 2026-10-10 the sign goes in dir, as from the parser for a
+       note: with a < 0, event_microtone() rounded the pitch bend one
+       unit up, (int) truncating toward zero. */
+    if (a < 0) {
+       event_microtone(-1,-a,b);
+       } else if (a != 0) {
        event_microtone(1,a,b); /* [SS] 2025-01-03 */
        }
   } else {  /* some accidentals save the state if propagate_accs != 0 */
