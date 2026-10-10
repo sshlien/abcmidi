@@ -103,8 +103,10 @@ endforeach()
 #   barcheck_long_warning.abc, barfly_barcheck.abc - a bar of the wrong
 #                   length, on purpose (regression guards): its warning is an
 #                   error with -Werror
+#   key_unknown_word.abc - an unknown word in K:, on purpose (regression
+#                   guard): its warning is an error with -Werror
 set(ABC2MIDI_ERROR_SAMPLES microtone.abc barcheck_long_warning.abc
-  barfly_barcheck.abc)
+  barfly_barcheck.abc key_unknown_word.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering
@@ -348,6 +350,15 @@ add_exit_status_test(
   ABC2MIDI_ARGS -BF 2
   RC            0
   REGEX         "Warning in line-char [0-9]+-[0-9]+ : Track 0 Bar 3 has 4499/500 time units \\(after the -BF stress model\\) while the time signature has 6"
+)
+
+# An unknown word in K: must be reported wherever it is in the field, not
+# only as its last word (see samples/key_unknown_word.abc).
+add_exit_status_test(
+  NAME          abc2midi_key_unknown_word
+  SAMPLE        key_unknown_word.abc
+  RC            0
+  REGEX         "Warning in line-char [0-9]+-[0-9]+ : Ignoring string 'xyz' in K: field"
 )
 
 # -Werror alone must not fail a tune that raises no warning.

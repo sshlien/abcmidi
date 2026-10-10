@@ -16106,3 +16106,14 @@ issue #3).  A new golden test, abc2midi_barloc_long
 (samples/barloc_long.abc, two voices of 1040 bars), pins barloc.txt
 through a new barloc TYPE of tests/run_test.cmake; it fails without the
 fix in every build.
+
+October 10 2026 [RK]
+
+abc2midi, abc2abc, yaps: parsekey() (parseabc.c) warned "Ignoring string
+'%s' in K: field" only for the last word of the field, as the check came
+after its loop over the words, so any other word it could not parse was
+dropped without a warning: K:G _/B _3/4e _3/4A said nothing about _/B
+(GitHub issue #10).  Every word is now checked.  A new exit-status test,
+abc2midi_key_unknown_word (samples/key_unknown_word.abc), checks the
+warning for a word followed by a clef.
+

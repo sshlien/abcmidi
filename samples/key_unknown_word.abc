@@ -1,0 +1,12 @@
+% Unknown word in a K: field.  parsekey() (parseabc.c) warned about a word
+% it could not parse only after its loop over the words of the field, so
+% only for the last word: here "xyz" is followed by a clef and was dropped
+% without a warning.  It is now reported:
+% Ignoring string 'xyz' in K: field
+X:1
+T:Unknown word in K:
+C:abc2midi test
+M:4/4
+L:1/4
+K:G xyz clef=treble
+G A B c|
