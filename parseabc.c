@@ -1614,13 +1614,16 @@ parsekey (char *str)
 	  /* parsed =0; [SS] 2020-09-30 */
    process_microtones (&parsed,  word,
         modmap, modmul, modmicrotone);
+
+      /* [RK] 2026-10-10 checked for every word: after the loop, only the
+         last word was, so any other word was dropped without a warning. */
+      if ((parsed == 0) && (strlen (word) > 0))
+        {
+          sprintf (msg, "Ignoring string '%s' in K: field", word);
+          event_warning (msg);
+        };
    }
 
-  if ((parsed == 0) && (strlen (word) > 0))
-    {
-      sprintf (msg, "Ignoring string '%s' in K: field", word);
-      event_warning (msg);
-    };
   if (cgotoctave)
     {
       gotoctave = 1;
