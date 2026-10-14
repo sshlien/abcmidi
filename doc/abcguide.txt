@@ -1,14 +1,15 @@
-Guide to writing abc for abc2midi - minor revision [JA] 2021-05-24
+Guide to writing abc for abc2midi
 --------------------------------------------------------------
-
-Updated June 1 2017. %%MIDI program ranges from 0 to 127 not 1 to 128.
-
-Updated April 30 2024: The [I:MIDI= ..] no longer works. You
-must use [I:MIDI ...] instead (without the equal sign).
+Updated October 15 2026.
 
 The abc notation language is described by the version 1.6 specification
 document and later modifications to this document referred to as
-version 2.1 and version 2.2. These can be found at abcnotation.com .
+version 2.1 and version 2.2. These can be found at abcnotation.com.
+https://abcnotation.com/wiki/abc:standard:v2.2
+Also see https://moinejf.pages-perso.free.fr/abcm2ps-doc/features.html
+There are numerous extensions specified by the %%MIDI command
+that are not part of the standard but are recognized by
+abc2midi and other abc to midi converters. They are described here.
 
 An abc tune consists of a header followed by a body. Each line in the
 header is a different field starting with a letter immediately followed 
@@ -139,7 +140,7 @@ the benefit of other people who may not be familiar with modes. e.g.
 K: DLoc % 3 flats
 
 The key signature may be followed by modifiers. A modifier consists of ^^, ^
-=, _ or __ followed by a-g. As an example, ^g means every a should be played
+=, _ or __ followed by a-g. As an example, ^g means every g should be played
 sharp unless otherwise marked in the music. This adds ^g to the existing
 key signature. For example
 
@@ -306,9 +307,8 @@ sharp and double flat respectively.
 Microtones are indicated by following a ^ or _ with a fraction.
 ^/C is played as one quarter tone (i.e. half a semitone) above C.
 _/C is played as one quarter tone (i.e. half a semitone) below C.
-^^/4F is played as 1/4 of a semitone above F#. (The microtone always
-follows any accidentals.) In general a microtone offset is indicated
-by a fraction using the same convention as note length (described
+^^/4F is not allowed or has meaning.  In general a microtone offset is
+indicated by a fraction using the same convention as note length (described
 below). Abcmidi uses the same microtone syntax as abcm2ps.
 (See features.txt in the abcm2ps distribution.)
 
