@@ -88,6 +88,18 @@ cmake --build build/debug --target update-golden
 git diff tests/golden/
 ```
 
+abc2svg is the reference for playback questions such as microtones. An
+informational CI job builds a pinned check-in of abc2svg and runs
+`tests/compare_abc2svg.py`, which compares, tune by tune, the pitches that
+abc2midi and abc2svg play for every sample and reports the differences in
+the job summary without failing. To run it on a built abc2svg tree
+(`NOMIN=1 ninja`, with `node` installed):
+
+```sh
+tests/compare_abc2svg.py --abc2midi build/debug/abc2midi \
+    --mftext build/debug/mftext --abc2svg path/to/abc2svg samples/*.abc
+```
+
 ### Maintainers / releasing
 
 The package release date in the `VERSION` file is the single source of
