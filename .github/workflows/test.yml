@@ -128,3 +128,45 @@ jobs:
         run: cmake --build --preset sanitize
       - name: Test (sanitizers)
         run: ctest --preset sanitize
+
+  # Informational comparison with abc2svg, the reference for playback
+  # questions such as microtones (GitHub issue #56).  tests/compare_abc2svg.py
+  # renders every tune of the samples with both programs and reports in the
+  # job summary where the pitches they play differ.  A difference never fails
+  # the job, and continue-on-error keeps a download or build problem from
+  # failing the workflow.
+  #
+  # abc2svg is built from a pinned check-in of its fossil repository.  To move
+  # to a newer one, set ABC2SVG_CHECKIN to its hash and ABC2SVG_SHA256 to the
+  # sha256sum of the tarball that the URL below then serves.
+  compare-abc2svg:
+    runs-on: ubuntu-latest
+    name: compare with abc2svg (informational)
+    continue-on-error: true
+    env:
+      ABC2SVG_CHECKIN: f1fdd410d44dbdba56558b5da1a29402c01a4183
+      ABC2SVG_SHA256: 4079d93938c7f7be0c00afc94794d63d5ee32bf070a010a385bbc49df7e03e52
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Configure
+        run: cmake --preset default
+      - name: Build
+        run: cmake --build --preset default --target abc2midi mftext
+      # NOMIN=1 skips the minification, which needs jsmin, qjs or uglifyjs.
+      - name: Fetch and build abc2svg
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/abc2svg.tar.gz" \
+            "https://chiselapp.com/user/moinejf/repository/abc2svg/tarball/$ABC2SVG_CHECKIN/abc2svg.tar.gz"
+          echo "$ABC2SVG_SHA256  $RUNNER_TEMP/abc2svg.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/abc2svg.tar.gz" -C "$RUNNER_TEMP"
+          command -v ninja || { sudo apt-get update && sudo apt-get install -y ninja-build; }
+          cd "$RUNNER_TEMP/abc2svg" && NOMIN=1 ninja
+      - name: Compare
+        run: >-
+          python3 tests/compare_abc2svg.py
+          --abc2midi build/default/abc2midi
+          --mftext build/default/mftext
+          --abc2svg "$RUNNER_TEMP/abc2svg"
+          samples/*.abc
