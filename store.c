@@ -3803,6 +3803,19 @@ static int pitchof_b(char note, char accidental, int mult, int octave, int propa
     if (acc == '_' && !microtone) p = p - mul;
     pitch = p + 12*octave + middle_c;
     bend = 8192; /* corresponds to zero bend */
+    /* [RK] 2026-10-14 a microtone of 2 semitones or more does not fit in
+       the +/- 2 semitones of the pitch bend, where event_microtone()
+       clips it: its whole semitones go into the note, as in abc2svg, so
+       that ^9/4F plays G raised by 1/4 of a semitone. */
+    if (microtone && (setmicrotone.num >= 2*setmicrotone.denom ||
+                      setmicrotone.num < -2*setmicrotone.denom)) {
+      int sign = setmicrotone.num < 0 ? -1 : 1;
+      int size = sign*setmicrotone.num; /* sign apart, C89 rounding */
+      int semitones = size/setmicrotone.denom;
+      int rest = size - semitones*setmicrotone.denom;
+      pitch += sign*semitones;
+      *pitchbend = 8192 + sign*(int) (4096.0*rest/setmicrotone.denom + 0.5);
+    }
     if (temperament == TEMPERDT) {  /* [HL] 2020-07-03 */
       /* [RK] 2026-09-19 an accidental can push p outside 0..11 (e.g. ^b -> 12,
          _c -> -1), so reduce it to a pitch class before indexing the twelve-
@@ -4426,7 +4439,10 @@ if (a == 0) {bend = 8192; /* [SS] 2014-01-19 */
              return;
             }
 else {
-  bend = dir*((int)(4096.0*a/b + 0.5))+8192; /* [HL] 2015-05-14 */
+  /* [RK] 2026-10-14 b is 0 for an integer microtone, as ^3G: without
+     %%MIDI temperamentequal it counts semitones, as in abc2svg, rather
+     than dividing by zero (pitchof_b() handles temperamentequal) */
+  bend = dir*((int)(4096.0*a/(b == 0 ? 1 : b) + 0.5))+8192; /* [HL] 2015-05-14 */
   bend = bend<0?0:(bend>16383?16383:bend);
   }
 active_pitchbend = bend;

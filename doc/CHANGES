@@ -16172,3 +16172,13 @@ not a valid accidental: write ^ without ="); the notes play as before.
 New exit-status tests abc2midi_microtone_double_accidental and
 abc2midi_microtone_natural_accidental
 (samples/microtone_accidentals.abc).
+
+abc2midi: in the normal temperament, a microtone of 2 semitones or more
+was clipped to the +/- 2 semitones of the pitch bend (^9/4F played G),
+and an integer microtone without %%MIDI temperamentequal, as ^3G,
+divided by zero in event_microtone() (store.c), playing ^3G and _2G
+both as F.  As in abc2svg, such an integer now counts semitones, and
+pitchof_b() puts the whole semitones of a microtone of 2 semitones or
+more in the note, leaving the rest in the pitch bend: ^9/4F plays G
+raised by 1/4 of a semitone.  Smaller microtones are unchanged.  New
+golden test abc2midi_microtone_wide (samples/microtone_wide.abc).
