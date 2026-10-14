@@ -226,6 +226,13 @@ add_golden_test(
   EXPECT_ERRORS
 )
 
+# Regression test for microtones of 2 semitones or more and for integer
+# microtones without %%MIDI temperamentequal (see samples/microtone_wide.abc):
+# the first were clipped to the +/- 2 semitones of the pitch bend, the
+# second divided by zero.  The golden puts their whole semitones in the note,
+# as abc2svg plays them.
+add_golden_test(TYPE abc2midi SAMPLE microtone_wide.abc)
+
 # Regression test for microtones in the key signature written with the
 # shortcuts of the note syntax, such as K:G _/B for _1/2B (GitHub issue
 # #10): process_microtones() used to ignore them.  Each bar played with the

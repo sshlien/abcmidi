@@ -1,0 +1,14 @@
+% Regression guard for microtones of 2 semitones or more, and for integer
+% microtones without %%MIDI temperamentequal, in the normal temperament.
+% The pitch bend covers +/- 2 semitones: a wider microtone was clipped
+% there (^9/4F played G), and an integer microtone, as ^3F, divided by
+% zero.  As in abc2svg, the whole semitones now go into the note and an
+% integer counts semitones.  Relative to F, the notes are raised by 2.25,
+% -2.25, 1.5 (in range, unchanged), 2, 3 and -3 semitones.
+X:1
+T:Microtones of 2 semitones or more
+C:abc2midi test
+M:1/4
+L:1/4
+K:C
+^9/4F|_9/4F|^3/2F|^2F|^3F|_3F|
