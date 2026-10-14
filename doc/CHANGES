@@ -16160,3 +16160,18 @@ test abc2midi_key_microtone, the bars played with the key signature now
 have the same pitch bends as the bars with the microtones written on
 the notes.
 
+
+October 14 2026 [RK]
+
+abc2midi, abc2abc, yaps: as in abc2svg, a microtone follows a single
+^ or _ (GitHub issue #56).  ^^ or __ followed by a microtone, as ^^/4F,
+lost its sharp or flat without a message, and =^ or =_ was read as ^
+or _.  parsenote() (parseabc.c) now reports them as errors that give
+the valid spelling ("^^/4 is not a valid microtone: write ^5/4", "=^ is
+not a valid accidental: write ^ without ="), and the note is played
+as a plain note, with the key signature and the earlier accidentals of
+the bar, as abc2svg plays it.  New exit-status tests
+abc2midi_microtone_double_accidental and
+abc2midi_microtone_natural_accidental, and golden tests
+abc2midi_microtone_accidentals and abc2midi_microtone_accidentals_2
+(samples/microtone_accidentals.abc).
