@@ -16182,3 +16182,13 @@ pitchof_b() puts the whole semitones of a microtone of 2 semitones or
 more in the note, leaving the rest in the pitch bend: ^9/4F plays G
 raised by 1/4 of a semitone.  Smaller microtones are unchanged.  New
 golden test abc2midi_microtone_wide (samples/microtone_wide.abc).
+
+doc/abcguide.txt: the microtone section follows abc2svg (GitHub issue
+#56).  It gave ^^/4F, not valid, for F# raised by 1/4 of a semitone
+(^5/4F), said that microtones do not propagate across a measure, while
+they do as accidentals, and explained its K: G example with this
+propagation and the lost sharp.  It also said that a microtone on a
+note of a chord applies to all its notes, while the chord ends with
+the pitchwheel of its last note unless %%MIDI makechordchannels plays
+the notes on separate channels.  It now also describes integer
+microtones and those of 2 semitones or more.
