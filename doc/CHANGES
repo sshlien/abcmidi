@@ -16160,3 +16160,35 @@ test abc2midi_key_microtone, the bars played with the key signature now
 have the same pitch bends as the bars with the microtones written on
 the notes.
 
+
+October 14 2026 [RK]
+
+abc2midi, abc2abc, yaps: as in abc2svg, a microtone follows a single
+^ or _ (GitHub issue #56).  ^^ or __ followed by a microtone, as ^^/4F,
+lost its sharp or flat without a message, and =^ or =_ was read as ^
+or _.  parsenote() (parseabc.c) now reports them as errors that give
+the valid spelling ("^^/4 is not a valid microtone: write ^5/4", "=^ is
+not a valid accidental: write ^ without ="); the notes play as before.
+New exit-status tests abc2midi_microtone_double_accidental and
+abc2midi_microtone_natural_accidental
+(samples/microtone_accidentals.abc).
+
+abc2midi: in the normal temperament, a microtone of 2 semitones or more
+was clipped to the +/- 2 semitones of the pitch bend (^9/4F played G),
+and an integer microtone without %%MIDI temperamentequal, as ^3G,
+divided by zero in event_microtone() (store.c), playing ^3G and _2G
+both as F.  As in abc2svg, such an integer now counts semitones, and
+pitchof_b() puts the whole semitones of a microtone of 2 semitones or
+more in the note, leaving the rest in the pitch bend: ^9/4F plays G
+raised by 1/4 of a semitone.  Smaller microtones are unchanged.  New
+golden test abc2midi_microtone_wide (samples/microtone_wide.abc).
+
+doc/abcguide.txt: the microtone section follows abc2svg (GitHub issue
+#56).  It gave ^^/4F, not valid, for F# raised by 1/4 of a semitone
+(^5/4F), said that microtones do not propagate across a measure, while
+they do as accidentals, and explained its K: G example with this
+propagation and the lost sharp.  It also said that a microtone on a
+note of a chord applies to all its notes, while the chord ends with
+the pitchwheel of its last note unless %%MIDI makechordchannels plays
+the notes on separate channels.  It now also describes integer
+microtones and those of 2 semitones or more.

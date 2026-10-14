@@ -105,8 +105,10 @@ endforeach()
 #                   error with -Werror
 #   key_unknown_word.abc - an unknown word in K:, on purpose (regression
 #                   guard): its warning is an error with -Werror
+#   microtone_accidentals.abc - invalid accidentals with a microtone, on
+#                   purpose (regression guard)
 set(ABC2MIDI_ERROR_SAMPLES microtone.abc barcheck_long_warning.abc
-  barfly_barcheck.abc key_unknown_word.abc)
+  barfly_barcheck.abc key_unknown_word.abc microtone_accidentals.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering
@@ -210,6 +212,13 @@ add_golden_test(
 # beatstring guard above, its value is under the sanitizer build, where the
 # pre-fix overflow aborts abc2midi.
 add_golden_test(TYPE abc2midi SAMPLE microtone.abc EXPECT_ERRORS)
+
+# Regression test for microtones of 2 semitones or more and for integer
+# microtones without %%MIDI temperamentequal (see samples/microtone_wide.abc):
+# the first were clipped to the +/- 2 semitones of the pitch bend, the
+# second divided by zero.  The golden puts their whole semitones in the note,
+# as abc2svg plays them.
+add_golden_test(TYPE abc2midi SAMPLE microtone_wide.abc)
 
 # Regression test for microtones in the key signature written with the
 # shortcuts of the note syntax, such as K:G _/B for _1/2B (GitHub issue
@@ -366,6 +375,24 @@ add_exit_status_test(
   SAMPLE        key_unknown_word.abc
   RC            0
   REGEX         "Warning in line-char [0-9]+-[0-9]+ : Ignoring string 'xyz' in K: field"
+)
+
+# A microtone follows a single ^ or _, as in abc2svg (GitHub issue #56):
+# ^^ or __ followed by a microtone, and =^ or =_, are errors that give the
+# valid spelling (see samples/microtone_accidentals.abc).
+add_exit_status_test(
+  NAME          abc2midi_microtone_double_accidental
+  SAMPLE        microtone_accidentals.abc
+  ABC2MIDI_ARGS 1
+  RC            1
+  REGEX         "Error in line-char [0-9]+-[0-9]+ : \\^\\^/4 is not a valid microtone: write \\^5/4.*Error in line-char [0-9]+-[0-9]+ : __/2 is not a valid microtone: write _3/2.*Error in line-char [0-9]+-[0-9]+ : \\^\\^1 is not a valid microtone: a microtone follows a single \\^"
+)
+add_exit_status_test(
+  NAME          abc2midi_microtone_natural_accidental
+  SAMPLE        microtone_accidentals.abc
+  ABC2MIDI_ARGS 2
+  RC            1
+  REGEX         "Error in line-char [0-9]+-[0-9]+ : =\\^ is not a valid accidental: write \\^ without =.*Error in line-char [0-9]+-[0-9]+ : =_ is not a valid accidental: write _ without ="
 )
 
 # -Werror alone must not fail a tune that raises no warning.

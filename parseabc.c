@@ -1708,12 +1708,35 @@ parsevoice (char *s)
 }
 
 
+/* [RK] 2026-10-14 a microtone follows a single ^ or _, as in abc2svg:
+   F sharp raised by 1/4 of a semitone is ^5/4F, not ^^/4F.  start and
+   end delimit the microtone text that followed acc acc. */
+static void
+microtone_after_double_accidental (char acc, char *start, char *end)
+{
+  int a, b;
+  char *p = start;
+  char msg[100];
+
+  read_microtone_value (&a, &b, &p);
+  if (b > 0)
+    snprintf (msg, sizeof msg,
+              "%c%c%.*s is not a valid microtone: write %c%d/%d",
+              acc, acc, (int) (end - start), start, acc, a + b, b);
+  else
+    snprintf (msg, sizeof msg,
+              "%c%c%.*s is not a valid microtone: a microtone follows a single %c",
+              acc, acc, (int) (end - start), start, acc);
+  event_error (msg);
+}
+
 void
 parsenote (char **s)
 /* parse abc note and advance character pointer */
 {
   int decorators[DECSIZE];
   int i, t;
+  char *microtone_start;
   int mult;
   char accidental, note;
   int octave, n, m;
@@ -1789,11 +1812,16 @@ parsenote (char **s)
 	  *s = *s + 1;
 	  mult = 2;
 	};
+      microtone_start = *s;
       microtone = ismicrotone (s, -1);
       if (microtone)
 	{
 	  if (mult == 2)
-	    mult = 1;
+            {
+              microtone_after_double_accidental ('_', microtone_start,
+                                                 *s);
+              mult = 1;
+            }
 	  else
 	    accidental = ' ';
 	}
@@ -1806,11 +1834,16 @@ parsenote (char **s)
 	  *s = *s + 1;
 	  mult = 2;
 	};
+      microtone_start = *s;
       microtone = ismicrotone (s, 1);
       if (microtone)
 	{
 	  if (mult == 2)
-	    mult = 1;
+            {
+              microtone_after_double_accidental ('^', microtone_start,
+                                                 *s);
+              mult = 1;
+            }
 	  else
 	    accidental = ' ';
 	}
@@ -1819,6 +1852,15 @@ parsenote (char **s)
     case '=':
       accidental = **s;
       *s = *s + 1;
+      /* [RK] 2026-10-14 =^ and =_ are not accidentals, as in abc2svg: a
+         sharp, a flat or a microtone already replaces the key signature */
+      if (**s == '^' || **s == '_')
+        {
+          snprintf (msg, sizeof msg,
+                    "=%c is not a valid accidental: write %c without =",
+                    **s, **s);
+          event_error (msg);
+        }
       /* if ((**s == '^') || (**s == '_')) {
          accidental = **s;
          }; */

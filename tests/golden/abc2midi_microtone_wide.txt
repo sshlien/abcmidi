@@ -1,0 +1,31 @@
+Header format=0 ntrks=1 division=480
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=0  minor=0
+Time=0  Time signature=1/4  MIDI-clocks/click=6  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:1>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=33
+     Text = <Microtones of 2 semitones or more>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=1  Pitchbend, chan=1 msb=72 lsb=0
+Time=1  Note on, chan=1 pitch=67 vol=105
+Time=480  Note off, chan=1 pitch=67 vol=0
+Time=481  Pitchbend, chan=1 msb=56 lsb=0
+Time=481  Note on, chan=1 pitch=63 vol=105
+Time=960  Note off, chan=1 pitch=63 vol=0
+Time=961  Pitchbend, chan=1 msb=112 lsb=0
+Time=961  Note on, chan=1 pitch=65 vol=105
+Time=1440  Note off, chan=1 pitch=65 vol=0
+Time=1441  Pitchbend, chan=1 msb=64 lsb=0
+Time=1441  Note on, chan=1 pitch=67 vol=105
+Time=1920  Note off, chan=1 pitch=67 vol=0
+Time=1921  Note on, chan=1 pitch=68 vol=105
+Time=2400  Note off, chan=1 pitch=68 vol=0
+Time=2401  Note on, chan=1 pitch=62 vol=105
+Time=2880  Note off, chan=1 pitch=62 vol=0
+Time=2906  Meta event, end of track
+Track end
