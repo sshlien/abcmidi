@@ -2375,6 +2375,21 @@ static void save_note(int num, int denom, int pitch, int pitchbend, int chan, in
         addtoQ(num, denom, pitch + transpose + global_transpose, chan,0, -1);}
 }
 
+static void save_gchord_note(int k, int shift, int len)
+/* play note k of the guitar chord for the gchord codes g to k (shift 0)
+ * and G to K (shift -12, an octave lower).  A chord with fewer notes
+ * plays its last note instead, so that an Alberti bass such as ghih has
+ * no gap on a two-note chord.  A chord with no note, as a gchord in
+ * lower case, plays nothing.
+ */
+{
+  if (gchordnotes_size == 0)
+    return;
+  if (k >= gchordnotes_size)
+    k = gchordnotes_size - 1;
+  save_note(g_num*len, g_denom, gchordnotes[k] + shift, 8192,
+            gchord.chan, gchord.vel);
+}
 
 
 
@@ -2426,74 +2441,19 @@ int j;
       break;
 
     case 'g':
-      if(gchordnotes_size>0)
-        save_note(g_num*len, g_denom, gchordnotes[0], 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
-      break;
-
     case 'h':
-      if(gchordnotes_size >1)
-        save_note(g_num*len, g_denom, gchordnotes[1], 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
-      break;
-
     case 'i':
-      if(gchordnotes_size >2)
-        save_note(g_num*len, g_denom, gchordnotes[2], 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
-      break;
-
     case 'j':
-      if(gchordnotes_size >3)
-        save_note(g_num*len, g_denom, gchordnotes[3], 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
-      break;
-
-    /* [SS] 2021-12-10 */
     case 'k':
-      if(gchordnotes_size >4)
-        save_note(g_num*len, g_denom, gchordnotes[4], 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
+      save_gchord_note(action - 'g', 0, len);
+      break;
 
     case 'G':
-      if(gchordnotes_size>0 )
-        save_note(g_num*len, g_denom, gchordnotes[0]-12, 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
-      break;
-
     case 'H':
-      if(gchordnotes_size >1)
-        save_note(g_num*len, g_denom, gchordnotes[1]-12, 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
-      break;
-
     case 'I':
-      if(gchordnotes_size >2)
-        save_note(g_num*len, g_denom, gchordnotes[2]-12, 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
-      break;
-
     case 'J':
-      if(gchordnotes_size >3)
-        save_note(g_num*len, g_denom, gchordnotes[3]-12, 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
-      break;
-
-    /* [SS] 2021-12-10 */
     case 'K':
-      if(gchordnotes_size >3)
-        save_note(g_num*len, g_denom, gchordnotes[4]-12, 8192, gchord.chan, gchord.vel); 
-      else /* [SS] 2016-01-03 */
-        save_note(g_num*len, g_denom, gchordnotes[gchordnotes_size], 8192, gchord.chan, gchord.vel); 
+      save_gchord_note(action - 'G', -12, len);
       break;
 
     case 'x':
