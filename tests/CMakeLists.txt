@@ -107,8 +107,11 @@ endforeach()
 #                   guard): its warning is an error with -Werror
 #   microtone_accidentals.abc - invalid accidentals with a microtone, on
 #                   purpose (regression guard)
+#   chordname_too_long.abc - a %%MIDI chordname of 11 notes, on purpose
+#                   (regression guard)
 set(ABC2MIDI_ERROR_SAMPLES microtone.abc barcheck_long_warning.abc
-  barfly_barcheck.abc key_unknown_word.abc microtone_accidentals.abc)
+  barfly_barcheck.abc key_unknown_word.abc microtone_accidentals.abc
+  chordname_too_long.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering
@@ -244,6 +247,13 @@ add_golden_test(TYPE abc2midi SAMPLE key_microtone.abc)
 # of a shorter chord they play that last note, k and K play the fifth note,
 # and a chord in lower case plays nothing (see samples/gchord_codes.abc).
 add_golden_test(TYPE abc2midi SAMPLE gchord_codes.abc)
+
+# Regression test for %%MIDI chordname chords of 7 to 10 notes: the notes of
+# a chord to play were written into gchordnotes[6] (genmidi.c), and those of
+# a chordname in the file header into an array of 6 (store.c).  The overflow
+# overwrote the count of notes, so that the test fails in every build, not
+# only the sanitizer one (see samples/chordname_long.abc).
+add_golden_test(TYPE abc2midi SAMPLE chordname_long.abc)
 
 # Regression test for the pitchof_b() global-buffer-overflow: under a detune
 # temperament an accidental can push a note's semitone offset outside 0..11
@@ -411,6 +421,16 @@ add_exit_status_test(
   ABC2MIDI_ARGS 2
   RC            1
   REGEX         "Error in line-char [0-9]+-[0-9]+ : =\\^ is not a valid accidental: write \\^ without =.*Error in line-char [0-9]+-[0-9]+ : =_ is not a valid accidental: write _ without ="
+)
+
+# A %%MIDI chordname of more than 10 notes is an error.  event_midi()
+# (store.c) used to read its notes past the end of an array of 10 first, which
+# the sanitizer build turns into a failure (see samples/chordname_too_long.abc).
+add_exit_status_test(
+  NAME          abc2midi_chordname_too_long
+  SAMPLE        chordname_too_long.abc
+  RC            1
+  REGEX         "Error in line-char [0-9]+-[0-9]+ : Named chord cannot have more than 10 notes"
 )
 
 # -Werror alone must not fail a tune that raises no warning.

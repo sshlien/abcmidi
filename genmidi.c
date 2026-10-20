@@ -182,7 +182,7 @@ int hyphenstate;  /* [Bas Schoutsen] 2010-04-08 */
 /* Generating accompaniment */
 int gchords, g_started;
 int basepitch, inversion, chordnum;
-int gchordnotes[6],gchordnotes_size;
+int gchordnotes[10],gchordnotes_size; /* as many notes as chordnotes[][10] */
 
 struct notetype {
   int base;
