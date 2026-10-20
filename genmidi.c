@@ -353,9 +353,13 @@ void configure_gchord()
 /* creates a list of notes to played as chord for
  * a specific guitar chord. Most of the code figures out
  * how to order the notes when inversions are encountered.
+ * In an inversion such as "C/E", the notes before the bass
+ * note in the chord definition are raised by an octave, and
+ * the notes are then sorted, so that the gchord codes g, h,
+ * i, j, k play them from the lowest.
 */
 {
- int j;
+ int j, k;
  int inchord, note;
 
  gchordnotes_size = 0;
@@ -385,6 +389,15 @@ for (j=0; j<chordlen[chordnum]; j++) {
    gchordnotes[gchordnotes_size] = gchord.base+note;
    gchordnotes_size++;
    };
+if (inchord > 0) {
+  /* insertion sort, from the lowest note */
+  for (j = 1; j < gchordnotes_size; j++) {
+    note = gchordnotes[j];
+    for (k = j; k > 0 && gchordnotes[k-1] > note; k--)
+      gchordnotes[k] = gchordnotes[k-1];
+    gchordnotes[k] = note;
+  }
+}
 }
 
 
