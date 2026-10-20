@@ -248,6 +248,12 @@ add_golden_test(TYPE abc2midi SAMPLE key_microtone.abc)
 # and a chord in lower case plays nothing (see samples/gchord_codes.abc).
 add_golden_test(TYPE abc2midi SAMPLE gchord_codes.abc)
 
+# Regression test for GitHub issue #11: on an inverted chord such as "C/E",
+# the gchord codes g to k play the notes from the lowest, the bass note,
+# instead of from the root raised by an octave (see
+# samples/gchord_inversion.abc).
+add_golden_test(TYPE abc2midi SAMPLE gchord_inversion.abc)
+
 # Regression test for %%MIDI chordname chords of 7 to 10 notes: the notes of
 # a chord to play were written into gchordnotes[6] (genmidi.c), and those of
 # a chordname in the file header into an array of 6 (store.c).  The overflow

@@ -16219,3 +16219,13 @@ the error.  gchordnotes[] now has 10 notes, and both readers take
 those of a chord of 11 notes, for the error.  New golden test
 abc2midi_chordname_long (samples/chordname_long.abc) and exit-status
 test abc2midi_chordname_too_long (samples/chordname_too_long.abc).
+
+abc2midi: the gchord codes g to k play the notes of an inverted chord,
+such as "C/E", from the lowest, the bass note, as abcguide.txt says
+(GitHub issue #11).  configure_gchord() (genmidi.c) raised the notes
+before the bass note in the chord by an octave, but kept them in the
+order of the chord definition, so that g played the root: "C/E" with
+%%MIDI gchord ghih played C' G E G instead of E G C' G.  The notes of
+an inverted chord are now sorted, which leaves the chord played by c
+unchanged.  New golden test abc2midi_gchord_inversion
+(samples/gchord_inversion.abc).
