@@ -16207,3 +16207,15 @@ of a break, and K read the fifth note of a four-note chord.  A chord in
 lower case, as "c", has a bass note only, and these codes now play
 nothing on it instead of the notes of an earlier chord.  New golden
 test abc2midi_gchord_codes (samples/gchord_codes.abc).
+
+abc2midi: a guitar chord defined by %%MIDI chordname may have 10 notes,
+but configure_gchord() (genmidi.c) wrote the notes of the chord to play
+into gchordnotes[6].  A chord of 7 notes or more overwrote their count,
+and abc2midi played dozens of wrong notes for it.  The %%MIDI
+chordname of the file header, read by event_specific_in_header()
+(store.c), overflowed an array of 6 with 7 notes, and that of a tune,
+read by event_midi(), an array of 10 with 11 notes before reporting
+the error.  gchordnotes[] now has 10 notes, and both readers take
+those of a chord of 11 notes, for the error.  New golden test
+abc2midi_chordname_long (samples/chordname_long.abc) and exit-status
+test abc2midi_chordname_too_long (samples/chordname_too_long.abc).

@@ -1,0 +1,12 @@
+% A guitar chord defined by %%MIDI chordname has at most 10 notes, so that
+% the chord below, of 11 notes, is an error.  event_midi() (store.c) read
+% its notes into an array of 10 before reporting it.  Like the other
+% overflow guards, the value of this sample is under the sanitizer build.
+X:1
+T:Named chord of 11 notes
+C:abc2midi test
+M:4/4
+L:1/2
+K:C
+%%MIDI chordname over 0 1 2 3 4 5 6 7 8 9 10
+"C"CE|]
