@@ -240,6 +240,11 @@ add_golden_test(TYPE abc2midi SAMPLE microtone_wide.abc)
 # the notes (see samples/key_microtone.abc).
 add_golden_test(TYPE abc2midi SAMPLE key_microtone.abc)
 
+# Regression test for the gchord codes g to k and G to K: past the last note
+# of a shorter chord they play that last note, k and K play the fifth note,
+# and a chord in lower case plays nothing (see samples/gchord_codes.abc).
+add_golden_test(TYPE abc2midi SAMPLE gchord_codes.abc)
+
 # Regression test for the pitchof_b() global-buffer-overflow: under a detune
 # temperament an accidental can push a note's semitone offset outside 0..11
 # (^b -> 12, _c -> -1), which used to index temperament_dt[] out of bounds.

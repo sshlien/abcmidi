@@ -16195,3 +16195,15 @@ note of a chord applies to all its notes, while the chord ends with
 the pitchwheel of its last note unless %%MIDI makechordchannels plays
 the notes on separate channels.  It now also describes integer
 microtones and those of 2 semitones or more.
+
+
+October 19 2026 [RK]
+
+abc2midi: the gchord codes g to k and G to K play the last note of a
+chord that has fewer notes, such as j on "C" or i on "C5".
+dogchords() (genmidi.c) played the slot after the last note instead,
+left from an earlier chord or 0.  k also played the note of G, for want
+of a break, and K read the fifth note of a four-note chord.  A chord in
+lower case, as "c", has a bass note only, and these codes now play
+nothing on it instead of the notes of an earlier chord.  New golden
+test abc2midi_gchord_codes (samples/gchord_codes.abc).
