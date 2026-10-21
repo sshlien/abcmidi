@@ -1708,6 +1708,43 @@ parsevoice (char *s)
 }
 
 
+/* [RK] 2026-10-14 skip the microtone, if any, at *s after an invalid
+   accidental: as in abc2svg, the note is then played as a plain note,
+   so no microtone is left set, as ismicrotone() leaves it without one */
+static void
+skip_microtone (char **s)
+{
+  int a, b;
+
+  read_microtone_value (&a, &b, s);
+  setmicrotone.num = 0;
+  setmicrotone.denom = 1;
+}
+
+/* [RK] 2026-10-14 a microtone follows a single ^ or _, as in abc2svg:
+   F sharp raised by 1/4 of a semitone is ^5/4F, not ^^/4F.  Report the
+   microtone at *s that follows acc acc, and skip it. */
+static void
+microtone_after_double_accidental (char acc, char **s)
+{
+  int a, b;
+  char *start = *s;
+  char *p = *s;
+  char msg[100];
+
+  read_microtone_value (&a, &b, &p);
+  if (b > 0)
+    snprintf (msg, sizeof msg,
+              "%c%c%.*s is not a valid microtone: write %c%d/%d",
+              acc, acc, (int) (p - start), start, acc, a + b, b);
+  else
+    snprintf (msg, sizeof msg,
+              "%c%c%.*s is not a valid microtone: a microtone follows a single %c",
+              acc, acc, (int) (p - start), start, acc);
+  event_error (msg);
+  skip_microtone (s);
+}
+
 void
 parsenote (char **s)
 /* parse abc note and advance character pointer */
@@ -1789,14 +1826,20 @@ parsenote (char **s)
 	  *s = *s + 1;
 	  mult = 2;
 	};
-      microtone = ismicrotone (s, -1);
-      if (microtone)
-	{
-	  if (mult == 2)
-	    mult = 1;
-	  else
-	    accidental = ' ';
-	}
+      /* [RK] 2026-10-14 checked before ismicrotone(), which would set
+         the microtone: __ with a microtone is played as a plain note */
+      if (mult == 2 && (isdigit (**s) || **s == '/'))
+        {
+          microtone_after_double_accidental ('_', s);
+          accidental = ' ';
+          mult = 1;
+        }
+      else
+        {
+          microtone = ismicrotone (s, -1);
+          if (microtone)
+            accidental = ' ';
+        }
       break;
     case '^':
       accidental = **s;
@@ -1806,38 +1849,38 @@ parsenote (char **s)
 	  *s = *s + 1;
 	  mult = 2;
 	};
-      microtone = ismicrotone (s, 1);
-      if (microtone)
-	{
-	  if (mult == 2)
-	    mult = 1;
-	  else
-	    accidental = ' ';
-	}
+      /* [RK] 2026-10-14 checked before ismicrotone(), which would set
+         the microtone: ^^ with a microtone is played as a plain note */
+      if (mult == 2 && (isdigit (**s) || **s == '/'))
+        {
+          microtone_after_double_accidental ('^', s);
+          accidental = ' ';
+          mult = 1;
+        }
+      else
+        {
+          microtone = ismicrotone (s, 1);
+          if (microtone)
+            accidental = ' ';
+        }
 
       break;
     case '=':
       accidental = **s;
       *s = *s + 1;
-      /* if ((**s == '^') || (**s == '_')) {
-         accidental = **s;
-         }; */
-      if (**s == '^')
-	{
-	  accidental = **s;
-	  *s = *s + 1;
-	  microtone = ismicrotone (s, 1);
-	  if (microtone == 0)
-	    accidental = '^';
-	}
-      else if (**s == '_')
-	{
-	  accidental = **s;
-	  *s = *s + 1;
-	  microtone = ismicrotone (s, -1);
-	  if (microtone == 0)
-	    accidental = '_';
-	}
+      /* [RK] 2026-10-14 =^ and =_ are not accidentals, as in abc2svg: a
+         sharp, a flat or a microtone already replaces the key signature.
+         As in abc2svg, the note is played as a plain note. */
+      if (**s == '^' || **s == '_')
+        {
+          snprintf (msg, sizeof msg,
+                    "=%c is not a valid accidental: write %c without =",
+                    **s, **s);
+          event_error (msg);
+          *s = *s + 1;
+          skip_microtone (s);
+          accidental = ' ';
+        }
       break;
     default:
       microtone = ismicrotone (s, 1);		/* [SS] 2014-01-19 */

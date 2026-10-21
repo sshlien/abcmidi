@@ -1,0 +1,23 @@
+% Regression guard for GitHub issue #56.  As in abc2svg, a microtone
+% follows a single ^ or _: F sharp raised by 1/4 of a semitone is ^5/4F.
+% ^^ or __ followed by a microtone used to lose its sharp or flat without
+% a message, and =^ or =_ was read as ^ or _.  They are now errors that
+% give the valid spelling, and the note is played as a plain note, with
+% the key signature and the earlier accidentals of the bar, as abc2svg
+% plays it: ^^/4F is F sharp in G major, and F raised by 1/2 semitone
+% after ^/F.
+X:1
+T:Double sharp or flat with a microtone
+C:abc2midi test
+M:2/4
+L:1/4
+K:G
+^^/4F F|^/F ^^/4F|__/2B B|^^1G G|
+
+X:2
+T:Natural with a sharp or a flat
+C:abc2midi test
+M:2/4
+L:1/4
+K:F
+=^/A A|=_B B|

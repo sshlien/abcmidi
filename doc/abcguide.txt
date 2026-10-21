@@ -304,41 +304,52 @@ barlines modify the default pitch in the same way as on a stave. Preceding
 a note with = generates natural pitch and ^^ and __ can be used for double 
 sharp and double flat respectively.
 
-Microtones are indicated by following a ^ or _ with a fraction.
-^/C is played as one quarter tone (i.e. half a semitone) above C.
-_/C is played as one quarter tone (i.e. half a semitone) below C.
-^^/4F is not allowed or has meaning.  In general a microtone offset is
-indicated by a fraction using the same convention as note length (described
-below). Abcmidi uses the same microtone syntax as abcm2ps.
-(See features.txt in the abcm2ps distribution.)
+Microtones are indicated by following a single ^ or _ with a fraction
+of a semitone, before the note. ^/C is played as one quarter tone (i.e.
+half a semitone) above C, and _/C as one quarter tone below C. In
+general the fraction uses the same convention as note length (described
+below): ^3/4F is played 3/4 of a semitone above F. A sharp or a flat
+and a microtone make a single fraction: ^5/4F is played 1/4 of a
+semitone above F#. ^^ and __ cannot be followed by a microtone, nor =
+by ^ or _: abc2midi reports an error for them and, as abc2svg, plays
+the plain note. With %%MIDI temperamentequal, a
+whole number after ^ or _ counts steps of the temperament, as ^3G;
+without it, a whole number counts semitones. Abcmidi uses the same
+microtone syntax as abc2svg and abcm2ps (see section 4.2, Accidentals,
+of https://moinejf.pages-perso.free.fr/abcm2ps-doc/features.html).
 
-Note that unlike accidentals, microtones do not propagate across a measure.
-Microtones are implemented using the MIDI pitchwheel command. Since the
-pitchwheel affects all notes played on a specific channel, a microtone
-applied to any note in a chord specified by rectangular brackets,
-(eg. [ACE]) will apply to all the notes in the chord. Microtone
-accidentals override any sharpening or flattening induced by 
-key signatures. To illustrate
+Like an accidental, a microtone applies to the following notes of the
+same pitch in the measure, until another accidental or microtone, and
+it overrides any sharpening or flattening induced by the key signature.
+To illustrate
 
 K: G
-^/F F ^^/2F F|
+^/F F =F F ^5/4F F|
 
 does the following. Even though the key of G major causes F to be
-sharp,  the first note is F natural raised by half a semitone.
-This effects the next note in making it F natural instead of F#.
-The third note is F# raised by a half a semitone. The F#  propagates
-to the last note making it also F#.
+sharp, the first note is F natural raised by half a semitone, and so is
+the second note. The natural cancels the microtone, so the third and
+fourth notes are F natural. The fifth note is F# raised by 1/4 of a
+semitone, and so is the last one.
+
+Microtones are implemented using the MIDI pitchwheel command, which
+affects all the notes playing on a MIDI channel. Each note of a chord
+specified by rectangular brackets (eg. [^/CE_/G]) sets the pitchwheel
+when it starts, so all the notes of the chord end with the pitchwheel
+of its last note, unless %%MIDI makechordchannels plays them on
+separate channels (see below). Each voice normally has its own
+channel, so different voices can play different microtones at the
+same time.
 
 In accordance to the General MIDI recommendations the pitch range
-of the pitchwheel is set to plus or minus two semitones. Therefore
-abc2midi cannot go beyond this range.
+of the pitchwheel is set to plus or minus two semitones. A microtone
+of two semitones or more is played on another note, which takes the
+whole semitones, the rest going to the pitchwheel.
 
 Microtones may be placed between tied notes, producing a pitch
 bend effect. eg G- ^/G.
 
-Microtones have been introduced fairly recently into abcmidi (Mar 2005);
-so far there is very little abc notated on the web which exploits
-this feature.
+Microtones were introduced into abcmidi in March 2005.
 
 
 The length is in general specified by a fraction following the pitch
