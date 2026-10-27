@@ -1,5 +1,17 @@
 
-YAPS - an abc to PostScript Converter
+Yaps is no longer supported by the original creator (James Allwright)
+or by myself (Seymour Shlien).  New features such as microtones
+are not included. Instead you should abcm2ps, txtmus, or abc2svg which is
+more compliant with the ABC Standard. (See http://moinejf.free.fr/)
+James Allwright has replaced yaps with Toadflax which is available
+on https://sourceforge.net/projects/toadflax/ . Furthermore
+PostScript files are slowly being replaced with pdf files.
+
+In a few cases, yaps has been able to process an abc file which causes
+other applications to fail due to bad syntax or large size. Therefore 
+it is a good fallback in such circumstances.  Here is the original
+documentation.
+
 
 YAPS is Yet Another abc to PostScript converter.
 

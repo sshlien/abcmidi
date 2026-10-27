@@ -7961,7 +7961,6 @@ There is no constraint on the number of segments other
 than it should be less that 31, the amount of allocated
 space in the program. For some irregular rhythms, such
 as 7/8 time, one may use an odd number of segments.
-A few sample stress files can be found in the pt folder.
 
 Here is a sample tune you can test.
 
@@ -9675,8 +9674,7 @@ April 11 2013
 Corrected a minor error in init_stresspat() (Tango) in stresspat.c.
 As a convenience, I have produced default_stress.txt in the format
 that read_custom_stress_file() accepts. Default_stress.txt contains
-the built in models to abc2midi. You can find the file in the pt (Phil
-Taylor) folder.
+the built in models to abc2midi.
 
 
 April 17 2013
@@ -14990,7 +14988,7 @@ cdec z4
 V:2
 z4 c4
 
-Fix: Hudson Lacerda supplied me with pseudo-code (doc/hudsonshift.txt)
+Fix: Hudson Lacerda supplied me with pseudo-code 
 which describes how all the transpose directives should work.
 This code was implemented in parseSoundScore() which now replaces
 parseSound(). It also fixes yaps.

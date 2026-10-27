@@ -27,16 +27,7 @@ This package is to be found on the web at
 
 http://abc.sourceforge.net/abcMIDI/
 (The latest versions for the time being is found on
- ifdo.ca/~seymour/runabc/top.html.)
-
-Note, if you have difficulty compiling the package because you do not have
-snprintf see the note in doc/CHANGES dated January 08 2005 (and also
-December 17 2004).
-
-These programs make use of the 'midifilelib' public domain MIDI file utilities,
-which was originally available from
-
-http://www.harmony-central.com/MIDI/midifilelib.tar.gz
+ ifdo.ca/~seymour/runabc )
 
 If you have the source distribution and intend to re-compile the code,
 read the file coding.txt.
