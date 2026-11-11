@@ -1,19 +1,19 @@
 Header format=1 ntrks=2 division=480
 Track start
-Time=1  Meta Text, type=0x01 (Text Event)  leng=19
+Time=0  Meta Text, type=0x01 (Text Event)  leng=19
      Text = <@KMIDI KARAOKE FILE>
-Time=1  Meta Text, type=0x03 (Sequence/Track Name)  leng=21
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=21
      Text = <Oh You New York Girls>
-Time=1  Meta Text, type=0x01 (Text Event)  leng=23
+Time=0  Meta Text, type=0x01 (Text Event)  leng=23
      Text = <@IOh You New York Girls>
-Time=1  Meta Text, type=0x01 (Text Event)  leng=6
+Time=0  Meta Text, type=0x01 (Text Event)  leng=6
      Text = <@ITrad>
-Time=1  Meta Text, type=0x01 (Text Event)  leng=10
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <note track>
-Time=1  Tempo, microseconds-per-MIDI-quarter-note=300000
-Time=1  Key signature, sharp/flats=0  minor=0
-Time=1  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
-Time=92186  Meta event, end of track
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=300000
+Time=0  Key signature, sharp/flats=0  minor=0
+Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=92185  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=17

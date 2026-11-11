@@ -16246,3 +16246,19 @@ lyrics of a line with an inline [P:] label, and stops voice 1 from
 playing the notes of voice 2 after a [P:] label in its line.  New
 golden tests abc2midi_part_pickup and abc2midi_pmar_part_pickup_6
 (samples/part_pickup.abc).
+
+
+November 11 2026 [RK]
+
+abc2midi: in a tune with w: lyrics, the conductor track starts at time
+0, as in a tune without lyrics (GitHub issue #63).  writetrack()
+(genmidi.c) keeps a delay of one tick for the first note of a track,
+and the first line of the Soft-Karaoke header, @KMIDI KARAOKE FILE,
+took it: this header, the tempo, the key signature and the time
+signature were at time 1, and the tempo changes and the -PMAR part
+markers of this track one tick after their bar line.  A program that
+reads the time signature at time 0, such as Midiano for its sheet
+music, found none.  text_data() now writes the header lines without
+delay.  The output with -lyrics, which has no such header, is
+unchanged.  New golden test abc2midi_words_tempo
+(samples/words_tempo.abc).

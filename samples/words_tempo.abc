@@ -1,0 +1,15 @@
+% A tune with w: lyrics has a conductor track that starts with the
+% Soft-Karaoke header (GitHub issue #63).  This header, the tempo, the key
+% signature and the time signature that follow it are at time 0, and the
+% tempo change is on its bar line, as in a tune without lyrics.  They were
+% all one tick later, so that a program reading the time signature at time
+% 0 found none.
+X:1
+T:Tempo change with lyrics
+C:abc2midi test
+M:3/4
+L:1/4
+Q:1/4=120
+K:G
+G A B |[Q:1/4=90] d2 z |]
+w:one two three four
