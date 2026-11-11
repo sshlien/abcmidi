@@ -1596,6 +1596,11 @@ Complications occur when the left repeat symbol (|:) is
 missing and abc2midi has to assume it is at the beginning.
 More complications occur when there is a key change after
 the repeat or the music is split into parts A,B,C, etc.
+A part may start with an incomplete bar (anacrusis) after its
+P: field, as the tune does. When the previous part ends on a
+complete bar, abc2midi accepts it and ends it at the bar line
+that follows, |: included, so that the next bar starts on the
+beat.
 Yaps does the bar checking differently when it encounters
 repeats so that it may not resolve as many incomplete bars
 and report more warnings.

@@ -319,6 +319,21 @@ add_golden_test(
   ABC2MIDI_ARGS -PMAR
 )
 
+# Regression test for GitHub issue #61: a pickup after a P: label is a bar
+# of its own, like the pickup of the tune (see samples/part_pickup.abc, whose
+# other tunes abc2midi_clean_part_pickup renders).  Before |: it was merged
+# with the next bar, so that this bar got the beat accents and the guitar
+# chords of the wrong places.  Tune 6, with -PMAR, pins [P:] labels in the
+# lines of two voices: voice 1 used to play the notes of voice 2 after them.
+add_golden_test(TYPE abc2midi SAMPLE part_pickup.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        part_pickup.abc
+  NAME          abc2midi_pmar_part_pickup_6
+  TUNE          6
+  ABC2MIDI_ARGS -PMAR
+)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given

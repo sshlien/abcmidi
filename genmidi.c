@@ -132,6 +132,9 @@ extern int ntracks;
 
 /* bar length checking */
 int bar_num, bar_denom, barno, barsize;
+/* set at a P: label met between two bars, until the next bar ends: that
+ * bar may be a pickup, like the first bar of the tune */
+static int part_pickup;
 int b_num, b_denom;
 extern int barchecking;
 
@@ -540,9 +543,11 @@ static void checkbar(int pass)
   if (barchecking) {
     /* only generate these errors once */
     if (noteson && (partrepno == 0)) {
-      /* allow zero length bars for typesetting purposes */
+      /* allow zero length bars for typesetting purposes, and a short
+       * first bar (a pickup) in the tune or in a part */
       if ((bar_num-barsize*(bar_denom) != 0) &&
-          (bar_num != 0) && ((pass == 2) || (barno != 0))) {
+          (bar_num != 0) && ((pass == 2) || (barno != 0)) &&
+          !(part_pickup && bar_num < barsize*bar_denom)) {
         /* [SS] 2014-11-17 added tracknumber */
         snprintf(msg, sizeof(msg), "Track %d Bar %d has %d",tracknumber, barno, bar_num);
         if (bar_denom != 1) {
@@ -561,6 +566,7 @@ static void checkbar(int pass)
   };
   if (bar_num > 0) {
     barno = barno + 1;
+    part_pickup = 0;
   };
   bar_num = 0;
   bar_denom = 1;
@@ -583,9 +589,11 @@ static void checkbar(int pass)
 
 static void softcheckbar(int pass)
 /* allows repeats to be in mid-bar */
+/* A pickup at the start of the tune or of a part ends at the bar line */
+/* that follows it, so that the next bar starts on the beat. */
 {
   if (barchecking) {
-    if ((bar_num-barsize*(bar_denom) >= 0) || (barno <= 0)) {
+    if ((bar_num-barsize*(bar_denom) >= 0) || (barno <= 0) || part_pickup) {
       checkbar(pass);
     };
   };
@@ -673,6 +681,7 @@ static int partbreak(int xtrack, int voice, int place)
   int newplace;
 
   newplace = place;
+  part_pickup = (bar_num == 0);
   
   if (parts != -1) {
     /* go to next part label */
@@ -696,7 +705,9 @@ static int findvoice(int initplace, int voice, int xtrack)
       }
     if (feature[j] == PART) {
       j = partbreak(xtrack, voice, j);
-      if (voice == 1) {
+      /* a part of a P: play order starts in voice 1, but without a play
+       * order a P: label stays in the current voice, as in store.c */
+      if ((voice == 1) && (parts != -1)) {
         foundvoice = 1;
       } else {
         j = j + 1;
@@ -814,8 +825,10 @@ static int check_wordextend(int startplace)
     if (this_feature == WORDEXTEND) {
       return 1;
     }
-    /* we should stop searching if we find any of these */
-    if ((this_feature == WORDLINE) || (this_feature == PART) ||
+    /* we should stop searching if we find any of these; without a P:
+     * play order, a PART is only a label */
+    if ((this_feature == WORDLINE) ||
+        ((this_feature == PART) && (parts != -1)) ||
         (this_feature == VOICE) || (this_feature == MUSICLINE)) {
       return 0;
     }
@@ -888,7 +901,11 @@ static int findwline(int startline)
          */
         break;
       case PART:
-        done = 1;
+        /* without a P: play order, a label such as [P:B] inside a line
+         * of music does not end its lyrics */
+        if (parts != -1) {
+          done = 1;
+        };
         break;
       case VOICE:
         done = 1;
@@ -2977,6 +2994,7 @@ long writetrack(int xtrack)
     j = findvoice(j, trackvoice, xtrack);
   };
   barno = 0;
+  part_pickup = 0;
   bar_num = 0;
   bar_denom = 1;
   err_num = 0;
@@ -3131,6 +3149,7 @@ long writetrack(int xtrack)
       break;
     case PART: /* [RK] 2026-03-30 */
       in_varend = 0;
+      part_pickup = (bar_num == 0);
       if (parts == -1) {
         /* No header P: spec, body labels only: emit "Part X" */
         if (partmarkers && xtrack == 0 &&

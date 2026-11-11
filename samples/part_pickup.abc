@@ -1,0 +1,103 @@
+% A part may start with a pickup (an anacrusis), a bar shorter than the
+% time signature, as the tune does (GitHub issue #61).  Before |: it was
+% merged with the next bar, so that this bar was reported too long, its
+% notes got the beat accents of the wrong places and its guitar chords did
+% not start on the beat.  Before a plain bar line it was reported too
+% short.
+% - Tune 1: the example of the issue, with P: labels and no P: play order.
+% - Tune 2: pickups before a plain bar line, after an inline [P:] label and
+%   inside a repeat.
+% - Tune 3: a P: play order.
+% - Tune 4: a part that ends on a short bar completed by the pickup of the
+%   next part, which stay one bar.
+% - Tune 5: two voices, with the P: labels before V:1.
+% - Tune 6: two voices, with a [P:] label in the line of each voice.
+% - Tune 7: lyrics of a line with an inline [P:] label.
+X:1
+T:Pickups after P: labels
+C:abc2midi test
+M:4/4
+L:1/4
+%%MIDI gchord fzcz
+K:C
+P:A
+zc/2cB|:"C"c>d ee|"G"c>d ee:|
+P:B
+ze/2ed|:"G"e>f gg|"C"e>d cG:|
+
+X:2
+T:Pickups before a plain bar line
+C:abc2midi test
+M:3/4
+L:1/8
+K:G
+P:A
+D2|G2 B2 d2|c2 A2 F2|G6||
+P:B
+d2|g2 f2 e2|d6||[P:C]B2|c2 B2 A2|G6||
+P:D
+|:D2|G2 B2 d2|G4:|
+
+X:3
+T:Pickups in a P: play order
+C:abc2midi test
+M:2/4
+L:1/8
+P:ABA
+K:D
+P:A
+A2|:d2 f2|e2 c2:|
+P:B
+z f|:a2 g2|f4:|
+
+X:4
+T:A short last bar completed by the next pickup
+C:abc2midi test
+M:2/4
+L:1/8
+K:D
+P:A
+A2|d2 f2|e2 d2|e2||
+P:B
+z f|a2 g2|f2 e2|d4|]
+
+X:5
+T:Pickups after P: labels in two voices
+C:abc2midi test
+M:4/4
+L:1/4
+K:C
+P:A
+V:1
+G|:c d e f|g4:|
+V:2
+G,|:C2 E2|C4:|
+P:B
+V:1
+g|:e d c B|c4:|
+V:2
+G,|:G,2 B,2|C4:|
+
+X:6
+T:Part labels in the lines of two voices
+C:abc2midi test
+M:3/4
+L:1/4
+K:G
+V:1
+[P:A]D|:G B d|g3:|
+V:2
+[P:A]z|:G, D G,|G,3:|
+V:1
+[P:B]d|:g f e|d3:|
+V:2
+[P:B]z|:B, D B,|D3:|
+
+X:7
+T:Lyrics with an inline part label
+C:abc2midi test
+M:4/4
+L:1/4
+K:C
+C D E F|[P:B]G A B c|
+w:one two three four five six sev-en
