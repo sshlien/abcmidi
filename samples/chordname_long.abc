@@ -1,0 +1,20 @@
+%%MIDI chordname 13 0 4 7 10 14 17 21
+% %%MIDI chordname defines a guitar chord of up to 10 notes.  The chord
+% above, of 7 notes, is defined in the file header, where
+% event_specific_in_header() (store.c) read the notes into an array of 6,
+% and configure_gchord() (genmidi.c) wrote the notes of a chord to play
+% into an array of 6, overwriting their count: abc2midi played dozens of
+% wrong notes for each chord.  The tune plays this chord and one of 10
+% notes, defined in the tune, with the gchord codes c, then g to k.
+X:1
+T:Named chords of 7 and 10 notes
+C:abc2midi test
+M:4/4
+L:1/2
+Q:1/4=120
+K:C
+%%MIDI chordname all 0 1 2 3 4 5 6 7 8 9
+%%MIDI gchord c
+"C13"CE|"Call"CE|
+%%MIDI gchord ghik
+"C13"CE|"Call"CE|]

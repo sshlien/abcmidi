@@ -1,0 +1,23 @@
+% The gchord codes g, h, i, j, k play the notes of a guitar chord from the
+% lowest, which in an inversion such as "C/E" is the bass note (GitHub
+% issue #11).  configure_gchord() (genmidi.c) raised the notes below the
+% bass note by an octave but kept them in the order of the chord
+% definition, so that g played the root: "C/E" with ghih played C' G E G
+% instead of E G C' G.  A bass note that is not in the chord, as in "C/B",
+% leaves the chord unchanged.  In "C9/E" and "C9/Bb" the raised root comes
+% before the ninth, D'.
+X:1
+T:Gchord codes on inverted chords
+C:abc2midi test
+M:4/4
+L:1/2
+Q:1/4=120
+K:C
+%%MIDI gchord ghih
+"C"CE|"C/E"EG|"C/G"Gc|"Am/C"CE|"Am/E"EA|"C/B"B,C|
+%%MIDI gchord ghij
+"G7"B,D|"G7/B"B,D|"G7/D"DF|"G7/F"FG|
+%%MIDI gchord hijk
+"C9"CE|"C9/E"EG|"C9/Bb"_BG|
+%%MIDI gchord GHIH
+"C/E"EG|]

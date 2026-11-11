@@ -1,0 +1,25 @@
+% The gchord codes g, h, i, j, k play the notes of a guitar chord, and G,
+% H, I, J, K the same notes an octave lower.  A code past the last note of
+% a shorter chord plays that last note, so that an Alberti bass has no
+% gap: j on "C" plays G, and h, i, j on "C5" play G.  dogchords()
+% (genmidi.c) used to play the slot after the last note instead, left
+% from an earlier chord or 0, a missing break made k also play G, and K
+% read the fifth note of a four-note chord.  A chord in lower case, as
+% "c", has the bass note only: f plays it and g, h, i play nothing.
+X:1
+T:Gchord codes g to k and G to K
+C:abc2midi test
+M:4/4
+L:1/2
+Q:1/4=120
+K:C
+%%MIDI gchord ghij
+"C"CE|"C5"CG|"G7"B,D|
+%%MIDI gchord hijk
+"C9"CE|"G7"B,D|"C"CE|
+%%MIDI gchord GHIJ
+"C"CE|"C5"CG|
+%%MIDI gchord HIJK
+"C9"CE|"G7"B,D|
+%%MIDI gchord fghi
+"c"CE|]

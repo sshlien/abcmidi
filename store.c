@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "5.07 October 14 2026 abc2midi"
+#define VERSION "5.08 October 19 2026 abc2midi"
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -2186,7 +2186,7 @@ void event_midi(char *s)
 
     else if (strcmp(command, "chordname") == 0) {
       char name[20];
-      int i, notes[10]; /* [SS] 2012-01-29 */
+      int i, notes[11]; /* 10 notes and one more for the error in addchordname() */
 
       skipspace(&p);
       i = 0;
@@ -2623,7 +2623,7 @@ void event_specific_in_header(char *package, char *s)
 
     if (strcmp(command, "chordname") == 0) {
       char name[20];
-      int i, notes[6];
+      int i, notes[11]; /* 10 notes and one more for the error in addchordname() */
       skipspace(&p);
       i = 0;
       while ((i<19) && (*p != ' ') && (*p != '\0')) {
@@ -2636,7 +2636,7 @@ void event_specific_in_header(char *package, char *s)
         event_error("Bad format for chordname command");
       } else {
         i = 0;
-        while ((i<=6) && (*p == ' ')) {
+        while ((i<=10) && (*p == ' ')) {
           skipspace(&p);
           notes[i] = readsnump(&p); 
           i = i + 1;
