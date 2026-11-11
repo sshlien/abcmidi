@@ -139,6 +139,12 @@ jobs:
   # abc2svg is built from a pinned check-in of its fossil repository.  To move
   # to a newer one, set ABC2SVG_CHECKIN to its hash and ABC2SVG_SHA256 to the
   # sha256sum of the tarball that the URL below then serves.
+  #
+  # The tarball is kept in the Actions cache, keyed by the pin, so that it is
+  # downloaded once.  When it is not in the cache and chiselapp.com does not
+  # serve it, the comparison is skipped with a warning and a note in the job
+  # summary instead of failing the job; a tarball whose sha256 differs from
+  # the pin still fails it.
   compare-abc2svg:
     runs-on: ubuntu-latest
     name: compare with abc2svg (informational)
@@ -154,16 +160,42 @@ jobs:
         run: cmake --preset default
       - name: Build
         run: cmake --build --preset default --target abc2midi mftext
-      # NOMIN=1 skips the minification, which needs jsmin, qjs or uglifyjs.
-      - name: Fetch and build abc2svg
+      - name: Restore the abc2svg tarball
+        id: abc2svg-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ runner.temp }}/abc2svg-tarball
+          key: abc2svg-${{ env.ABC2SVG_CHECKIN }}-${{ env.ABC2SVG_SHA256 }}
+      - name: Download the abc2svg tarball
+        id: abc2svg-download
+        if: steps.abc2svg-cache.outputs.cache-hit != 'true'
         run: |
-          curl -sSfL -o "$RUNNER_TEMP/abc2svg.tar.gz" \
-            "https://chiselapp.com/user/moinejf/repository/abc2svg/tarball/$ABC2SVG_CHECKIN/abc2svg.tar.gz"
-          echo "$ABC2SVG_SHA256  $RUNNER_TEMP/abc2svg.tar.gz" | sha256sum --check
-          tar -xzf "$RUNNER_TEMP/abc2svg.tar.gz" -C "$RUNNER_TEMP"
+          tarball="$RUNNER_TEMP/abc2svg-tarball/abc2svg.tar.gz"
+          mkdir -p "$(dirname "$tarball")"
+          if curl -sSfL -o "$tarball" \
+              "https://chiselapp.com/user/moinejf/repository/abc2svg/tarball/$ABC2SVG_CHECKIN/abc2svg.tar.gz"
+          then
+            echo "$ABC2SVG_SHA256  $tarball" | sha256sum --check
+            echo "downloaded=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::chiselapp.com did not serve the abc2svg tarball: comparison with abc2svg skipped"
+            echo "chiselapp.com did not serve the abc2svg tarball of check-in $ABC2SVG_CHECKIN, and it is not in the Actions cache: comparison with abc2svg skipped." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Save the abc2svg tarball
+        if: steps.abc2svg-download.outputs.downloaded == 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/abc2svg-tarball
+          key: abc2svg-${{ env.ABC2SVG_CHECKIN }}-${{ env.ABC2SVG_SHA256 }}
+      # NOMIN=1 skips the minification, which needs jsmin, qjs or uglifyjs.
+      - name: Build abc2svg
+        if: steps.abc2svg-cache.outputs.cache-hit == 'true' || steps.abc2svg-download.outputs.downloaded == 'true'
+        run: |
+          tar -xzf "$RUNNER_TEMP/abc2svg-tarball/abc2svg.tar.gz" -C "$RUNNER_TEMP"
           command -v ninja || { sudo apt-get update && sudo apt-get install -y ninja-build; }
           cd "$RUNNER_TEMP/abc2svg" && NOMIN=1 ninja
       - name: Compare
+        if: steps.abc2svg-cache.outputs.cache-hit == 'true' || steps.abc2svg-download.outputs.downloaded == 'true'
         run: >-
           python3 tests/compare_abc2svg.py
           --abc2midi build/default/abc2midi
