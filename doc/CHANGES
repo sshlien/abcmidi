@@ -16227,3 +16227,22 @@ order of the chord definition, so that g played the root: "C/E" with
 an inverted chord are now sorted, which leaves the chord played by c
 unchanged.  New golden test abc2midi_gchord_inversion
 (samples/gchord_inversion.abc).
+
+
+November 10 2026 [RK]
+
+abc2midi: a part may start with a pickup, a bar shorter than the time
+signature, as the tune does (GitHub issue #61).  checkbar() and
+softcheckbar() (genmidi.c) accepted it only at the start of the tune:
+before |:, a pickup after a P: label was merged with the next bar,
+which was reported too long and played with the beat accents and the
+guitar chords of the wrong places, and before a plain bar line it was
+reported too short.  A part that ends on a short bar completed by the
+pickup of the next part is unchanged.  Without a P: play order in the
+header, event_part() (store.c) now keeps the body P: labels even
+without -PMAR, and such a label neither ends the lyrics of a line nor
+makes findvoice() resume voice 1.  With -PMAR, this restores the w:
+lyrics of a line with an inline [P:] label, and stops voice 1 from
+playing the notes of voice 2 after a [P:] label in its line.  New
+golden tests abc2midi_part_pickup and abc2midi_pmar_part_pickup_6
+(samples/part_pickup.abc).

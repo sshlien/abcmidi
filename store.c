@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "5.08 October 19 2026 abc2midi"
+#define VERSION "5.09 November 10 2026 abc2midi"
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -2956,8 +2956,9 @@ void event_part(char *s)
     p = s;
     skipspace(&p);
     if (pastheader && parts == -1) { /* [RK] 2026-03-30 */
-      /* No header P: spec. If -PMAR, store body P: as section label */
-      if (partmarkers && ((int)*p >= 'A') && ((int)*p <= 'Z')) {
+      /* No header P: spec: store body P: as a section label, for the
+       * -PMAR markers and for a pickup at the start of the section */
+      if (((int)*p >= 'A') && ((int)*p <= 'Z')) {
         addfeature(PART, (int)*p, 0, 0);
       }
       return;
