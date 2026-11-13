@@ -729,7 +729,7 @@ static void text_data(char *s)
  * follow it: the delay kept in delta_time is for the first event after the
  * header of the track. */
 {
-  mf_write_meta_event(0L, text_event, s, strlen(s));
+  mf_write_meta_event(0L, text_event, s, strlen(s)); /* [RK] 2026-11-11 */
 }
 
 /* [RK] 2026-05-30 */
