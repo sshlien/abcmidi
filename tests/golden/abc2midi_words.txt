@@ -1,18 +1,18 @@
 Header format=1 ntrks=2 division=480
 Track start
-Time=1  Meta Text, type=0x01 (Text Event)  leng=19
+Time=0  Meta Text, type=0x01 (Text Event)  leng=19
      Text = <@KMIDI KARAOKE FILE>
-Time=1  Meta Text, type=0x03 (Sequence/Track Name)  leng=23
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=23
      Text = <Word and lyric handling>
-Time=1  Meta Text, type=0x01 (Text Event)  leng=25
+Time=0  Meta Text, type=0x01 (Text Event)  leng=25
      Text = <@IWord and lyric handling>
-Time=1  Meta Text, type=0x01 (Text Event)  leng=15
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
      Text = <@Iabc2midi test>
-Time=1  Meta Text, type=0x01 (Text Event)  leng=10
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <note track>
-Time=1  Tempo, microseconds-per-MIDI-quarter-note=500000
-Time=1  Key signature, sharp/flats=0  minor=0
-Time=1  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=0  minor=0
+Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
 Time=3866  Meta event, end of track
 Track end
 Track start

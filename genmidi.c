@@ -724,11 +724,12 @@ static int findvoice(int initplace, int voice, int xtrack)
 }
 
 static void text_data(char *s)
-/* write text event to MIDI file */
+/* Write a text event of the karaoke header, at the start of the track.
+ * It is at time 0, like the tempo, key signature and time signature that
+ * follow it: the delay kept in delta_time is for the first event after the
+ * header of the track. */
 {
-  mf_write_meta_event(delta_time, text_event, s, strlen(s));
-  tracklen = tracklen + delta_time;
-  delta_time = 0L;
+  mf_write_meta_event(0L, text_event, s, strlen(s)); /* [RK] 2026-11-11 */
 }
 
 /* [RK] 2026-05-30 */

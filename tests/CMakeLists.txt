@@ -334,6 +334,13 @@ add_golden_test(
   ABC2MIDI_ARGS -PMAR
 )
 
+# Regression test for GitHub issue #63: in a tune with w: lyrics, the
+# Soft-Karaoke header of the conductor track is at time 0, with the tempo, the
+# key signature and the time signature that follow it, and a tempo change is
+# on its bar line, as in a tune without lyrics (see samples/words_tempo.abc).
+# They were all one tick later.
+add_golden_test(TYPE abc2midi SAMPLE words_tempo.abc)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given
