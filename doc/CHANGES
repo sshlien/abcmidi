@@ -16369,3 +16369,8 @@ subtracts it.  The notes are played as long as before, and barloc.txt
 (-c) gives the written length of the bars.  New golden tests
 abc2midi_fermata_bars and abc2midi_fermata_bars_2
 (samples/fermata_bars.abc).
+
+abc2abc: a rest keeps its shorthand decorations, such as the fermata of
+"Hz" or "H z", which event_rest() (toabc.c) did not write.  A
+decoration written as !fermata! was already kept.  New golden test
+abc2abc_decoration_space (samples/decoration_space.abc).

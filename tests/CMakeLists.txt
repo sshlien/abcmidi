@@ -415,6 +415,10 @@ add_golden_test(
   NAME          abc2midi_decoration_space_2
   TUNE          2
 )
+# abc2abc writes the shorthand decorations of the notes, rests and chords,
+# without the white space that follows them.  The decorations of rests,
+# such as the fermata of "H z", were dropped.
+add_golden_test(TYPE abc2abc SAMPLE decoration_space.abc)
 
 # Regression test for the bar check of a bar with fermatas: it counts the
 # length written in the bar, not the longer one that the fermatas give to

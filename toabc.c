@@ -1712,8 +1712,12 @@ void event_spacing(int n, int m)
 void event_rest(int decorators[DECSIZE], int n, int m, int type)
 {
   struct fract newlen;
+  int t;
 
   inmusic = 1;
+  for (t=0; t<DECSIZE; t++) {
+    if (decorators[t]) emit_char(decorations[t]); /* [RK] 2026-11-14 */
+  };
   if( type == 1) emit_string("x");
   else emit_string("z");
   newlen.num = n * lenfactor.num;
