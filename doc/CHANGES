@@ -16357,3 +16357,15 @@ decoration is a "Malformed note" error.  New golden tests
 abc2midi_decoration_space and abc2midi_decoration_space_2
 (samples/decoration_space.abc), and exit-status test
 abc2midi_decoration_line_end (samples/decoration_line_end.abc).
+
+abc2midi: the bar check counts the length written in a bar, and no
+longer the longer one that fermatas give to its notes, rests and
+chords.  Each bar with a fermata but the first one was reported as too
+long, such as "Track 0 Bar 1 has 5 time units while the time signature
+has 4" for "C D E F|C E G Hc|", an error with -Werror.  The voice adds
+up in fermata_length() (store.c) the length that fermatas add to its
+bar, event_bar() stores it in the bar line, and checkbar() (genmidi.c)
+subtracts it.  The notes are played as long as before, and barloc.txt
+(-c) gives the written length of the bars.  New golden tests
+abc2midi_fermata_bars and abc2midi_fermata_bars_2
+(samples/fermata_bars.abc).

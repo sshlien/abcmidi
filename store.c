@@ -339,6 +339,11 @@ struct voicecontext {
   /* chord handling */
   int inchord, chordcount;
   int chord_num, chord_denom;
+  /* length that fermatas added to the bar being parsed, and to the chord
+     being parsed through its first note, in the units of num[]/denom[]:
+     see fermata_length() */
+  int fermata_num, fermata_denom; /* [RK] 2026-11-14 */
+  int chord_fermata_num, chord_fermata_denom; /* [RK] 2026-11-14 */
   /* details of last 2 notes/chords to apply length-modifiers to */
   int laststart, lastend, thisstart, thisend; /* for handling broken rhythms*/
   /* broken rhythm handling */
@@ -558,6 +563,10 @@ static struct voicecontext* newvoice(int n)
   s->ingrace = 0;
   s->inchord = 0;
   s->chordcount = 0;
+  s->fermata_num = 0; /* [RK] 2026-11-14 */
+  s->fermata_denom = 1;
+  s->chord_fermata_num = 0;
+  s->chord_fermata_denom = 1;
   s->lastbarloc = -1;
   s->laststart = -1;
   s->lastend = -1;
@@ -3483,13 +3492,36 @@ void event_spacing(int n, int m)
 {
 }
 
+static void fermata_length(int n, int d, int n0, int d0)
+/* A fermata has lengthened the note, rest or chord being parsed from n0/d0
+ * to n/d units of L:.  This extra length is played, but it is not part of
+ * the length written in the bar, which checkbar() (genmidi.c) compares with
+ * the time signature.  It is added up in the voice for the bar or, through
+ * the first note, for the chord, and event_bar() stores it in the bar line.
+ * Grace notes take no time in the bar. [RK] 2026-11-14 */
+{
+  int ext_num, ext_denom;
+
+  if (v->ingrace) return;
+  ext_num = 4*(n*d0 - n0*d);
+  ext_denom = d*d0*(v->default_length);
+  if (!v->inchord) {
+    addfract(&v->fermata_num, &v->fermata_denom, ext_num, ext_denom);
+  } else if (v->chordcount == 1) {
+    addfract(&v->chord_fermata_num, &v->chord_fermata_denom, ext_num, ext_denom);
+  };
+}
+
 void event_rest(int decorators[DECSIZE], int n, int m, int type)
 /* rest of n/m in the abc */
 {
   int num, denom;
+  int written_num, written_denom; /* without the fermata [RK] 2026-11-14 */
 
   num = n;
   denom = m;
+  written_num = n;
+  written_denom = m;
   if (decorators[FERMATA] && !ignore_fermata) {
     if (fermata_fixed) addfract(&num,&denom,1,1);
     else num = num*2;
@@ -3501,6 +3533,8 @@ void event_rest(int decorators[DECSIZE], int n, int m, int type)
   if (tuplecount > 0) {
     num = num * tfact_num;
     denom = denom * tfact_denom;
+    written_num = written_num * tfact_num; /* [RK] 2026-11-14 */
+    written_denom = written_denom * tfact_denom;
     if (tnote_num == 0) {
       tnote_num = num;
       tnote_denom = denom;
@@ -3521,6 +3555,9 @@ void event_rest(int decorators[DECSIZE], int n, int m, int type)
   };
   if ((!v->ingrace) && ((!v->inchord)||(v->chordcount==1))) {
     addunits(num, denom*(v->default_length));
+  };
+  if (decorators[FERMATA] && !ignore_fermata) { /* [RK] 2026-11-14 */
+    fermata_length(num, denom, written_num, written_denom);
   };
   last_num = 3; /* hornpiping (>) cannot follow rest */
   addfeature(REST, 0, num*4, denom*(v->default_length));
@@ -3567,6 +3604,8 @@ void event_chordon(int chorddecorators[])
     v->chordcount = 0;
     v->chord_num = 0;
     v->chord_denom = 1;
+    v->chord_fermata_num = 0; /* [RK] 2026-11-14 */
+    v->chord_fermata_denom = 1;
     marknotestart();
   };
 }
@@ -3605,8 +3644,12 @@ void event_chordoff(int chord_n, int chord_m)
         };
     };
 
-    if(chord_m == 1 && chord_n == 1) /* chord length not set outside [] */
+    if(chord_m == 1 && chord_n == 1) { /* chord length not set outside [] */
       addfeature(CHORDOFF, 0, v->chord_num, v->chord_denom); 
+      /* the length of the chord is that of its first note */
+      addfract(&v->fermata_num, &v->fermata_denom,
+               v->chord_fermata_num, v->chord_fermata_denom); /* [RK] 2026-11-14 */
+      }
     else
       {
 
@@ -4274,6 +4317,7 @@ void event_note(int decorators[DECSIZE], cleftype_t *clef, char accidental, int 
   int pitch;
   int pitch_noacc = 0;
   int dummy;
+  int written_num, written_denom; /* without the fermata [RK] 2026-11-14 */
 
   decotype[notes] = 0; /* [SS] 2012-07-02 no decoration */
   if (voicesused == 0) bodystarted=1;
@@ -4328,8 +4372,11 @@ void event_note(int decorators[DECSIZE], cleftype_t *clef, char accidental, int 
   /* [SS] 2015-08-18 */
   pitch = pitchof_b(note, accidental, mult, octave, propagate_accidentals,&active_pitchbend);
   if (decorators[FERMATA] && !ignore_fermata) {
+    written_num = num; /* [RK] 2026-11-14 */
+    written_denom = denom;
     if(fermata_fixed) addfract(&num,&denom,1,1);
     else num = num*2;
+    fermata_length(num, denom, written_num, written_denom); /* [RK] 2026-11-14 */
   };
   if (v->chordcount == 1) {
     v->chord_num = num*4;
@@ -5010,10 +5057,16 @@ static void fix_enclosed_note_lengths(int from, int end)
 /* inside the chord.                                   */
 
 int j;
+int n0, d0; /* [RK] 2026-11-14 */
 if (apply_fermata_to_chord && !ignore_fermata)   /* [SS] 2012-03-26 */
     {
+    n0 = num[end];
+    d0 = denom[end];
     if (fermata_fixed) addfract(&num[end],&denom[end],1,1);
     else num[end] *= 2;
+    /* the length added, already in the units of num[]/denom[] */
+    addfract(&v->fermata_num, &v->fermata_denom,
+             num[end]*d0 - n0*denom[end], denom[end]*d0); /* [RK] 2026-11-14 */
     }
 for (j = from; j < end; j++)
   {
@@ -5440,7 +5493,15 @@ void event_bar(int type, char *replist)
   if ((type == THIN_THICK) || (type == THICK_THIN) || (type == DOTTED_BAR)) {
     newtype = DOUBLE_BAR;
   };
-  addfeature(newtype, 0, 0, 0);
+  /* the bar line holds the length that fermatas added to its bar, for
+     checkbar() (genmidi.c) */
+  if (v->fermata_num != 0) { /* [RK] 2026-11-14 */
+    addfeature(newtype, 0, v->fermata_num, v->fermata_denom);
+  } else {
+    addfeature(newtype, 0, 0, 0);
+  };
+  v->fermata_num = 0;
+  v->fermata_denom = 1;
   copymap(v);
   zerobar();
   if (strlen(replist) > 0) {

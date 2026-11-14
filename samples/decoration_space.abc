@@ -4,8 +4,6 @@
 % #73).  parsenote() (parseabc.c) required the note straight after the
 % decoration, so that "H c" was a "Malformed note" and lost its fermata.
 % Tune 2 is tune 1 without this white space: abc2midi plays both alike.
-% The fermatas are in the first bar, which the bar check skips: it counts
-% the longer length that a fermata gives.
 X:1
 T:Shorthand decorations followed by white space
 C:abc2midi test

@@ -416,6 +416,19 @@ add_golden_test(
   TUNE          2
 )
 
+# Regression test for the bar check of a bar with fermatas: it counts the
+# length written in the bar, not the longer one that the fermatas give to
+# its notes, rests and chords (see samples/fermata_bars.abc), which made
+# each such bar but the first one too long.  Tune 2 has %%MIDI
+# fermatafixed.
+add_golden_test(TYPE abc2midi SAMPLE fermata_bars.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        fermata_bars.abc
+  NAME          abc2midi_fermata_bars_2
+  TUNE          2
+)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given
