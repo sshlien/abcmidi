@@ -1,8 +1,8 @@
 # CI workflow for abcMIDI.
 #
 # Runs the CMake-based test suite (smoke + golden-file tests) on every push
-# and pull request against the long-lived branches, and can also be triggered
-# manually from the GitHub UI or via `gh workflow run test.yml`.
+# to the long-lived branches and on every pull request, and can also be
+# triggered manually from the GitHub UI or via `gh workflow run test.yml`.
 #
 # Status badge: see the [![Tests]] link at the top of README.md.
 
@@ -12,9 +12,9 @@ on:
   # Run on pushes to the main development branches.
   push:
     branches: [master, future]
-  # Run on PRs targeting those same branches.
+  # Run on every PR, whatever its base branch, so that a PR stacked on the
+  # branch of another PR is tested too.
   pull_request:
-    branches: [master, future]
   # Allow manual runs on any branch from the Actions tab or `gh workflow run`.
   workflow_dispatch:
 
