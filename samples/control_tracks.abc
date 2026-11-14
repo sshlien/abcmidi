@@ -1,0 +1,22 @@
+% The %%MIDI commands of a voice write their events on the track of this
+% voice, and not on the conductor track of a tune with several tracks
+% (GitHub issue #71).  This track had a copy of the events of %%MIDI
+% control, portamento, noportamento, pitchbendrange and snt, at the time
+% of its last tempo change or at time 0: the two volumes below were both
+% set at time 0, so that the first bar was played with the volume of the
+% third.
+X:1
+T:MIDI controls in a tune with two voices
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+V:1
+C D E F |
+%%MIDI control 7 40
+G A B c |
+%%MIDI control 7 50
+c B A G |]
+V:2
+C,4 | G,4 | C,4 |]

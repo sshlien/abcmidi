@@ -1952,7 +1952,12 @@ static void dodeferred(char *s, int noteson)
   int val;
   int i;
   int bendinput[64]; /* [SS] 2020-08-09 */
+  int conductor; /* [RK] 2026-11-13 */
 
+  /* The conductor track of a tune with several tracks plays nothing.  It
+   * writes no event for a %%MIDI command of its voice: the track of this
+   * voice has the event, at its time. */
+  conductor = (wordson + noteson + gchordson + drumson + droneon == 0);
   p = s;
   skipspace(&p);
   readstr(command, &p, 40);
@@ -2131,7 +2136,7 @@ static void dodeferred(char *s, int noteson)
   else if (strcmp(command, "pitchbendrange") == 0) {
      int semis;
      semis = readsnump(&p);
-     midiPitchBendRange(semis);
+     if (!conductor) midiPitchBendRange(semis); /* [RK] 2026-11-13 */
      done = 1;
      }
 
@@ -2228,7 +2233,7 @@ static void dodeferred(char *s, int noteson)
       n = n + 1;
       skipspace(&p);
     };
-    write_event(control_change, chan, data, n);
+    if (!conductor) write_event(control_change, chan, data, n); /* [RK] 2026-11-13 */
     controldefaults[(int) data[0]] = (int) data[1]; /* [SS] 2015-08-10 */
     done = 1;
   }
@@ -2283,7 +2288,7 @@ static void dodeferred(char *s, int noteson)
    data[0] = 65;
    data[1] = 127;
    /* turn portamento on */
-   write_event(control_change, chan, data, 2);
+   if (!conductor) write_event(control_change, chan, data, 2); /* [RK] 2026-11-13 */
    data[0] = 5; /* coarse portamento */
    datum = readnump(&p);
    if (datum > 63) {
@@ -2291,7 +2296,7 @@ static void dodeferred(char *s, int noteson)
         datum = 0;
       };
    data[1] =(char) datum;
-   write_event(control_change, chan, data, 2);
+   if (!conductor) write_event(control_change, chan, data, 2); /* [RK] 2026-11-13 */
    done = 1;
    } 
 
@@ -2302,7 +2307,7 @@ static void dodeferred(char *s, int noteson)
    data[0] = 65;
    data[1] = 0;
    /* turn portamento off */
-   write_event(control_change, chan, data, 2);
+   if (!conductor) write_event(control_change, chan, data, 2); /* [RK] 2026-11-13 */
    done = 1;
    }
 
@@ -2338,7 +2343,7 @@ static void dodeferred(char *s, int noteson)
     float midipitch;
     midikey = readnump(&p);
     sscanf(p,"%f", &midipitch);
-    single_note_tuning_change(midikey,  midipitch);
+    if (!conductor) single_note_tuning_change(midikey,  midipitch); /* [RK] 2026-11-13 */
     done = 1;
     }
    
