@@ -7,7 +7,7 @@ Time=0  Key signature, sharp/flats=0  minor=0
 Time=0  Time signature=2/4  MIDI-clocks/click=24  32nd-notes/24-MIDI-clocks=8
 Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=5
      Text = <drums>
-Time=985  Meta event, end of track
+Time=11546  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10

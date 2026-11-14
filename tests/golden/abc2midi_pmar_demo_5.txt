@@ -25,7 +25,7 @@ Time=61440  Meta Text, type=0x06 (Marker)  leng=8
      Text = <Part A-3>
 Time=76320  Meta Text, type=0x06 (Marker)  leng=8
      Text = <Part B-3>
-Time=92185  Meta event, end of track
+Time=92186  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=17
