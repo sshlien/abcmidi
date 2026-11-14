@@ -1,0 +1,13 @@
+% A shorthand decoration at the end of a line of music decorates nothing,
+% which is an error.  parsenote() (parseabc.c) took the '\0' that ends the
+% line for a decoration: it wrote past the end of its array of decorations
+% and went on reading after the end of the line.  Like the other overflow
+% guards, the value of this sample is under the sanitizer build.
+X:1
+T:Shorthand decoration at the end of a line
+C:abc2midi test
+M:4/4
+L:1/4
+K:C
+C D E F |H
+G A B c |]

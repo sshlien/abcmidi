@@ -1,0 +1,25 @@
+% A shorthand decoration, such as H for !fermata! or T for !trill!, may be
+% followed by white space before the note, rest or chord that it
+% decorates, as section 4.14 of the abc standard allows (GitHub issue
+% #73).  parsenote() (parseabc.c) required the note straight after the
+% decoration, so that "H c" was a "Malformed note" and lost its fermata.
+% Tune 2 is tune 1 without this white space: abc2midi plays both alike.
+% The fermatas are in the first bar, which the bar check skips: it counts
+% the longer length that a fermata gives.
+X:1
+T:Shorthand decorations followed by white space
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+H C . E H [CE] H z |T d . e ~ f R g |' a . T b u c v d |L . c'4 |]
+
+X:2
+T:Shorthand decorations without white space
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+HC .E H[CE] Hz |Td .e ~f Rg |'a .Tb uc vd |L.c'4 |]

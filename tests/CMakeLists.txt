@@ -143,9 +143,11 @@ endforeach()
 #                   purpose (regression guard)
 #   chordname_too_long.abc - a %%MIDI chordname of 11 notes, on purpose
 #                   (regression guard)
+#   decoration_line_end.abc - a decoration at the end of a line, on
+#                   purpose (regression guard)
 set(ABC2MIDI_ERROR_SAMPLES microtone.abc barcheck_long_warning.abc
   barfly_barcheck.abc key_unknown_word.abc microtone_accidentals.abc
-  chordname_too_long.abc)
+  chordname_too_long.abc decoration_line_end.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering
@@ -401,6 +403,19 @@ add_golden_test(
 # was at the time of the last tempo change of this track, or at time 0.
 add_golden_test(TYPE abc2midi SAMPLE control_tracks.abc)
 
+# Regression test for GitHub issue #73: white space may separate a shorthand
+# decoration such as H or T from the note, rest or chord that it decorates
+# (see samples/decoration_space.abc).  It was a "Malformed note", and the
+# decoration was lost.  Tune 2 is the same music without this white space:
+# its golden differs from that of tune 1 only by the title.
+add_golden_test(TYPE abc2midi SAMPLE decoration_space.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        decoration_space.abc
+  NAME          abc2midi_decoration_space_2
+  TUNE          2
+)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given
@@ -520,6 +535,17 @@ add_exit_status_test(
   SAMPLE        chordname_too_long.abc
   RC            1
   REGEX         "Error in line-char [0-9]+-[0-9]+ : Named chord cannot have more than 10 notes"
+)
+
+# A shorthand decoration at the end of a line of music is an error.
+# parsenote() (parseabc.c) used to take the end of the line for a decoration
+# and write past the end of its array of decorations, which the sanitizer
+# build turns into a failure (see samples/decoration_line_end.abc).
+add_exit_status_test(
+  NAME          abc2midi_decoration_line_end
+  SAMPLE        decoration_line_end.abc
+  RC            1
+  REGEX         "Error in line-char [0-9]+-[0-9]+ : Malformed note : expecting a-g or A-G"
 )
 
 # -Werror alone must not fail a tune that raises no warning.

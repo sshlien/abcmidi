@@ -16343,3 +16343,17 @@ abcmatch_sample_*, which must exit 0.
 midistats: the input MIDI file, and the output file of -o, are closed
 before the program ends.  valgrind reports the open input file with
 --track-fds=yes, which the valgrind preset of the tests uses.
+
+abc2midi, abc2abc, yaps, abcmatch: white space may separate a
+shorthand decoration, such as H, T or ., from the note, rest or chord
+that it decorates, as section 4.14 of the abc standard allows (GitHub
+issue #73).  "C E G H c" gave "Malformed note : expecting a-g or A-G"
+and lost its fermata, while "C E G !fermata! c" was accepted.
+parsenote() (parseabc.c) now skips the white space after each shorthand
+decoration.  It also stops at the end of the line: it took the '\0'
+that ends a line of music for a decoration, so that a decoration at the
+end of a line wrote past the end of its array of decorations.  Such a
+decoration is a "Malformed note" error.  New golden tests
+abc2midi_decoration_space and abc2midi_decoration_space_2
+(samples/decoration_space.abc), and exit-status test
+abc2midi_decoration_line_end (samples/decoration_line_end.abc).
