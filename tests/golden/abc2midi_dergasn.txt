@@ -9,7 +9,7 @@ Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=14
      Text = <der Gasn Nigun>
 Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=15
      Text = <the Street Tune>
-Time=46105  Meta event, end of track
+Time=46106  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
