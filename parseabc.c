@@ -2772,10 +2772,16 @@ static void check_bar_repeats (int bar_type, char *replist)
 /* [JA] 2020-10-12 */
 static void check_and_call_bar(int bar_type, char *replist)
 {
+  int i;
+
   if (repcheck)
   {
     check_bar_repeats (bar_type, replist);
   }
+  /* A !fermata!, !trill! or !breath! just before the bar line decorates
+     the bar line, not the next note. */
+  for (i = 0; i < DECSIZE; i++)
+    decorators_passback[i] = 0; /* [RK] 2026-11-14 */
   event_bar (bar_type, replist);
 }
 

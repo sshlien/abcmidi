@@ -415,6 +415,12 @@ add_golden_test(
   NAME          abc2midi_decoration_space_2
   TUNE          2
 )
+# Regression test for a !fermata!, !trill! or !breath! just before a bar
+# line: it decorates the bar line, and the first note after it is played
+# plain (see samples/decoration_bar_line.abc).  This note was lengthened,
+# trilled or shortened.
+add_golden_test(TYPE abc2midi SAMPLE decoration_bar_line.abc)
+
 # abc2abc writes the shorthand decorations of the notes, rests and chords,
 # without the white space that follows them.  The decorations of rests,
 # such as the fermata of "H z", were dropped.

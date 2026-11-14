@@ -16374,3 +16374,11 @@ abc2abc: a rest keeps its shorthand decorations, such as the fermata of
 "Hz" or "H z", which event_rest() (toabc.c) did not write.  A
 decoration written as !fermata! was already kept.  New golden test
 abc2abc_decoration_space (samples/decoration_space.abc).
+
+abc2midi, abc2abc, yaps, abcmatch: a !fermata!, !trill! or !breath!
+just before a bar line, as in "C D E F !fermata!|", decorates the bar
+line and no longer the first note after it, which abc2midi lengthened,
+trilled or shortened, and yaps drew with the fermata or the trill.
+check_and_call_bar() (parseabc.c) now clears decorators_passback,
+which keeps these decorations for the next note.  New golden test
+abc2midi_decoration_bar_line (samples/decoration_bar_line.abc).
