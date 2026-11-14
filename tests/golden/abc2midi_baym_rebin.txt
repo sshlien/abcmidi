@@ -10,7 +10,7 @@ Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=17
 Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=20
      Text = <At the Rabbi's Table>
 Time=0  Tempo, microseconds-per-MIDI-quarter-note=750000
-Time=92425  Meta event, end of track
+Time=92426  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10

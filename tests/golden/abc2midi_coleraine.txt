@@ -9,7 +9,7 @@ Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=9
      Text = <Coleraine>
 Time=0  Parameter, chan=1 c1=7 c2=115
 Time=0  Parameter, chan=1 c1=10 c2=67
-Time=46105  Meta event, end of track
+Time=46106  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
