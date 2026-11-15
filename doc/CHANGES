@@ -16279,6 +16279,20 @@ the command.  The end of this track is now written with
 delta_time_track0.  New golden tests abc2midi_tempo_tracks and
 abc2midi_tempo_tracks_2 (samples/tempo_tracks.abc).
 
+abc2midi: in a tune with several tracks, the conductor track no longer
+has a copy of the events of the %%MIDI commands control, portamento,
+noportamento, pitchbendrange and snt of its voice (GitHub issue #71).
+dodeferred() (genmidi.c) wrote them on every track that reads the
+voice, and they are written without delay, after the last event of the
+track: on the conductor track, which has no notes, they were at the
+time of its last tempo change or at time 0.  With %%MIDI control 7 40
+before the second bar and %%MIDI control 7 50 before the third, this
+track set both volumes at time 0, so that the first bar was played with
+the volume of the third.  The track of the voice has these events at
+their time; %%MIDI pitchbend and program were already kept off the
+conductor track.  New golden test abc2midi_control_tracks
+(samples/control_tracks.abc).
+
 
 November 14 2026 [RK]
 

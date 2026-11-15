@@ -395,6 +395,12 @@ add_golden_test(
   TUNE          2
 )
 
+# Regression test for GitHub issue #71: the conductor track of a tune with
+# several tracks has no copy of the events of the %%MIDI commands of its
+# voice, such as %%MIDI control (see samples/control_tracks.abc).  The copy
+# was at the time of the last tempo change of this track, or at time 0.
+add_golden_test(TYPE abc2midi SAMPLE control_tracks.abc)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given

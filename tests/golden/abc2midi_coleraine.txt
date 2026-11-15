@@ -7,8 +7,6 @@ Time=0  Key signature, sharp/flats=0  minor=1
 Time=0  Time signature=6/8  MIDI-clocks/click=36  32nd-notes/24-MIDI-clocks=8
 Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=9
      Text = <Coleraine>
-Time=0  Parameter, chan=1 c1=7 c2=115
-Time=0  Parameter, chan=1 c1=10 c2=67
 Time=46106  Meta event, end of track
 Track end
 Track start
