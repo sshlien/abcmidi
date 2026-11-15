@@ -16262,3 +16262,54 @@ music, found none.  text_data() now writes the header lines without
 delay.  The output with -lyrics, which has no such header, is
 unchanged.  New golden test abc2midi_words_tempo
 (samples/words_tempo.abc).
+
+
+November 14 2026 [RK]
+
+abc2midi: after the last part of a P: play order, partbreak()
+(genmidi.c) took the label of the next part from pitch[notes], an
+element after the notes that is allocated but never written.  It now
+gives no label there.  Under the new valgrind preset of the tests,
+abc2midi_pmar_demo_5 and abc2midi_pmar_partdemo fail without the fix.
+
+abc2midi, yaps: \% in a field such as T: is a percent sign, and no
+longer the start of a comment (abc 2.2 sections 2.2.5 and 8.2).
+parsefield() (parseabc.c) ended the field at its %: abc2midi named the
+tracks of samples/temperament.abc, whose titles start with
+"\%\%MIDI", "\" instead of "%%MIDI temperamentlinear - microtone
+accidentals in cents", and yaps printed "\" as their title.
+strip_field_comment() now ends the field at the first % that does not
+follow a backslash, keeps \\ as it is, and gives \% as % to all the
+programs but abc2abc, which writes the field as it reads it.  New
+golden tests abc2midi_text_fields and abc2abc_text_fields
+(samples/text_fields.abc).
+
+yaps: a text that ends with a backslash, such as the title "Ends with a
+backslash \", is printed with this backslash.  getISO() (drawtune.c)
+read the two characters after it, past the end of the string.  Under
+the valgrind or sanitize preset of the tests, the new test
+yaps_sample_text_fields fails without the fix.
+
+yaps: the tempo of a Q: field in the body of a tune is freed with the
+tune.  freefeature() (yapstree.c) freed its texts but not the tempo
+itself, which the new test yaps_sample_text_fields reports under the
+valgrind preset.
+
+abcmatch: make_note_representation() (abcmatch.c) no longer writes
+past the end of its arrays.  After counting as many bars as the array
+of bar positions has, 2000 for a tune and 300 for a template, it wrote
+one more position, as for samples/barloc_long.abc, of two voices of
+1040 bars: the new test abcmatch_sample_barloc_long fails without the
+fix under the sanitize preset.  Its limit on the number of notes left
+no room for the bar line that it adds after the last note, and was the
+one of a tune, 10000, also for a template, whose arrays have 1000.
+
+Tests: the new valgrind preset (cmake --preset valgrind) runs every
+program of the test suite under valgrind, and a valgrind error fails
+the test; a CI job runs it.  abc2abc, yaps and abcmatch also run on
+every sample, in the new tests abc2abc_sample_*, yaps_sample_* and
+abcmatch_sample_*, which must exit 0.
+
+midistats: the input MIDI file, and the output file of -o, are closed
+before the program ends.  valgrind reports the open input file with
+--track-fds=yes, which the valgrind preset of the tests uses.

@@ -25,6 +25,12 @@ endif()
 # --- Options ---
 
 option(ABCMIDI_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+option(ABCMIDI_VALGRIND "Run the programs of the test suite under valgrind" OFF)
+
+# valgrind cannot run a program built with AddressSanitizer.
+if(ABCMIDI_SANITIZERS AND ABCMIDI_VALGRIND)
+  message(FATAL_ERROR "ABCMIDI_SANITIZERS and ABCMIDI_VALGRIND cannot be used together")
+endif()
 
 # --- Compiler configuration ---
 

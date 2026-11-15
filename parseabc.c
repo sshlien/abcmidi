@@ -2342,6 +2342,38 @@ static void resolve_unitlen()
   }
 }
 
+static char *
+strip_field_comment (char *field)
+/* End the field at its comment, which starts with the first % not
+ * written \%: in a text string, \% is a percent sign and \\ a backslash
+ * (abc 2.2 sections 2.2.5 and 8.2).  Except in abc2abc, which writes the
+ * field as it reads it, the backslash of \% is removed.  Returns the text
+ * after the %, or NULL if there is no comment. [RK] 2026-11-14 */
+{
+  char *p, *q;
+
+  p = field;
+  q = field;
+  while ((*p != '\0') && (*p != '%'))
+    {
+      if ((*p == '\\') && (*(p + 1) != '\0'))
+        {
+          if ((*(p + 1) == '%') && (fileprogram != ABC2ABC))
+            p = p + 1;  /* \% is a percent sign */
+          else
+            *q++ = *p++;  /* keep the backslash with what follows */
+        }
+      *q++ = *p++;
+    }
+  if (*p == '%')
+    {
+      *q = '\0';
+      return p + 1;
+    }
+  *q = '\0';
+  return NULL;
+}
+
 void
 parsefield (char key, char *field)
 /* top-level routine handling all lines containing a field */
@@ -2385,18 +2417,8 @@ parsefield (char key, char *field)
     {
       event_error ("Field not allowed in tune body");
     };
-  comment = field;
-  iscomment = 0;
-  while ((*comment != '\0') && (*comment != '%'))
-    {
-      comment = comment + 1;
-    };
-  if (*comment == '%')
-    {
-      iscomment = 1;
-      *comment = '\0';
-      comment = comment + 1;
-    };
+  comment = strip_field_comment (field); /* [RK] 2026-11-14 */
+  iscomment = (comment != NULL);
   place = field;
   skipspace (&place);
   switch (key)

@@ -49,7 +49,7 @@ Matching:
 
 
 
-#define VERSION "1.85 November 10 2026 abcmatch"
+#define VERSION "1.86 November 14 2026 abcmatch"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -276,7 +276,8 @@ make_note_representation (int *nnotes, int *nbars, int maxnotes, int maxbars,
 	    midipitch[*nnotes] = BAR;
 	    notelength[*nnotes] = BAR;
 	    (*nnotes)++;
-	    if (*nbars < maxbars) (*nbars)++;
+            /* barlineptr[*nbars] below: barlineptr has maxbars entries */
+            if (*nbars < maxbars - 1) (*nbars)++; /* [RK] 2026-11-14 */
             else printf("abcmatch too many bars\n");
             }
 	  barlineptr[*nbars] = *nnotes;
@@ -293,7 +294,9 @@ make_note_representation (int *nnotes, int *nbars, int maxnotes, int maxbars,
 	default:
 	  break;
 	}
-      if (*nnotes > imaxnotes)
+      /* midipitch has maxnotes entries, and the one after the last note
+         is written after the loop [RK] 2026-11-14 */
+      if (*nnotes >= maxnotes - 1)
 	{
 	  printf ("ran out of space for midipitch for xref %d\n",xrefno);
 	  exit (0);

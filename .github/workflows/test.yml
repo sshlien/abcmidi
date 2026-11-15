@@ -129,6 +129,32 @@ jobs:
       - name: Test (sanitizers)
         run: ctest --preset sanitize
 
+  # Memory-checking gate with valgrind: the `valgrind` preset (see
+  # CMakePresets.json) runs every program of every test under valgrind, on
+  # binaries built without instrumentation.  Unlike the sanitizers above,
+  # valgrind reports conditional jumps on uninitialised memory, such as a
+  # read of an element of the note arrays that was allocated but never
+  # written.  The memcheck options are the strictest available (see
+  # ABCMIDI_LAUNCHER in tests/CMakeLists.txt): any valgrind error, a memory
+  # leak or a file left open included, fails the test, and the test output
+  # shows the valgrind report.  A test can be quarantined as for the
+  # sanitize job.
+  test-valgrind:
+    runs-on: ubuntu-latest
+    name: valgrind
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Install valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+      - name: Configure
+        run: cmake --preset valgrind
+      - name: Build
+        run: cmake --build --preset valgrind
+      - name: Test (valgrind)
+        run: ctest --preset valgrind --parallel "$(nproc)"
+
   # Informational comparison with abc2svg, the reference for playback
   # questions such as microtones (GitHub issue #56).  tests/compare_abc2svg.py
   # renders every tune of the samples with both programs and reports in the

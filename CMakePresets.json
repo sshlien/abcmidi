@@ -26,6 +26,15 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "ABCMIDI_SANITIZERS": "ON"
       }
+    },
+    {
+      "name": "valgrind",
+      "displayName": "Debug, tests run under valgrind",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ABCMIDI_VALGRIND": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -40,6 +49,10 @@
     {
       "name": "sanitize",
       "configurePreset": "sanitize"
+    },
+    {
+      "name": "valgrind",
+      "configurePreset": "valgrind"
     }
   ],
   "testPresets": [
@@ -61,6 +74,11 @@
         "ASAN_OPTIONS": "abort_on_error=1:halt_on_error=1",
         "UBSAN_OPTIONS": "abort_on_error=1:halt_on_error=1:print_stacktrace=1"
       }
+    },
+    {
+      "name": "valgrind",
+      "configurePreset": "valgrind",
+      "output": { "outputOnFailure": true }
     }
   ]
 }

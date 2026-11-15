@@ -687,7 +687,13 @@ static int partbreak(int xtrack, int voice, int place)
     /* go to next part label */
     newplace = findpart(newplace); /* [SS] 2023.01.20 */
   };
-  partlabel = (int) pitch[newplace] - (int)'A';
+  /* after the last part of the play order, newplace is notes, past the
+   * features */
+  if (newplace < notes) { /* [RK] 2026-11-14 */
+    partlabel = (int) pitch[newplace] - (int)'A';
+  } else {
+    partlabel = -1;
+  };
   return(newplace);
 }
 

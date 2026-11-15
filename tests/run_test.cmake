@@ -15,6 +15,9 @@
 #   ABC2MIDI_TUNE, ABC2MIDI_ARGS - see abc2midi_to_mid() below
 #   ABC2MIDI_EXPECT_ERRORS       - true if abc2midi must exit 1 on SAMPLE
 #                                  instead of 0
+#   LAUNCHER                     - command (CMake list) that every program
+#                                  is run with, such as valgrind and its
+#                                  options; empty to run them directly
 #
 # Behaviour:
 #   - Runs the requested binary (and any pipeline steps required to make the
@@ -46,10 +49,11 @@ set(midfile "${TMPDIR}/${tag}.mid")
 
 # --- Command helpers ---------------------------------------------------------
 
-# Run a command; abort with a detailed message on non-zero exit.
+# Run a command with ${LAUNCHER}; abort with a detailed message on non-zero
+# exit.
 function(run_or_die)
   execute_process(
-    COMMAND ${ARGN}
+    COMMAND ${LAUNCHER} ${ARGN}
     RESULT_VARIABLE rc
     OUTPUT_VARIABLE captured_out
     ERROR_VARIABLE  captured_err
@@ -62,10 +66,10 @@ function(run_or_die)
   endif()
 endfunction()
 
-# Run a command and capture its stdout into a file.
+# Run a command with ${LAUNCHER} and capture its stdout into a file.
 function(run_to_file outfile)
   execute_process(
-    COMMAND ${ARGN}
+    COMMAND ${LAUNCHER} ${ARGN}
     OUTPUT_FILE "${outfile}"
     RESULT_VARIABLE rc
     ERROR_VARIABLE  captured_err
@@ -92,8 +96,8 @@ endfunction()
 function(abc2midi_to_mid)
   file(REMOVE "${midfile}")
   execute_process(
-    COMMAND "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_TUNE} ${ABC2MIDI_ARGS}
-            -o "${midfile}" -Werror
+    COMMAND ${LAUNCHER} "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_TUNE}
+            ${ABC2MIDI_ARGS} -o "${midfile}" -Werror
     RESULT_VARIABLE abc_rc
     OUTPUT_VARIABLE abc_out
     ERROR_VARIABLE  abc_err
@@ -177,7 +181,7 @@ elseif(TYPE STREQUAL "barloc")
   file(REMOVE_RECURSE "${workdir}")
   file(MAKE_DIRECTORY "${workdir}")
   execute_process(
-    COMMAND "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_ARGS} -c -Werror
+    COMMAND ${LAUNCHER} "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_ARGS} -c -Werror
     WORKING_DIRECTORY "${workdir}"
     RESULT_VARIABLE abc_rc
     OUTPUT_VARIABLE abc_out

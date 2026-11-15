@@ -1,0 +1,16 @@
+% Text fields with \% and \\, and a tempo change in the body.  \% is a
+% percent sign, not the start of a comment, and \\ is a backslash (abc 2.2
+% sections 2.2.5 and 8.2).  The parser ended a field at \%, so that
+% abc2midi named the track "50\" and yaps printed this title.  A title
+% that ends with a backslash made yaps read past its end, and yaps did
+% not free the tempo of a Q: field in the body.
+X:1
+T:50\% faster % a comment
+T:C:\\ % after \\, the % starts a comment
+T:Ends with a backslash \
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+C D E F |[Q:1/4=180] G A B c |]

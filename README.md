@@ -42,7 +42,7 @@ A CMake build system is available alongside the legacy one, with
 for common configurations:
 
 ```sh
-# Configure and build (pick a preset: default, debug, sanitize)
+# Configure and build (pick a preset: default, debug, sanitize, valgrind)
 cmake --preset default
 cmake --build --preset default
 
@@ -57,6 +57,7 @@ Available presets:
 | `default`  | Release    | Optimized build                              |
 | `debug`    | Debug      | Debug symbols, no optimization               |
 | `sanitize` | Debug      | Debug + AddressSanitizer + UndefinedBehaviorSanitizer |
+| `valgrind` | Debug      | Debug; the tests run every program under valgrind |
 
 The CMake build generates `compile_commands.json` for use with
 clangd and other LSP-based editors.
@@ -78,6 +79,17 @@ ctest --preset debug
 # Run only golden-file tests / only smoke tests
 ctest --preset debug -L golden
 ctest --preset debug -L smoke
+```
+
+With the `valgrind` preset (valgrind must be installed), every program that
+a test runs is run under valgrind with strict memcheck options, and a
+valgrind error, such as a read of uninitialised memory, a memory leak or a
+file left open, fails the test:
+
+```sh
+cmake --preset valgrind
+cmake --build --preset valgrind
+ctest --preset valgrind
 ```
 
 To regenerate the golden files after an intentional behavioural change,

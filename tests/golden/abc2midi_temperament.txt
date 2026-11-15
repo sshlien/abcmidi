@@ -5,8 +5,8 @@ Time=0  Meta Text, type=0x01 (Text Event)  leng=10
 Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
 Time=0  Key signature, sharp/flats=0  minor=0
 Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
-Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=1
-     Text = <\>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=57
+     Text = <%%MIDI temperamentlinear - microtone accidentals in cents>
 Time=7705  Meta event, end of track
 Track end
 Track start
@@ -14,10 +14,8 @@ Time=0  Meta Text, type=0x01 (Text Event)  leng=10
      Text = <note track>
 Time=0  Meta Text, type=0x01 (Text Event)  leng=3
      Text = <X:1>
-Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=1
-     Text = <\>
-Time=0  Meta Text, type=0x01 (Text Event)  leng=57
-     Text = <\%MIDI temperamentlinear - microtone accidentals in cents>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=57
+     Text = <%%MIDI temperamentlinear - microtone accidentals in cents>
 Time=1  Program, chan=1 program=17
 Time=1  Program, chan=2 program=17
 Time=1  Program, chan=3 program=17

@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.95 November 10 2026 yaps"
+#define VERSION "1.96 November 14 2026 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -969,6 +969,7 @@ static void freefeature(void* item, featuretype type)
     break;
   case TEMPO:
     freetempo(item);
+    free(item); /* [RK] 2026-11-14 */
     break;
   case CLEF:
   case TIME:

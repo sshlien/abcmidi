@@ -305,7 +305,8 @@ static int getISO(char s[], int j, int* code)
   int count;
 
   i =j;
-  if (s[i]=='\\') {
+  /* a backslash that ends the string is printed as it is */
+  if ((s[i]=='\\') && (s[i+1] != '\0')) { /* [RK] 2026-11-14 */
     /* look for 2 character code */
     *code = ISOencoding(s[i+1], s[i+2]);
     if (*code != 0) {

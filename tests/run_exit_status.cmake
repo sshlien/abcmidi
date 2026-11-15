@@ -17,6 +17,8 @@
 #   EXPECTED_REGEX  - regular expression that stdout must match
 #   ALL_TUNES       - true to render every tune of SAMPLE instead of only the
 #                     first (or selected) one
+#   LAUNCHER        - command (CMake list) that abc2midi is run with, such as
+#                     valgrind and its options; empty to run it directly
 
 cmake_minimum_required(VERSION 3.14)
 
@@ -36,11 +38,11 @@ if(ALL_TUNES)
   file(MAKE_DIRECTORY "${workdir}")
   file(COPY "${SAMPLE}" DESTINATION "${workdir}")
   get_filename_component(input "${SAMPLE}" NAME)
-  set(command "${ABC2MIDI}" "${input}" ${ABC2MIDI_ARGS})
+  set(command ${LAUNCHER} "${ABC2MIDI}" "${input}" ${ABC2MIDI_ARGS})
 else()
   set(workdir "${TMPDIR}")
   set(midfile "${TMPDIR}/${NAME}.mid")
-  set(command "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_ARGS} -o "${midfile}")
+  set(command ${LAUNCHER} "${ABC2MIDI}" "${SAMPLE}" ${ABC2MIDI_ARGS} -o "${midfile}")
 endif()
 
 execute_process(

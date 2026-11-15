@@ -16,7 +16,8 @@
 #
 #   3. Exit-status tests - abc2midi's exit status and messages on specific
 #                      inputs and options, and every tune of every sample
-#                      rendered with -Werror.
+#                      rendered with -Werror.  abc2abc, yaps and abcmatch
+#                      also run on every sample and must exit 0.
 #
 # To regenerate golden files after an intentional change:
 #
@@ -28,10 +29,42 @@ set(SAMPLES_DIR "${PROJECT_SOURCE_DIR}/samples")
 set(GOLDEN_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/golden")
 set(TEST_TMPDIR "${CMAKE_CURRENT_BINARY_DIR}/tmp")
 
+# With ABCMIDI_VALGRIND, every program that a test runs is run under
+# valgrind, and any valgrind error makes the program exit with status 99
+# instead of its own, which fails the test.  The report is on stderr, which
+# the tests print when they fail.  Empty otherwise, so that the programs run
+# directly.  The checks are the strictest that memcheck offers, but for
+# memory still reachable at exit, which the system takes back and which no
+# program frees on all its exit paths:
+#   - every leak is an error: definite, indirect and possible, and so is a
+#     file left open (--track-fds);
+#   - uninitialised values are tracked to their origin and checked
+#     precisely, also in partly valid loads;
+#   - heap blocks get 128-byte red zones, and freed blocks stay poisoned in
+#     a 1 GB queue to catch late uses;
+#   - new and freed memory is filled with 0xa5 and 0x5a, so that a read of
+#     it shows in the output even where memcheck does not report it.
+# --read-var-info=yes, which names the variables in the reports but triples
+# the run time, can be added with VALGRIND_OPTS when looking into a failure.
+set(ABCMIDI_LAUNCHER)
+if(ABCMIDI_VALGRIND)
+  find_program(VALGRIND_EXECUTABLE valgrind REQUIRED)
+  set(ABCMIDI_LAUNCHER "${VALGRIND_EXECUTABLE}" --quiet --error-exitcode=99
+    --error-limit=no --num-callers=50
+    --leak-check=full --show-leak-kinds=definite,indirect,possible
+    --errors-for-leak-kinds=definite,indirect,possible
+    --track-fds=yes
+    --track-origins=yes --expensive-definedness-checks=yes
+    --partial-loads-ok=no
+    --redzone-size=128 --freelist-vol=1000000000 --freelist-big-blocks=0
+    --malloc-fill=0xa5 --free-fill=0x5a)
+endif()
+
 # --- Smoke tests: -ver on every binary ---
 
 foreach(bin IN LISTS ABCMIDI_BINARIES)
-  add_test(NAME "smoke_${bin}_ver" COMMAND $<TARGET_FILE:${bin}> -ver)
+  add_test(NAME "smoke_${bin}_ver"
+    COMMAND ${ABCMIDI_LAUNCHER} $<TARGET_FILE:${bin}> -ver)
   set_tests_properties("smoke_${bin}_ver" PROPERTIES LABELS "smoke")
 endforeach()
 
@@ -81,6 +114,7 @@ function(add_golden_test)
       "-DABC2MIDI_ARGS=${T_ABC2MIDI_ARGS}"
       "-DABC2MIDI_TUNE=${T_TUNE}"
       -DABC2MIDI_EXPECT_ERRORS=${T_EXPECT_ERRORS}
+      "-DLAUNCHER=${ABCMIDI_LAUNCHER}"
       ${BINARY_DEFS}
       -P "${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake"
   )
@@ -341,6 +375,13 @@ add_golden_test(
 # They were all one tick later.
 add_golden_test(TYPE abc2midi SAMPLE words_tempo.abc)
 
+# Regression test for \% in a text field, which is a percent sign and not
+# the start of a comment (see samples/text_fields.abc): abc2midi named the
+# track "50\" instead of "50% faster", and abc2abc must still write the
+# fields as they are.
+add_golden_test(TYPE abc2midi SAMPLE text_fields.abc)
+add_golden_test(TYPE abc2abc  SAMPLE text_fields.abc)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given
@@ -362,6 +403,7 @@ function(add_exit_status_test)
       -DALL_TUNES=${T_ALL_TUNES}
       "-DEXPECTED_REGEX=${T_REGEX}"
       "-DABC2MIDI_ARGS=${T_ABC2MIDI_ARGS}"
+      "-DLAUNCHER=${ABCMIDI_LAUNCHER}"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/run_exit_status.cmake"
   )
   set_tests_properties("${T_NAME}" PROPERTIES LABELS "exit-status")
@@ -488,6 +530,30 @@ foreach(sample IN LISTS all_samples)
     RC            ${rc}
     ALL_TUNES
   )
+endforeach()
+
+# Every sample through abc2abc, yaps and abcmatch, whose golden tests cover
+# only some samples: the program must exit 0.  The value of these tests is
+# under the sanitize and valgrind presets, where a memory error fails them,
+# such as yaps reading past a title that ends with a backslash (see
+# samples/text_fields.abc).  Test names start with the program name so that
+# the CI per-tool jobs run them.
+file(MAKE_DIRECTORY "${TEST_TMPDIR}")
+foreach(sample IN LISTS all_samples)
+  get_filename_component(stem "${sample}" NAME_WE)
+  add_test(NAME abc2abc_sample_${stem}
+    COMMAND ${ABCMIDI_LAUNCHER} $<TARGET_FILE:abc2abc> "${SAMPLES_DIR}/${sample}"
+    WORKING_DIRECTORY "${TEST_TMPDIR}")
+  add_test(NAME yaps_sample_${stem}
+    COMMAND ${ABCMIDI_LAUNCHER} $<TARGET_FILE:yaps> "${SAMPLES_DIR}/${sample}"
+      -o "${TEST_TMPDIR}/yaps_sample_${stem}.ps"
+    WORKING_DIRECTORY "${TEST_TMPDIR}")
+  add_test(NAME abcmatch_sample_${stem}
+    COMMAND ${ABCMIDI_LAUNCHER} $<TARGET_FILE:abcmatch> "${SAMPLES_DIR}/${sample}"
+      -pitch_hist
+    WORKING_DIRECTORY "${TEST_TMPDIR}")
+  set_tests_properties(abc2abc_sample_${stem} yaps_sample_${stem}
+    abcmatch_sample_${stem} PROPERTIES LABELS "sample")
 endforeach()
 
 # --- Regenerate-golden convenience target ---
