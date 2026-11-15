@@ -7,8 +7,11 @@
  * removed.
  */
 
+#define VERSION "1.00 November 15 2026 mftext" /* [RK] 2026-11-15 */
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #ifdef ANSILIBS
 #include <ctype.h>
 #endif
@@ -35,6 +38,15 @@ extern int arg_index;
 int main(int argc, char *argv[])
 {
   char *ch;
+  int i;
+
+  /* -ver before crack(), which reads it as the unknown flag v */
+  for (i = 1; i < argc; i++) { /* [RK] 2026-11-15 */
+    if (strcmp(argv[i], "-ver") == 0) {
+      printf("%s\n", VERSION);
+      exit(0);
+    };
+  };
 
   SECONDS = 0;
 
