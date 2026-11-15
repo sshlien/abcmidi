@@ -49,7 +49,7 @@ Matching:
 
 
 
-#define VERSION "1.86 November 14 2026 abcmatch"
+#define VERSION "1.87 November 14 2026 abcmatch"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>

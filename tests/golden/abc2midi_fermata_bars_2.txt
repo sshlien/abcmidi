@@ -1,0 +1,149 @@
+Header format=0 ntrks=1 division=480
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=0  minor=0
+Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:2>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=34
+     Text = <Fermatas in the bars, fermatafixed>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=1  Note on, chan=1 pitch=60 vol=105
+Time=480  Note off, chan=1 pitch=60 vol=0
+Time=481  Note on, chan=1 pitch=62 vol=80
+Time=960  Note off, chan=1 pitch=62 vol=0
+Time=961  Note on, chan=1 pitch=64 vol=95
+Time=1440  Note off, chan=1 pitch=64 vol=0
+Time=1441  Note on, chan=1 pitch=65 vol=80
+Time=1920  Note off, chan=1 pitch=65 vol=0
+Time=1921  Note on, chan=1 pitch=72 vol=105
+Time=2880  Note off, chan=1 pitch=72 vol=0
+Time=2881  Note on, chan=1 pitch=74 vol=95
+Time=3360  Note off, chan=1 pitch=74 vol=0
+Time=3361  Note on, chan=1 pitch=76 vol=80
+Time=3840  Note off, chan=1 pitch=76 vol=0
+Time=4801  Note on, chan=1 pitch=72 vol=105
+Time=4811  Note on, chan=1 pitch=76 vol=105
+Time=5760  Note off, chan=1 pitch=76 vol=0
+Time=5760  Note off, chan=1 pitch=72 vol=0
+Time=5761  Note on, chan=1 pitch=81 vol=95
+Time=6240  Note off, chan=1 pitch=81 vol=0
+Time=6241  Note on, chan=1 pitch=72 vol=80
+Time=6251  Note on, chan=1 pitch=76 vol=80
+Time=7680  Note off, chan=1 pitch=76 vol=0
+Time=7680  Note off, chan=1 pitch=72 vol=0
+Time=7681  Note on, chan=1 pitch=72 vol=105
+Time=8160  Note off, chan=1 pitch=72 vol=0
+Time=8641  Note on, chan=1 pitch=74 vol=95
+Time=9120  Note off, chan=1 pitch=74 vol=0
+Time=9121  Note on, chan=1 pitch=77 vol=80
+Time=9180  Note off, chan=1 pitch=77 vol=0
+Time=9181  Note on, chan=1 pitch=76 vol=80
+Time=9240  Note off, chan=1 pitch=76 vol=0
+Time=9241  Note on, chan=1 pitch=77 vol=80
+Time=9300  Note off, chan=1 pitch=77 vol=0
+Time=9301  Note on, chan=1 pitch=76 vol=80
+Time=9360  Note off, chan=1 pitch=76 vol=0
+Time=9361  Note on, chan=1 pitch=77 vol=80
+Time=9420  Note off, chan=1 pitch=77 vol=0
+Time=9421  Note on, chan=1 pitch=76 vol=80
+Time=9480  Note off, chan=1 pitch=76 vol=0
+Time=9481  Note on, chan=1 pitch=77 vol=80
+Time=9540  Note off, chan=1 pitch=77 vol=0
+Time=9541  Note on, chan=1 pitch=76 vol=80
+Time=9600  Note off, chan=1 pitch=76 vol=0
+Time=9601  Note on, chan=1 pitch=77 vol=95
+Time=9660  Note off, chan=1 pitch=77 vol=0
+Time=9661  Note on, chan=1 pitch=76 vol=80
+Time=9720  Note off, chan=1 pitch=76 vol=0
+Time=9721  Note on, chan=1 pitch=77 vol=80
+Time=9780  Note off, chan=1 pitch=77 vol=0
+Time=9781  Note on, chan=1 pitch=76 vol=80
+Time=9840  Note off, chan=1 pitch=76 vol=0
+Time=9841  Note on, chan=1 pitch=77 vol=80
+Time=9900  Note off, chan=1 pitch=77 vol=0
+Time=9901  Note on, chan=1 pitch=76 vol=80
+Time=9960  Note off, chan=1 pitch=76 vol=0
+Time=9961  Note on, chan=1 pitch=77 vol=80
+Time=10020  Note off, chan=1 pitch=77 vol=0
+Time=10021  Note on, chan=1 pitch=76 vol=80
+Time=10080  Note off, chan=1 pitch=76 vol=0
+Time=10081  Note on, chan=1 pitch=77 vol=80
+Time=10560  Note off, chan=1 pitch=77 vol=0
+Time=10561  Note on, chan=1 pitch=72 vol=105
+Time=11360  Note off, chan=1 pitch=72 vol=0
+Time=11361  Note on, chan=1 pitch=74 vol=80
+Time=11680  Note off, chan=1 pitch=74 vol=0
+Time=11681  Note on, chan=1 pitch=76 vol=80
+Time=12000  Note off, chan=1 pitch=76 vol=0
+Time=12001  Note on, chan=1 pitch=77 vol=80
+Time=12480  Note off, chan=1 pitch=77 vol=0
+Time=12481  Note on, chan=1 pitch=79 vol=95
+Time=12960  Note off, chan=1 pitch=79 vol=0
+Time=12961  Note on, chan=1 pitch=72 vol=105
+Time=13440  Note off, chan=1 pitch=72 vol=0
+Time=13921  Note on, chan=1 pitch=74 vol=95
+Time=14400  Note off, chan=1 pitch=74 vol=0
+Time=14401  Note on, chan=1 pitch=77 vol=80
+Time=14460  Note off, chan=1 pitch=77 vol=0
+Time=14461  Note on, chan=1 pitch=76 vol=80
+Time=14520  Note off, chan=1 pitch=76 vol=0
+Time=14521  Note on, chan=1 pitch=77 vol=80
+Time=14580  Note off, chan=1 pitch=77 vol=0
+Time=14581  Note on, chan=1 pitch=76 vol=80
+Time=14640  Note off, chan=1 pitch=76 vol=0
+Time=14641  Note on, chan=1 pitch=77 vol=80
+Time=14700  Note off, chan=1 pitch=77 vol=0
+Time=14701  Note on, chan=1 pitch=76 vol=80
+Time=14760  Note off, chan=1 pitch=76 vol=0
+Time=14761  Note on, chan=1 pitch=77 vol=80
+Time=14820  Note off, chan=1 pitch=77 vol=0
+Time=14821  Note on, chan=1 pitch=76 vol=80
+Time=14880  Note off, chan=1 pitch=76 vol=0
+Time=14881  Note on, chan=1 pitch=77 vol=95
+Time=14940  Note off, chan=1 pitch=77 vol=0
+Time=14941  Note on, chan=1 pitch=76 vol=80
+Time=15000  Note off, chan=1 pitch=76 vol=0
+Time=15001  Note on, chan=1 pitch=77 vol=80
+Time=15060  Note off, chan=1 pitch=77 vol=0
+Time=15061  Note on, chan=1 pitch=76 vol=80
+Time=15120  Note off, chan=1 pitch=76 vol=0
+Time=15121  Note on, chan=1 pitch=77 vol=80
+Time=15180  Note off, chan=1 pitch=77 vol=0
+Time=15181  Note on, chan=1 pitch=76 vol=80
+Time=15240  Note off, chan=1 pitch=76 vol=0
+Time=15241  Note on, chan=1 pitch=77 vol=80
+Time=15300  Note off, chan=1 pitch=77 vol=0
+Time=15301  Note on, chan=1 pitch=76 vol=80
+Time=15360  Note off, chan=1 pitch=76 vol=0
+Time=15361  Note on, chan=1 pitch=77 vol=80
+Time=15840  Note off, chan=1 pitch=77 vol=0
+Time=15841  Note on, chan=1 pitch=72 vol=105
+Time=16640  Note off, chan=1 pitch=72 vol=0
+Time=16641  Note on, chan=1 pitch=74 vol=80
+Time=16960  Note off, chan=1 pitch=74 vol=0
+Time=16961  Note on, chan=1 pitch=76 vol=80
+Time=17280  Note off, chan=1 pitch=76 vol=0
+Time=17281  Note on, chan=1 pitch=77 vol=80
+Time=17760  Note off, chan=1 pitch=77 vol=0
+Time=17761  Note on, chan=1 pitch=79 vol=95
+Time=18240  Note off, chan=1 pitch=79 vol=0
+Time=18241  Note on, chan=1 pitch=72 vol=105
+Time=19680  Note off, chan=1 pitch=72 vol=0
+Time=19681  Note on, chan=1 pitch=81 vol=80
+Time=20160  Note off, chan=1 pitch=81 vol=0
+Time=20161  Note on, chan=1 pitch=83 vol=95
+Time=20640  Note off, chan=1 pitch=83 vol=0
+Time=20641  Note on, chan=1 pitch=72 vol=105
+Time=21600  Note off, chan=1 pitch=72 vol=0
+Time=21601  Note on, chan=1 pitch=74 vol=95
+Time=22080  Note off, chan=1 pitch=74 vol=0
+Time=22081  Note on, chan=1 pitch=76 vol=80
+Time=22560  Note off, chan=1 pitch=76 vol=0
+Time=22561  Note on, chan=1 pitch=77 vol=95
+Time=23040  Note off, chan=1 pitch=77 vol=0
+Time=23066  Meta event, end of track
+Track end

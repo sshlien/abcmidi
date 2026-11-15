@@ -1766,11 +1766,15 @@ parsenote (char **s)
       if (!inchordflag)
 	decorators_passback[i] = 0;	/* [SS] 2012-03-30 */
     }
-  while (strchr (decorations, **s) != NULL)
+  /* White space may separate the decorations from each other and from
+     the object they decorate, as in "H c".  strchr() also finds the
+     '\0' that ends decorations[], hence the test of the end of line. */
+  while ((**s != '\0') && (strchr (decorations, **s) != NULL)) /* [RK] 2026-11-14 */
     {
       t = strchr (decorations, **s) - decorations;
       decorators[t] = 1;
       *s = *s + 1;
+      skipspace (s); /* [RK] 2026-11-14 */
     };
   /*check for decorated chord */
   if (**s == '[')
@@ -2768,10 +2772,16 @@ static void check_bar_repeats (int bar_type, char *replist)
 /* [JA] 2020-10-12 */
 static void check_and_call_bar(int bar_type, char *replist)
 {
+  int i;
+
   if (repcheck)
   {
     check_bar_repeats (bar_type, replist);
   }
+  /* A !fermata!, !trill! or !breath! just before the bar line decorates
+     the bar line, not the next note. */
+  for (i = 0; i < DECSIZE; i++)
+    decorators_passback[i] = 0; /* [RK] 2026-11-14 */
   event_bar (bar_type, replist);
 }
 

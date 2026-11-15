@@ -1,0 +1,27 @@
+% A fermata lengthens the note, rest or chord that it decorates, but the
+% bar check counts the length written in the bar.  checkbar() (genmidi.c)
+% counted the length played, so that each bar with a fermata but the
+% first one was reported as too long, an error with -Werror.  The
+% fermatas below are on notes, rests, chords, a staccato note, a trill, a
+% tuplet and a tied note, in and out of a repeat.  Tune 2 plays them with
+% %%MIDI fermatafixed.
+X:1
+T:Fermatas in the bars
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+C D E F |Hc d e Hz |H[ce] a H[ce]2 |
+|: H.c d HTe f |(3Hcde f g :| Hc-c a b |!fermata!c d e f |]
+
+X:2
+T:Fermatas in the bars, fermatafixed
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+%%MIDI fermatafixed
+C D E F |Hc d e Hz |H[ce] a H[ce]2 |
+|: H.c d HTe f |(3Hcde f g :| Hc-c a b |!fermata!c d e f |]

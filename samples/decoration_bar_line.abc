@@ -1,0 +1,12 @@
+% A !fermata!, !trill! or !breath! just before a bar line decorates the
+% bar line, which abc2midi does not play.  It was kept for the first note
+% after the bar line, which was lengthened, trilled or shortened.  The
+% notes below are all played plain, with the beat stress of their place.
+X:1
+T:Decorations on bar lines
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+C D E F !fermata!|G A B c !trill!|c B A G !breath!|F E D C |]

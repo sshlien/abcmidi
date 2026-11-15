@@ -587,6 +587,17 @@ static void checkbar(int pass)
 
 }
 
+static void remove_fermata_length(int j)
+/* The bar line j holds in num[j]/denom[j] the length that fermatas added to
+ * the notes of its bar (fermata_length() in store.c): it is played, but it
+ * is not part of the length written in the bar, which checkbar() compares
+ * with the time signature.  Called at a bar line before checkbar(). */
+{
+  if (num[j] != 0 && denom[j] != 0) { /* [RK] 2026-11-14 */
+    addunits(-num[j], denom[j]);
+  };
+}
+
 static void softcheckbar(int pass)
 /* allows repeats to be in mid-bar */
 /* A pickup at the start of the tune or of a part ends at the bar line */
@@ -3238,11 +3249,13 @@ long writetrack(int xtrack)
       break;
     case SINGLE_BAR:
       waitforbar = 0;
+      remove_fermata_length(j); /* [RK] 2026-11-14 */
       checkbar(pass);
       break;
     case DOUBLE_BAR:  /* || */
       in_varend = 0;
       waitforbar = 0;
+      remove_fermata_length(j); /* [RK] 2026-11-14 */
       softcheckbar(pass);
       break;
 
@@ -3251,6 +3264,7 @@ long writetrack(int xtrack)
     /* saves position of where to return when :| is encountered */
       in_varend = 0;
       waitforbar = 0;
+      remove_fermata_length(j); /* [RK] 2026-11-14 */
       softcheckbar(pass);
       if ((pass==1)&&(expect_repeat)) {
         event_error("Expected end repeat not found at |:");
@@ -3266,6 +3280,7 @@ long writetrack(int xtrack)
     /* returns index j to the place following |:                */ 
       in_varend = 0;
       waitforbar = 0;
+      remove_fermata_length(j); /* [RK] 2026-11-14 */
       softcheckbar(pass);
       if (pass == 1) {
          if (!expect_repeat) {
@@ -3360,6 +3375,7 @@ long writetrack(int xtrack)
     case DOUBLE_REP:     /*  ::  */
       in_varend = 0;
       waitforbar = 0;
+      remove_fermata_length(j); /* [RK] 2026-11-14 */
       softcheckbar(pass);
       if (pass > 1) {
         /* Already gone through last time. Process it as a |:*/
