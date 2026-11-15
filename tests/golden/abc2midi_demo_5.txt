@@ -13,7 +13,7 @@ Time=0  Meta Text, type=0x01 (Text Event)  leng=10
 Time=0  Tempo, microseconds-per-MIDI-quarter-note=300000
 Time=0  Key signature, sharp/flats=0  minor=0
 Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
-Time=92185  Meta event, end of track
+Time=92186  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=17

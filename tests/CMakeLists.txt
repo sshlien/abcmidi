@@ -382,6 +382,19 @@ add_golden_test(TYPE abc2midi SAMPLE words_tempo.abc)
 add_golden_test(TYPE abc2midi SAMPLE text_fields.abc)
 add_golden_test(TYPE abc2abc  SAMPLE text_fields.abc)
 
+# Regression test for GitHub issue #67: in a tune with several tracks, the
+# conductor track ends with the other tracks after a tempo change (see
+# samples/tempo_tracks.abc).  It ended later by the time of the last tempo
+# change.  Tune 2 has a %%MIDI command between two tempo changes, which
+# resets the delay that the end of this track was written with.
+add_golden_test(TYPE abc2midi SAMPLE tempo_tracks.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        tempo_tracks.abc
+  NAME          abc2midi_tempo_tracks_2
+  TUNE          2
+)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given

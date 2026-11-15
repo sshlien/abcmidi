@@ -1,0 +1,32 @@
+% A tempo change in a tune with several tracks: the conductor track, track
+% 0, ends with the other tracks (GitHub issue #67).  It ended after them,
+% later by the time of the last tempo change, so that the MIDI file had
+% silence at its end.
+% - Tune 1: two voices and two tempo changes.
+% - Tune 2: a %%MIDI command between two tempo changes.  Such a command
+%   resets the delay that the end of track 0 was written with.
+X:1
+T:Tempo changes in a tune with two voices
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+V:1
+C D E F |[Q:1/4=90] G A B c |[Q:1/4=60] c B A G |]
+V:2
+C,4 | G,4 | C,4 |]
+
+X:2
+T:Tempo changes around a MIDI command
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+V:1
+C D E F |[Q:1/4=90] G A B c |
+%%MIDI program 5
+c B A G |[Q:1/4=60] G4 |]
+V:2
+C,4 | G,4 | C,4 | C,4 |]

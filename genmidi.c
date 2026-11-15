@@ -3545,6 +3545,14 @@ long writetrack(int xtrack)
     event_error("Missing :| at end of tune");
   };
   clearQ();
+  if ((xtrack == 0) && (ntracks != 1)) {
+    /* The conductor track ends with the track of its voice.  Its tempo
+     * changes and part markers are written with delta_time_track0, the time
+     * since the last of them, while delta_time is kept by a tempo change
+     * and reset by a %%MIDI command.  The tick is the delay that starts
+     * every track. */
+    delta_time = delta_time_track0 + 1L; /* [RK] 2026-11-13 */
+  };
   tracklen = tracklen + delta_time;
   if (xtrack == 1) {
     tracklen1 = tracklen;

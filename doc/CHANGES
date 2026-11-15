@@ -16264,6 +16264,22 @@ unchanged.  New golden test abc2midi_words_tempo
 (samples/words_tempo.abc).
 
 
+November 13 2026 [RK]
+
+abc2midi: the conductor track of a tune with several tracks ends with
+the other tracks (GitHub issue #67).  After a tempo change in the body
+of a tune with two voices or with w: lyrics, it ended later by the time
+of this tempo change, so that the MIDI file had silence at its end.
+writetrack() (genmidi.c) writes the tempo changes and the -PMAR part
+markers of this track with delta_time_track0, but wrote its end with
+delta_time, which a tempo change leaves untouched while a part marker
+or a %%MIDI command resets it: after one of these, the track ended
+before the others instead, by one tick or by the time elapsed before
+the command.  The end of this track is now written with
+delta_time_track0.  New golden tests abc2midi_tempo_tracks and
+abc2midi_tempo_tracks_2 (samples/tempo_tracks.abc).
+
+
 November 14 2026 [RK]
 
 abc2midi: after the last part of a P: play order, partbreak()
