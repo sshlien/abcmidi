@@ -150,9 +150,12 @@ endforeach()
 #                   (regression guard)
 #   decoration_line_end.abc - a decoration at the end of a line, on
 #                   purpose (regression guard)
+#   lyrics_missing.abc - a line of notes without lyrics, on purpose
+#                   (regression guard): its warning is an error with
+#                   -Werror
 set(ABC2MIDI_ERROR_SAMPLES microtone.abc barcheck_long_warning.abc
   barfly_barcheck.abc key_unknown_word.abc microtone_accidentals.abc
-  chordname_too_long.abc decoration_line_end.abc)
+  chordname_too_long.abc decoration_line_end.abc lyrics_missing.abc)
 
 # Broad coverage: an abc2midi (ABC->MIDI) and an abc2abc (ABC reformat) golden
 # for every other sample, so each sample file has at least its MIDI rendering
@@ -456,6 +459,19 @@ add_golden_test(
   TUNE          2
 )
 
+# Regression test for GitHub issue #79: a line of rests needs no lyrics, in
+# a voice with lyrics on its other lines (tune 1, two voices) or in a tune
+# with a single voice (tune 2), with or without an empty w: field below it
+# (see samples/lyrics_rests.abc).  abc2midi reported a "Line of music
+# without lyrics" for it.
+add_golden_test(TYPE abc2midi SAMPLE lyrics_rests.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        lyrics_rests.abc
+  NAME          abc2midi_lyrics_rests_2
+  TUNE          2
+)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given
@@ -586,6 +602,16 @@ add_exit_status_test(
   SAMPLE        decoration_line_end.abc
   RC            1
   REGEX         "Error in line-char [0-9]+-[0-9]+ : Malformed note : expecting a-g or A-G"
+)
+
+# A line of notes without lyrics, in a tune with lyrics, gets one warning,
+# at its first note, which ends the output (see samples/lyrics_missing.abc,
+# GitHub issue #79).  A second one, at the end of the line, followed it.
+add_exit_status_test(
+  NAME          abc2midi_lyrics_missing
+  SAMPLE        lyrics_missing.abc
+  RC            0
+  REGEX         "Warning in line-char 14-0 : Line of music without lyrics[^A-Za-z]*$"
 )
 
 # -Werror alone must not fail a tune that raises no warning.

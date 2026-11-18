@@ -1245,7 +1245,12 @@ static void checksyllables()
     if (syllcount > 0) {
       lyricsyllables = lyricsyllables + syllcount;
     } else {
-      thiswline = findwline(thiswline);
+      /* thiswline is -1 when this line has no lyrics left: its notes
+         have already looked for them, or it has no note to sing, such
+         as a line of rests, which needs none */
+      if (thiswline != -1) { /* [RK] 2026-11-17 */
+        thiswline = findwline(thiswline);
+      };
       if (thiswline == -1) {
         done = 1;
       } else {
