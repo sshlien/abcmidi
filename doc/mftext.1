@@ -2,16 +2,24 @@
 .SH NAME
 mftext \- Dump a MIDI file as text
 .SH SYNOPSIS
-.BI mftext " file"
+\fBmftext\fP [\fB-ver\fP] [\fB-s\fP] [\fIfile\fP]
 .SH "DESCRIPTION"
 .PP
 .B mftext
 gives a verbose description of what is in a MIDI file.
 You may wish to use it to check the output from
 .BR abc2midi .
+Without a file, it reads the standard input.
 It is part of the original midifilelib distribution
 available from
 .IR http://www.harmony-central.com/MIDI/midifilelib.tar.gz .
+.SH OPTIONS
+.TP
+.B -ver
+prints version number and then exits
+.TP
+.B -s
+gives the time of each event in seconds instead of MIDI ticks
 .SH "SEE ALSO"
 .PP
 .IR abcmtex "(1), " abc2abc "(1), " abc2midi "(1), " midi2abc "(1)"

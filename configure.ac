@@ -38,7 +38,6 @@ AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
 AC_CHECK_FUNCS([strcasecmp strchr])
 
 AC_CONFIG_FILES([Makefile])

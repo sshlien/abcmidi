@@ -2,8 +2,9 @@
 #
 # Three layers of tests:
 #
-#   1. Smoke tests   - every binary runs with -ver and exits cleanly.
-#                      Catches link errors, missing libraries, trivial crashes.
+#   1. Smoke tests   - every binary runs with -ver, exits cleanly and prints
+#                      its version.  Catches link errors, missing libraries,
+#                      trivial crashes and a missing -ver.
 #
 #   2. Golden tests  - each program is run on a sample input and its output
 #                      is compared with a checked-in reference file.  Binary
@@ -64,7 +65,11 @@ endif()
 
 foreach(bin IN LISTS ABCMIDI_BINARIES)
   add_test(NAME "smoke_${bin}_ver"
-    COMMAND ${ABCMIDI_LAUNCHER} $<TARGET_FILE:${bin}> -ver)
+    COMMAND "${CMAKE_COMMAND}"
+      -DBIN=$<TARGET_FILE:${bin}>
+      -DNAME=${bin}
+      "-DLAUNCHER=${ABCMIDI_LAUNCHER}"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/run_smoke.cmake")
   set_tests_properties("smoke_${bin}_ver" PROPERTIES LABELS "smoke")
 endforeach()
 
