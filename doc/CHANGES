@@ -16400,3 +16400,18 @@ version 2011-08-03.  configure.ac drops AC_FUNC_MALLOC: with Autoconf
 2.70 or later, it makes configure require config.guess and config.sub,
 and it only defined HAVE_MALLOC in config.h, which no source file
 includes.
+
+
+November 17 2026 [RK]
+
+abc2midi: %%MIDI ratio with an odd sum, such as 3 2 or 4 3, gives the
+notes of a broken rhythm the right lengths.  For the ratio n m,
+brokenadjust() (store.c) multiplies the lengths of the notes by n and
+m divided by (n + m)/2, an integer division, so event_midi() and
+event_specific_in_header() double a ratio whose sum is odd.  Their
+test lacked parentheses: (a + b) % 2 == 1 was written a + b % 2 == 1,
+which doubled only the ratios n 1 with an even n, such as 2 1.  With
+%%MIDI ratio 3 2, the notes of c>d lasted 3/2 and 1 of an eighth
+instead of 6/5 and 4/5, and the bar check reported each such bar as
+too long.  Fixes issue #77.  New golden tests abc2midi_broken_ratio
+and abc2midi_broken_ratio_2 (samples/broken_ratio.abc).
