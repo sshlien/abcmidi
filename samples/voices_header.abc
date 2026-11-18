@@ -1,0 +1,16 @@
+% V: fields in the tune header, before K:, as in the example of GitHub
+% issue #79.  At the K: field, event_key() (matchsup.c) replaced the
+% list of voices of abcmatch with a new voice 1 without freeing the
+% voices that these V: fields had made, a leak that the sanitize and
+% valgrind builds report on abcmatch_sample_voices_header.
+X:1
+T:Voices declared in the header
+C:abc2midi test
+M:C
+L:1/4
+Q:1/4=120
+V:S
+V:A
+K:C
+[V:S] C E G c |]
+[V:A] E G c e |]

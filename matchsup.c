@@ -1833,6 +1833,9 @@ void event_key(
       sf = sharps;
       mi = minor;
       headerprocess();
+      /* the V: fields of the header have made voices that the body
+         does not use */
+      clearvoicecontexts(); /* [RK] 2026-11-17 */
       v = newvoice(1);
       head = v;
     };

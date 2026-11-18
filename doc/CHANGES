@@ -16437,3 +16437,10 @@ change, but abc2midi exited with status 1.  abc2abc writes the dotted
 tie as a plain one, as it does with the dotted slur.  Fixes issue #80.
 New golden tests abc2midi_dotted_tie and abc2midi_dotted_tie_2
 (samples/dotted_tie.abc).
+
+abcmatch: frees the voices made by V: fields in a tune header.  At
+the K: field, event_key() (matchsup.c) replaced the list of voices
+with a new voice 1 without freeing these voices, which the body does
+not use, a leak that the sanitize and valgrind builds report.  The
+output of abcmatch does not change.  New sample
+samples/voices_header.abc, run by the test abcmatch_sample_voices_header.
