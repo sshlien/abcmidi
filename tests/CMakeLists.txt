@@ -472,6 +472,18 @@ add_golden_test(
   TUNE          2
 )
 
+# Regression test for GitHub issue #80: a dotted tie, as in C.-C, plays as a
+# tie, and a dotted slur as a slur (see samples/dotted_tie.abc).  The dotted
+# tie was a "Malformed note".  Tune 2 is the same music with plain ties and
+# slurs: its golden differs from that of tune 1 only by the title.
+add_golden_test(TYPE abc2midi SAMPLE dotted_tie.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        dotted_tie.abc
+  NAME          abc2midi_dotted_tie_2
+  TUNE          2
+)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given

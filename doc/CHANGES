@@ -16427,3 +16427,13 @@ nothing and reported a "Line of music without lyrics".  Fixes issue
 #79.  New golden tests abc2midi_lyrics_rests and
 abc2midi_lyrics_rests_2 (samples/lyrics_rests.abc) and exit-status
 test abc2midi_lyrics_missing (samples/lyrics_missing.abc).
+
+abc2midi, abc2abc, yaps and abcmatch: a dotted tie, as in C.-C
+(section 4.11 of the abc standard), is read as a tie, as the dotted
+slur .( already was.  parsemusic() (parseabc.c) read its dot as a
+staccato before a note, and reported a "Malformed note" on the - that
+follows it.  The tie itself was kept, so the MIDI output does not
+change, but abc2midi exited with status 1.  abc2abc writes the dotted
+tie as a plain one, as it does with the dotted slur.  Fixes issue #80.
+New golden tests abc2midi_dotted_tie and abc2midi_dotted_tie_2
+(samples/dotted_tie.abc).
