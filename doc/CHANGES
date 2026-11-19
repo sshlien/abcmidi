@@ -16415,3 +16415,32 @@ which doubled only the ratios n 1 with an even n, such as 2 1.  With
 instead of 6/5 and 4/5, and the bar check reported each such bar as
 too long.  Fixes issue #77.  New golden tests abc2midi_broken_ratio
 and abc2midi_broken_ratio_2 (samples/broken_ratio.abc).
+
+abc2midi: a line of music with no note to sing, such as a line of
+rests, needs no lyrics, with or without an empty w: field below it,
+also in a voice that has lyrics on its other lines, and a line of
+notes without lyrics is reported once instead of twice.  At the end of
+each line of music, checksyllables() (genmidi.c) looked for more
+lyrics with findwline() even when the line had none left (thiswline
+is -1).  findwline() then searched from the start of the tune, found
+nothing and reported a "Line of music without lyrics".  Fixes issue
+#79.  New golden tests abc2midi_lyrics_rests and
+abc2midi_lyrics_rests_2 (samples/lyrics_rests.abc) and exit-status
+test abc2midi_lyrics_missing (samples/lyrics_missing.abc).
+
+abc2midi, abc2abc, yaps and abcmatch: a dotted tie, as in C.-C
+(section 4.11 of the abc standard), is read as a tie, as the dotted
+slur .( already was.  parsemusic() (parseabc.c) read its dot as a
+staccato before a note, and reported a "Malformed note" on the - that
+follows it.  The tie itself was kept, so the MIDI output does not
+change, but abc2midi exited with status 1.  abc2abc writes the dotted
+tie as a plain one, as it does with the dotted slur.  Fixes issue #80.
+New golden tests abc2midi_dotted_tie and abc2midi_dotted_tie_2
+(samples/dotted_tie.abc).
+
+abcmatch: frees the voices made by V: fields in a tune header.  At
+the K: field, event_key() (matchsup.c) replaced the list of voices
+with a new voice 1 without freeing these voices, which the body does
+not use, a leak that the sanitize and valgrind builds report.  The
+output of abcmatch does not change.  New sample
+samples/voices_header.abc, run by the test abcmatch_sample_voices_header.

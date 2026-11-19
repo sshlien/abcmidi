@@ -1,10 +1,10 @@
 abcMIDI :   abc <-> MIDI conversion utilities
 
 midi2abc version 3.64 June 14 2025
-abc2midi version 5.15 November 17 2026
-abc2abc  version 2.25 November 14 2026
-yaps     version 1.97 November 14 2026
-abcmatch version 1.87 November 14 2026
+abc2midi version 5.16 November 17 2026
+abc2abc  version 2.26 November 17 2026
+yaps     version 1.98 November 17 2026
+abcmatch version 1.88 November 17 2026
 midicopy version 1.40 August 11 2024
 midistats version 1.05 November 14 2026
 mftext   version 1.00 November 15 2026

@@ -2990,6 +2990,11 @@ parsemusic (char *field)
          /* ignore dotted bar */
          }
 
+      if (*p == '.' && *(p+1) == '-') { /* [RK] 2026-11-17 dotted tie */
+         p = p + 1;
+         /* a dotted tie, as in C.-C, is read as a tie */
+         }
+
       if (((*p >= 'a') && (*p <= 'g')) || ((*p >= 'A') && (*p <= 'G')) ||
 	  (strchr ("_^=", *p) != NULL) || (strchr (decorations, *p) != NULL))
 	{

@@ -1,0 +1,40 @@
+% A line of music with no note to sing, such as a line of rests, needs
+% no lyrics, also in a voice that has lyrics on its other lines (GitHub
+% issue #79).  checksyllables() (genmidi.c) looked for the lyrics of
+% such a line from the start of the tune, did not find them and
+% reported a "Line of music without lyrics", even with an empty w:
+% field below the line.  In tune 1, voice A rests for two lines, the
+% second one with an empty w: field.  Tune 2 has a single voice.
+X:1
+T:Lyrics and lines of rests in two voices
+C:abc2midi test
+M:C
+L:1/4
+Q:1/4=120
+K:C
+V:S
+V:A
+[V:S] C E G c |
+w: do mi sol do
+[V:A] z z z z |
+[V:S] c G E C |
+w: do sol mi do
+[V:A] z4 |
+w:
+[V:S] C E G c |]
+w: do mi sol do
+[V:A] E G c e |]
+w: mi sol do mi
+
+X:2
+T:Lyrics and a line of rests in one voice
+C:abc2midi test
+M:C
+L:1/4
+Q:1/4=120
+K:C
+C E G c |
+w: do mi sol do
+z4 |
+c G E C |]
+w: do sol mi do
