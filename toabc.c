@@ -1820,6 +1820,17 @@ void event_bar(int type, char *replist)
   copymap();
 }
 
+void event_bar_decorations(int decorators[DECSIZE])
+/* shorthand decorations of the bar line that follows [RK] 2026-11-18 */
+{
+  int t;
+
+  inmusic = 1;
+  for (t=0; t<DECSIZE; t++) {
+    if (decorators[t]) emit_char(decorations[t]);
+  };
+}
+
 void event_space()
 {
   if (!(newspacing && have_spacing_scheme)) {

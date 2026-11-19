@@ -2144,6 +2144,12 @@ void event_bar(int type, char *playonrep_list)
   };
 }
 
+void event_bar_decorations(int decorators[DECSIZE])
+/* shorthand decorations of the bar line that follows: not drawn,
+   like !fermata! before a bar line [RK] 2026-11-18 */
+{
+}
+
 void event_space()
 /* A region of whitespace has been encountered */
 {

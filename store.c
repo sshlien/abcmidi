@@ -5529,6 +5529,12 @@ void event_bar(int type, char *replist)
  v->nbars = v->nbars + 1; /* [SS] 2019-03-18 */
 }
 
+void event_bar_decorations(int decorators[DECSIZE])
+/* shorthand decorations of the bar line that follows: not played,
+   like !fermata! before a bar line [RK] 2026-11-18 */
+{
+}
+
 
 
 static void placeendrep(int j)

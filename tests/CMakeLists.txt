@@ -428,11 +428,23 @@ add_golden_test(
 # plain (see samples/decoration_bar_line.abc).  This note was lengthened,
 # trilled or shortened.
 add_golden_test(TYPE abc2midi SAMPLE decoration_bar_line.abc)
+# Regression test for GitHub issue #57: a shorthand decoration such as H or
+# T may be put before a bar line.  It was a "Malformed note".  Tune 2 is
+# played as the same music without these decorations.
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        decoration_bar_line.abc
+  NAME          abc2midi_decoration_bar_line_2
+  TUNE          2
+)
 
 # abc2abc writes the shorthand decorations of the notes, rests and chords,
 # without the white space that follows them.  The decorations of rests,
 # such as the fermata of "H z", were dropped.
 add_golden_test(TYPE abc2abc SAMPLE decoration_space.abc)
+# abc2abc keeps the decorations put before a bar line.  The shorthand ones
+# of tune 2, such as the H of "H|", were dropped.
+add_golden_test(TYPE abc2abc SAMPLE decoration_bar_line.abc)
 
 # Regression test for the bar check of a bar with fermatas: it counts the
 # length written in the bar, not the longer one that the fermatas give to

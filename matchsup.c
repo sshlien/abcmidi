@@ -1695,6 +1695,12 @@ void event_bar(int type, char *replist)
 */
 }
 
+void event_bar_decorations(int decorators[DECSIZE])
+/* shorthand decorations of the bar line that follows: not matched
+   [RK] 2026-11-18 */
+{
+}
+
 
 
 

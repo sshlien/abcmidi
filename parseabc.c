@@ -1776,6 +1776,13 @@ parsenote (char **s)
       *s = *s + 1;
       skipspace (s); /* [RK] 2026-11-14 */
     };
+  /* Decorations may also be applied to bar lines, as in "H|" or "T :|".
+     The bar line itself is left to parsemusic(). [RK] 2026-11-18 */
+  if ((**s == '|') || (**s == ':') || ((**s == '[') && (*(*s + 1) == '|')))
+    {
+      event_bar_decorations (decorators);
+      return;
+    };
   /*check for decorated chord */
   if (**s == '[')
     {
