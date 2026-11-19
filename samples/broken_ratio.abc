@@ -1,0 +1,23 @@
+%%MIDI ratio 3 2
+% %%MIDI ratio n m plays the first note of a>b for n/(n+m) of the total
+% length of both notes and the second one for m/(n+m), and a<b the other
+% way round.  The file header sets the ratio 3:2 for every tune, and
+% tune 2 sets 8:7 in its body.  The sums of both ratios are odd.
+X:1
+T:Broken rhythm with the ratio 3:2
+C:abc2midi test
+M:2/4
+L:1/8
+Q:1/4=120
+K:C
+c>d e<f|g>a b<c'|]
+
+X:2
+T:Broken rhythm with the ratio 8:7
+C:abc2midi test
+M:2/4
+L:1/8
+Q:1/4=120
+K:C
+%%MIDI ratio 8 7
+c>d e<f|g>a b<c'|]

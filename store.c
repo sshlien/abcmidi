@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "5.14 November 14 2026 abc2midi"
+#define VERSION "5.15 November 17 2026 abc2midi"
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -2086,7 +2086,7 @@ void event_midi(char *s)
       if ((a > 0) && (b > 0)) {
         ratio_a = a;
         ratio_b = b;
-        if (ratio_a + ratio_b % 2 == 1) {
+        if ((ratio_a + ratio_b) % 2 == 1) { /* [RK] 2026-11-17 */
           ratio_a = 2 * a;
           ratio_b = 2 * b;
         };
@@ -2620,7 +2620,7 @@ void event_specific_in_header(char *package, char *s)
       if ((a > 0) && (b > 0)) {
         default_ratio_a = a;
         default_ratio_b = b;
-        if (default_ratio_a + default_ratio_b % 2 == 1) {
+        if ((default_ratio_a + default_ratio_b) % 2 == 1) { /* [RK] 2026-11-17 */
           default_ratio_a = 2 * a;
           default_ratio_b = 2 * b;
         };

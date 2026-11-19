@@ -444,6 +444,18 @@ add_golden_test(
   TUNE          2
 )
 
+# Regression test for %%MIDI ratio with an odd sum, such as 3 2 in the file
+# header (tune 1) and 8 7 in the body of tune 2 (see
+# samples/broken_ratio.abc): the notes of c>d last 6/5 and 4/5 of an eighth
+# with 3 2.  They lasted 3/2 and 1, which made the bars too long.
+add_golden_test(TYPE abc2midi SAMPLE broken_ratio.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        broken_ratio.abc
+  NAME          abc2midi_broken_ratio_2
+  TUNE          2
+)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given

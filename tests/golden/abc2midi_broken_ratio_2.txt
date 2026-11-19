@@ -1,0 +1,31 @@
+Header format=0 ntrks=1 division=480
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=0  minor=0
+Time=0  Time signature=2/4  MIDI-clocks/click=24  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:2>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=32
+     Text = <Broken rhythm with the ratio 8:7>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=1  Note on, chan=1 pitch=72 vol=105
+Time=256  Note off, chan=1 pitch=72 vol=0
+Time=257  Note on, chan=1 pitch=74 vol=80
+Time=480  Note off, chan=1 pitch=74 vol=0
+Time=481  Note on, chan=1 pitch=76 vol=80
+Time=704  Note off, chan=1 pitch=76 vol=0
+Time=705  Note on, chan=1 pitch=77 vol=80
+Time=960  Note off, chan=1 pitch=77 vol=0
+Time=961  Note on, chan=1 pitch=79 vol=105
+Time=1216  Note off, chan=1 pitch=79 vol=0
+Time=1217  Note on, chan=1 pitch=81 vol=80
+Time=1440  Note off, chan=1 pitch=81 vol=0
+Time=1441  Note on, chan=1 pitch=83 vol=80
+Time=1664  Note off, chan=1 pitch=83 vol=0
+Time=1665  Note on, chan=1 pitch=84 vol=80
+Time=1920  Note off, chan=1 pitch=84 vol=0
+Time=1946  Meta event, end of track
+Track end
