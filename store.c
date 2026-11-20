@@ -339,11 +339,9 @@ struct voicecontext {
   /* chord handling */
   int inchord, chordcount;
   int chord_num, chord_denom;
-  /* length that fermatas added to the bar being parsed, and to the chord
-     being parsed through its first note, in the units of num[]/denom[]:
-     see fermata_length() */
+  /* length that fermatas added to the bar being parsed, in the units of
+     num[]/denom[]: see fermata_length() and fermata_on_chord() */
   int fermata_num, fermata_denom; /* [RK] 2026-11-14 */
-  int chord_fermata_num, chord_fermata_denom; /* [RK] 2026-11-14 */
   /* details of last 2 notes/chords to apply length-modifiers to */
   int laststart, lastend, thisstart, thisend; /* for handling broken rhythms*/
   /* broken rhythm handling */
@@ -565,8 +563,6 @@ static struct voicecontext* newvoice(int n)
   s->chordcount = 0;
   s->fermata_num = 0; /* [RK] 2026-11-14 */
   s->fermata_denom = 1;
-  s->chord_fermata_num = 0;
-  s->chord_fermata_denom = 1;
   s->lastbarloc = -1;
   s->laststart = -1;
   s->lastend = -1;
@@ -3493,23 +3489,54 @@ void event_spacing(int n, int m)
 }
 
 static void fermata_length(int n, int d, int n0, int d0)
-/* A fermata has lengthened the note, rest or chord being parsed from n0/d0
- * to n/d units of L:.  This extra length is played, but it is not part of
- * the length written in the bar, which checkbar() (genmidi.c) compares with
- * the time signature.  It is added up in the voice for the bar or, through
- * the first note, for the chord, and event_bar() stores it in the bar line.
- * Grace notes take no time in the bar. [RK] 2026-11-14 */
+/* A fermata has lengthened the note or rest being parsed from n0/d0 to n/d
+ * units of L:.  This extra length is played, but it is not part of the
+ * length written in the bar, which checkbar() (genmidi.c) compares with the
+ * time signature.  It is added up in the voice, and event_bar() stores it
+ * in the bar line.  A fermata in a chord lengthens the whole chord when the
+ * chord ends: see fermata_on_chord().  Grace notes take no time in the bar.
+ * [RK] 2026-11-14 */
 {
   int ext_num, ext_denom;
 
   if (v->ingrace) return;
   ext_num = 4*(n*d0 - n0*d);
   ext_denom = d*d0*(v->default_length);
-  if (!v->inchord) {
-    addfract(&v->fermata_num, &v->fermata_denom, ext_num, ext_denom);
-  } else if (v->chordcount == 1) {
-    addfract(&v->chord_fermata_num, &v->chord_fermata_denom, ext_num, ext_denom);
+  addfract(&v->fermata_num, &v->fermata_denom, ext_num, ext_denom); /* [RK] 2026-11-20 */
+}
+
+static void fermata_lengthen(int *n, int *d)
+/* Lengthens *n / *d, in the units of num[]/denom[], by a fermata: doubles
+ * it, or adds one unit length (L:) after %%MIDI fermatafixed, as
+ * event_note() does. [RK] 2026-11-20 */
+{
+  if (fermata_fixed) addfract(n, d, 4, v->default_length);
+  else *n = *n * 2;
+}
+
+static void fermata_on_chord()
+/* A fermata on a chord, as in "H[ce]", or on any of its notes, as in
+ * "[cHe]", lengthens every note of the chord and the chord itself, whose
+ * length is that of its first note.  The chord has no length after its ]:
+ * fix_enclosed_note_lengths() handles the other case.  The length added
+ * to the bar is counted as in fermata_length(). [RK] 2026-11-20 */
+{
+  int j;
+  int n0, d0;
+
+  for (j = chordstart; j < notes; j++) {
+    if (feature[j] == NOTE || feature[j] == TNOTE || feature[j] == REST) {
+      fermata_lengthen(&num[j], &denom[j]);
+    };
   };
+  n0 = v->chord_num;
+  d0 = v->chord_denom;
+  fermata_lengthen(&v->chord_num, &v->chord_denom);
+  if (!v->ingrace) {
+    addfract(&v->fermata_num, &v->fermata_denom,
+             v->chord_num*d0 - n0*v->chord_denom, v->chord_denom*d0);
+  };
+  apply_fermata_to_chord = 0;
 }
 
 void event_rest(int decorators[DECSIZE], int n, int m, int type)
@@ -3522,12 +3549,15 @@ void event_rest(int decorators[DECSIZE], int n, int m, int type)
   denom = m;
   written_num = n;
   written_denom = m;
-  if (decorators[FERMATA] && !ignore_fermata) {
-    if (fermata_fixed) addfract(&num,&denom,1,1);
-    else num = num*2;
-  };
   if (v == NULL) {
     event_fatal_error("Internal error : no voice allocated");
+  };
+  if (decorators[FERMATA] && !ignore_fermata) {
+    if (v->inchord) {
+      /* the whole chord is lengthened at its end */
+      apply_fermata_to_chord = 1; /* [RK] 2026-11-20 */
+    } else if (fermata_fixed) addfract(&num,&denom,1,1);
+    else num = num*2;
   };
   if (v->inchord) v->chordcount = v->chordcount + 1;
   if (tuplecount > 0) {
@@ -3556,7 +3586,7 @@ void event_rest(int decorators[DECSIZE], int n, int m, int type)
   if ((!v->ingrace) && ((!v->inchord)||(v->chordcount==1))) {
     addunits(num, denom*(v->default_length));
   };
-  if (decorators[FERMATA] && !ignore_fermata) { /* [RK] 2026-11-14 */
+  if (decorators[FERMATA] && !ignore_fermata && !v->inchord) { /* [RK] 2026-11-20 */
     fermata_length(num, denom, written_num, written_denom);
   };
   last_num = 3; /* hornpiping (>) cannot follow rest */
@@ -3604,8 +3634,6 @@ void event_chordon(int chorddecorators[])
     v->chordcount = 0;
     v->chord_num = 0;
     v->chord_denom = 1;
-    v->chord_fermata_num = 0; /* [RK] 2026-11-14 */
-    v->chord_fermata_denom = 1;
     marknotestart();
   };
 }
@@ -3645,10 +3673,10 @@ void event_chordoff(int chord_n, int chord_m)
     };
 
     if(chord_m == 1 && chord_n == 1) { /* chord length not set outside [] */
+      if (apply_fermata_to_chord && !ignore_fermata) {
+        fermata_on_chord(); /* [RK] 2026-11-20 */
+      };
       addfeature(CHORDOFF, 0, v->chord_num, v->chord_denom); 
-      /* the length of the chord is that of its first note */
-      addfract(&v->fermata_num, &v->fermata_denom,
-               v->chord_fermata_num, v->chord_fermata_denom); /* [RK] 2026-11-14 */
       }
     else
       {
@@ -4372,11 +4400,16 @@ void event_note(int decorators[DECSIZE], cleftype_t *clef, char accidental, int 
   /* [SS] 2015-08-18 */
   pitch = pitchof_b(note, accidental, mult, octave, propagate_accidentals,&active_pitchbend);
   if (decorators[FERMATA] && !ignore_fermata) {
-    written_num = num; /* [RK] 2026-11-14 */
-    written_denom = denom;
-    if(fermata_fixed) addfract(&num,&denom,1,1);
-    else num = num*2;
-    fermata_length(num, denom, written_num, written_denom); /* [RK] 2026-11-14 */
+    if (v->inchord) {
+      /* the whole chord is lengthened at its end */
+      apply_fermata_to_chord = 1; /* [RK] 2026-11-20 */
+    } else {
+      written_num = num; /* [RK] 2026-11-14 */
+      written_denom = denom;
+      if(fermata_fixed) addfract(&num,&denom,1,1);
+      else num = num*2;
+      fermata_length(num, denom, written_num, written_denom); /* [RK] 2026-11-14 */
+    };
   };
   if (v->chordcount == 1) {
     v->chord_num = num*4;

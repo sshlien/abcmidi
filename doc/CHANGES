@@ -16460,3 +16460,20 @@ they ignore !fermata! before a bar line.  A decoration at the end of a
 line of music is still an error.  Fixes issue #57.  New golden tests
 abc2midi_decoration_bar_line_2 and abc2abc_decoration_bar_line
 (samples/decoration_bar_line.abc).
+
+
+November 20 2026 [RK]
+
+abc2midi: a fermata on one note of a chord, as in [Hce] or [cHe],
+lengthens the whole chord, as a fermata before the chord, H[ce], does.
+event_note() and event_rest() (store.c) lengthened only that note,
+while genmidi.c plays every note of a chord with the length of its
+first note.  [Hce] was played right but reported "unequal notes in
+chord", an error with -Werror; the fermata was lost in [cHe], and in
+[Hce]2, whose notes all take the length written after the ].  Of a
+chord that starts with a rest, as in [Hz e], only the rest was
+lengthened.  A fermata in a chord now lengthens all its notes and the
+chord at the end of the chord (fermata_on_chord() and
+fix_enclosed_note_lengths()), where the length that it adds to the bar
+is counted for the bar check.  New golden tests abc2midi_chord_fermata
+and abc2midi_chord_fermata_2 (samples/chord_fermata.abc).
