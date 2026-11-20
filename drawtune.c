@@ -1603,7 +1603,8 @@ static void sizevoice(struct voice* v, struct tune* t)
       spacechord(chordplace);
       break;
     case CHORDOFF:
-      if (thischord != NULL) {
+      /* an empty chord, as in "[]", has no chordhead */
+      if ((thischord != NULL) && (chordhead != NULL)) { /* [RK] 2026-11-20 */
         anote = chordhead->item.voidptr;
         thischord->beaming = chordbeaming;
         if (thischord->beaming == single) {

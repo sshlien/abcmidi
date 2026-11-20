@@ -16490,3 +16490,11 @@ read the first backslash as the start of a code, such as \'e for an e
 acute, found none and printed it, then read the second one in the same
 way, so that yaps printed two backslashes.  New golden test
 yaps_text_backslash (samples/text_backslash.abc).
+
+yaps: an empty chord, [], with or without a length, as in the abcm2ps
+sample deco.abc, no longer crashes yaps.  sizevoice() (drawtune.c) read
+the first note of a chord that has none, newchord() (yapstree.c) left
+the stem fields of the chord uninitialised for drawchordtail(), and
+event_chordoff() (yapstree.c) gave the length of []2 to notes that it
+does not have.  yaps still reports such a chord as mis-formed.  New
+sample samples/empty_chord.abc, run by the test yaps_sample_empty_chord.
