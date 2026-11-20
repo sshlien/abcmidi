@@ -1,0 +1,26 @@
+% Shorthand decorations followed by a chord symbol, an annotation, a
+% decoration such as !p!, a slur, grace notes or a y spacer, as in O "D" C
+% (GitHub issue #84).  parsenote() (parseabc.c) required a note, a rest or
+% a chord after the decorations, and reported a "Malformed note".  The
+% decorations put before grace notes are those of the note after them, and
+% those of a y spacer, as in !fermata! y, decorate no note.  Tune 2 is the
+% same music in the order of the abc standard.
+X:1
+T:Decorations before chord symbols
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+"C" HC E G c |"G" HG B d g |"^trill" Tc d e f |!p! Hc2 "C" H[ce]2 |
+"Am" Hz A c e |(Hc d) e f |{g}Hf e d c |!fermata! y c d e "C" Hy f |]
+
+X:2
+T:Decorations after chord symbols
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+"C" HC E G c |"G"HG B d g |"^trill" Tc d e f |!p! Hc2 "C" H[ce]2 |
+"Am" Hz A c e |(Hc d) e f |{g}Hf e d c |y c d e "C" y f |]
