@@ -1634,6 +1634,7 @@ parsevoice (char *s)
   vparams.octave = 0;
   vparams.gotoctave = 0;
   vparams.gotclef = 0;
+  vparams.clefname[0] = '\0'; /* [RK] 2026-11-20 */
   cgotoctave = 0;
   coctave = 0;
   vparams.gotname = 0;
