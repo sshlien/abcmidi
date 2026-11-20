@@ -1,0 +1,14 @@
+% V: fields with words but no clef, such as name= or sname=.
+% parsevoice() (parseabc.c) compared the name of the clef with "tab"
+% when the field had none, a read of uninitialised memory that the
+% valgrind preset reports for abc2midi, abc2abc, yaps and abcmatch.
+X:1
+T:Voices without a clef
+C:abc2midi test
+M:4/4
+L:1/4
+K:C
+V:1 name="Melody" sname="M"
+C D E F |G A B c |]
+V:2 name="Bass"
+C, D, E, F, |G, A, B, C |]
