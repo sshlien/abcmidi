@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "2.00 November 20 2026 yaps"
+#define VERSION "2.01 November 20 2026 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -209,6 +209,13 @@ static struct chord* newchord()
   f = (struct chord*)checkmalloc(sizeof(struct chord));
   f->ytop = 0;
   f->ybot = 0;
+  /* the notes of the chord set these fields; an empty chord, as in "[]",
+     has neither a stem nor a tail */
+  f->beaming = nostem; /* [RK] 2026-11-20 */
+  f->stemlength = 0.0;
+  f->stemup = 0;
+  f->base = 0;
+  f->base_exp = 0;
   return(f);
 }
 
@@ -2683,6 +2690,8 @@ void event_ignore () { };  /* [SS] 2018-12-21 */
 
 void fix_enclosed_note_lengths(struct feature* chordplace,
       int chord_n, int chord_m, int * base, int * base_exp)
+/* gives the length written after the ] of a chord to its notes; the
+   chord starts with a note, which follows chordplace */
 {
 struct feature* f;
 struct note* anote;
@@ -2691,7 +2700,10 @@ f = chordplace->next;
 anote = f->item.voidptr;
 /* remove old note length from barcount */
 addfractions(&cv->barcount, -anote->len.num, anote->len.denom);
-while ((f != NULL)&&((f->type==NOTE)||(f->type=CHORDNOTE))) {
+while (f != NULL) { /* [RK] 2026-11-20 */
+  /* the chord may also hold other features, such as spaces, ties and
+     slurs */
+  if ((f->type == NOTE) || (f->type == CHORDNOTE)) { /* [RK] 2026-11-20 */
    anote = f->item.voidptr;
    /* remove old note length from barcount */
    setfract(&anote->len, chord_n*cv->unitlen.num, chord_m*cv->unitlen.denom);
@@ -2701,9 +2713,10 @@ while ((f != NULL)&&((f->type==NOTE)||(f->type=CHORDNOTE))) {
    */
    anote->dots = count_dots(&anote->base, &anote->base_exp,
          anote->len.num, anote->len.denom);
-   f = f->next;
    *base = anote->base;
    *base_exp = anote->base_exp;
+   };
+   f = f->next;
    }
    /* and new note length to barcount */
    addfractions(&cv->barcount, anote->len.num, anote->len.denom);
@@ -2736,7 +2749,8 @@ void event_chordoff(int chord_n, int chord_m)
     event_error("mis-formed chord");
   };
   
-  if (cv->chordplace) {
+  /* a mis-formed chord, such as "[]", has no note to fix */
+  if (thechord != NULL) { /* [RK] 2026-11-20 */
       fix_enclosed_note_lengths(cv->chordplace,chord_n,chord_m,&base,&base_exp);
       if (chord_n != 1 || chord_m != 1) {
          thechord->base = base;
