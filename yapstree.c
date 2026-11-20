@@ -2690,6 +2690,8 @@ void event_ignore () { };  /* [SS] 2018-12-21 */
 
 void fix_enclosed_note_lengths(struct feature* chordplace,
       int chord_n, int chord_m, int * base, int * base_exp)
+/* gives the length written after the ] of a chord to its notes; the
+   chord starts with a note, which follows chordplace */
 {
 struct feature* f;
 struct note* anote;
@@ -2698,7 +2700,10 @@ f = chordplace->next;
 anote = f->item.voidptr;
 /* remove old note length from barcount */
 addfractions(&cv->barcount, -anote->len.num, anote->len.denom);
-while ((f != NULL)&&((f->type==NOTE)||(f->type=CHORDNOTE))) {
+while (f != NULL) { /* [RK] 2026-11-20 */
+  /* the chord may also hold other features, such as spaces, ties and
+     slurs */
+  if ((f->type == NOTE) || (f->type == CHORDNOTE)) { /* [RK] 2026-11-20 */
    anote = f->item.voidptr;
    /* remove old note length from barcount */
    setfract(&anote->len, chord_n*cv->unitlen.num, chord_m*cv->unitlen.denom);
@@ -2708,9 +2713,10 @@ while ((f != NULL)&&((f->type==NOTE)||(f->type=CHORDNOTE))) {
    */
    anote->dots = count_dots(&anote->base, &anote->base_exp,
          anote->len.num, anote->len.denom);
-   f = f->next;
    *base = anote->base;
    *base_exp = anote->base_exp;
+   };
+   f = f->next;
    }
    /* and new note length to barcount */
    addfractions(&cv->barcount, anote->len.num, anote->len.denom);

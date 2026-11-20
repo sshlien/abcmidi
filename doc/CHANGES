@@ -16498,3 +16498,12 @@ the stem fields of the chord uninitialised for drawchordtail(), and
 event_chordoff() (yapstree.c) gave the length of []2 to notes that it
 does not have.  yaps still reports such a chord as mis-formed.  New
 sample samples/empty_chord.abc, run by the test yaps_sample_empty_chord.
+
+yaps: a chord with a length after its ] that also holds a space, a tie
+or a slur, as in [C E]2 or [C-E-]2, no longer makes yaps write past the
+end of these features or crash.  fix_enclosed_note_lengths()
+(yapstree.c) gave the length to every feature of the chord as if it
+were a note: its loop test (f->type=CHORDNOTE) was an assignment, which
+also turned each of these features into a chord note.  It now gives the
+length to the notes only.  New sample samples/chord_length.abc, run by
+the test yaps_sample_chord_length.
