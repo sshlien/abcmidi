@@ -155,6 +155,7 @@ extern void event_rest(int decorators[DECSIZE],int n,int m,int type);
 extern void event_mrest(int n,int m,char c);
 extern void event_spacing(int n, int m);
 extern void event_bar(int type, char *replist);
+extern void event_bar_decorations(int decorators[DECSIZE]); /* [RK] 2026-11-18 */
 extern void event_space(void);
 extern void event_lineend(char ch, int n);
 extern void event_broken(int type, int mult);
@@ -222,6 +223,7 @@ extern void event_rest();
 extern void event_mrest();
 extern void event_spacing();
 extern void event_bar();
+extern void event_bar_decorations(); /* [RK] 2026-11-18 */
 extern void event_space();
 extern void event_lineend();
 extern void event_broken();

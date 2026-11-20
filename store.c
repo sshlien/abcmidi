@@ -186,7 +186,7 @@ int main()
 
 */
 
-#define VERSION "5.16 November 17 2026 abc2midi"
+#define VERSION "5.17 November 18 2026 abc2midi"
 
 /* enables reading V: indication in header */
 #define XTEN1 1
@@ -5527,6 +5527,12 @@ void event_bar(int type, char *replist)
  if (v->fromsplitno != -1 || splitdepth >0) recurse_back_to_original_voice();
  }
  v->nbars = v->nbars + 1; /* [SS] 2019-03-18 */
+}
+
+void event_bar_decorations(int decorators[DECSIZE])
+/* shorthand decorations of the bar line that follows: not played,
+   like !fermata! before a bar line [RK] 2026-11-18 */
+{
 }
 
 

@@ -22,7 +22,7 @@
 /* yapstree.c - back-end for abc parser. */
 /* generates a data structure suitable for typeset music */
 
-#define VERSION "1.98 November 17 2026 yaps"
+#define VERSION "1.99 November 18 2026 yaps"
 #include <stdio.h>
 #ifdef USE_INDEX
 #define strchr index
@@ -2142,6 +2142,12 @@ void event_bar(int type, char *playonrep_list)
   if ((playonrep_list != NULL) && (strlen(playonrep_list) > 0)) {
     event_playonrep(playonrep_list);
   };
+}
+
+void event_bar_decorations(int decorators[DECSIZE])
+/* shorthand decorations of the bar line that follows: not drawn,
+   like !fermata! before a bar line [RK] 2026-11-18 */
+{
 }
 
 void event_space()

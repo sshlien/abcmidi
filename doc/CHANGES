@@ -16444,3 +16444,19 @@ with a new voice 1 without freeing these voices, which the body does
 not use, a leak that the sanitize and valgrind builds report.  The
 output of abcmatch does not change.  New sample
 samples/voices_header.abc, run by the test abcmatch_sample_voices_header.
+
+
+November 18 2026 [RK]
+
+abc2midi, abc2abc, yaps and abcmatch: a shorthand decoration, such as
+H for !fermata! or T for !trill!, may be put before a bar line, as in
+"C D E F H|", with or without white space between them, as section
+4.14 of the abc standard allows.  parsenote() (parseabc.c) required a
+note, a rest or a chord after the decorations, and reported a
+"Malformed note" on the bar line.  The decorations of a bar line are
+passed to the new event_bar_decorations().  abc2abc writes them before
+the bar line (toabc.c); abc2midi, yaps and abcmatch ignore them, as
+they ignore !fermata! before a bar line.  A decoration at the end of a
+line of music is still an error.  Fixes issue #57.  New golden tests
+abc2midi_decoration_bar_line_2 and abc2abc_decoration_bar_line
+(samples/decoration_bar_line.abc).

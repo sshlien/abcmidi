@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.26 November 17 2026 abc2abc"
+#define VERSION "2.27 November 18 2026 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -1818,6 +1818,17 @@ void event_bar(int type, char *replist)
   newabctext(barline);
   barno = barno + 1;
   copymap();
+}
+
+void event_bar_decorations(int decorators[DECSIZE])
+/* shorthand decorations of the bar line that follows [RK] 2026-11-18 */
+{
+  int t;
+
+  inmusic = 1;
+  for (t=0; t<DECSIZE; t++) {
+    if (decorators[t]) emit_char(decorations[t]);
+  };
 }
 
 void event_space()
