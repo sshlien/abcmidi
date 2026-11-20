@@ -16483,3 +16483,10 @@ length after its ], such as [ce]2, by one unit length, as it does the
 other notes and chords.  fix_enclosed_note_lengths() (store.c) added a
 quarter note, whatever the unit length.  The golden test
 abc2midi_chord_fermata_2 has such chords with L:1/8.
+
+yaps: \\ in a text field or in lyrics is printed as one backslash, as
+sections 2.2.5 and 8.2 of the abc standard say.  getISO() (drawtune.c)
+read the first backslash as the start of a code, such as \'e for an e
+acute, found none and printed it, then read the second one in the same
+way, so that yaps printed two backslashes.  New golden test
+yaps_text_backslash (samples/text_backslash.abc).

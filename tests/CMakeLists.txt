@@ -392,6 +392,11 @@ add_golden_test(TYPE abc2midi SAMPLE words_tempo.abc)
 add_golden_test(TYPE abc2midi SAMPLE text_fields.abc)
 add_golden_test(TYPE abc2abc  SAMPLE text_fields.abc)
 
+# Regression test for \\ in the text fields and lyrics that yaps prints
+# (see samples/text_backslash.abc): it is a backslash, which yaps printed
+# as two backslashes.
+add_golden_test(TYPE yaps SAMPLE text_backslash.abc)
+
 # Regression test for GitHub issue #67: in a tune with several tracks, the
 # conductor track ends with the other tracks after a tempo change (see
 # samples/tempo_tracks.abc).  It ended later by the time of the last tempo
