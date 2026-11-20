@@ -16551,3 +16551,16 @@ annotations, the order of the abc standard, and on a chord only before
 it, not on its notes.  Fixes issue #84.  New golden tests
 abc2midi_decoration_annotation, abc2midi_decoration_annotation_2 and
 abc2abc_decoration_annotation (samples/decoration_annotation.abc).
+
+abc2midi, abc2abc, yaps and abcmatch: a shorthand decoration may also
+be followed by a slur, as in H (CE), by grace notes, as in H {g}c, or
+by a y spacer, as in H y, which were also a "Malformed note".  The
+decorations put before grace notes, shorthand or !...!, are those of
+the note after them, as in abc2svg: parsemusic() sets them aside at the
+{ and passes them back at the }, while !fermata!{g}c lengthened the
+grace note.  The decorations of a y spacer, as in !fermata! y c or
+H "C" y c, decorate no note: abc2midi lengthened the c.  abc2abc writes
+them before the y, through event_bar_decorations().  The golden tests
+abc2midi_decoration_annotation, abc2midi_decoration_annotation_2 and
+abc2abc_decoration_annotation (samples/decoration_annotation.abc) get
+these cases.
