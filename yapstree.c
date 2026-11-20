@@ -209,6 +209,13 @@ static struct chord* newchord()
   f = (struct chord*)checkmalloc(sizeof(struct chord));
   f->ytop = 0;
   f->ybot = 0;
+  /* the notes of the chord set these fields; an empty chord, as in "[]",
+     has neither a stem nor a tail */
+  f->beaming = nostem; /* [RK] 2026-11-20 */
+  f->stemlength = 0.0;
+  f->stemup = 0;
+  f->base = 0;
+  f->base_exp = 0;
   return(f);
 }
 
@@ -2736,7 +2743,8 @@ void event_chordoff(int chord_n, int chord_m)
     event_error("mis-formed chord");
   };
   
-  if (cv->chordplace) {
+  /* a mis-formed chord, such as "[]", has no note to fix */
+  if (thechord != NULL) { /* [RK] 2026-11-20 */
       fix_enclosed_note_lengths(cv->chordplace,chord_n,chord_m,&base,&base_exp);
       if (chord_n != 1 || chord_m != 1) {
          thechord->base = base;

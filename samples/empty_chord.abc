@@ -1,0 +1,10 @@
+% An empty chord, [], with or without a length, as in the abcm2ps sample
+% deco.abc.  yaps read the first note of a chord that has none and
+% crashed, and drew the stem of a chord whose stem fields were never set.
+X:1
+T:Empty chords
+C:abc2midi test
+M:4/4
+L:1/4
+K:C
+C D [] E F |G []2 c |]
