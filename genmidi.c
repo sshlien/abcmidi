@@ -3201,6 +3201,12 @@ long writetrack(int xtrack)
            where N is the instance number (1-based) */
         /*j = partbreak(xtrack, trackvoice, j); [SS] 2023.01.20 */
         j = findvoice(j, trackvoice, xtrack);
+        /* the V: field of this voice in the next part is passed over, so
+           its line of music starts here, as in case VOICE below */
+        if (wordson && (j < notes) && (feature[j] == VOICE)) { /* [RK] 2026-11-20 */
+          thismline = j+1;
+          nowordline = 0;
+        };
         if (partmarkers && xtrack == 0 &&
             partlabel >= 0 && partlabel < 26) {
           char msg[20];
