@@ -1784,6 +1784,16 @@ parsenote (char **s)
       event_bar_decorations (decorators);
       return;
     };
+  /* A chord symbol, an annotation or a decoration such as !p! may follow,
+     as in O "D" C: these decorations go to the note, rest or chord after
+     them, which parsemusic() reads next, as the !...! decorations do.
+     [RK] 2026-11-20 */
+  if ((**s == '"') || (**s == '!') || ((**s == '+') && !oldchordconvention))
+    {
+      for (i = 0; i < DECSIZE; i++)
+        decorators_passback[i] = decorators[i];
+      return;
+    };
   /*check for decorated chord */
   if (**s == '[')
     {
@@ -3171,6 +3181,11 @@ parsemusic (char *field)
 			    chorddecorators[i] =
 			      decorators[i] | decorators_passback[i];
 			  event_chordon (chorddecorators);
+                          /* abc2abc writes the decorations of a chord before
+                             it, not on its notes [RK] 2026-11-20 */
+                          if (fileprogram == ABC2ABC)
+                            for (i = 0; i < DECSIZE; i++)
+                              decorators_passback[i] = 0;
 			  parserinchord = 1;
 			};
 		    };

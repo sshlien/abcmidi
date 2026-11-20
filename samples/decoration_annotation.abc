@@ -1,0 +1,24 @@
+% Shorthand decorations followed by a chord symbol, an annotation or a
+% decoration such as !p!, as in O "D" C (GitHub issue #84).  parsenote()
+% (parseabc.c) required a note, a rest or a chord after the decorations,
+% and reported a "Malformed note".  Tune 2 is the same music with the
+% chord symbols and annotations first, as the abc standard orders them.
+X:1
+T:Decorations before chord symbols
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+H "C" C E G c |H"G" G B d g |T "^trill" c d e f |H !p! c2 H "C" [ce]2 |
+H "Am" z A c e |]
+
+X:2
+T:Decorations after chord symbols
+C:abc2midi test
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+"C" H C E G c |"G"H G B d g |"^trill" T c d e f |!p! H c2 "C" H [ce]2 |
+"Am" H z A c e |]
