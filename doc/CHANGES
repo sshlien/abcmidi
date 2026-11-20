@@ -16565,3 +16565,12 @@ note.  The decorations of a y spacer decorate no note: !fermata! y C no
 longer lengthens C.  Fixes issue #84.  New golden tests
 abc2midi_decoration_annotation, abc2midi_decoration_annotation_2 and
 abc2abc_decoration_annotation (samples/decoration_annotation.abc).
+
+abc2midi: in a tune with a P: play order, a voice other than the first
+one gets its lyrics.  At each part, writetrack() (genmidi.c) went to
+the V: field of the voice with findvoice() without starting its line of
+music there, as it does for a V: field, so that it looked for the
+lyrics of another line, reported a "Line of music without lyrics" and
+wrote none of the lyrics of the voice.  Fixes issue #85.  New golden
+tests abc2midi_lyrics_parts and abc2midi_lyrics_parts_2
+(samples/lyrics_parts.abc).
