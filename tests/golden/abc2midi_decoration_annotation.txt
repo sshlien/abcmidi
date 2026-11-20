@@ -7,7 +7,7 @@ Time=0  Key signature, sharp/flats=0  minor=0
 Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
 Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=32
      Text = <Decorations before chord symbols>
-Time=12986  Meta event, end of track
+Time=19706  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=10
@@ -68,7 +68,33 @@ Time=12001  Note on, chan=1 pitch=72 vol=50
 Time=12480  Note off, chan=1 pitch=72 vol=0
 Time=12481  Note on, chan=1 pitch=76 vol=50
 Time=12960  Note off, chan=1 pitch=76 vol=0
-Time=12986  Meta event, end of track
+Time=12961  Note on, chan=1 pitch=72 vol=60
+Time=13920  Note off, chan=1 pitch=72 vol=0
+Time=13921  Note on, chan=1 pitch=74 vol=50
+Time=14400  Note off, chan=1 pitch=74 vol=0
+Time=14401  Note on, chan=1 pitch=76 vol=50
+Time=14880  Note off, chan=1 pitch=76 vol=0
+Time=14881  Note on, chan=1 pitch=77 vol=50
+Time=15360  Note off, chan=1 pitch=77 vol=0
+Time=15361  Note on, chan=1 pitch=79 vol=60
+Time=15480  Note off, chan=1 pitch=79 vol=0
+Time=15481  Note on, chan=1 pitch=77 vol=35
+Time=16320  Note off, chan=1 pitch=77 vol=0
+Time=16321  Note on, chan=1 pitch=76 vol=50
+Time=16800  Note off, chan=1 pitch=76 vol=0
+Time=16801  Note on, chan=1 pitch=74 vol=50
+Time=17280  Note off, chan=1 pitch=74 vol=0
+Time=17281  Note on, chan=1 pitch=72 vol=50
+Time=17760  Note off, chan=1 pitch=72 vol=0
+Time=17761  Note on, chan=1 pitch=72 vol=60
+Time=18240  Note off, chan=1 pitch=72 vol=0
+Time=18241  Note on, chan=1 pitch=74 vol=50
+Time=18720  Note off, chan=1 pitch=74 vol=0
+Time=18721  Note on, chan=1 pitch=76 vol=50
+Time=19200  Note off, chan=1 pitch=76 vol=0
+Time=19201  Note on, chan=1 pitch=77 vol=50
+Time=19680  Note off, chan=1 pitch=77 vol=0
+Time=19706  Meta event, end of track
 Track end
 Track start
 Time=0  Meta Text, type=0x01 (Text Event)  leng=12
@@ -157,5 +183,53 @@ Time=12001  Note on, chan=3 pitch=64 vol=75
 Time=12240  Note off, chan=3 pitch=57 vol=0
 Time=12240  Note off, chan=3 pitch=60 vol=0
 Time=12240  Note off, chan=3 pitch=64 vol=0
-Time=12986  Meta event, end of track
+Time=12961  Note on, chan=2 pitch=45 vol=80
+Time=13200  Note off, chan=2 pitch=45 vol=0
+Time=13441  Note on, chan=3 pitch=57 vol=75
+Time=13441  Note on, chan=3 pitch=60 vol=75
+Time=13441  Note on, chan=3 pitch=64 vol=75
+Time=13680  Note off, chan=3 pitch=57 vol=0
+Time=13680  Note off, chan=3 pitch=60 vol=0
+Time=13680  Note off, chan=3 pitch=64 vol=0
+Time=13921  Note on, chan=2 pitch=45 vol=80
+Time=14160  Note off, chan=2 pitch=45 vol=0
+Time=14401  Note on, chan=3 pitch=57 vol=75
+Time=14401  Note on, chan=3 pitch=60 vol=75
+Time=14401  Note on, chan=3 pitch=64 vol=75
+Time=14640  Note off, chan=3 pitch=57 vol=0
+Time=14640  Note off, chan=3 pitch=60 vol=0
+Time=14640  Note off, chan=3 pitch=64 vol=0
+Time=15361  Note on, chan=2 pitch=45 vol=80
+Time=15600  Note off, chan=2 pitch=45 vol=0
+Time=15841  Note on, chan=3 pitch=57 vol=75
+Time=15841  Note on, chan=3 pitch=60 vol=75
+Time=15841  Note on, chan=3 pitch=64 vol=75
+Time=16080  Note off, chan=3 pitch=57 vol=0
+Time=16080  Note off, chan=3 pitch=60 vol=0
+Time=16080  Note off, chan=3 pitch=64 vol=0
+Time=16321  Note on, chan=2 pitch=45 vol=80
+Time=16560  Note off, chan=2 pitch=45 vol=0
+Time=16801  Note on, chan=3 pitch=57 vol=75
+Time=16801  Note on, chan=3 pitch=60 vol=75
+Time=16801  Note on, chan=3 pitch=64 vol=75
+Time=17040  Note off, chan=3 pitch=57 vol=0
+Time=17040  Note off, chan=3 pitch=60 vol=0
+Time=17040  Note off, chan=3 pitch=64 vol=0
+Time=17761  Note on, chan=2 pitch=45 vol=80
+Time=18000  Note off, chan=2 pitch=45 vol=0
+Time=18241  Note on, chan=3 pitch=57 vol=75
+Time=18241  Note on, chan=3 pitch=60 vol=75
+Time=18241  Note on, chan=3 pitch=64 vol=75
+Time=18480  Note off, chan=3 pitch=57 vol=0
+Time=18480  Note off, chan=3 pitch=60 vol=0
+Time=18480  Note off, chan=3 pitch=64 vol=0
+Time=18721  Note on, chan=2 pitch=45 vol=80
+Time=18960  Note off, chan=2 pitch=45 vol=0
+Time=19201  Note on, chan=3 pitch=48 vol=75
+Time=19201  Note on, chan=3 pitch=52 vol=75
+Time=19201  Note on, chan=3 pitch=55 vol=75
+Time=19440  Note off, chan=3 pitch=48 vol=0
+Time=19440  Note off, chan=3 pitch=52 vol=0
+Time=19440  Note off, chan=3 pitch=55 vol=0
+Time=19706  Meta event, end of track
 Track end
