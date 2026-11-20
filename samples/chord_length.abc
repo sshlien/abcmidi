@@ -1,0 +1,10 @@
+% Chords with a length after their ], which also hold a space, a tie or a
+% slur.  yaps gave this length to every feature of the chord, as if it
+% were a note, and wrote past the end of the features that are not notes.
+X:1
+T:Chords with a length, spaces, ties and slurs
+C:abc2midi test
+M:4/4
+L:1/4
+K:C
+[C E]2 [z C]2 |[C-E-]2 [CE]2 |c/B/ {(G}[CA)]3 |[(CE]2 D) E |]
