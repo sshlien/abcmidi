@@ -1,0 +1,45 @@
+% Lyrics in a voice other than the first one, in a tune with a P: play
+% order (GitHub issue #85).  At each part, writetrack() (genmidi.c) went
+% to the V: field of the voice without starting its line of music there,
+% so that it reported a "Line of music without lyrics" and wrote none of
+% the lyrics of this voice.  In part B, voice K has a line of rests
+% without lyrics in tune 1, as in the issue, and notes with lyrics in
+% tune 2.
+X:1
+T:Lyrics in parts
+C:abc2midi test
+V:S clef=treble
+V:K clef=treble
+P:AB
+M:C
+L:1/4
+K:C
+P:A
+[V:S] C E G c |]
+w:    C E G c
+[V:K] C E G c |]
+w:    C E G c
+P:B
+[V:S] C E G c |]
+w:    C E G c
+[V:K] z z z z |]
+
+X:2
+T:Lyrics in parts, both voices
+C:abc2midi test
+V:S clef=treble
+V:K clef=treble
+P:AB
+M:C
+L:1/4
+K:C
+P:A
+[V:S] C E G c |]
+w:    C E G c
+[V:K] C E G c |]
+w:    C E G c
+P:B
+[V:S] C E G c |]
+w:    C E G c
+[V:K] D F A d |]
+w:    x y z w
