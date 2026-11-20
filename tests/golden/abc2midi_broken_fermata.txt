@@ -1,0 +1,93 @@
+Header format=0 ntrks=1 division=480
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=0  minor=0
+Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:1>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=28
+     Text = <Broken rhythms with fermatas>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=1  Note on, chan=1 pitch=72 vol=105
+Time=1440  Note off, chan=1 pitch=72 vol=0
+Time=1441  Note on, chan=1 pitch=74 vol=80
+Time=1680  Note off, chan=1 pitch=74 vol=0
+Time=1681  Note on, chan=1 pitch=76 vol=80
+Time=2160  Note off, chan=1 pitch=76 vol=0
+Time=2161  Note on, chan=1 pitch=77 vol=80
+Time=2640  Note off, chan=1 pitch=77 vol=0
+Time=2641  Note on, chan=1 pitch=72 vol=105
+Time=3360  Note off, chan=1 pitch=72 vol=0
+Time=3361  Note on, chan=1 pitch=74 vol=80
+Time=3840  Note off, chan=1 pitch=74 vol=0
+Time=3841  Note on, chan=1 pitch=76 vol=80
+Time=4320  Note off, chan=1 pitch=76 vol=0
+Time=4321  Note on, chan=1 pitch=77 vol=80
+Time=4800  Note off, chan=1 pitch=77 vol=0
+Time=4801  Note on, chan=1 pitch=72 vol=105
+Time=5040  Note off, chan=1 pitch=72 vol=0
+Time=5041  Note on, chan=1 pitch=74 vol=80
+Time=6480  Note off, chan=1 pitch=74 vol=0
+Time=6481  Note on, chan=1 pitch=76 vol=80
+Time=6960  Note off, chan=1 pitch=76 vol=0
+Time=6961  Note on, chan=1 pitch=77 vol=80
+Time=7440  Note off, chan=1 pitch=77 vol=0
+Time=7441  Note on, chan=1 pitch=72 vol=105
+Time=9120  Note off, chan=1 pitch=72 vol=0
+Time=9121  Note on, chan=1 pitch=74 vol=80
+Time=9240  Note off, chan=1 pitch=74 vol=0
+Time=9241  Note on, chan=1 pitch=76 vol=80
+Time=9720  Note off, chan=1 pitch=76 vol=0
+Time=9721  Note on, chan=1 pitch=77 vol=80
+Time=10200  Note off, chan=1 pitch=77 vol=0
+Time=11641  Note on, chan=1 pitch=74 vol=80
+Time=11880  Note off, chan=1 pitch=74 vol=0
+Time=11881  Note on, chan=1 pitch=76 vol=80
+Time=12360  Note off, chan=1 pitch=76 vol=0
+Time=12361  Note on, chan=1 pitch=77 vol=80
+Time=12840  Note off, chan=1 pitch=77 vol=0
+Time=12841  Note on, chan=1 pitch=72 vol=105
+Time=12851  Note on, chan=1 pitch=76 vol=105
+Time=14280  Note off, chan=1 pitch=76 vol=0
+Time=14280  Note off, chan=1 pitch=72 vol=0
+Time=14281  Note on, chan=1 pitch=74 vol=80
+Time=14520  Note off, chan=1 pitch=74 vol=0
+Time=14521  Note on, chan=1 pitch=76 vol=80
+Time=15000  Note off, chan=1 pitch=76 vol=0
+Time=15001  Note on, chan=1 pitch=77 vol=80
+Time=15480  Note off, chan=1 pitch=77 vol=0
+Time=15481  Note on, chan=1 pitch=74 vol=105
+Time=16200  Note off, chan=1 pitch=74 vol=0
+Time=16201  Note on, chan=1 pitch=72 vol=80
+Time=16211  Note on, chan=1 pitch=76 vol=80
+Time=16680  Note off, chan=1 pitch=76 vol=0
+Time=16680  Note off, chan=1 pitch=72 vol=0
+Time=16681  Note on, chan=1 pitch=76 vol=80
+Time=17160  Note off, chan=1 pitch=76 vol=0
+Time=17161  Note on, chan=1 pitch=77 vol=80
+Time=17640  Note off, chan=1 pitch=77 vol=0
+Time=17641  Note on, chan=1 pitch=72 vol=105
+Time=17651  Note on, chan=1 pitch=76 vol=105
+Time=18360  Note off, chan=1 pitch=76 vol=0
+Time=18360  Note off, chan=1 pitch=72 vol=0
+Time=18361  Note on, chan=1 pitch=74 vol=80
+Time=18371  Note on, chan=1 pitch=77 vol=80
+Time=18840  Note off, chan=1 pitch=77 vol=0
+Time=18840  Note off, chan=1 pitch=74 vol=0
+Time=18841  Note on, chan=1 pitch=76 vol=80
+Time=19320  Note off, chan=1 pitch=76 vol=0
+Time=19321  Note on, chan=1 pitch=77 vol=80
+Time=19800  Note off, chan=1 pitch=77 vol=0
+Time=19801  Note on, chan=1 pitch=72 vol=105
+Time=21240  Note off, chan=1 pitch=72 vol=0
+Time=21241  Note on, chan=1 pitch=74 vol=80
+Time=21720  Note off, chan=1 pitch=74 vol=0
+Time=21721  Note on, chan=1 pitch=76 vol=95
+Time=22200  Note off, chan=1 pitch=76 vol=0
+Time=22201  Note on, chan=1 pitch=77 vol=80
+Time=22680  Note off, chan=1 pitch=77 vol=0
+Time=22706  Meta event, end of track
+Track end

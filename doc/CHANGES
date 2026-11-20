@@ -16515,3 +16515,16 @@ for a tablature voice, before any clef had set it.  New sample
 samples/voice_no_clef.abc, run by the tests abc2midi_clean_voice_no_clef,
 abc2abc_sample_voice_no_clef, yaps_sample_voice_no_clef and
 abcmatch_sample_voice_no_clef, which the valgrind preset checks.
+
+abc2midi: a broken rhythm applies to the written lengths of a note,
+rest or chord with a fermata, as in Hc>d or [Hce]>d, and the fermata to
+the lengths that the broken rhythm gives.  brokenadjust() (store.c)
+compared the lengths with the fermata, so that Hc>d or c>Hd was "Cannot
+apply broken rhythm" and played without it, and multiplied the length
+that the fermata added without counting this change for the bar check,
+so that [Hce]>d e f was reported as too long.  With %%MIDI fermatafixed,
+the fermata now adds one unit length to the new length.  The length that
+a fermata adds is recorded with the last two notes, rests or chords
+(marknote()).  Staccato notes, made of a note and a rest, still cannot
+take a broken rhythm.  New golden tests abc2midi_broken_fermata and
+abc2midi_broken_fermata_2 (samples/broken_fermata.abc).

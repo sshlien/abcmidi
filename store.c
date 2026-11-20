@@ -342,6 +342,12 @@ struct voicecontext {
   /* length that fermatas added to the bar being parsed, in the units of
      num[]/denom[]: see fermata_length() and fermata_on_chord() */
   int fermata_num, fermata_denom; /* [RK] 2026-11-14 */
+  /* length that a fermata added to the note or rest being parsed, and to
+     the last two notes, rests or chords, which a broken rhythm may
+     change: see marknote() and brokenadjust() */
+  int note_fermata_num, note_fermata_denom; /* [RK] 2026-11-20 */
+  int this_fermata_num, this_fermata_denom;
+  int last_fermata_num, last_fermata_denom;
   /* details of last 2 notes/chords to apply length-modifiers to */
   int laststart, lastend, thisstart, thisend; /* for handling broken rhythms*/
   /* broken rhythm handling */
@@ -563,6 +569,12 @@ static struct voicecontext* newvoice(int n)
   s->chordcount = 0;
   s->fermata_num = 0; /* [RK] 2026-11-14 */
   s->fermata_denom = 1;
+  s->note_fermata_num = 0; /* [RK] 2026-11-20 */
+  s->note_fermata_denom = 1;
+  s->this_fermata_num = 0;
+  s->this_fermata_denom = 1;
+  s->last_fermata_num = 0;
+  s->last_fermata_denom = 1;
   s->lastbarloc = -1;
   s->laststart = -1;
   s->lastend = -1;
@@ -3392,12 +3404,41 @@ static void lenmul(int n, int a, int b)
 }
 
 
+static void fermata_broken(int start, int end, int ext_num, int ext_denom,
+                           int a, int b)
+/* A broken rhythm has multiplied by a/b the lengths of the features from
+ * start to end, a note, rest or chord that a fermata had lengthened by
+ * ext_num/ext_denom.  A fermata that doubles the note doubles its new
+ * length, so that the length it adds to the bar is multiplied by a/b too.
+ * A fixed fermata still adds one unit length to the new length.
+ * [RK] 2026-11-20 */
+{
+  int j;
+  int change_num, change_denom;
+
+  if (ext_num == 0) return;
+  /* ext*a/b - ext */
+  change_num = ext_num*(a - b);
+  change_denom = ext_denom*b;
+  if (fermata_fixed) {
+    for (j = start; j <= end; j++) {
+      if ((feature[j] == NOTE) || (feature[j] == REST) ||
+          (feature[j] == CHORDOFF) || (feature[j] == CHORDOFFEX)) {
+        addfract(&num[j], &denom[j], -change_num, change_denom);
+      };
+    };
+  } else {
+    addfract(&v->fermata_num, &v->fermata_denom, change_num, change_denom);
+  };
+}
+
 static void brokenadjust()
 /* adjust lengths of broken notes */
 {
   int num1, num2, denom12;
   int j;
   int failed;
+  int last_num, last_denom, this_num, this_denom; /* [RK] 2026-11-20 */
 
   switch(v->brokenmult) {
     case 1:
@@ -3426,9 +3467,22 @@ static void brokenadjust()
       (v->thisstart == -1) || (v->thisend == -1)) {
     failed = 1;
   } else {
-    /* check for same length notes */
-    if ((num[v->laststart]*denom[v->thisstart]) != 
-             (num[v->thisstart]*denom[v->laststart])) {
+    /* check for same length notes, as written: without the length that
+       a fermata added to a note or rest.  A chord starts with CHORDON,
+       which has no length. [RK] 2026-11-20 */
+    last_num = num[v->laststart];
+    last_denom = denom[v->laststart];
+    this_num = num[v->thisstart];
+    this_denom = denom[v->thisstart];
+    if ((feature[v->laststart] == NOTE) || (feature[v->laststart] == REST)) {
+      addfract(&last_num, &last_denom,
+               -v->last_fermata_num, v->last_fermata_denom);
+    };
+    if ((feature[v->thisstart] == NOTE) || (feature[v->thisstart] == REST)) {
+      addfract(&this_num, &this_denom,
+               -v->this_fermata_num, v->this_fermata_denom);
+    };
+    if ((last_num*this_denom) != (this_num*last_denom)) {
       failed = 1;
     };
   };
@@ -3445,6 +3499,10 @@ static void brokenadjust()
     for (j=v->thisstart; j<=v->thisend; j++) {
       lenmul(j, num2, denom12);
     };
+    fermata_broken(v->laststart, v->lastend, v->last_fermata_num,
+                   v->last_fermata_denom, num1, denom12); /* [RK] 2026-11-20 */
+    fermata_broken(v->thisstart, v->thisend, v->this_fermata_num,
+                   v->this_fermata_denom, num2, denom12);
   };
 }
 
@@ -3458,6 +3516,13 @@ static void marknotestart()
   v->laststart = v->thisstart;
   v->lastend = v->thisend;
   v->thisstart = notes-1;
+  v->last_fermata_num = v->this_fermata_num; /* [RK] 2026-11-20 */
+  v->last_fermata_denom = v->this_fermata_denom;
+  /* set by marknote(), fermata_on_chord() or fix_enclosed_note_lengths() */
+  v->this_fermata_num = 0;
+  v->this_fermata_denom = 1;
+  v->note_fermata_num = 0;
+  v->note_fermata_denom = 1;
 }
 
 static void marknoteend()
@@ -3479,7 +3544,15 @@ static void marknote()
 /* when handling a single note, not a chord, marknotestart() and */
 /* marknoteend() can be called together */
 {
+  int ext_num, ext_denom; /* [RK] 2026-11-20 */
+
+  /* the fermata of this note or rest; the staccato notes, made of a note
+     and a rest, do not come here */
+  ext_num = v->note_fermata_num; /* [RK] 2026-11-20 */
+  ext_denom = v->note_fermata_denom;
   marknotestart();
+  v->this_fermata_num = ext_num; /* [RK] 2026-11-20 */
+  v->this_fermata_denom = ext_denom;
   marknoteend();
 }
 
@@ -3503,6 +3576,8 @@ static void fermata_length(int n, int d, int n0, int d0)
   ext_num = 4*(n*d0 - n0*d);
   ext_denom = d*d0*(v->default_length);
   addfract(&v->fermata_num, &v->fermata_denom, ext_num, ext_denom); /* [RK] 2026-11-20 */
+  v->note_fermata_num = ext_num; /* [RK] 2026-11-20 */
+  v->note_fermata_denom = ext_denom;
 }
 
 static void fermata_lengthen(int *n, int *d)
@@ -3523,6 +3598,7 @@ static void fermata_on_chord()
 {
   int j;
   int n0, d0;
+  int ext_num, ext_denom;
 
   for (j = chordstart; j < notes; j++) {
     if (feature[j] == NOTE || feature[j] == TNOTE || feature[j] == REST) {
@@ -3532,9 +3608,13 @@ static void fermata_on_chord()
   n0 = v->chord_num;
   d0 = v->chord_denom;
   fermata_lengthen(&v->chord_num, &v->chord_denom);
+  ext_num = v->chord_num*d0 - n0*v->chord_denom;
+  ext_denom = v->chord_denom*d0;
   if (!v->ingrace) {
-    addfract(&v->fermata_num, &v->fermata_denom,
-             v->chord_num*d0 - n0*v->chord_denom, v->chord_denom*d0);
+    addfract(&v->fermata_num, &v->fermata_denom, ext_num, ext_denom);
+    /* for a broken rhythm */
+    v->this_fermata_num = ext_num; /* [RK] 2026-11-20 */
+    v->this_fermata_denom = ext_denom;
   };
   apply_fermata_to_chord = 0;
 }
@@ -5099,6 +5179,9 @@ if (apply_fermata_to_chord && !ignore_fermata)   /* [SS] 2012-03-26 */
     /* the length added, already in the units of num[]/denom[] */
     addfract(&v->fermata_num, &v->fermata_denom,
              num[end]*d0 - n0*denom[end], denom[end]*d0); /* [RK] 2026-11-14 */
+    /* for a broken rhythm */
+    v->this_fermata_num = num[end]*d0 - n0*denom[end]; /* [RK] 2026-11-20 */
+    v->this_fermata_denom = denom[end]*d0;
     }
 for (j = from; j < end; j++)
   {

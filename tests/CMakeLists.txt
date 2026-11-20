@@ -477,6 +477,19 @@ add_golden_test(
   TUNE          2
 )
 
+# Regression test for broken rhythms on notes, rests and chords with a
+# fermata, as in Hc>d (see samples/broken_fermata.abc): the broken rhythm
+# applies to the written lengths.  Hc>d was "Cannot apply broken rhythm",
+# and the bar check reported [Hce]>d e f as too long.  Tune 2 has %%MIDI
+# fermatafixed.
+add_golden_test(TYPE abc2midi SAMPLE broken_fermata.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        broken_fermata.abc
+  NAME          abc2midi_broken_fermata_2
+  TUNE          2
+)
+
 # Regression test for %%MIDI ratio with an odd sum, such as 3 2 in the file
 # header (tune 1) and 8 7 in the body of tune 2 (see
 # samples/broken_ratio.abc): the notes of c>d last 6/5 and 4/5 of an eighth
