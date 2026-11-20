@@ -16539,3 +16539,15 @@ last two notes.  Staccato notes, played as a note and a rest, still
 cannot take a broken rhythm (issue #94).  New golden tests
 abc2midi_broken_fermata and abc2midi_broken_fermata_2
 (samples/broken_fermata.abc).
+
+abc2midi, abc2abc, yaps and abcmatch: a shorthand decoration may be
+followed by a chord symbol, an annotation or a decoration such as !p!,
+as in O "D" C, with or without white space.  parsenote() (parseabc.c)
+required a note, a rest or a chord after the decorations, and reported
+a "Malformed note".  These decorations now go to the note, rest or
+chord that follows, through decorators_passback, as the !...!
+decorations do.  abc2abc writes them after the chord symbols and
+annotations, the order of the abc standard, and on a chord only before
+it, not on its notes.  Fixes issue #84.  New golden tests
+abc2midi_decoration_annotation, abc2midi_decoration_annotation_2 and
+abc2abc_decoration_annotation (samples/decoration_annotation.abc).
