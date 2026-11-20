@@ -16477,3 +16477,9 @@ chord at the end of the chord (fermata_on_chord() and
 fix_enclosed_note_lengths()), where the length that it adds to the bar
 is counted for the bar check.  New golden tests abc2midi_chord_fermata
 and abc2midi_chord_fermata_2 (samples/chord_fermata.abc).
+
+abc2midi: with %%MIDI fermatafixed, a fermata lengthens a chord with a
+length after its ], such as [ce]2, by one unit length, as it does the
+other notes and chords.  fix_enclosed_note_lengths() (store.c) added a
+quarter note, whatever the unit length.  The golden test
+abc2midi_chord_fermata_2 has such chords with L:1/8.

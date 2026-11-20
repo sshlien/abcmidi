@@ -5095,8 +5095,7 @@ if (apply_fermata_to_chord && !ignore_fermata)   /* [SS] 2012-03-26 */
     {
     n0 = num[end];
     d0 = denom[end];
-    if (fermata_fixed) addfract(&num[end],&denom[end],1,1);
-    else num[end] *= 2;
+    fermata_lengthen(&num[end], &denom[end]); /* [RK] 2026-11-20 */
     /* the length added, already in the units of num[]/denom[] */
     addfract(&v->fermata_num, &v->fermata_denom,
              num[end]*d0 - n0*denom[end], denom[end]*d0); /* [RK] 2026-11-14 */

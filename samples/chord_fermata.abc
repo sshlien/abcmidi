@@ -4,7 +4,8 @@
 % not played when the note was not the first one of the chord, when the
 % chord had a length after its ], or on the other notes of a chord that
 % starts with a rest.  Tune 2 plays chords with %%MIDI fermatafixed, which
-% lengthens them by one unit length, here an eighth note.
+% lengthens them by one unit length, here an eighth note.  The chords with a
+% length after their ], such as [Hce]2, were lengthened by a quarter note.
 X:1
 T:Fermatas in chords
 C:abc2midi test
@@ -23,4 +24,5 @@ L:1/8
 Q:1/4=120
 K:C
 %%MIDI fermatafixed
-[Hc2e2] c2 d2 e2 |[c2He2] c2 d2 e2 |H[c2e2] c2 d2 e2 |Hc2 c2 d2 e2 |]
+[Hc2e2] c2 d2 e2 |[c2He2] c2 d2 e2 |H[c2e2] c2 d2 e2 |Hc2 c2 d2 e2 |
+[Hce]2 c2 d2 e2 |[cHe]2 c2 d2 e2 |H[ce]2 c2 d2 e2 |]
