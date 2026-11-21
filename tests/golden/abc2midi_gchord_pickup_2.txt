@@ -36,8 +36,8 @@ Time=0  Meta Text, type=0x01 (Text Event)  leng=3
 Time=0  Meta Text, type=0x01 (Text Event)  leng=15
      Text = <C:abc2midi test>
 Time=1  Note on, chan=2 pitch=36 vol=80
+Time=481  Note off, chan=2 pitch=36 vol=0
 Time=481  Note on, chan=2 pitch=36 vol=80
-Time=950  Note off, chan=2 pitch=36 vol=0
 Time=1440  Note off, chan=2 pitch=36 vol=0
 Time=1441  Note on, chan=3 pitch=48 vol=75
 Time=1441  Note on, chan=3 pitch=52 vol=75
@@ -71,8 +71,8 @@ Time=0  Meta Text, type=0x01 (Text Event)  leng=3
 Time=0  Meta Text, type=0x01 (Text Event)  leng=15
      Text = <C:abc2midi test>
 Time=1  Note on, chan=10 pitch=35 vol=80
+Time=481  Note off, chan=10 pitch=35 vol=0
 Time=481  Note on, chan=10 pitch=35 vol=80
-Time=1910  Note off, chan=10 pitch=35 vol=0
 Time=2400  Note off, chan=10 pitch=35 vol=0
 Time=2401  Note on, chan=10 pitch=35 vol=80
 Time=4320  Note off, chan=10 pitch=35 vol=0

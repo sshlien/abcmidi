@@ -575,6 +575,7 @@ static void checkbar(int pass)
   if (gchordson) {
     if (gchordbars < 2) { /* [SS] 2018-06-23 */
       g_ptr = 0;
+      end_sequence_notes(); /* [RK] 2026-11-21 */
       }
     remove_sequence_requests(); /* [RK] 2026-11-21 */
     addtoQ(0, g_denom, -1, g_ptr ,0, 0); /* [SS] 2018-06-23 */
@@ -582,6 +583,7 @@ static void checkbar(int pass)
   if (drumson) {
     if (drumbars < 2) { /* [SS] 2018-06-23 */
        drum_ptr = 0;
+       end_sequence_notes(); /* [RK] 2026-11-21 */
        }
     remove_sequence_requests(); /* [RK] 2026-11-21 */
     addtoQ(0, drum_denom, -1, drum_ptr,0, 0); /* [SS] 2018-06-23 */

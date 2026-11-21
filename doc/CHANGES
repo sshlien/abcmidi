@@ -16596,3 +16596,14 @@ one element played its first chord twice.
 Fixes issue #96.  New golden tests abc2midi_gchord_pickup and
 abc2midi_gchord_pickup_2 (samples/gchord_pickup.abc); the chords of
 the golden test abc2midi_chordname_long are played once.
+
+abc2midi: the notes of a gchord or drum string played in a pickup end
+on the bar line that restarts the string.  When the pickup is shorter
+than the element of the string played last, its notes sounded over the
+first element of the next bar, and their note off ended the notes of
+the same pitch that this element started, so that the first bass note
+of "C"G2|"C"c8| with %%MIDI gchord fc lasted about a quarter note
+instead of a half note.  checkbar() (genmidi.c) ends them with the new
+end_sequence_notes() (queues.c).  The golden tests
+abc2midi_gchord_pickup and abc2midi_gchord_pickup_2 get these note
+offs.

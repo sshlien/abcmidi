@@ -178,6 +178,42 @@ void remove_sequence_requests()
   };
 }
 
+void end_sequence_notes()
+/* End now the notes of a gchord or drum track that are still sounding,
+ * without changing the time of the other entries of the queue.  Called
+ * at a bar line that restarts the sequence: after a bar shorter than
+ * the sequence, as a pickup, the notes of the element played last
+ * would otherwise sound over the first element of the next bar, and
+ * their note off would end the notes of the same pitch that this
+ * element starts.  The notes due to end at the bar line are left to
+ * timestep().  [RK] 2026-11-21 */
+{
+  int *ptr;
+  int i;
+  int time;
+
+  ptr = &Qhead;
+  time = 0;
+  while (*ptr != -1) {
+    i = *ptr;
+    time = time + Q[i].delay;
+    if ((Q[i].pitch != -1) && (time > 0)) {
+      midi_noteoff(delta_time, Q[i].pitch, Q[i].chan);
+      tracklen = tracklen + delta_time;
+      delta_time = 0L;
+      time = time - Q[i].delay;
+      if (Q[i].next != -1) {
+        Q[Q[i].next].delay = Q[Q[i].next].delay + Q[i].delay;
+      };
+      *ptr = Q[i].next;
+      Q[i].next = freehead;
+      freehead = i;
+    } else {
+      ptr = &Q[i].next;
+    };
+  };
+}
+
 void clearQ()
 {
   int time;
