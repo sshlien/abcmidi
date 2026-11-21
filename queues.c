@@ -150,6 +150,34 @@ void removefromQ(int i)
   };
 }
 
+void remove_sequence_requests()
+/* Remove from the queue the requests to play the next element of the
+ * gchord or drum sequence (pitch -1), without changing the time of the
+ * other entries.  Called before the sequence is restarted: a request
+ * queued for the sequence before a bar line shorter than its first
+ * element, as a pickup, is still pending after the bar line, and
+ * progress_sequence() would play the element it names too early.
+ * [RK] 2026-11-21 */
+{
+  int *ptr;
+  int i;
+
+  ptr = &Qhead;
+  while (*ptr != -1) {
+    i = *ptr;
+    if (Q[i].pitch == -1) {
+      if (Q[i].next != -1) {
+        Q[Q[i].next].delay = Q[Q[i].next].delay + Q[i].delay;
+      };
+      *ptr = Q[i].next;
+      Q[i].next = freehead;
+      freehead = i;
+    } else {
+      ptr = &Q[i].next;
+    };
+  };
+}
+
 void clearQ()
 {
   int time;

@@ -1,0 +1,32 @@
+% The gchord and drum strings start on the bar line that follows a pickup
+% (GitHub issue #96).  After a pickup shorter than the first element of a
+% string, abc2midi played the second element of the first full bar early,
+% and the other elements of this bar with the same shift.
+% - Tune 1: 6/8 with a pickup of one eighth, and strings of four elements
+%   of a dotted eighth.
+% - Tune 2: 4/4 with a pickup of one quarter, a gchord string of two
+%   elements of a half note and a drum string of one element of a whole
+%   note, which abc2midi played twice at each bar line.
+X:1
+T:Pickup shorter than a gchord unit in 6/8
+C:abc2midi test
+M:6/8
+L:1/8
+Q:3/8=60
+%%MIDI gchord bhcb
+%%MIDI drum dddd 35 38 42 38
+K:C
+%%MIDI drumon
+"C"G|"C"c6|"G"B6|"C"c6|]
+
+X:2
+T:Pickup shorter than a gchord unit in 4/4
+C:abc2midi test
+M:4/4
+L:1/8
+Q:1/4=120
+%%MIDI gchord fc
+%%MIDI drum d 35
+K:C
+%%MIDI drumon
+"C"G2|"C"c8|"G"B8|"C"c8|]

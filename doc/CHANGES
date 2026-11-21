@@ -16574,3 +16574,25 @@ lyrics of another line, reported a "Line of music without lyrics" and
 wrote none of the lyrics of the voice.  Fixes issue #85.  New golden
 tests abc2midi_lyrics_parts and abc2midi_lyrics_parts_2
 (samples/lyrics_parts.abc).
+
+
+November 21 2026 [RK]
+
+abc2midi: the gchord and drum strings start on the bar line that
+follows a pickup shorter than their first element, as "C"G|"C"c6| in
+6/8 with %%MIDI gchord bhcb.  dogchords() and dodrums() (genmidi.c)
+play an element of the string and queue a request for the next one,
+which checkbar() did not remove when it restarted the string at the
+bar line: the request queued in the pickup played the second element
+of the next bar early, and the other elements of this bar followed
+with the same shift.  checkbar() and the %%MIDI gchordbars and
+drumbars commands now remove the pending requests with the new
+remove_sequence_requests() (queues.c) before they queue their own.
+checkbar() also queued two requests for a drum string, so that a drum
+string of one element played twice at each bar line, and the || that
+scan_for_missing_repeats() (store.c) puts at the start of the music
+added a request to that of starttrack(), so that a gchord string of
+one element played its first chord twice.
+Fixes issue #96.  New golden tests abc2midi_gchord_pickup and
+abc2midi_gchord_pickup_2 (samples/gchord_pickup.abc); the chords of
+the golden test abc2midi_chordname_long are played once.

@@ -556,6 +556,19 @@ add_golden_test(
   TUNE          2
 )
 
+# Regression test for GitHub issue #96: the gchord and drum strings start on
+# the bar line that follows a pickup shorter than their first element (see
+# samples/gchord_pickup.abc).  The second element of the first full bar was
+# played early, and the other elements of this bar with the same shift.  In
+# tune 2, the drum string of one element was played twice at each bar line.
+add_golden_test(TYPE abc2midi SAMPLE gchord_pickup.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        gchord_pickup.abc
+  NAME          abc2midi_gchord_pickup_2
+  TUNE          2
+)
+
 # --- Exit-status tests ---
 #
 # These pin abc2midi's exit status, and optionally its messages, for given
