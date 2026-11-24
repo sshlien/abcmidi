@@ -459,6 +459,19 @@ add_golden_test(
   TUNE          2
 )
 
+# Regression test for a fermata on one note of a chord, as in [Hce] or
+# [cHe]: it lengthens the whole chord, as H[ce] does (see
+# samples/chord_fermata.abc).  Only that note was lengthened, which gave
+# "unequal notes in chord" or lost the fermata.  Tune 2 has %%MIDI
+# fermatafixed.
+add_golden_test(TYPE abc2midi SAMPLE chord_fermata.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        chord_fermata.abc
+  NAME          abc2midi_chord_fermata_2
+  TUNE          2
+)
+
 # Regression test for %%MIDI ratio with an odd sum, such as 3 2 in the file
 # header (tune 1) and 8 7 in the body of tune 2 (see
 # samples/broken_ratio.abc): the notes of c>d last 6/5 and 4/5 of an eighth
