@@ -451,6 +451,22 @@ add_golden_test(TYPE abc2abc SAMPLE decoration_space.abc)
 # of tune 2, such as the H of "H|", were dropped.
 add_golden_test(TYPE abc2abc SAMPLE decoration_bar_line.abc)
 
+# Regression test for GitHub issue #84: a shorthand decoration may be
+# followed by a chord symbol, an annotation, a decoration such as !p!, a
+# slur, grace notes or a y spacer, as in O "D" C (see
+# samples/decoration_annotation.abc).  It was a "Malformed note".  The
+# decorations before grace notes go to the note after them, and those of
+# a y spacer to no note.  Tune 2 is the same music in the order of the
+# abc standard.  abc2abc writes the decorations in this order.
+add_golden_test(TYPE abc2midi SAMPLE decoration_annotation.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        decoration_annotation.abc
+  NAME          abc2midi_decoration_annotation_2
+  TUNE          2
+)
+add_golden_test(TYPE abc2abc SAMPLE decoration_annotation.abc)
+
 # Regression test for the bar check of a bar with fermatas: it counts the
 # length written in the bar, not the longer one that the fermatas give to
 # its notes, rests and chords (see samples/fermata_bars.abc), which made

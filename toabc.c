@@ -21,7 +21,7 @@
 
 /* back-end for outputting (possibly modified) abc */
 
-#define VERSION "2.28 November 20 2026 abc2abc"
+#define VERSION "2.29 November 20 2026 abc2abc"
 
 /* for Microsoft Visual C++ 6.0 or higher */
 #ifdef _MSC_VER
@@ -1821,7 +1821,8 @@ void event_bar(int type, char *replist)
 }
 
 void event_bar_decorations(int decorators[DECSIZE])
-/* shorthand decorations of the bar line that follows [RK] 2026-11-18 */
+/* shorthand decorations of the bar line that follows [RK] 2026-11-18,
+   or of a y spacer [RK] 2026-11-20 */
 {
   int t;
 

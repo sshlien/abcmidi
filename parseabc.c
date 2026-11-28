@@ -106,6 +106,10 @@ int voicenum; /* current voice number */
 int has_voice_fields = 0;
 
 int decorators_passback[DECSIZE];
+/* the decorations put before grace notes, as in H {g}c or !trill!{g}c,
+   are those of the note after them: parsemusic() sets them aside at the
+   { and passes them back at the } */
+static int decorators_aftergrace[DECSIZE]; /* [RK] 2026-11-20 */
 /* this global array is linked as an external to store.c and 
  * yaps.tree.c and is used to pass back decorator information
  * from event_instruction to parsenote.
@@ -1778,10 +1782,25 @@ parsenote (char **s)
       skipspace (s); /* [RK] 2026-11-14 */
     };
   /* Decorations may also be applied to bar lines, as in "H|" or "T :|".
-     The bar line itself is left to parsemusic(). [RK] 2026-11-18 */
-  if ((**s == '|') || (**s == ':') || ((**s == '[') && (*(*s + 1) == '|')))
+     The bar line itself is left to parsemusic(). [RK] 2026-11-18
+     So may they to the y spacer, as in "H y", to be typeset between
+     notes (section 4.14 of the abc standard). [RK] 2026-11-20 */
+  if ((**s == '|') || (**s == ':') || ((**s == '[') && (*(*s + 1) == '|'))
+      || (**s == 'y')) /* [RK] 2026-11-20 */
     {
       event_bar_decorations (decorators);
+      return;
+    };
+  /* A chord symbol, an annotation, a decoration such as !p!, the start
+     of a slur or grace notes may follow, as in O "D" C, H (CE) or
+     H {g}c: these decorations go to the note, rest or chord after them,
+     which parsemusic() reads next, as the !...! decorations do, or to a
+     y spacer. [RK] 2026-11-20 */
+  if ((**s == '"') || (**s == '!') || (**s == '(') || (**s == '{')
+      || ((**s == '+') && !oldchordconvention))
+    {
+      for (i = 0; i < DECSIZE; i++)
+        decorators_passback[i] = decorators[i];
       return;
     };
   /*check for decorated chord */
@@ -3133,11 +3152,21 @@ parsemusic (char *field)
 	      p = p + 1;
 	      event_graceon ();
 	      ingrace = 1;
+              for (i = 0; i < DECSIZE; i++) /* [RK] 2026-11-20 */
+                {
+                  decorators_aftergrace[i] |= decorators_passback[i];
+                  decorators_passback[i] = 0;
+                };
 	      break;
 	    case '}':
 	      p = p + 1;
 	      event_graceoff ();
 	      ingrace = 0;
+              for (i = 0; i < DECSIZE; i++) /* [RK] 2026-11-20 */
+                {
+                  decorators_passback[i] |= decorators_aftergrace[i];
+                  decorators_aftergrace[i] = 0;
+                };
 	      break;
 	    case '[':
 	      p = p + 1;
@@ -3171,6 +3200,11 @@ parsemusic (char *field)
 			    chorddecorators[i] =
 			      decorators[i] | decorators_passback[i];
 			  event_chordon (chorddecorators);
+                          /* abc2abc writes the decorations of a chord before
+                             it, not on its notes [RK] 2026-11-20 */
+                          if (fileprogram == ABC2ABC)
+                            for (i = 0; i < DECSIZE; i++)
+                              decorators_passback[i] = 0;
 			  parserinchord = 1;
 			};
 		    };
@@ -3247,6 +3281,12 @@ parsemusic (char *field)
 
 		p = p + 1;
 		readlen (&n, &m, &p);
+                /* the decorations before y, such as the !fermata! of
+                   "!fermata! y" or the H of H "C" y, are those of the
+                   spacer, not of the next note [RK] 2026-11-20 */
+                event_bar_decorations (decorators_passback);
+                for (i = 0; i < DECSIZE; i++)
+                  decorators_passback[i] = 0;
 		event_spacing (n, m);
 		break;
 	      };
