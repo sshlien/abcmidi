@@ -531,6 +531,19 @@ add_golden_test(
   TUNE          2
 )
 
+# Regression test for GitHub issue #85: the lyrics of a voice other than
+# the first one, in a tune with a P: play order (see
+# samples/lyrics_parts.abc).  abc2midi reported a "Line of music without
+# lyrics" and wrote none of them.  In part B, voice K has a line of rests
+# in tune 1 and notes with lyrics in tune 2.
+add_golden_test(TYPE abc2midi SAMPLE lyrics_parts.abc)
+add_golden_test(
+  TYPE          abc2midi
+  SAMPLE        lyrics_parts.abc
+  NAME          abc2midi_lyrics_parts_2
+  TUNE          2
+)
+
 # Regression test for GitHub issue #80: a dotted tie, as in C.-C, plays as a
 # tie, and a dotted slur as a slur (see samples/dotted_tie.abc).  The dotted
 # tie was a "Malformed note".  Tune 2 is the same music with plain ties and
