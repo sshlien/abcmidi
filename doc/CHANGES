@@ -16516,15 +16516,26 @@ samples/voice_no_clef.abc, run by the tests abc2midi_clean_voice_no_clef,
 abc2abc_sample_voice_no_clef, yaps_sample_voice_no_clef and
 abcmatch_sample_voice_no_clef, which the valgrind preset checks.
 
-abc2midi: a broken rhythm applies to the written lengths of a note,
-rest or chord with a fermata, as in Hc>d or [Hce]>d, and the fermata to
-the lengths that the broken rhythm gives.  brokenadjust() (store.c)
-compared the lengths with the fermata, so that Hc>d or c>Hd was "Cannot
-apply broken rhythm" and played without it, and multiplied the length
-that the fermata added without counting this change for the bar check,
-so that [Hce]>d e f was reported as too long.  With %%MIDI fermatafixed,
-the fermata now adds one unit length to the new length.  The length that
-a fermata adds is recorded with the last two notes, rests or chords
-(marknote()).  Staccato notes, made of a note and a rest, still cannot
-take a broken rhythm.  New golden tests abc2midi_broken_fermata and
-abc2midi_broken_fermata_2 (samples/broken_fermata.abc).
+abc2midi: a broken rhythm is applied to a note, a rest or a chord that
+has a fermata.  In Hc>d, with L:1/4, c and d are written with the same
+length: the broken rhythm makes them c3/2 and d/2, then the fermata
+doubles c, so that abc2midi now plays c3 d/2.  abc2midi compared the
+lengths after the fermata had doubled c, reported "Cannot apply broken
+rhythm. Notes not equal durations" and played c2 d.  abc2midi now plays
+these examples as follows:
+
+  Hc>d   c3 d/2        c>Hd   c3/2 d        c<Hd   c/2 d3
+  Hc>>d  c7/2 d/4      Hz>d   z3 d/2        Hc>Hd  c3 d
+
+Notes written with different lengths, as in c2>d, are still rejected.
+[Hce]>d e f was already played as [ce]3 d/2 e f, but the bar check did
+not count the change that the broken rhythm makes to the length added
+by the fermata, and reported the bar as 9/2 units long.  With %%MIDI
+fermatafixed, the fermata adds one unit length after the broken rhythm:
+with L:1/8, Hc2>d2 plays as c4 d.  abc2svg also applies the broken
+rhythm to these notes, but plays no fermata.  marknote() and
+brokenadjust() (store.c) record the length that a fermata adds to the
+last two notes.  Staccato notes, played as a note and a rest, still
+cannot take a broken rhythm (issue #94).  New golden tests
+abc2midi_broken_fermata and abc2midi_broken_fermata_2
+(samples/broken_fermata.abc).
