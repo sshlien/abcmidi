@@ -7,7 +7,11 @@
  * adds a note to the list. The unused elements of array Q are held
  * in another linked list pointed to by freehead. The tail is pointed
  * to by freetail. removefromQ() removes an element (always from the
- * head of the list) and adds it to the free list. Qinit() initializes
+ * head of the list) and adds it to the free list.
+ * remove_sequence_requests() removes the requests of the gchord or
+ * drum sequence (pitch -1) from anywhere in the list, and
+ * end_sequence_notes() ends the notes of such a sequence that are still
+ * sounding at a bar line. Qinit() initializes
  * the queue and clearQ() outputs all the remaining notes at the end
  * of a track.
  * Qcheck() and PrintQ() are diagnostic routines.
@@ -23,6 +27,8 @@ extern int div_factor;
 #ifndef KANDR
 void addtoQ(int num, int denom, int pitch, int chan, int effect, int d);
 void removefromQ(int i);
+void remove_sequence_requests(void);
+void end_sequence_notes(void);
 void clearQ(void);
 void printQ(void);
 void advanceQ(int t);
@@ -32,6 +38,8 @@ void timestep(int t, int atend);
 #else
 void addtoQ();
 void removefromQ();
+void remove_sequence_requests();
+void end_sequence_notes();
 void clearQ();
 void printQ();
 void advanceQ();

@@ -570,18 +570,22 @@ static void checkbar(int pass)
   };
   bar_num = 0;
   bar_denom = 1;
-  /* zero place in gchord sequence */
+  /* zero place in gchord sequence; the bar line queues the only
+   * request for the sequence [RK] 2026-11-21 */
   if (gchordson) {
     if (gchordbars < 2) { /* [SS] 2018-06-23 */
       g_ptr = 0;
+      end_sequence_notes(); /* [RK] 2026-11-21 */
       }
+    remove_sequence_requests(); /* [RK] 2026-11-21 */
     addtoQ(0, g_denom, -1, g_ptr ,0, 0); /* [SS] 2018-06-23 */
     };
   if (drumson) {
     if (drumbars < 2) { /* [SS] 2018-06-23 */
        drum_ptr = 0;
-       addtoQ(0, drum_denom, -1, drum_ptr,0, 0);
+       end_sequence_notes(); /* [RK] 2026-11-21 */
        }
+    remove_sequence_requests(); /* [RK] 2026-11-21 */
     addtoQ(0, drum_denom, -1, drum_ptr,0, 0); /* [SS] 2018-06-23 */
   };
 
@@ -2023,6 +2027,7 @@ static void dodeferred(char *s, int noteson)
      if (drumbars < 1 || drumbars > 10) drumbars = 1;
      done = 1;
      drum_ptr = 0; /* [SS] 2018-06-23 */
+     remove_sequence_requests(); /* [RK] 2026-11-21 */
      addtoQ(0,drum_denom,-1,drum_ptr,0,0);
      }
 
@@ -2031,6 +2036,7 @@ static void dodeferred(char *s, int noteson)
      if (gchordbars < 1 || gchordbars > 10) gchordbars = 1;
      done = 1;
      g_ptr = 0; /* [SS] 2018-06-23 */
+     remove_sequence_requests(); /* [RK] 2026-11-21 */
      addtoQ(0, g_denom, -1, g_ptr ,0, 0);
      }
 

@@ -1,0 +1,82 @@
+Header format=1 ntrks=4 division=480
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Tempo, microseconds-per-MIDI-quarter-note=500000
+Time=0  Key signature, sharp/flats=0  minor=0
+Time=0  Time signature=4/4  MIDI-clocks/click=48  32nd-notes/24-MIDI-clocks=8
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=40
+     Text = <Pickup shorter than a gchord unit in 4/4>
+Time=6266  Meta event, end of track
+Track end
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <note track>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:2>
+Time=0  Meta Text, type=0x03 (Sequence/Track Name)  leng=40
+     Text = <Pickup shorter than a gchord unit in 4/4>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=1  Note on, chan=1 pitch=67 vol=105
+Time=480  Note off, chan=1 pitch=67 vol=0
+Time=481  Note on, chan=1 pitch=72 vol=105
+Time=2400  Note off, chan=1 pitch=72 vol=0
+Time=2401  Note on, chan=1 pitch=71 vol=105
+Time=4320  Note off, chan=1 pitch=71 vol=0
+Time=4321  Note on, chan=1 pitch=72 vol=105
+Time=6240  Note off, chan=1 pitch=72 vol=0
+Time=6266  Meta event, end of track
+Track end
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=12
+     Text = <gchord track>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:2>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=1  Note on, chan=2 pitch=36 vol=80
+Time=481  Note off, chan=2 pitch=36 vol=0
+Time=481  Note on, chan=2 pitch=36 vol=80
+Time=1440  Note off, chan=2 pitch=36 vol=0
+Time=1441  Note on, chan=3 pitch=48 vol=75
+Time=1441  Note on, chan=3 pitch=52 vol=75
+Time=1441  Note on, chan=3 pitch=55 vol=75
+Time=2400  Note off, chan=3 pitch=48 vol=0
+Time=2400  Note off, chan=3 pitch=52 vol=0
+Time=2400  Note off, chan=3 pitch=55 vol=0
+Time=2401  Note on, chan=2 pitch=43 vol=80
+Time=3360  Note off, chan=2 pitch=43 vol=0
+Time=3361  Note on, chan=3 pitch=55 vol=75
+Time=3361  Note on, chan=3 pitch=59 vol=75
+Time=3361  Note on, chan=3 pitch=62 vol=75
+Time=4320  Note off, chan=3 pitch=55 vol=0
+Time=4320  Note off, chan=3 pitch=59 vol=0
+Time=4320  Note off, chan=3 pitch=62 vol=0
+Time=4321  Note on, chan=2 pitch=36 vol=80
+Time=5280  Note off, chan=2 pitch=36 vol=0
+Time=5281  Note on, chan=3 pitch=48 vol=75
+Time=5281  Note on, chan=3 pitch=52 vol=75
+Time=5281  Note on, chan=3 pitch=55 vol=75
+Time=6240  Note off, chan=3 pitch=48 vol=0
+Time=6240  Note off, chan=3 pitch=52 vol=0
+Time=6240  Note off, chan=3 pitch=55 vol=0
+Time=6266  Meta event, end of track
+Track end
+Track start
+Time=0  Meta Text, type=0x01 (Text Event)  leng=10
+     Text = <drum track>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=3
+     Text = <X:2>
+Time=0  Meta Text, type=0x01 (Text Event)  leng=15
+     Text = <C:abc2midi test>
+Time=1  Note on, chan=10 pitch=35 vol=80
+Time=481  Note off, chan=10 pitch=35 vol=0
+Time=481  Note on, chan=10 pitch=35 vol=80
+Time=2400  Note off, chan=10 pitch=35 vol=0
+Time=2401  Note on, chan=10 pitch=35 vol=80
+Time=4320  Note off, chan=10 pitch=35 vol=0
+Time=4321  Note on, chan=10 pitch=35 vol=80
+Time=6240  Note off, chan=10 pitch=35 vol=0
+Time=6266  Meta event, end of track
+Track end
