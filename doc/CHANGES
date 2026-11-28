@@ -16507,3 +16507,11 @@ were a note: its loop test (f->type=CHORDNOTE) was an assignment, which
 also turned each of these features into a chord note.  It now gives the
 length to the notes only.  New sample samples/chord_length.abc, run by
 the test yaps_sample_chord_length.
+
+abc2midi, abc2abc, yaps and abcmatch: a V: field with words but no
+clef, such as V:1 name="Melody", no longer reads uninitialised memory.
+parsevoice() (parseabc.c) compared the name of the clef with "tab",
+for a tablature voice, before any clef had set it.  New sample
+samples/voice_no_clef.abc, run by the tests abc2midi_clean_voice_no_clef,
+abc2abc_sample_voice_no_clef, yaps_sample_voice_no_clef and
+abcmatch_sample_voice_no_clef, which the valgrind preset checks.
