@@ -16540,27 +16540,28 @@ cannot take a broken rhythm (issue #94).  New golden tests
 abc2midi_broken_fermata and abc2midi_broken_fermata_2
 (samples/broken_fermata.abc).
 
-abc2midi, abc2abc, yaps and abcmatch: a shorthand decoration may be
-followed by a chord symbol, an annotation or a decoration such as !p!,
-as in O "D" C, with or without white space.  parsenote() (parseabc.c)
-required a note, a rest or a chord after the decorations, and reported
-a "Malformed note".  These decorations now go to the note, rest or
-chord that follows, through decorators_passback, as the !...!
-decorations do.  abc2abc writes them after the chord symbols and
-annotations, the order of the abc standard, and on a chord only before
-it, not on its notes.  Fixes issue #84.  New golden tests
+abc2midi, abc2abc, yaps and abcmatch: a shorthand decoration, such as
+H or O, may be followed by another element written before the note.
+These examples were reported as "Malformed note : expecting a-g or A-G"
+and lost their decoration:
+
+  O "D" C      a chord symbol
+  H "^text" C  an annotation
+  H !p! C      a decoration written !...!
+  H (CE)       the start of a slur
+  H {g}C       grace notes
+  H y          a y spacer
+
+parsenote() (parseabc.c) required a note, a rest or a chord just after
+the shorthand decorations.  Section 4.20 of the abc standard writes the
+grace notes and the chord symbols first, as in "D" OC or {g}HC, which
+were accepted, and abc2svg accepts both orders.  The decorations now go
+to the note, rest or chord that follows, as the !...! decorations do,
+through decorators_passback.  abc2abc, which dropped them, writes them
+in the order of the standard: O "D" C becomes "D" OC.  The decorations
+put before grace notes, shorthand or !...!, are those of the note after
+them, as in abc2svg: !fermata!{g}C lengthens C instead of the grace
+note.  The decorations of a y spacer decorate no note: !fermata! y C no
+longer lengthens C.  Fixes issue #84.  New golden tests
 abc2midi_decoration_annotation, abc2midi_decoration_annotation_2 and
 abc2abc_decoration_annotation (samples/decoration_annotation.abc).
-
-abc2midi, abc2abc, yaps and abcmatch: a shorthand decoration may also
-be followed by a slur, as in H (CE), by grace notes, as in H {g}c, or
-by a y spacer, as in H y, which were also a "Malformed note".  The
-decorations put before grace notes, shorthand or !...!, are those of
-the note after them, as in abc2svg: parsemusic() sets them aside at the
-{ and passes them back at the }, while !fermata!{g}c lengthened the
-grace note.  The decorations of a y spacer, as in !fermata! y c or
-H "C" y c, decorate no note: abc2midi lengthened the c.  abc2abc writes
-them before the y, through event_bar_decorations().  The golden tests
-abc2midi_decoration_annotation, abc2midi_decoration_annotation_2 and
-abc2abc_decoration_annotation (samples/decoration_annotation.abc) get
-these cases.
